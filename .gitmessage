@@ -1,0 +1,19 @@
+# 提交类型: 简短描述（不超过50个字符）
+# |<----  使用最多50个字符  ---->|
+
+# 详细说明（可选）
+# 换行分段，每行不超过72个字符
+# |<----   每行最多72个字符   ---->|
+
+# 提交类型说明：
+# feat:     新功能（feature）
+# fix:      修复bug
+# docs:     文档更新
+# style:    格式调整（不影响代码运行）
+# refactor: 重构（既不是新功能也不是修复bug）
+# test:     添加测试
+# chore:    构建过程或辅助工具的变动
+
+# 🤖 Generated with [Claude Code](https://claude.ai/code)
+#
+# Co-Authored-By: Claude <noreply@anthropic.com>

@@ -59,6 +59,23 @@ Learning materials follow consistent table structure:
 |------|------|------|----------|------|----------|
 ```
 
+## Git配置说明
+
+### Commit消息规范
+项目已配置中文commit消息模板：
+- 使用 `.gitmessage` 作为commit消息模板
+- 支持中文编码（UTF-8）
+- 遵循约定式提交格式：`类型: 简短描述`
+
+### 常用提交类型
+- `feat:` 新功能
+- `fix:` 修复问题
+- `docs:` 文档更新
+- `style:` 格式调整
+- `refactor:` 代码重构
+- `test:` 测试相关
+- `chore:` 工具和配置
+
 ## Development Guidelines
 
 ### Content Creation
