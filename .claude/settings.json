@@ -1,0 +1,9 @@
+{
+  "language": "zh-CN",
+  "output_language": "Chinese",
+  "communication_style": {
+    "primary_language": "中文",
+    "fallback_language": "English for code/technical terms only"
+  },
+  "instructions": "始终使用中文进行交流和回复，除非涉及代码注释或技术术语需要英文表达。"
+}
