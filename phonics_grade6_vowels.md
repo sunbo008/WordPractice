@@ -2,28 +2,52 @@
 
 ## /i:/ 长元音练习
 
-| 序号 | 单词 | 音标 | 中文释义 | 例句 | 例句中文 |
-|------|------|------|----------|------|----------|
-| 1 | see | [siː] | 看见 | I can see a bird. | 我能看见一只鸟。 |
-| 2 | tree | [triː] | 树 | The tree is very tall. | 这棵树很高。 |
-| 3 | green | [ɡriːn] | 绿色的 | I like green apples. | 我喜欢绿苹果。 |
-| 4 | sleep | [sliːp] | 睡觉 | I sleep at nine. | 我九点睡觉。 |
-| 5 | sweet | [swiːt] | 甜的 | This cake is sweet. | 这个蛋糕很甜。 |
-| 6 | three | [θriː] | 三 | I have three books. | 我有三本书。 |
-| 7 | free | [friː] | 自由的，免费的 | The bird is free. | 鸟儿是自由的。 |
-| 8 | sheep | [ʃiːp] | 绵羊 | The sheep is white. | 绵羊是白色的。 |
-| 9 | teeth | [tiːθ] | 牙齿 | Brush your teeth. | 刷牙。 |
-| 10 | deep | [diːp] | 深的 | The river is deep. | 河很深。 |
-| 11 | feel | [fiːl] | 感觉 | I feel happy today. | 我今天感觉很开心。 |
-| 12 | keep | [kiːp] | 保持 | Keep quiet, please. | 请保持安静。 |
-| 13 | meet | [miːt] | 遇见 | Nice to meet you. | 很高兴见到你。 |
-| 14 | need | [niːd] | 需要 | I need some water. | 我需要一些水。 |
-| 15 | week | [wiːk] | 星期 | There are seven days in a week. | 一周有七天。 |
-| 16 | feet | [fiːt] | 脚 | I have two feet. | 我有两只脚。 |
-| 17 | eat | [iːt] | 吃 | Let's eat dinner. | 我们吃晚饭吧。 |
-| 18 | read | [riːd] | 读 | I read books every day. | 我每天读书。 |
-| 19 | sea | [siː] | 海 | The sea is blue. | 海是蓝色的。 |
-| 20 | team | [tiːm] | 队伍 | Our team won the game. | 我们队赢了比赛。 |
+**单词表：**
+
+| 单词 | 音标 | 中文释义 |
+|------|------|----------|
+| see | [siː] | 看见 |
+| tree | [triː] | 树 |
+| green | [ɡriːn] | 绿色的 |
+| sleep | [sliːp] | 睡觉 |
+| sweet | [swiːt] | 甜的 |
+| three | [θriː] | 三 |
+| free | [friː] | 自由的，免费的 |
+| sheep | [ʃiːp] | 绵羊 |
+| teeth | [tiːθ] | 牙齿 |
+| deep | [diːp] | 深的 |
+| feel | [fiːl] | 感觉 |
+| keep | [kiːp] | 保持 |
+| meet | [miːt] | 遇见 |
+| need | [niːd] | 需要 |
+| week | [wiːk] | 星期 |
+| feet | [fiːt] | 脚 |
+| eat | [iːt] | 吃 |
+| read | [riːd] | 读 |
+| sea | [siː] | 海 |
+| team | [tiːm] | 队伍 |
+
+**例句练习：**
+1. I can **see** a bird. (我能看见一只鸟。)
+2. The **tree** is very tall. (这棵树很高。)
+3. I like **green** apples. (我喜欢绿苹果。)
+4. I **sleep** at nine. (我九点睡觉。)
+5. This cake is **sweet**. (这个蛋糕很甜。)
+6. I have **three** books. (我有三本书。)
+7. The bird is **free**. (鸟儿是自由的。)
+8. The **sheep** is white. (绵羊是白色的。)
+9. Brush your **teeth**. (刷牙。)
+10. The river is **deep**. (河很深。)
+11. I **feel** happy today. (我今天感觉很开心。)
+12. **Keep** quiet, please. (请保持安静。)
+13. Nice to **meet** you. (很高兴见到你。)
+14. I **need** some water. (我需要一些水。)
+15. There are seven days in a **week**. (一周有七天。)
+16. I have two **feet**. (我有两只脚。)
+17. Let's **eat** dinner. (我们吃晚饭吧。)
+18. I **read** books every day. (我每天读书。)
+19. The **sea** is blue. (海是蓝色的。)
+20. Our **team** won the game. (我们队赢了比赛。)
 
 ---
 
