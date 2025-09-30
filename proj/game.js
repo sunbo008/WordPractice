@@ -44,6 +44,25 @@ class WordTetrisGame {
         this.gameAreaTop = this.bufferHeight;
         this.gameAreaHeight = this.canvasHeight - this.bufferHeight;
         
+        // 炮管系统
+        this.cannon = {
+            x: this.canvasWidth / 2,
+            y: this.canvasHeight - 30,
+            width: 40,
+            height: 60,
+            angle: -Math.PI / 2, // 初始向上
+            targetAngle: -Math.PI / 2
+        };
+        
+        // 炮弹系统
+        this.bullets = [];
+        
+        // 爆炸效果系统
+        this.explosions = [];
+        
+        // 错误标记系统
+        this.errorMarks = []; // 存储错误红叉标记
+        
         this.init();
     }
 
@@ -385,6 +404,15 @@ class WordTetrisGame {
         // 更新下降单词
         this.updateFallingWords();
         
+        // 更新炮弹
+        this.updateBullets();
+        
+        // 更新爆炸效果
+        this.updateExplosions();
+        
+        // 更新错误标记
+        this.updateErrorMarks();
+        
         // 检查游戏结束条件
         this.checkGameOver();
     }
@@ -454,11 +482,23 @@ class WordTetrisGame {
         // 绘制缓冲区
         this.drawBufferZone();
         
+        // 绘制堆叠单词
+        this.drawStackedWords();
+        
+        // 绘制炮管（在单词之前，这样单词在上层）
+        this.drawCannon();
+        
         // 绘制下降单词
         this.drawFallingWords();
         
-        // 绘制堆叠单词
-        this.drawStackedWords();
+        // 绘制炮弹
+        this.drawBullets();
+        
+        // 绘制爆炸效果
+        this.drawExplosions();
+        
+        // 绘制错误标记
+        this.drawErrorMarks();
         
         // 绘制UI元素
         this.drawGameInfo();
@@ -616,6 +656,95 @@ class WordTetrisGame {
         });
     }
 
+    drawCannon() {
+        if (this.gameState !== 'playing' && this.gameState !== 'review') return;
+        
+        // 更新炮管瞄准角度
+        if (this.fallingWords.length > 0) {
+            const targetWord = this.fallingWords[0];
+            const dx = targetWord.x - this.cannon.x;
+            const dy = targetWord.y - this.cannon.y;
+            this.cannon.targetAngle = Math.atan2(dy, dx) - Math.PI / 2;
+        }
+        
+        // 平滑过渡炮管角度
+        const angleDiff = this.cannon.targetAngle - this.cannon.angle;
+        this.cannon.angle += angleDiff * 0.1;
+        
+        this.ctx.save();
+        this.ctx.translate(this.cannon.x, this.cannon.y);
+        this.ctx.rotate(this.cannon.angle + Math.PI / 2);
+        
+        // 绘制炮管底座
+        this.ctx.fillStyle = '#555555';
+        this.ctx.beginPath();
+        this.ctx.arc(0, 0, 20, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // 绘制炮管
+        this.ctx.fillStyle = '#888888';
+        this.ctx.fillRect(-8, -40, 16, 40);
+        
+        // 炮管边缘高光
+        this.ctx.fillStyle = '#aaaaaa';
+        this.ctx.fillRect(-8, -40, 4, 40);
+        
+        // 炮口
+        this.ctx.fillStyle = '#333333';
+        this.ctx.fillRect(-10, -42, 20, 4);
+        
+        this.ctx.restore();
+    }
+
+    drawBullets() {
+        this.bullets.forEach(bullet => {
+            // 绘制炮弹轨迹（橙色/黄色光束）
+            const gradient = this.ctx.createLinearGradient(
+                bullet.startX, bullet.startY,
+                bullet.x, bullet.y
+            );
+            gradient.addColorStop(0, 'rgba(255, 165, 0, 0.8)');
+            gradient.addColorStop(0.5, 'rgba(255, 215, 0, 1)');
+            gradient.addColorStop(1, 'rgba(255, 255, 0, 0.6)');
+            
+            this.ctx.strokeStyle = gradient;
+            this.ctx.lineWidth = 4;
+            this.ctx.lineCap = 'round';
+            
+            this.ctx.beginPath();
+            this.ctx.moveTo(bullet.startX, bullet.startY);
+            this.ctx.lineTo(bullet.x, bullet.y);
+            this.ctx.stroke();
+            
+            // 绘制炮弹头部（发光效果）
+            const glowGradient = this.ctx.createRadialGradient(
+                bullet.x, bullet.y, 0,
+                bullet.x, bullet.y, 8
+            );
+            glowGradient.addColorStop(0, 'rgba(255, 255, 0, 1)');
+            glowGradient.addColorStop(1, 'rgba(255, 165, 0, 0)');
+            
+            this.ctx.fillStyle = glowGradient;
+            this.ctx.beginPath();
+            this.ctx.arc(bullet.x, bullet.y, 8, 0, Math.PI * 2);
+            this.ctx.fill();
+        });
+    }
+
+    drawExplosions() {
+        this.explosions.forEach(explosion => {
+            explosion.particles.forEach(particle => {
+                if (particle.life > 0) {
+                    const alpha = particle.life / particle.maxLife;
+                    this.ctx.fillStyle = `rgba(${particle.color.r}, ${particle.color.g}, ${particle.color.b}, ${alpha})`;
+                    this.ctx.beginPath();
+                    this.ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+                    this.ctx.fill();
+                }
+            });
+        });
+    }
+
     drawGameInfo() {
         // 绘制游戏状态信息
         if (this.gameState === 'paused') {
@@ -744,7 +873,7 @@ class WordTetrisGame {
     }
 
     updateRealTimeDisplay() {
-        if (this.gameState !== 'playing' || this.fallingWords.length === 0) return;
+        if ((this.gameState !== 'playing' && this.gameState !== 'review') || this.fallingWords.length === 0) return;
         
         const currentInput = document.getElementById('letterInput').value.toUpperCase();
         const currentWord = this.fallingWords[0]; // 假设只有一个下降单词
@@ -769,6 +898,14 @@ class WordTetrisGame {
             currentWord.realTimeDisplay = displayWord;
             currentWord.inputCorrect = isCorrect;
             
+            // 检测错误输入
+            if (!isCorrect && currentInput.length > 0) {
+                // 显示血色红叉并清空输入
+                this.showErrorMark(currentWord, currentInput.length - 1);
+                this.clearInputWithAnimation();
+                return;
+            }
+            
             // 自动射击：当输入完成且正确时自动击落
             if (currentInput.length === expectedLetters.length && isCorrect) {
                 setTimeout(() => {
@@ -784,6 +921,112 @@ class WordTetrisGame {
             currentWord.inputCorrect = null;
             this.updateHtmlPreview('等待输入...', null);
         }
+    }
+
+    showErrorMark(word, errorIndex) {
+        // 计算错误字母的位置
+        const missingIndex = word.missing[errorIndex];
+        const letterWidth = this.ctx.measureText('A').width;
+        const wordX = word.x;
+        const wordY = word.y;
+        
+        // 计算错误字母在单词中的x位置
+        let xOffset = 0;
+        for (let i = 0; i < missingIndex; i++) {
+            xOffset += this.ctx.measureText(word.original[i]).width;
+        }
+        
+        // 创建错误标记
+        const errorMark = {
+            x: wordX + xOffset,
+            y: wordY + word.height / 2,
+            life: 1,
+            maxLife: 1,
+            decay: 0.05,
+            size: 20
+        };
+        
+        this.errorMarks.push(errorMark);
+        
+        // 重置连击和完美等级
+        this.combo = 0;
+        this.perfectLevel = false;
+    }
+
+    clearInputWithAnimation() {
+        const inputElement = document.getElementById('letterInput');
+        
+        // 添加淡出动画
+        inputElement.style.transition = 'opacity 0.3s';
+        inputElement.style.opacity = '0.3';
+        
+        setTimeout(() => {
+            inputElement.value = '';
+            inputElement.style.opacity = '1';
+            
+            // 清除当前单词的实时显示
+            if (this.fallingWords.length > 0) {
+                this.fallingWords[0].realTimeDisplay = null;
+                this.fallingWords[0].inputCorrect = null;
+            }
+            this.updateHtmlPreview('等待输入...', null);
+        }, 300);
+    }
+
+    updateErrorMarks() {
+        for (let i = this.errorMarks.length - 1; i >= 0; i--) {
+            const mark = this.errorMarks[i];
+            mark.life -= mark.decay;
+            
+            if (mark.life <= 0) {
+                this.errorMarks.splice(i, 1);
+            }
+        }
+    }
+
+    drawErrorMarks() {
+        this.errorMarks.forEach(mark => {
+            if (mark.life > 0) {
+                const alpha = mark.life;
+                
+                // 绘制血色红叉
+                this.ctx.save();
+                this.ctx.strokeStyle = `rgba(255, 0, 0, ${alpha})`;
+                this.ctx.lineWidth = 3;
+                this.ctx.lineCap = 'round';
+                
+                const halfSize = mark.size / 2;
+                
+                // X形状
+                this.ctx.beginPath();
+                this.ctx.moveTo(mark.x - halfSize, mark.y - halfSize);
+                this.ctx.lineTo(mark.x + halfSize, mark.y + halfSize);
+                this.ctx.stroke();
+                
+                this.ctx.beginPath();
+                this.ctx.moveTo(mark.x + halfSize, mark.y - halfSize);
+                this.ctx.lineTo(mark.x - halfSize, mark.y + halfSize);
+                this.ctx.stroke();
+                
+                // 闪烁效果
+                if (Math.floor(mark.life * 10) % 2 === 0) {
+                    this.ctx.strokeStyle = `rgba(139, 0, 0, ${alpha})`;
+                    this.ctx.lineWidth = 5;
+                    
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(mark.x - halfSize, mark.y - halfSize);
+                    this.ctx.lineTo(mark.x + halfSize, mark.y + halfSize);
+                    this.ctx.stroke();
+                    
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(mark.x + halfSize, mark.y - halfSize);
+                    this.ctx.lineTo(mark.x - halfSize, mark.y + halfSize);
+                    this.ctx.stroke();
+                }
+                
+                this.ctx.restore();
+            }
+        });
     }
 
     updateHtmlPreview(displayText, isCorrect) {
@@ -806,17 +1049,77 @@ class WordTetrisGame {
     }
 
     autoShoot(word) {
-        if (this.gameState !== 'playing') return;
+        if (this.gameState !== 'playing' && this.gameState !== 'review') return;
         
         // 检查单词是否仍在下降列表中
         const wordIndex = this.fallingWords.indexOf(word);
         if (wordIndex === -1) return;
         
-        // 移除单词
-        this.fallingWords.splice(wordIndex, 1);
+        // 发射炮弹
+        this.shootBullet(word);
+    }
+
+    shootBullet(targetWord) {
+        // 创建炮弹对象
+        const bullet = {
+            startX: this.cannon.x,
+            startY: this.cannon.y - 40,
+            x: this.cannon.x,
+            y: this.cannon.y - 40,
+            targetX: targetWord.x,
+            targetY: targetWord.y + targetWord.height / 2,
+            speed: 15,
+            targetWord: targetWord
+        };
         
-        // 计算分数
+        // 计算炮弹方向
+        const dx = bullet.targetX - bullet.x;
+        const dy = bullet.targetY - bullet.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        bullet.vx = (dx / distance) * bullet.speed;
+        bullet.vy = (dy / distance) * bullet.speed;
+        
+        this.bullets.push(bullet);
+    }
+
+    updateBullets() {
+        for (let i = this.bullets.length - 1; i >= 0; i--) {
+            const bullet = this.bullets[i];
+            
+            // 更新炮弹位置
+            bullet.x += bullet.vx;
+            bullet.y += bullet.vy;
+            
+            // 检查是否击中目标
+            const dx = bullet.x - bullet.targetX;
+            const dy = bullet.y - bullet.targetY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance < 20) {
+                // 击中目标
+                this.bullets.splice(i, 1);
+                this.onBulletHit(bullet.targetWord);
+            } else if (bullet.y < 0 || bullet.y > this.canvasHeight || 
+                       bullet.x < 0 || bullet.x > this.canvasWidth) {
+                // 炮弹飞出屏幕
+                this.bullets.splice(i, 1);
+            }
+        }
+    }
+
+    onBulletHit(word) {
+        // 移除单词
+        const wordIndex = this.fallingWords.indexOf(word);
+        if (wordIndex !== -1) {
+            this.fallingWords.splice(wordIndex, 1);
+        }
+        
+        // 创建爆炸效果
+        this.createExplosion(word.x, word.y + word.height / 2, word.original.length);
+        
+        // 计算分数（包含射击奖励+2分）
         let points = this.calculateScore(word);
+        points += 2; // 射击奖励
         this.score += points;
         this.combo++;
         this.lastHitTime = Date.now();
@@ -842,6 +1145,65 @@ class WordTetrisGame {
         }
         
         this.updateUI();
+    }
+
+    createExplosion(x, y, wordLength) {
+        // 创建多彩粒子爆炸
+        const particleCount = Math.min(50, wordLength * 8);
+        const particles = [];
+        
+        const colors = [
+            { r: 255, g: 69, b: 0 },   // 橙红色
+            { r: 255, g: 215, b: 0 },  // 金色
+            { r: 255, g: 0, b: 0 },    // 红色
+            { r: 255, g: 165, b: 0 },  // 橙色
+            { r: 255, g: 255, b: 0 },  // 黄色
+            { r: 0, g: 255, b: 127 }   // 绿色
+        ];
+        
+        for (let i = 0; i < particleCount; i++) {
+            const angle = (Math.PI * 2 * i) / particleCount;
+            const speed = 2 + Math.random() * 4;
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            
+            particles.push({
+                x: x,
+                y: y,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
+                size: 2 + Math.random() * 3,
+                life: 1,
+                maxLife: 1,
+                decay: 0.02 + Math.random() * 0.02,
+                color: color
+            });
+        }
+        
+        this.explosions.push({
+            particles: particles,
+            life: 1
+        });
+    }
+
+    updateExplosions() {
+        for (let i = this.explosions.length - 1; i >= 0; i--) {
+            const explosion = this.explosions[i];
+            let allDead = true;
+            
+            explosion.particles.forEach(particle => {
+                if (particle.life > 0) {
+                    allDead = false;
+                    particle.x += particle.vx;
+                    particle.y += particle.vy;
+                    particle.vy += 0.1; // 重力
+                    particle.life -= particle.decay;
+                }
+            });
+            
+            if (allDead) {
+                this.explosions.splice(i, 1);
+            }
+        }
     }
 
     giveUpCurrentWord() {
