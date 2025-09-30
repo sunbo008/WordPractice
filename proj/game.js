@@ -60,6 +60,9 @@ class WordTetrisGame {
         // 爆炸效果系统
         this.explosions = [];
         
+        // 中文翻译爆炸动画系统
+        this.meaningExplosions = [];
+        
         // 错误标记系统
         this.errorMarks = []; // 存储错误红叉标记
         
@@ -410,6 +413,9 @@ class WordTetrisGame {
         // 更新爆炸效果
         this.updateExplosions();
         
+        // 更新中文翻译爆炸动画
+        this.updateMeaningExplosions();
+        
         // 更新错误标记
         this.updateErrorMarks();
         
@@ -496,6 +502,9 @@ class WordTetrisGame {
         
         // 绘制爆炸效果
         this.drawExplosions();
+        
+        // 绘制中文翻译爆炸动画（在粒子之上）
+        this.drawMeaningExplosions();
         
         // 绘制错误标记
         this.drawErrorMarks();
@@ -1117,6 +1126,9 @@ class WordTetrisGame {
         // 创建爆炸效果
         this.createExplosion(word.x, word.y + word.height / 2, word.original.length);
         
+        // 创建中文翻译爆炸动画
+        this.createMeaningExplosion(word.x, word.y + word.height / 2, word.meaning, word.original);
+        
         // 计算分数（包含射击奖励+2分）
         let points = this.calculateScore(word);
         points += 2; // 射击奖励
@@ -1204,6 +1216,103 @@ class WordTetrisGame {
                 this.explosions.splice(i, 1);
             }
         }
+    }
+
+    createMeaningExplosion(x, y, meaning, englishWord) {
+        // 创建中文翻译爆炸动画
+        const meaningExplosion = {
+            x: x,
+            y: y,
+            meaning: meaning || '未知',
+            englishWord: englishWord || '',
+            scale: 0.5,        // 从0.5倍开始
+            targetScale: 2.5,  // 放大到2.5倍
+            life: 1,           // 生命周期（1秒）
+            maxLife: 1,
+            phase: 'growing',  // growing（放大阶段）-> showing（显示阶段）-> fading（淡出阶段）
+            displayTime: 0,    // 显示时间计数
+            alpha: 0           // 透明度
+        };
+        
+        this.meaningExplosions.push(meaningExplosion);
+    }
+
+    updateMeaningExplosions() {
+        for (let i = this.meaningExplosions.length - 1; i >= 0; i--) {
+            const explosion = this.meaningExplosions[i];
+            
+            if (explosion.phase === 'growing') {
+                // 放大阶段（0.3秒）
+                explosion.scale += (explosion.targetScale - 0.5) * 0.15;
+                explosion.alpha += 0.1;
+                
+                if (explosion.scale >= explosion.targetScale * 0.95) {
+                    explosion.phase = 'showing';
+                    explosion.alpha = 1;
+                }
+            } else if (explosion.phase === 'showing') {
+                // 显示阶段（1秒）
+                explosion.displayTime += 1/60; // 假设60fps
+                
+                if (explosion.displayTime >= 1.0) {
+                    explosion.phase = 'fading';
+                }
+            } else if (explosion.phase === 'fading') {
+                // 淡出阶段（0.5秒）
+                explosion.alpha -= 0.04;
+                explosion.scale += 0.05; // 继续轻微放大
+                
+                if (explosion.alpha <= 0) {
+                    this.meaningExplosions.splice(i, 1);
+                }
+            }
+        }
+    }
+
+    drawMeaningExplosions() {
+        this.meaningExplosions.forEach(explosion => {
+            if (explosion.alpha > 0) {
+                this.ctx.save();
+                
+                // 移动到爆炸位置
+                this.ctx.translate(explosion.x, explosion.y);
+                
+                // 设置字体和样式
+                const fontSize = 24 * explosion.scale;
+                this.ctx.font = `bold ${fontSize}px "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", sans-serif`;
+                this.ctx.textAlign = 'center';
+                this.ctx.textBaseline = 'middle';
+                
+                // 绘制中文翻译（带描边和发光效果）
+                // 外层发光
+                this.ctx.shadowColor = 'rgba(255, 215, 0, 0.8)';
+                this.ctx.shadowBlur = 20 * explosion.scale;
+                
+                // 描边
+                this.ctx.strokeStyle = `rgba(255, 165, 0, ${explosion.alpha})`;
+                this.ctx.lineWidth = 3 * explosion.scale;
+                this.ctx.strokeText(explosion.meaning, 0, 0);
+                
+                // 填充
+                const gradient = this.ctx.createLinearGradient(0, -fontSize/2, 0, fontSize/2);
+                gradient.addColorStop(0, `rgba(255, 255, 100, ${explosion.alpha})`);
+                gradient.addColorStop(0.5, `rgba(255, 215, 0, ${explosion.alpha})`);
+                gradient.addColorStop(1, `rgba(255, 165, 0, ${explosion.alpha})`);
+                this.ctx.fillStyle = gradient;
+                this.ctx.fillText(explosion.meaning, 0, 0);
+                
+                // 绘制英文单词（小字，在中文下方）
+                if (explosion.scale >= 1.5) {
+                    const englishFontSize = 12 * explosion.scale * 0.6;
+                    this.ctx.font = `${englishFontSize}px Arial`;
+                    this.ctx.fillStyle = `rgba(200, 200, 200, ${explosion.alpha * 0.8})`;
+                    this.ctx.shadowBlur = 5;
+                    this.ctx.fillText(explosion.englishWord, 0, fontSize * 0.6);
+                }
+                
+                this.ctx.restore();
+            }
+        });
     }
 
     giveUpCurrentWord() {
