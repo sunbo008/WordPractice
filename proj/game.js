@@ -140,7 +140,7 @@ class WordTetrisGame {
         document.getElementById('startBtn').addEventListener('click', () => this.startGame());
         document.getElementById('pauseBtn').addEventListener('click', () => this.pauseGame());
         document.getElementById('resetBtn').addEventListener('click', () => this.resetGame());
-        document.getElementById('submitBtn').addEventListener('click', () => this.submitAnswer());
+        // 提交按钮已移除，使用实时输入自动射击机制
         document.getElementById('giveUpBtn').addEventListener('click', () => this.giveUpCurrentWord());
         document.getElementById('reviewBtn').addEventListener('click', () => this.startReviewMode());
         document.getElementById('exportBtn').addEventListener('click', () => this.exportVocabulary());
