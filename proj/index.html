@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Tetris - 单词俄罗斯方块</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="game-container">
+        <!-- 游戏标题 -->
+        <header class="game-header">
+            <h1>Word Tetris</h1>
+            <p>单词俄罗斯方块 - 在游戏中学习英语</p>
+        </header>
+
+        <!-- 游戏信息栏 -->
+        <div class="game-info">
+            <div class="info-item">
+                <span class="label">分数:</span>
+                <span id="score">0</span>
+            </div>
+            <div class="info-item">
+                <span class="label">等级:</span>
+                <span id="level">1</span>
+            </div>
+            <div class="info-item">
+                <span class="label">目标:</span>
+                <span id="target">100</span>
+            </div>
+            <div class="info-item">
+                <span class="label">生词本:</span>
+                <span id="vocabulary-count">0</span>
+            </div>
+            <div class="info-item">
+                <span class="label">时间:</span>
+                <span id="time">00:00</span>
+            </div>
+            <div class="info-item">
+                <span class="label">连击:</span>
+                <span id="combo">0</span>
+            </div>
+        </div>
+
+        <!-- 游戏主体 -->
+        <div class="game-main">
+            <!-- 游戏画布 -->
+            <canvas id="gameCanvas" width="600" height="500"></canvas>
+            
+            <!-- 游戏控制 -->
+            <div class="game-controls">
+                <div class="input-section">
+                    <label for="letterInput">输入缺失字母:</label>
+                    <input type="text" id="letterInput" maxlength="3" placeholder="输入字母">
+                    <button id="submitBtn">提交</button>
+                    <button id="giveUpBtn" class="give-up-btn">放弃 (空格键)</button>
+                    <div id="realTimePreview" class="real-time-preview">实时预览: 等待输入...</div>
+                </div>
+                
+                <div class="control-buttons">
+                    <button id="startBtn">开始游戏</button>
+                    <button id="pauseBtn" disabled>暂停</button>
+                    <button id="resetBtn">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 侧边栏 -->
+        <div class="sidebar">
+            <!-- 缓冲区指示器 -->
+            <div class="buffer-indicator">
+                <h3>单词准备区</h3>
+                <div class="traffic-lights">
+                    <div class="light red" id="redLight"></div>
+                    <div class="light yellow" id="yellowLight"></div>
+                    <div class="light green" id="greenLight"></div>
+                </div>
+                <div id="nextWord">准备中...</div>
+            </div>
+
+            <!-- 生词本 -->
+            <div class="vocabulary-book">
+                <h3>生词本</h3>
+                <div id="vocabularyList">
+                    <p>暂无生词</p>
+                </div>
+                <button id="reviewBtn" disabled>复习生词</button>
+                <button id="exportBtn" disabled>导出生词</button>
+            </div>
+
+            <!-- 游戏说明 -->
+            <div class="game-instructions">
+                <h3>游戏说明</h3>
+                <ul>
+                    <li>单词从上方下降</li>
+                    <li>输入缺失的字母击落单词</li>
+                    <li>未击落的单词会堆叠</li>
+                    <li>堆叠满时游戏结束</li>
+                    <li>达到目标分数升级</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- 游戏结束弹窗 -->
+    <div id="gameOverModal" class="modal">
+        <div class="modal-content">
+            <h2>游戏结束</h2>
+            <p>最终分数: <span id="finalScore">0</span></p>
+            <p>达到等级: <span id="finalLevel">1</span></p>
+            <p>收集生词: <span id="finalVocabulary">0</span> 个</p>
+            <div class="modal-buttons">
+                <button id="restartBtn">重新开始</button>
+                <button id="reviewVocabBtn">查看生词本</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 等级提升弹窗 -->
+    <div id="levelUpModal" class="modal">
+        <div class="modal-content">
+            <h2>🎉 等级提升！</h2>
+            <p>恭喜升到第 <span id="newLevel">2</span> 级！</p>
+            <p>本级收集生词: <span id="levelVocabulary">0</span> 个</p>
+            <div class="modal-buttons">
+                <button id="continueBtn">继续游戏</button>
+                <button id="viewVocabBtn">查看生词</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="vocabulary.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
