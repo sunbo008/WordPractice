@@ -162,6 +162,16 @@ button {
     margin-left: 10px;
 }
 
+.toggle-speech {
+    background: #2196F3;
+    color: white;
+    font-size: 0.9em;
+}
+
+.toggle-speech.disabled {
+    background: #757575;
+}
+
 #pauseBtn {
     background: #ff9800;
     color: white;

@@ -69,7 +69,129 @@ class WordTetrisGame {
         // 错误标记系统
         this.errorMarks = []; // 存储错误红叉标记
         
+        // 语音朗读系统
+        this.speechEnabled = true;
+        this.currentSpeech = null;
+        this.speechTimer = null;
+        this.setupSpeechSynthesis();
+        
         this.init();
+    }
+
+    setupSpeechSynthesis() {
+        // 检查浏览器是否支持语音合成
+        if ('speechSynthesis' in window) {
+            this.speechSynthesis = window.speechSynthesis;
+            
+            // 等待语音列表加载
+            if (this.speechSynthesis.getVoices().length === 0) {
+                this.speechSynthesis.addEventListener('voiceschanged', () => {
+                    this.selectBritishVoice();
+                });
+            } else {
+                this.selectBritishVoice();
+            }
+        } else {
+            console.warn('浏览器不支持语音合成功能');
+            this.speechEnabled = false;
+        }
+    }
+
+    selectBritishVoice() {
+        // 获取所有可用的语音
+        const voices = this.speechSynthesis.getVoices();
+        
+        // 尝试找到英式英语语音
+        this.britishVoice = voices.find(voice => 
+            voice.lang === 'en-GB' || 
+            voice.name.includes('British') || 
+            voice.name.includes('UK') ||
+            voice.name.includes('Daniel') ||
+            voice.name.includes('Kate')
+        );
+        
+        // 如果没有英式语音，使用任何英语语音
+        if (!this.britishVoice) {
+            this.britishVoice = voices.find(voice => 
+                voice.lang.startsWith('en-')
+            );
+        }
+        
+        if (this.britishVoice) {
+            console.log('已选择语音:', this.britishVoice.name, this.britishVoice.lang);
+        } else {
+            console.warn('未找到合适的英语语音');
+        }
+    }
+
+    speakWord(word) {
+        // 检查是否启用语音和是否有可用语音
+        if (!this.speechEnabled || !this.speechSynthesis || !this.britishVoice) {
+            return;
+        }
+
+        // 停止当前正在播放的语音
+        this.stopSpeaking();
+
+        // 创建新的语音合成实例
+        const utterance = new SpeechSynthesisUtterance(word);
+        utterance.voice = this.britishVoice;
+        utterance.lang = 'en-GB';
+        utterance.rate = 0.9; // 稍微慢一点，便于听清
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
+
+        // 播放语音
+        this.currentSpeech = utterance;
+        this.speechSynthesis.speak(utterance);
+
+        console.log('朗读单词:', word);
+    }
+
+    startRepeatedSpeech(word) {
+        // 立即播放第一次
+        this.speakWord(word);
+
+        // 设置定时器，每5秒重复播放
+        this.speechTimer = setInterval(() => {
+            this.speakWord(word);
+        }, 5000); // 5秒 = 5000毫秒
+    }
+
+    stopSpeaking() {
+        // 取消定时器
+        if (this.speechTimer) {
+            clearInterval(this.speechTimer);
+            this.speechTimer = null;
+        }
+
+        // 停止当前语音
+        if (this.speechSynthesis) {
+            this.speechSynthesis.cancel();
+        }
+
+        this.currentSpeech = null;
+    }
+
+    toggleSpeech() {
+        this.speechEnabled = !this.speechEnabled;
+        
+        const btn = document.getElementById('toggleSpeechBtn');
+        if (this.speechEnabled) {
+            btn.textContent = '🔊 语音开';
+            btn.classList.remove('disabled');
+            
+            // 如果有单词在下降且游戏正在进行，重新开始朗读
+            if (this.gameState === 'playing' && this.fallingWords.length > 0) {
+                this.startRepeatedSpeech(this.fallingWords[0].original);
+            }
+        } else {
+            btn.textContent = '🔇 语音关';
+            btn.classList.add('disabled');
+            this.stopSpeaking();
+        }
+        
+        console.log('语音', this.speechEnabled ? '开启' : '关闭');
     }
 
     setupHighDPICanvas() {
@@ -171,6 +293,7 @@ class WordTetrisGame {
         document.getElementById('giveUpBtn').addEventListener('click', () => this.giveUpCurrentWord());
         document.getElementById('reviewBtn').addEventListener('click', () => this.startReviewMode());
         document.getElementById('exportBtn').addEventListener('click', () => this.exportVocabulary());
+        document.getElementById('toggleSpeechBtn').addEventListener('click', () => this.toggleSpeech());
         
         // 弹窗事件
         document.getElementById('restartBtn').addEventListener('click', () => this.restartGame());
@@ -211,13 +334,20 @@ class WordTetrisGame {
     pauseGame() {
         if (this.gameState === 'playing') {
             this.gameState = 'paused';
+            this.stopSpeaking(); // 暂停时停止朗读
         } else if (this.gameState === 'paused') {
             this.gameState = 'playing';
+            // 恢复游戏时，如果有单词在下降，重新开始朗读
+            if (this.fallingWords.length > 0) {
+                this.startRepeatedSpeech(this.fallingWords[0].original);
+            }
         }
         this.updateButtons();
     }
 
     resetGame() {
+        this.stopSpeaking(); // 重置时停止朗读
+        
         this.gameState = 'stopped';
         this.score = 0;
         this.level = 1;
@@ -403,6 +533,9 @@ class WordTetrisGame {
         
         this.fallingWords.push(fallingWord);
         
+        // 开始语音朗读（立即播放，并每5秒重复）
+        this.startRepeatedSpeech(this.nextWord.original);
+        
         // 重置缓冲区
         this.bufferState = 'idle';
         this.bufferTimer = 0;
@@ -457,6 +590,9 @@ class WordTetrisGame {
             
             // 检查是否到达底部
             if (word.y + word.height >= this.canvasHeight) {
+                // 停止语音朗读
+                this.stopSpeaking();
+                
                 // 移到堆叠区 - 标记为失败（非放弃）
                 this.fallingWords.splice(i, 1);
                 word.giveUp = false; // 确保标记为失败而非放弃
@@ -500,6 +636,7 @@ class WordTetrisGame {
     }
 
     gameOver() {
+        this.stopSpeaking(); // 游戏结束时停止朗读
         this.gameState = 'gameOver';
         this.saveGameData(); // 保存最终数据
         this.showGameOverModal();
@@ -1144,6 +1281,9 @@ class WordTetrisGame {
     }
 
     onBulletHit(word) {
+        // 停止语音朗读
+        this.stopSpeaking();
+        
         // 移除单词
         const wordIndex = this.fallingWords.indexOf(word);
         if (wordIndex !== -1) {
@@ -1344,6 +1484,9 @@ class WordTetrisGame {
 
     giveUpCurrentWord() {
         if (this.gameState !== 'playing' || this.fallingWords.length === 0) return;
+        
+        // 停止语音朗读
+        this.stopSpeaking();
         
         const currentWord = this.fallingWords[0];
         
