@@ -5,6 +5,9 @@ class WordTetrisGame {
         this.ctx = this.canvas.getContext('2d');
         this.vocabularyManager = new VocabularyManager();
         
+        // 高清屏适配
+        this.setupHighDPICanvas();
+        
         // 游戏状态
         this.gameState = 'stopped'; // stopped, playing, paused, gameOver
         this.score = 0;
@@ -31,15 +34,15 @@ class WordTetrisGame {
         this.bufferLights = { red: false, yellow: false, green: false };
         
         // 游戏设置
-        this.baseSpeed = 0.2; // 基础速度：5帧1像素 = 0.2像素/帧
+        this.baseSpeed = 1 / 3; // 基础速度：3帧1像素 = 0.333像素/帧
         this.wordSpeed = this.baseSpeed;
         this.spawnRate = 180; // 帧数（3秒）
         this.spawnTimer = 0;
         this.speedMultiplier = 1.0; // 速度倍数
         
-        // 画布设置
-        this.canvasWidth = this.canvas.width;
-        this.canvasHeight = this.canvas.height;
+        // 画布设置（逻辑尺寸）
+        this.canvasWidth = 600;
+        this.canvasHeight = 500;
         this.bufferHeight = 80;
         this.gameAreaTop = this.bufferHeight;
         this.gameAreaHeight = this.canvasHeight - this.bufferHeight;
@@ -67,6 +70,30 @@ class WordTetrisGame {
         this.errorMarks = []; // 存储错误红叉标记
         
         this.init();
+    }
+
+    setupHighDPICanvas() {
+        // 获取设备像素比
+        const dpr = window.devicePixelRatio || 1;
+        
+        // 获取Canvas的显示尺寸（CSS尺寸）
+        const displayWidth = 600;
+        const displayHeight = 500;
+        
+        // 设置Canvas的实际像素尺寸
+        this.canvas.width = displayWidth * dpr;
+        this.canvas.height = displayHeight * dpr;
+        
+        // 设置Canvas的CSS显示尺寸
+        this.canvas.style.width = displayWidth + 'px';
+        this.canvas.style.height = displayHeight + 'px';
+        
+        // 缩放绘图上下文以匹配设备像素比
+        this.ctx.scale(dpr, dpr);
+        
+        // 启用更好的图像平滑
+        this.ctx.imageSmoothingEnabled = true;
+        this.ctx.imageSmoothingQuality = 'high';
     }
 
     init() {
