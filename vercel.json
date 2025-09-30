@@ -1,0 +1,20 @@
+{
+  "version": 2,
+  "name": "word-tetris-game",
+  "builds": [
+    {
+      "src": "proj/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/proj/$1"
+    },
+    {
+      "src": "/",
+      "dest": "/proj/index.html"
+    }
+  ]
+}
