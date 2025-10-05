@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音标专项练习单词测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .phonics-section {
+            margin-bottom: 30px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        .phonics-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .word-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .word-item {
+            background: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 5px;
+            border-left: 4px solid #3498db;
+        }
+        .word {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .phonetic {
+            color: #e74c3c;
+            font-size: 0.9em;
+        }
+        .meaning {
+            color: #27ae60;
+            font-size: 0.9em;
+        }
+        .stats {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .stat-item {
+            display: inline-block;
+            margin-right: 20px;
+            font-weight: bold;
+        }
+        .error {
+            color: #e74c3c;
+            background: #fdf2f2;
+            padding: 10px;
+            border-radius: 5px;
+            border-left: 4px solid #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 音标专项练习单词测试</h1>
+        <p>测试新增的四个重点音标专项练习单词是否正确加载</p>
+        
+        <div id="stats" class="stats">
+            <div class="stat-item">📚 加载状态: <span id="loadStatus">加载中...</span></div>
+            <div class="stat-item">🔢 总单词数: <span id="totalWords">-</span></div>
+            <div class="stat-item">📖 专项课程: <span id="specialLessons">-</span></div>
+        </div>
+
+        <div id="errorMsg" class="error" style="display: none;"></div>
+        
+        <div id="phonicsContainer"></div>
+    </div>
+
+    <script>
+        async function loadAndTestWords() {
+            try {
+                const response = await fetch('./words.json');
+                const data = await response.json();
+                
+                // 更新统计信息
+                document.getElementById('loadStatus').textContent = '✅ 加载成功';
+                document.getElementById('totalWords').textContent = data.metadata.totalWords;
+                
+                // 筛选专项练习课程
+                const specialPhonicsLessons = Object.entries(data.phonicsLessons)
+                    .filter(([key, value]) => key.includes('special_') && key.includes('phonics'));
+                
+                document.getElementById('specialLessons').textContent = specialPhonicsLessons.length;
+                
+                // 显示专项练习单词
+                const container = document.getElementById('phonicsContainer');
+                
+                specialPhonicsLessons.forEach(([lessonKey, lesson]) => {
+                    const section = document.createElement('div');
+                    section.className = 'phonics-section';
+                    
+                    const title = document.createElement('div');
+                    title.className = 'phonics-title';
+                    title.innerHTML = `${lesson.description} (${lesson.phoneme}) - ${lesson.words.length}个单词`;
+                    section.appendChild(title);
+                    
+                    const wordGrid = document.createElement('div');
+                    wordGrid.className = 'word-grid';
+                    
+                    lesson.words.forEach(wordObj => {
+                        const wordItem = document.createElement('div');
+                        wordItem.className = 'word-item';
+                        wordItem.innerHTML = `
+                            <div class="word">${wordObj.word}</div>
+                            <div class="phonetic">${wordObj.phonetic}</div>
+                            <div class="meaning">${wordObj.meaning}</div>
+                        `;
+                        wordGrid.appendChild(wordItem);
+                    });
+                    
+                    section.appendChild(wordGrid);
+                    container.appendChild(section);
+                });
+                
+                console.log('✅ 音标专项练习单词加载成功:', specialPhonicsLessons.length, '个课程');
+                
+            } catch (error) {
+                console.error('❌ 加载失败:', error);
+                document.getElementById('loadStatus').textContent = '❌ 加载失败';
+                document.getElementById('errorMsg').style.display = 'block';
+                document.getElementById('errorMsg').textContent = '错误: ' + error.message;
+            }
+        }
+        
+        // 页面加载时执行测试
+        window.addEventListener('load', loadAndTestWords);
+    </script>
+</body>
+</html>

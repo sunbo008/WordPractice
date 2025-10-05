@@ -352,9 +352,39 @@ class WordTetrisGame {
         
         // 全局键盘事件
         document.addEventListener('keydown', (e) => {
+            // 空格键放弃单词
             if (e.code === 'Space' && this.gameState === 'playing') {
                 e.preventDefault(); // 防止页面滚动
                 this.giveUpCurrentWord();
+                return;
+            }
+            
+            // 等级提升弹窗快捷键
+            if (this.gameState === 'levelup' && (e.code === 'Enter' || e.code === 'Space')) {
+                e.preventDefault();
+                this.continueGame();
+                return;
+            }
+            
+            // 字母输入处理（游戏进行中）
+            if (this.gameState === 'playing' && e.key.match(/^[a-zA-Z]$/)) {
+                e.preventDefault();
+                this.handleLetterInput(e.key.toUpperCase());
+                return;
+            }
+            
+            // Enter键提交答案
+            if (e.code === 'Enter' && this.gameState === 'playing') {
+                e.preventDefault();
+                this.submitAnswer();
+                return;
+            }
+            
+            // Backspace键删除字符
+            if (e.code === 'Backspace' && this.gameState === 'playing') {
+                e.preventDefault();
+                this.handleBackspace();
+                return;
             }
         });
         
@@ -364,12 +394,39 @@ class WordTetrisGame {
             this.updateRealTimeDisplay();
         });
     }
+    
+    // 处理全局字母输入
+    handleLetterInput(letter) {
+        const letterInput = document.getElementById('letterInput');
+        const currentValue = letterInput.value;
+        
+        // 限制最大长度
+        if (currentValue.length < 3) {
+            letterInput.value = currentValue + letter;
+            this.updateRealTimeDisplay();
+        }
+    }
+    
+    // 处理退格键
+    handleBackspace() {
+        const letterInput = document.getElementById('letterInput');
+        const currentValue = letterInput.value;
+        
+        if (currentValue.length > 0) {
+            letterInput.value = currentValue.slice(0, -1);
+            this.updateRealTimeDisplay();
+        }
+    }
 
     startGame() {
         this.gameState = 'playing';
         this.startTime = Date.now();
         this.updateButtons();
         this.startBufferCountdown();
+        
+        // 确保输入框可以接收键盘输入（但不需要焦点）
+        const letterInput = document.getElementById('letterInput');
+        letterInput.blur(); // 移除焦点，让全局键盘事件生效
     }
 
     pauseGame() {
@@ -418,6 +475,18 @@ class WordTetrisGame {
     }
 
     continueGame() {
+        // 清除自动关闭定时器
+        if (this.levelUpAutoCloseTimer) {
+            clearTimeout(this.levelUpAutoCloseTimer);
+            this.levelUpAutoCloseTimer = null;
+        }
+        
+        // 清除倒计时定时器
+        if (this.levelUpCountdownTimer) {
+            clearInterval(this.levelUpCountdownTimer);
+            this.levelUpCountdownTimer = null;
+        }
+        
         this.hideModals();
         this.gameState = 'playing';
     }
@@ -514,7 +583,8 @@ class WordTetrisGame {
         this.combo = 0;
         this.levelWordCount = 0;
         
-        // 显示升级弹窗
+        // 暂停游戏并显示升级弹窗
+        this.gameState = 'levelup';
         this.showLevelUpModal(vocabularyStats.totalWords);
         
         // 清空当前等级生词本
@@ -527,6 +597,11 @@ class WordTetrisGame {
     generateNextWord() {
         // 检查单词库是否已加载
         if (!this.vocabularyManager.isLoaded) {
+            // 如果有加载错误，不再重试
+            if (this.vocabularyManager.loadError) {
+                console.error('单词库加载失败，停止生成单词');
+                return;
+            }
             console.log('等待单词库加载...');
             // 延迟重试
             setTimeout(() => this.generateNextWord(), 100);
@@ -1604,6 +1679,43 @@ class WordTetrisGame {
         document.getElementById('newLevel').textContent = this.level;
         document.getElementById('levelVocabulary').textContent = vocabularyCount;
         document.getElementById('levelUpModal').style.display = 'block';
+        
+        // 5秒后自动关闭弹窗
+        this.levelUpAutoCloseTimer = setTimeout(() => {
+            this.continueGame();
+        }, 5000);
+        
+        // 添加键盘快捷键提示
+        const modalContent = document.querySelector('#levelUpModal .modal-content');
+        let keyboardHint = modalContent.querySelector('.keyboard-hint');
+        if (!keyboardHint) {
+            keyboardHint = document.createElement('p');
+            keyboardHint.className = 'keyboard-hint';
+            keyboardHint.style.fontSize = '14px';
+            keyboardHint.style.color = '#666';
+            keyboardHint.style.marginTop = '10px';
+            modalContent.insertBefore(keyboardHint, modalContent.querySelector('.modal-buttons'));
+        }
+        keyboardHint.textContent = '按 Enter 或 Space 继续游戏 (5秒后自动继续)';
+        
+        // 开始倒计时显示
+        this.startLevelUpCountdown();
+    }
+    
+    startLevelUpCountdown() {
+        let countdown = 5;
+        const keyboardHint = document.querySelector('#levelUpModal .keyboard-hint');
+        
+        this.levelUpCountdownTimer = setInterval(() => {
+            countdown--;
+            if (countdown > 0) {
+                keyboardHint.textContent = `按 Enter 或 Space 继续游戏 (${countdown}秒后自动继续)`;
+            } else {
+                keyboardHint.textContent = '自动继续游戏...';
+                clearInterval(this.levelUpCountdownTimer);
+                this.levelUpCountdownTimer = null;
+            }
+        }, 1000);
     }
 
     showVocabularyBook() {

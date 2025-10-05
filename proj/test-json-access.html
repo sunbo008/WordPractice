@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON访问测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .test-button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #2980b9;
+        }
+        .code-block {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 JSON访问测试</h1>
+        <p>测试 words.json 文件是否可以正常访问</p>
+        
+        <div id="status" class="status warning">准备测试...</div>
+        
+        <button class="test-button" onclick="testJsonAccess()">测试JSON访问</button>
+        <button class="test-button" onclick="testWithFullPath()">测试完整路径</button>
+        <button class="test-button" onclick="testServerInfo()">显示服务器信息</button>
+        
+        <div id="results"></div>
+        
+        <div class="code-block">
+<strong>当前页面URL:</strong> <span id="currentUrl"></span>
+<strong>预期JSON路径:</strong> <span id="expectedPath"></span>
+<strong>测试时间:</strong> <span id="testTime"></span>
+        </div>
+    </div>
+
+    <script>
+        function updateStatus(message, type = 'warning') {
+            const statusElement = document.getElementById('status');
+            statusElement.textContent = message;
+            statusElement.className = `status ${type}`;
+        }
+        
+        function updateResults(content) {
+            document.getElementById('results').innerHTML = content;
+        }
+        
+        function updateInfo() {
+            document.getElementById('currentUrl').textContent = window.location.href;
+            document.getElementById('expectedPath').textContent = new URL('./words.json', window.location.href).href;
+            document.getElementById('testTime').textContent = new Date().toLocaleString();
+        }
+        
+        async function testJsonAccess() {
+            updateStatus('正在测试JSON访问...', 'warning');
+            updateInfo();
+            
+            try {
+                console.log('开始测试 words.json 访问...');
+                
+                const response = await fetch('./words.json');
+                console.log('Response status:', response.status);
+                console.log('Response headers:', [...response.headers.entries()]);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log('JSON数据加载成功:', data.metadata);
+                
+                updateStatus(`✅ JSON访问成功！版本: ${data.metadata.version}`, 'success');
+                updateResults(`
+                    <div class="code-block">
+<strong>✅ 测试结果：成功</strong>
+HTTP状态: ${response.status} ${response.statusText}
+Content-Type: ${response.headers.get('content-type')}
+文件大小: ${response.headers.get('content-length')} bytes
+单词总数: ${data.metadata.totalWords}
+版本: ${data.metadata.version}
+                    </div>
+                `);
+                
+            } catch (error) {
+                console.error('JSON访问失败:', error);
+                updateStatus(`❌ JSON访问失败: ${error.message}`, 'error');
+                updateResults(`
+                    <div class="code-block">
+<strong>❌ 测试结果：失败</strong>
+错误类型: ${error.constructor.name}
+错误消息: ${error.message}
+错误堆栈: ${error.stack}
+                    </div>
+                `);
+            }
+        }
+        
+        async function testWithFullPath() {
+            updateStatus('测试完整路径访问...', 'warning');
+            
+            const fullPath = new URL('./words.json', window.location.href).href;
+            
+            try {
+                const response = await fetch(fullPath);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                updateStatus(`✅ 完整路径访问成功！`, 'success');
+                updateResults(`
+                    <div class="code-block">
+<strong>✅ 完整路径测试：成功</strong>
+访问路径: ${fullPath}
+HTTP状态: ${response.status}
+单词总数: ${data.metadata.totalWords}
+                    </div>
+                `);
+                
+            } catch (error) {
+                updateStatus(`❌ 完整路径访问失败: ${error.message}`, 'error');
+                updateResults(`
+                    <div class="code-block">
+<strong>❌ 完整路径测试：失败</strong>
+访问路径: ${fullPath}
+错误: ${error.message}
+                    </div>
+                `);
+            }
+        }
+        
+        function testServerInfo() {
+            updateInfo();
+            updateResults(`
+                <div class="code-block">
+<strong>🔍 服务器信息诊断</strong>
+
+当前页面协议: ${window.location.protocol}
+当前页面主机: ${window.location.host}
+当前页面路径: ${window.location.pathname}
+当前页面完整URL: ${window.location.href}
+
+预期JSON文件URL: ${new URL('./words.json', window.location.href).href}
+
+<strong>常见问题诊断:</strong>
+1. 如果协议是 file:// - 需要通过HTTP服务器访问
+2. 如果端口不是预期的 - 检查服务器是否在正确端口运行
+3. 如果路径不包含 /proj/ - 可能需要访问 http://localhost:8006/
+                </div>
+            `);
+        }
+        
+        // 页面加载时自动更新信息
+        window.addEventListener('load', () => {
+            updateInfo();
+            // 自动测试
+            setTimeout(testJsonAccess, 1000);
+        });
+    </script>
+</body>
+</html>

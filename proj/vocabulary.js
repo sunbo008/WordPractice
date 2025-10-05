@@ -19,15 +19,18 @@ class VocabularyManager {
     async loadWordsData() {
         try {
             const response = await fetch('./words.json');
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
             this.wordsData = await response.json();
             this.processWordsData();
             this.isLoaded = true;
             console.log('✅ 单词库加载成功:', this.wordsData.metadata);
         } catch (error) {
             console.error('❌ 单词库加载失败:', error);
-            // 使用备用单词库
-            this.loadFallbackWords();
-            this.isLoaded = true;
+            this.loadError = error;
+            this.isLoaded = false;
+            this.showLoadError(error);
         }
     }
     
@@ -59,26 +62,72 @@ class VocabularyManager {
         console.log(`📚 已加载 ${this.allWords.length} 个单词`);
     }
     
-    // 备用单词库（如果JSON加载失败）
-    loadFallbackWords() {
-        console.log('🔄 使用备用单词库');
-        this.allWords = [
-            { word: "cat", meaning: "猫", difficulty: 1 },
-            { word: "dog", meaning: "狗", difficulty: 1 },
-            { word: "sun", meaning: "太阳", difficulty: 1 },
-            { word: "run", meaning: "跑", difficulty: 1 },
-            { word: "fun", meaning: "有趣", difficulty: 1 },
-            { word: "big", meaning: "大的", difficulty: 1 },
-            { word: "red", meaning: "红色", difficulty: 1 },
-            { word: "box", meaning: "盒子", difficulty: 1 },
-            { word: "book", meaning: "书", difficulty: 2 },
-            { word: "tree", meaning: "树", difficulty: 2 },
-            { word: "fish", meaning: "鱼", difficulty: 2 },
-            { word: "bird", meaning: "鸟", difficulty: 2 },
-            { word: "water", meaning: "水", difficulty: 3 },
-            { word: "school", meaning: "学校", difficulty: 3 },
-            { word: "teacher", meaning: "老师", difficulty: 3 }
-        ];
+    // 显示加载错误信息
+    showLoadError(error) {
+        // 创建错误信息元素
+        const errorContainer = document.createElement('div');
+        errorContainer.id = 'wordLoadError';
+        errorContainer.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            font-family: Arial, sans-serif;
+        `;
+        
+        const errorBox = document.createElement('div');
+        errorBox.style.cssText = `
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        `;
+        
+        errorBox.innerHTML = `
+            <h2 style="color: #e74c3c; margin-top: 0;">❌ 单词库加载失败</h2>
+            <p style="color: #333; margin: 20px 0;">
+                无法加载游戏所需的单词库文件 (words.json)
+            </p>
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                <strong>错误详情：</strong><br>
+                <code style="color: #e74c3c;">${error.message}</code>
+            </div>
+            <p style="color: #666; font-size: 14px;">
+                请检查：<br>
+                • 网络连接是否正常<br>
+                • words.json 文件是否存在<br>
+                • 服务器是否正常运行
+            </p>
+            <button onclick="location.reload()" style="
+                background: #3498db;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 16px;
+                margin-top: 20px;
+            ">重新加载页面</button>
+        `;
+        
+        errorContainer.appendChild(errorBox);
+        document.body.appendChild(errorContainer);
+        
+        // 同时在控制台输出详细错误信息
+        console.error('单词库加载失败详情:', {
+            error: error,
+            message: error.message,
+            stack: error.stack,
+            timestamp: new Date().toISOString()
+        });
     }
 
     // 获取指定等级的词汇
@@ -107,8 +156,12 @@ class VocabularyManager {
 
     // 智能选择单词（避免短期重复）
     getRandomWord(level, isEndChallenge = false) {
-        // 检查单词库是否已加载
+        // 检查单词库是否已加载或加载失败
         if (!this.isLoaded) {
+            if (this.loadError) {
+                console.error('单词库加载失败，无法生成单词');
+                return null;
+            }
             console.warn('单词库尚未加载完成，请稍候...');
             return null;
         }

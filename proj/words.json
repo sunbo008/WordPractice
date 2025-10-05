@@ -1,10 +1,16 @@
 {
   "metadata": {
-    "version": "1.0",
+    "version": "1.1",
     "description": "Word Tetris游戏单词库 - 基于phonics_methods学习内容",
-    "source": "phonics_methods 15天学习计划",
-    "totalWords": 75,
-    "lastUpdated": "2025-10-05"
+    "source": "phonics_methods 15天学习计划 + 四个重点音标专项练习",
+    "totalWords": 155,
+    "lastUpdated": "2025-10-05",
+    "newFeatures": [
+      "新增音标/æ/专项练习20个单词",
+      "新增音标/e/专项练习20个单词", 
+      "新增音标/ɔ:/专项练习20个单词",
+      "新增音标/ɒ/专项练习20个单词"
+    ]
   },
   "phonicsLessons": {
     "day1": {
@@ -154,6 +160,110 @@
         {"word": "winter", "phonetic": "[ˈwɪntə]", "meaning": "冬天", "difficulty": 2},
         {"word": "summer", "phonetic": "[ˈsʌmə]", "meaning": "夏天", "difficulty": 2}
       ]
+    },
+    "special_ae_phonics": {
+      "phoneme": "/æ/",
+      "description": "音标/æ/专项练习",
+      "words": [
+        {"word": "cat", "phonetic": "[kæt]", "meaning": "猫", "difficulty": 1},
+        {"word": "hat", "phonetic": "[hæt]", "meaning": "帽子", "difficulty": 1},
+        {"word": "bat", "phonetic": "[bæt]", "meaning": "蝙蝠", "difficulty": 1},
+        {"word": "rat", "phonetic": "[ræt]", "meaning": "老鼠", "difficulty": 1},
+        {"word": "mat", "phonetic": "[mæt]", "meaning": "垫子", "difficulty": 1},
+        {"word": "bag", "phonetic": "[bæg]", "meaning": "包", "difficulty": 1},
+        {"word": "map", "phonetic": "[mæp]", "meaning": "地图", "difficulty": 1},
+        {"word": "cap", "phonetic": "[kæp]", "meaning": "帽子", "difficulty": 1},
+        {"word": "jam", "phonetic": "[dʒæm]", "meaning": "果酱", "difficulty": 1},
+        {"word": "man", "phonetic": "[mæn]", "meaning": "男人", "difficulty": 1},
+        {"word": "bad", "phonetic": "[bæd]", "meaning": "坏的", "difficulty": 1},
+        {"word": "dad", "phonetic": "[dæd]", "meaning": "爸爸", "difficulty": 1},
+        {"word": "sad", "phonetic": "[sæd]", "meaning": "悲伤的", "difficulty": 1},
+        {"word": "mad", "phonetic": "[mæd]", "meaning": "疯狂的", "difficulty": 1},
+        {"word": "glad", "phonetic": "[glæd]", "meaning": "高兴的", "difficulty": 1},
+        {"word": "apple", "phonetic": "[ˈæpəl]", "meaning": "苹果", "difficulty": 2},
+        {"word": "black", "phonetic": "[blæk]", "meaning": "黑色的", "difficulty": 1},
+        {"word": "back", "phonetic": "[bæk]", "meaning": "后面", "difficulty": 1},
+        {"word": "pack", "phonetic": "[pæk]", "meaning": "包装", "difficulty": 1},
+        {"word": "track", "phonetic": "[træk]", "meaning": "轨道", "difficulty": 2}
+      ]
+    },
+    "special_e_phonics": {
+      "phoneme": "/e/",
+      "description": "音标/e/专项练习",
+      "words": [
+        {"word": "bed", "phonetic": "[bed]", "meaning": "床", "difficulty": 1},
+        {"word": "red", "phonetic": "[red]", "meaning": "红色的", "difficulty": 1},
+        {"word": "pen", "phonetic": "[pen]", "meaning": "钢笔", "difficulty": 1},
+        {"word": "ten", "phonetic": "[ten]", "meaning": "十", "difficulty": 1},
+        {"word": "hen", "phonetic": "[hen]", "meaning": "母鸡", "difficulty": 1},
+        {"word": "leg", "phonetic": "[leg]", "meaning": "腿", "difficulty": 1},
+        {"word": "egg", "phonetic": "[eg]", "meaning": "鸡蛋", "difficulty": 1},
+        {"word": "get", "phonetic": "[get]", "meaning": "得到", "difficulty": 1},
+        {"word": "let", "phonetic": "[let]", "meaning": "让", "difficulty": 1},
+        {"word": "set", "phonetic": "[set]", "meaning": "设置", "difficulty": 1},
+        {"word": "yes", "phonetic": "[jes]", "meaning": "是的", "difficulty": 1},
+        {"word": "net", "phonetic": "[net]", "meaning": "网", "difficulty": 1},
+        {"word": "wet", "phonetic": "[wet]", "meaning": "湿的", "difficulty": 1},
+        {"word": "pet", "phonetic": "[pet]", "meaning": "宠物", "difficulty": 1},
+        {"word": "met", "phonetic": "[met]", "meaning": "遇见", "difficulty": 1},
+        {"word": "desk", "phonetic": "[desk]", "meaning": "桌子", "difficulty": 1},
+        {"word": "help", "phonetic": "[help]", "meaning": "帮助", "difficulty": 1},
+        {"word": "step", "phonetic": "[step]", "meaning": "步骤", "difficulty": 1},
+        {"word": "best", "phonetic": "[best]", "meaning": "最好的", "difficulty": 1},
+        {"word": "rest", "phonetic": "[rest]", "meaning": "休息", "difficulty": 1}
+      ]
+    },
+    "special_or_phonics": {
+      "phoneme": "/ɔ:/",
+      "description": "音标/ɔ:/专项练习",
+      "words": [
+        {"word": "door", "phonetic": "[dɔ:]", "meaning": "门", "difficulty": 1},
+        {"word": "more", "phonetic": "[mɔ:]", "meaning": "更多", "difficulty": 1},
+        {"word": "four", "phonetic": "[fɔ:]", "meaning": "四", "difficulty": 1},
+        {"word": "your", "phonetic": "[jɔ:]", "meaning": "你的", "difficulty": 1},
+        {"word": "for", "phonetic": "[fɔ:]", "meaning": "为了", "difficulty": 1},
+        {"word": "floor", "phonetic": "[flɔ:]", "meaning": "地板", "difficulty": 1},
+        {"word": "store", "phonetic": "[stɔ:]", "meaning": "商店", "difficulty": 1},
+        {"word": "score", "phonetic": "[skɔ:]", "meaning": "分数", "difficulty": 1},
+        {"word": "sport", "phonetic": "[spɔ:t]", "meaning": "运动", "difficulty": 1},
+        {"word": "short", "phonetic": "[ʃɔ:t]", "meaning": "短的", "difficulty": 1},
+        {"word": "horse", "phonetic": "[hɔ:s]", "meaning": "马", "difficulty": 1},
+        {"word": "north", "phonetic": "[nɔ:θ]", "meaning": "北方", "difficulty": 1},
+        {"word": "corn", "phonetic": "[kɔ:n]", "meaning": "玉米", "difficulty": 1},
+        {"word": "fork", "phonetic": "[fɔ:k]", "meaning": "叉子", "difficulty": 1},
+        {"word": "born", "phonetic": "[bɔ:n]", "meaning": "出生", "difficulty": 1},
+        {"word": "morning", "phonetic": "[ˈmɔ:nɪŋ]", "meaning": "早晨", "difficulty": 2},
+        {"word": "important", "phonetic": "[ɪmˈpɔ:tənt]", "meaning": "重要的", "difficulty": 3},
+        {"word": "before", "phonetic": "[bɪˈfɔ:]", "meaning": "在...之前", "difficulty": 2},
+        {"word": "order", "phonetic": "[ˈɔ:də]", "meaning": "命令", "difficulty": 2},
+        {"word": "corner", "phonetic": "[ˈkɔ:nə]", "meaning": "角落", "difficulty": 2}
+      ]
+    },
+    "special_o_phonics": {
+      "phoneme": "/ɒ/",
+      "description": "音标/ɒ/专项练习",
+      "words": [
+        {"word": "hot", "phonetic": "[hɒt]", "meaning": "热的", "difficulty": 1},
+        {"word": "not", "phonetic": "[nɒt]", "meaning": "不", "difficulty": 1},
+        {"word": "pot", "phonetic": "[pɒt]", "meaning": "锅", "difficulty": 1},
+        {"word": "got", "phonetic": "[gɒt]", "meaning": "得到", "difficulty": 1},
+        {"word": "lot", "phonetic": "[lɒt]", "meaning": "很多", "difficulty": 1},
+        {"word": "dog", "phonetic": "[dɒg]", "meaning": "狗", "difficulty": 1},
+        {"word": "frog", "phonetic": "[frɒg]", "meaning": "青蛙", "difficulty": 1},
+        {"word": "log", "phonetic": "[lɒg]", "meaning": "木头", "difficulty": 1},
+        {"word": "box", "phonetic": "[bɒks]", "meaning": "盒子", "difficulty": 1},
+        {"word": "fox", "phonetic": "[fɒks]", "meaning": "狐狸", "difficulty": 1},
+        {"word": "stop", "phonetic": "[stɒp]", "meaning": "停止", "difficulty": 1},
+        {"word": "top", "phonetic": "[tɒp]", "meaning": "顶部", "difficulty": 1},
+        {"word": "job", "phonetic": "[dʒɒb]", "meaning": "工作", "difficulty": 1},
+        {"word": "rob", "phonetic": "[rɒb]", "meaning": "抢劫", "difficulty": 1},
+        {"word": "mop", "phonetic": "[mɒp]", "meaning": "拖把", "difficulty": 1},
+        {"word": "orange", "phonetic": "[ˈɒrɪndʒ]", "meaning": "橙子", "difficulty": 2},
+        {"word": "doctor", "phonetic": "[ˈdɒktə]", "meaning": "医生", "difficulty": 2},
+        {"word": "problem", "phonetic": "[ˈprɒbləm]", "meaning": "问题", "difficulty": 2},
+        {"word": "bottle", "phonetic": "[ˈbɒtəl]", "meaning": "瓶子", "difficulty": 2},
+        {"word": "coffee", "phonetic": "[ˈkɒfi]", "meaning": "咖啡", "difficulty": 2}
+      ]
     }
   },
   "gameConfig": {
@@ -181,20 +291,25 @@
       }
     },
     "categories": {
-      "colors": ["red", "green", "blue"],
-      "animals": ["cat", "dog", "bird", "fish"],
-      "family": ["mother", "father", "sister", "brother"],
-      "school": ["teacher", "school", "book", "pen", "paper"],
-      "body": ["arm", "heart"],
-      "nature": ["tree", "sun", "moon", "star", "water"],
-      "actions": ["see", "look", "sleep", "run", "walk", "swim", "work", "help", "turn", "stop"],
-      "objects": ["cup", "bag", "hat", "box", "clock", "door", "ball", "sofa", "camera"],
-      "food": ["banana", "pizza", "milk"],
-      "adjectives": ["big", "hot", "cool", "good", "sweet", "sad", "fun"],
-      "numbers": ["four", "number"],
-      "time": ["winter", "summer"],
-      "places": ["park", "zoo", "school"],
-      "transport": ["car", "bus"]
+      "colors": ["red", "green", "blue", "black", "orange"],
+      "animals": ["cat", "dog", "bird", "fish", "bat", "rat", "hen", "horse", "frog", "fox"],
+      "family": ["mother", "father", "sister", "brother", "man", "dad"],
+      "school": ["teacher", "school", "book", "pen", "paper", "desk", "step"],
+      "body": ["arm", "heart", "leg"],
+      "nature": ["tree", "sun", "moon", "star", "water", "corn"],
+      "actions": ["see", "look", "sleep", "run", "walk", "swim", "work", "help", "turn", "stop", "get", "let", "set", "met", "got", "rest"],
+      "objects": ["cup", "bag", "hat", "box", "clock", "door", "ball", "sofa", "camera", "mat", "map", "cap", "net", "pot", "log", "fork", "bottle", "mop"],
+      "food": ["banana", "pizza", "milk", "jam", "apple", "egg", "orange", "coffee"],
+      "adjectives": ["big", "hot", "cool", "good", "sweet", "sad", "fun", "bad", "mad", "glad", "wet", "best", "short", "important"],
+      "numbers": ["four", "number", "ten"],
+      "time": ["winter", "summer", "morning", "before"],
+      "places": ["park", "zoo", "school", "store", "floor", "north", "corner"],
+      "transport": ["car", "bus"],
+      "clothing": ["hat", "cap"],
+      "professions": ["teacher", "doctor"],
+      "sports": ["sport", "score"],
+      "directions": ["back", "north", "top", "corner"],
+      "common_words": ["yes", "not", "more", "your", "for", "lot"]
     }
   }
 }

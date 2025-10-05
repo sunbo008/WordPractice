@@ -135,6 +135,23 @@ body {
     justify-content: center;
 }
 
+.keyboard-hint {
+    margin-top: 8px;
+    padding: 6px 10px;
+    background: rgba(52, 152, 219, 0.2);
+    border: 1px solid rgba(52, 152, 219, 0.3);
+    border-radius: 5px;
+    font-size: 0.9em;
+    color: #3498db;
+    text-align: center;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.8; }
+    50% { opacity: 1; }
+}
+
 .control-buttons {
     display: flex;
     gap: 10px;

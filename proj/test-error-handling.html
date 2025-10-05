@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>单词库错误处理测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .test-button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #2980b9;
+        }
+        .test-button.danger {
+            background: #e74c3c;
+        }
+        .test-button.danger:hover {
+            background: #c0392b;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .feature-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .feature-list li {
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .feature-list li:before {
+            content: "✅ ";
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .removed-feature {
+            list-style-type: none;
+            padding: 0;
+        }
+        .removed-feature li:before {
+            content: "❌ ";
+            color: #e74c3c;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 单词库错误处理测试</h1>
+        <p>测试移除备用单词库后的错误处理机制</p>
+        
+        <div class="test-section">
+            <h3>📋 功能变更说明</h3>
+            <h4>✅ 新增功能：</h4>
+            <ul class="feature-list">
+                <li>JSON加载失败时显示全屏错误弹窗</li>
+                <li>详细的错误信息显示（HTTP状态码、错误消息等）</li>
+                <li>用户友好的错误提示和解决建议</li>
+                <li>重新加载页面按钮</li>
+                <li>控制台详细错误日志</li>
+                <li>停止无限重试机制</li>
+            </ul>
+            
+            <h4>❌ 移除功能：</h4>
+            <ul class="removed-feature">
+                <li>备用单词库（15个硬编码单词）</li>
+                <li>加载失败时的自动降级机制</li>
+                <li>loadFallbackWords() 函数</li>
+            </ul>
+        </div>
+        
+        <div class="test-section">
+            <h3>🧪 错误场景测试</h3>
+            <div id="testStatus" class="status warning">准备测试...</div>
+            
+            <button class="test-button" onclick="testNormalLoad()">测试正常加载</button>
+            <button class="test-button danger" onclick="testFileNotFound()">模拟文件不存在</button>
+            <button class="test-button danger" onclick="testNetworkError()">模拟网络错误</button>
+            <button class="test-button danger" onclick="testInvalidJSON()">模拟JSON格式错误</button>
+            <button class="test-button" onclick="location.reload()">重新加载页面</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>📝 测试说明</h3>
+            <p><strong>正常情况：</strong></p>
+            <ol>
+                <li>单词库正常加载，游戏可以正常开始</li>
+                <li>控制台显示"✅ 单词库加载成功"</li>
+            </ol>
+            
+            <p><strong>错误情况：</strong></p>
+            <ol>
+                <li>显示全屏错误弹窗，阻止游戏继续</li>
+                <li>显示具体的错误信息和解决建议</li>
+                <li>提供重新加载按钮</li>
+                <li>控制台输出详细错误日志</li>
+                <li>不再使用备用单词库</li>
+            </ol>
+        </div>
+        
+        <div class="test-section">
+            <h3>🎮 实际游戏测试</h3>
+            <p>要测试实际游戏中的错误处理：</p>
+            <ol>
+                <li>重命名 words.json 文件（模拟文件不存在）</li>
+                <li>打开游戏页面：<a href="index.html" target="_blank">Word Tetris 游戏</a></li>
+                <li>观察是否显示错误弹窗而不是使用备用单词库</li>
+                <li>恢复 words.json 文件名并重新加载页面</li>
+            </ol>
+        </div>
+        
+        <div class="test-section">
+            <h3>🔍 错误信息示例</h3>
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 5px;">
+                <strong>可能的错误类型：</strong>
+                <ul>
+                    <li><code>HTTP 404: Not Found</code> - words.json 文件不存在</li>
+                    <li><code>HTTP 500: Internal Server Error</code> - 服务器错误</li>
+                    <li><code>NetworkError</code> - 网络连接问题</li>
+                    <li><code>SyntaxError</code> - JSON 格式错误</li>
+                    <li><code>TypeError</code> - 数据结构错误</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="vocabulary.js"></script>
+    <script>
+        let testVocabularyManager;
+        
+        function updateStatus(message, type = 'warning') {
+            const statusElement = document.getElementById('testStatus');
+            statusElement.textContent = message;
+            statusElement.className = `status ${type}`;
+        }
+        
+        function testNormalLoad() {
+            updateStatus('测试正常加载...', 'warning');
+            
+            // 创建新的VocabularyManager实例
+            testVocabularyManager = new VocabularyManager();
+            
+            // 监听加载结果
+            const checkLoading = setInterval(() => {
+                if (testVocabularyManager.isLoaded) {
+                    clearInterval(checkLoading);
+                    updateStatus(`✅ 正常加载成功！共 ${testVocabularyManager.allWords.length} 个单词`, 'success');
+                } else if (testVocabularyManager.loadError) {
+                    clearInterval(checkLoading);
+                    updateStatus(`❌ 加载失败：${testVocabularyManager.loadError.message}`, 'error');
+                }
+            }, 100);
+            
+            // 超时检查
+            setTimeout(() => {
+                if (!testVocabularyManager.isLoaded && !testVocabularyManager.loadError) {
+                    updateStatus('⏰ 加载超时', 'error');
+                }
+            }, 5000);
+        }
+        
+        function testFileNotFound() {
+            updateStatus('模拟文件不存在错误...', 'warning');
+            alert('要测试文件不存在错误：\n1. 重命名 words.json 为 words.json.bak\n2. 刷新页面\n3. 观察错误弹窗\n4. 恢复文件名');
+        }
+        
+        function testNetworkError() {
+            updateStatus('模拟网络错误...', 'warning');
+            alert('要测试网络错误：\n1. 断开网络连接\n2. 刷新页面\n3. 观察错误弹窗\n4. 恢复网络连接');
+        }
+        
+        function testInvalidJSON() {
+            updateStatus('模拟JSON格式错误...', 'warning');
+            alert('要测试JSON格式错误：\n1. 编辑 words.json，删除一些括号或逗号\n2. 刷新页面\n3. 观察错误弹窗\n4. 恢复正确的JSON格式');
+        }
+        
+        // 页面加载时自动测试正常加载
+        window.addEventListener('load', () => {
+            setTimeout(testNormalLoad, 1000);
+        });
+    </script>
+</body>
+</html>
