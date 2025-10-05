@@ -1,0 +1,80 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "description": "Word Tetris 分布式单词库配置文件",
+    "lastUpdated": "2025-10-05"
+  },
+  "availableLibraries": [
+    {
+      "id": "basic-phonics",
+      "filename": "basic-phonics.json",
+      "name": "基础音标课程",
+      "description": "15天音标学习计划 - 基础元音和辅音",
+      "category": "phonics",
+      "difficulty": "beginner",
+      "totalWords": 80,
+      "enabled": true,
+      "recommended": true,
+      "tags": ["音标", "基础", "元音", "辅音"],
+      "icon": "🔤"
+    },
+    {
+      "id": "special-phonics",
+      "filename": "special-phonics.json",
+      "name": "专项音标练习",
+      "description": "四个重点音标的专项强化练习",
+      "category": "phonics",
+      "difficulty": "intermediate",
+      "totalWords": 80,
+      "enabled": false,
+      "recommended": false,
+      "tags": ["音标", "专项", "强化", "重点"],
+      "icon": "🎯"
+    },
+    {
+      "id": "common-words",
+      "filename": "common-words.json",
+      "name": "常用单词库",
+      "description": "日常生活中最常用的英语单词",
+      "category": "vocabulary",
+      "difficulty": "beginner",
+      "totalWords": 50,
+      "enabled": true,
+      "recommended": true,
+      "tags": ["常用", "基础", "日常", "生活"],
+      "icon": "📚"
+    }
+  ],
+  "defaultConfig": {
+    "enabledLibraries": ["basic-phonics", "common-words"],
+    "maxWords": 200,
+    "difficultyRange": [1, 3],
+    "categories": ["all"]
+  },
+  "categories": [
+    {
+      "id": "phonics",
+      "name": "音标学习",
+      "description": "音标发音和拼读练习",
+      "icon": "🔤"
+    },
+    {
+      "id": "vocabulary",
+      "name": "词汇学习",
+      "description": "常用单词和词汇扩展",
+      "icon": "📚"
+    },
+    {
+      "id": "grammar",
+      "name": "语法学习",
+      "description": "语法规则和句型练习",
+      "icon": "📝"
+    },
+    {
+      "id": "conversation",
+      "name": "对话练习",
+      "description": "日常对话和交流用语",
+      "icon": "💬"
+    }
+  ]
+}

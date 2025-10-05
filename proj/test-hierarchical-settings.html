@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>层级化设置系统测试</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        .test-section h2 {
+            color: #3498db;
+            margin-bottom: 15px;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .status.success { background: #d5f4e6; color: #27ae60; }
+        .status.error { background: #f8d7da; color: #e74c3c; }
+        .status.info { background: #d1ecf1; color: #0c5460; }
+        .category-tree {
+            font-family: monospace;
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            margin-top: 10px;
+        }
+        .category-tree .level1 {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .category-tree .level2 {
+            margin-left: 20px;
+            color: #3498db;
+            margin-bottom: 5px;
+        }
+        .category-tree .level3 {
+            margin-left: 40px;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        .btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: #2980b9;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #3498db;
+        }
+        .stat-label {
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 层级化设置系统测试</h1>
+        
+        <!-- 配置文件测试 -->
+        <div class="test-section">
+            <h2>📋 配置文件结构测试</h2>
+            <div id="config-status" class="status info">正在加载配置文件...</div>
+            <div class="stats-grid" id="config-stats">
+                <!-- 动态生成统计卡片 -->
+            </div>
+            <button class="btn" onclick="testConfigLoading()">重新加载配置</button>
+            <button class="btn" onclick="testConfigStructure()">验证配置结构</button>
+        </div>
+        
+        <!-- 分类树展示 -->
+        <div class="test-section">
+            <h2>🌳 三级分类树结构</h2>
+            <div id="tree-status" class="status info">准备显示分类树...</div>
+            <button class="btn" onclick="displayCategoryTree()">显示完整分类树</button>
+            <div id="category-tree" class="category-tree"></div>
+        </div>
+        
+        <!-- 词库统计 -->
+        <div class="test-section">
+            <h2>📊 词库统计分析</h2>
+            <div id="stats-status" class="status info">准备统计词库信息...</div>
+            <button class="btn" onclick="analyzeVocabularyStats()">分析词库统计</button>
+            <div id="vocab-stats"></div>
+        </div>
+        
+        <!-- 路径验证 -->
+        <div class="test-section">
+            <h2>🔍 文件路径验证</h2>
+            <div id="path-status" class="status info">准备验证文件路径...</div>
+            <button class="btn" onclick="validateFilePaths()">验证所有文件路径</button>
+            <div id="path-results"></div>
+        </div>
+    </div>
+
+    <script>
+        let configData = null;
+        
+        async function testConfigLoading() {
+            try {
+                updateStatus('config-status', '正在加载配置文件...', 'info');
+                
+                const response = await fetch('./words/config-v2.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                configData = await response.json();
+                
+                updateStatus('config-status', '✅ 配置文件加载成功！', 'success');
+                
+                // 显示配置统计
+                displayConfigStats();
+                
+            } catch (error) {
+                updateStatus('config-status', `❌ 加载失败: ${error.message}`, 'error');
+                console.error('配置加载失败:', error);
+            }
+        }
+        
+        function updateStatus(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `status ${type}`;
+        }
+        
+        function displayConfigStats() {
+            const statsGrid = document.getElementById('config-stats');
+            
+            const totalCategories = configData.categories.length;
+            let totalSubcategories = 0;
+            let totalItems = 0;
+            
+            configData.categories.forEach(category => {
+                if (category.subcategories) {
+                    category.subcategories.forEach(sub => {
+                        totalSubcategories++;
+                        if (sub.items) {
+                            totalItems += sub.items.length;
+                        } else {
+                            totalItems++;
+                        }
+                    });
+                }
+            });
+            
+            statsGrid.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-value">${totalCategories}</div>
+                    <div class="stat-label">主分类</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${totalSubcategories}</div>
+                    <div class="stat-label">子分类</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${totalItems}</div>
+                    <div class="stat-label">课程总数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${configData.metadata.version}</div>
+                    <div class="stat-label">配置版本</div>
+                </div>
+            `;
+        }
+        
+        function testConfigStructure() {
+            if (!configData) {
+                updateStatus('config-status', '请先加载配置文件！', 'error');
+                return;
+            }
+            
+            try {
+                // 验证必要字段
+                const requiredFields = ['metadata', 'categories', 'defaultConfig'];
+                const missing = requiredFields.filter(field => !configData[field]);
+                
+                if (missing.length > 0) {
+                    throw new Error(`缺少必要字段: ${missing.join(', ')}`);
+                }
+                
+                // 验证分类结构
+                let errors = [];
+                configData.categories.forEach((category, index) => {
+                    if (!category.id) errors.push(`分类${index}缺少id`);
+                    if (!category.name) errors.push(`分类${index}缺少name`);
+                    if (!category.subcategories) errors.push(`分类${index}缺少subcategories`);
+                });
+                
+                if (errors.length > 0) {
+                    throw new Error(errors.join('; '));
+                }
+                
+                updateStatus('config-status', '✅ 配置结构验证通过！', 'success');
+                
+            } catch (error) {
+                updateStatus('config-status', `❌ 结构验证失败: ${error.message}`, 'error');
+            }
+        }
+        
+        function displayCategoryTree() {
+            if (!configData) {
+                updateStatus('tree-status', '请先加载配置文件！', 'error');
+                return;
+            }
+            
+            const treeContainer = document.getElementById('category-tree');
+            let treeHTML = '';
+            
+            configData.categories.forEach(category => {
+                treeHTML += `<div class="level1">📂 ${category.name} (${category.id})</div>`;
+                
+                if (category.subcategories) {
+                    category.subcategories.forEach(sub => {
+                        if (sub.items) {
+                            // 三级结构（年级分类）
+                            treeHTML += `<div class="level2">  📁 ${sub.name} (${sub.id})</div>`;
+                            sub.items.forEach(item => {
+                                treeHTML += `<div class="level3">    📄 ${item.name} - ${item.wordCount}个单词</div>`;
+                            });
+                        } else {
+                            // 二级结构（按天学习、专项练习）
+                            treeHTML += `<div class="level2">  📄 ${sub.name} (${sub.id}) - ${sub.wordCount}个单词</div>`;
+                        }
+                    });
+                }
+            });
+            
+            treeContainer.innerHTML = treeHTML;
+            updateStatus('tree-status', '✅ 分类树显示完成！', 'success');
+        }
+        
+        function analyzeVocabularyStats() {
+            if (!configData) {
+                updateStatus('stats-status', '请先加载配置文件！', 'error');
+                return;
+            }
+            
+            const statsContainer = document.getElementById('vocab-stats');
+            let totalWords = 0;
+            let categoryStats = {};
+            
+            configData.categories.forEach(category => {
+                let categoryTotal = 0;
+                let items = [];
+                
+                if (category.subcategories) {
+                    category.subcategories.forEach(sub => {
+                        if (sub.items) {
+                            sub.items.forEach(item => {
+                                categoryTotal += item.wordCount || 0;
+                                items.push(item);
+                            });
+                        } else {
+                            categoryTotal += sub.wordCount || 0;
+                            items.push(sub);
+                        }
+                    });
+                }
+                
+                categoryStats[category.name] = {
+                    total: categoryTotal,
+                    count: items.length
+                };
+                totalWords += categoryTotal;
+            });
+            
+            let statsHTML = '<div class="category-tree">';
+            statsHTML += `<div class="level1">总单词数: ${totalWords}</div>`;
+            Object.entries(categoryStats).forEach(([name, stats]) => {
+                statsHTML += `<div class="level2">${name}: ${stats.total}个单词（${stats.count}个课程）</div>`;
+            });
+            statsHTML += '</div>';
+            
+            statsContainer.innerHTML = statsHTML;
+            updateStatus('stats-status', '✅ 词库统计分析完成！', 'success');
+        }
+        
+        async function validateFilePaths() {
+            if (!configData) {
+                updateStatus('path-status', '请先加载配置文件！', 'error');
+                return;
+            }
+            
+            updateStatus('path-status', '正在验证文件路径...', 'info');
+            
+            const resultsContainer = document.getElementById('path-results');
+            let results = '<div class="category-tree">';
+            let validCount = 0;
+            let totalCount = 0;
+            
+            for (const category of configData.categories) {
+                results += `<div class="level1">${category.name}</div>`;
+                
+                if (category.subcategories) {
+                    for (const sub of category.subcategories) {
+                        const items = sub.items || [sub];
+                        
+                        for (const item of items) {
+                            if (item.filename) {
+                                totalCount++;
+                                const path = `./words/${item.filename}`;
+                                
+                                try {
+                                    const response = await fetch(path, { method: 'HEAD' });
+                                    if (response.ok) {
+                                        results += `<div class="level3" style="color: #27ae60;">✓ ${path}</div>`;
+                                        validCount++;
+                                    } else {
+                                        results += `<div class="level3" style="color: #e74c3c;">✗ ${path} (${response.status})</div>`;
+                                    }
+                                } catch (error) {
+                                    results += `<div class="level3" style="color: #e74c3c;">✗ ${path} (错误)</div>`;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            results += '</div>';
+            resultsContainer.innerHTML = results;
+            
+            const message = `验证完成: ${validCount}/${totalCount} 个文件可访问`;
+            updateStatus('path-status', validCount === totalCount ? `✅ ${message}` : `⚠️ ${message}`, 
+                         validCount === totalCount ? 'success' : 'error');
+        }
+        
+        // 页面加载时自动测试配置加载
+        document.addEventListener('DOMContentLoaded', testConfigLoading);
+    </script>
+</body>
+</html>

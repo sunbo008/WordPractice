@@ -1,0 +1,228 @@
+{
+  "metadata": {
+    "id": "common-words",
+    "name": "常用单词库",
+    "description": "日常生活中最常用的英语单词",
+    "version": "1.0",
+    "category": "vocabulary",
+    "difficulty": "beginner",
+    "totalWords": 50,
+    "lessons": 0,
+    "source": "常用英语单词整理",
+    "tags": ["常用", "基础", "日常", "生活"],
+    "recommended": true,
+    "lastUpdated": "2025-10-05"
+  },
+  "words": [
+    {
+      "word": "hello",
+      "phonetic": "[həˈləʊ]",
+      "meaning": "你好",
+      "difficulty": 1,
+      "category": "greeting"
+    },
+    {
+      "word": "goodbye",
+      "phonetic": "[ɡʊdˈbaɪ]",
+      "meaning": "再见",
+      "difficulty": 1,
+      "category": "greeting"
+    },
+    {
+      "word": "thank",
+      "phonetic": "[θæŋk]",
+      "meaning": "感谢",
+      "difficulty": 1,
+      "category": "courtesy"
+    },
+    {
+      "word": "please",
+      "phonetic": "[pliːz]",
+      "meaning": "请",
+      "difficulty": 1,
+      "category": "courtesy"
+    },
+    {
+      "word": "sorry",
+      "phonetic": "[ˈsɒri]",
+      "meaning": "对不起",
+      "difficulty": 1,
+      "category": "courtesy"
+    },
+    {
+      "word": "water",
+      "phonetic": "[ˈwɔːtə(r)]",
+      "meaning": "水",
+      "difficulty": 1,
+      "category": "food"
+    },
+    {
+      "word": "food",
+      "phonetic": "[fuːd]",
+      "meaning": "食物",
+      "difficulty": 1,
+      "category": "food"
+    },
+    {
+      "word": "house",
+      "phonetic": "[haʊs]",
+      "meaning": "房子",
+      "difficulty": 1,
+      "category": "home"
+    },
+    {
+      "word": "school",
+      "phonetic": "[skuːl]",
+      "meaning": "学校",
+      "difficulty": 1,
+      "category": "education"
+    },
+    {
+      "word": "friend",
+      "phonetic": "[frend]",
+      "meaning": "朋友",
+      "difficulty": 1,
+      "category": "relationship"
+    },
+    {
+      "word": "family",
+      "phonetic": "[ˈfæməli]",
+      "meaning": "家庭",
+      "difficulty": 1,
+      "category": "relationship"
+    },
+    {
+      "word": "mother",
+      "phonetic": "[ˈmʌðə(r)]",
+      "meaning": "母亲",
+      "difficulty": 1,
+      "category": "family"
+    },
+    {
+      "word": "father",
+      "phonetic": "[ˈfɑːðə(r)]",
+      "meaning": "父亲",
+      "difficulty": 1,
+      "category": "family"
+    },
+    {
+      "word": "brother",
+      "phonetic": "[ˈbrʌðə(r)]",
+      "meaning": "兄弟",
+      "difficulty": 1,
+      "category": "family"
+    },
+    {
+      "word": "sister",
+      "phonetic": "[ˈsɪstə(r)]",
+      "meaning": "姐妹",
+      "difficulty": 1,
+      "category": "family"
+    },
+    {
+      "word": "happy",
+      "phonetic": "[ˈhæpi]",
+      "meaning": "快乐的",
+      "difficulty": 1,
+      "category": "emotion"
+    },
+    {
+      "word": "love",
+      "phonetic": "[lʌv]",
+      "meaning": "爱",
+      "difficulty": 1,
+      "category": "emotion"
+    },
+    {
+      "word": "like",
+      "phonetic": "[laɪk]",
+      "meaning": "喜欢",
+      "difficulty": 1,
+      "category": "emotion"
+    },
+    {
+      "word": "big",
+      "phonetic": "[bɪɡ]",
+      "meaning": "大的",
+      "difficulty": 1,
+      "category": "size"
+    },
+    {
+      "word": "small",
+      "phonetic": "[smɔːl]",
+      "meaning": "小的",
+      "difficulty": 1,
+      "category": "size"
+    },
+    {
+      "word": "new",
+      "phonetic": "[njuː]",
+      "meaning": "新的",
+      "difficulty": 1,
+      "category": "quality"
+    },
+    {
+      "word": "old",
+      "phonetic": "[əʊld]",
+      "meaning": "老的",
+      "difficulty": 1,
+      "category": "quality"
+    },
+    {
+      "word": "hot",
+      "phonetic": "[hɒt]",
+      "meaning": "热的",
+      "difficulty": 1,
+      "category": "temperature"
+    },
+    {
+      "word": "cold",
+      "phonetic": "[kəʊld]",
+      "meaning": "冷的",
+      "difficulty": 1,
+      "category": "temperature"
+    },
+    {
+      "word": "day",
+      "phonetic": "[deɪ]",
+      "meaning": "天",
+      "difficulty": 1,
+      "category": "time"
+    },
+    {
+      "word": "night",
+      "phonetic": "[naɪt]",
+      "meaning": "夜晚",
+      "difficulty": 1,
+      "category": "time"
+    },
+    {
+      "word": "morning",
+      "phonetic": "[ˈmɔːnɪŋ]",
+      "meaning": "早晨",
+      "difficulty": 1,
+      "category": "time"
+    },
+    {
+      "word": "afternoon",
+      "phonetic": "[ˌɑːftəˈnuːn]",
+      "meaning": "下午",
+      "difficulty": 2,
+      "category": "time"
+    },
+    {
+      "word": "evening",
+      "phonetic": "[ˈiːvnɪŋ]",
+      "meaning": "晚上",
+      "difficulty": 1,
+      "category": "time"
+    },
+    {
+      "word": "today",
+      "phonetic": "[təˈdeɪ]",
+      "meaning": "今天",
+      "difficulty": 1,
+      "category": "time"
+    }
+  ]
+}

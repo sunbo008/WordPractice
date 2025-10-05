@@ -1,0 +1,85 @@
+{
+  "metadata": {
+    "id": "day01",
+    "name": "Day 1 - 长元音 /i:/",
+    "phoneme": "/i:/",
+    "description": "学习长元音i的发音和拼读规则",
+    "day": 1,
+    "category": "daily-phonics",
+    "difficulty": "beginner",
+    "wordCount": 10,
+    "lastUpdated": "2025-10-05"
+  },
+  "words": [
+    {
+      "word": "see",
+      "phonetic": "[siː]",
+      "meaning": "看见",
+      "difficulty": 1,
+      "category": "action"
+    },
+    {
+      "word": "tree",
+      "phonetic": "[triː]",
+      "meaning": "树",
+      "difficulty": 1,
+      "category": "nature"
+    },
+    {
+      "word": "three",
+      "phonetic": "[θriː]",
+      "meaning": "三",
+      "difficulty": 1,
+      "category": "number"
+    },
+    {
+      "word": "free",
+      "phonetic": "[friː]",
+      "meaning": "自由的",
+      "difficulty": 1,
+      "category": "adjective"
+    },
+    {
+      "word": "green",
+      "phonetic": "[ɡriːn]",
+      "meaning": "绿色",
+      "difficulty": 1,
+      "category": "color"
+    },
+    {
+      "word": "sleep",
+      "phonetic": "[sliːp]",
+      "meaning": "睡觉",
+      "difficulty": 1,
+      "category": "action"
+    },
+    {
+      "word": "sweet",
+      "phonetic": "[swiːt]",
+      "meaning": "甜的",
+      "difficulty": 1,
+      "category": "taste"
+    },
+    {
+      "word": "meet",
+      "phonetic": "[miːt]",
+      "meaning": "遇见",
+      "difficulty": 1,
+      "category": "action"
+    },
+    {
+      "word": "feet",
+      "phonetic": "[fiːt]",
+      "meaning": "脚",
+      "difficulty": 1,
+      "category": "body"
+    },
+    {
+      "word": "keep",
+      "phonetic": "[kiːp]",
+      "meaning": "保持",
+      "difficulty": 1,
+      "category": "action"
+    }
+  ]
+}

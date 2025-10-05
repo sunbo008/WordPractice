@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Tetris - 词库设置</title>
+    <link rel="stylesheet" href="settings-v2.css">
+</head>
+<body>
+    <div class="settings-container">
+        <!-- 头部 -->
+        <header class="settings-header">
+            <h1>🎮 Word Tetris 词库设置</h1>
+            <p>选择学习内容，定制专属学习计划</p>
+            <button class="back-btn" onclick="goBack()">← 返回游戏</button>
+        </header>
+
+        <!-- 主要内容 -->
+        <main class="settings-main">
+            <!-- 当前配置概览 -->
+            <section class="config-overview">
+                <h2>📊 当前配置</h2>
+                <div class="overview-stats">
+                    <div class="stat-item">
+                        <span class="stat-value" id="enabled-count">0</span>
+                        <span class="stat-label">已选课程</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="total-words-count">0</span>
+                        <span class="stat-label">总单词数</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="difficulty-range">1-3</span>
+                        <span class="stat-label">难度范围</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 词库分类选择 -->
+            <section class="library-categories">
+                <h2>📚 选择学习内容</h2>
+                
+                <!-- 分类1: 按天学习音标 -->
+                <div class="category-section">
+                    <div class="category-header" onclick="toggleCategory('daily-phonics')">
+                        <div class="category-title">
+                            <span class="category-icon">📅</span>
+                            <span class="category-name">按天学习音标</span>
+                            <span class="category-desc">15天系统化音标学习课程</span>
+                        </div>
+                        <div class="category-controls">
+                            <span class="selected-count" id="daily-phonics-count">0/12</span>
+                            <button class="select-all-btn" onclick="selectAllInCategory(event, 'daily-phonics')">全选</button>
+                            <span class="expand-icon">▼</span>
+                        </div>
+                    </div>
+                    <div class="category-content" id="daily-phonics-content">
+                        <div class="subcategory-grid" id="daily-phonics-grid">
+                            <!-- 动态生成Day 1-14的选项 -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 分类2: 专项强化练习 -->
+                <div class="category-section">
+                    <div class="category-header" onclick="toggleCategory('special-practice')">
+                        <div class="category-title">
+                            <span class="category-icon">🎯</span>
+                            <span class="category-name">专项强化练习</span>
+                            <span class="category-desc">针对重点音标的专项强化</span>
+                        </div>
+                        <div class="category-controls">
+                            <span class="selected-count" id="special-practice-count">0/4</span>
+                            <button class="select-all-btn" onclick="selectAllInCategory(event, 'special-practice')">全选</button>
+                            <span class="expand-icon">▼</span>
+                        </div>
+                    </div>
+                    <div class="category-content collapsed" id="special-practice-content">
+                        <div class="subcategory-grid" id="special-practice-grid">
+                            <!-- 动态生成专项练习选项 -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 分类3: 按年级分类 -->
+                <div class="category-section">
+                    <div class="category-header" onclick="toggleCategory('grade-based')">
+                        <div class="category-title">
+                            <span class="category-icon">🎓</span>
+                            <span class="category-name">按年级分类</span>
+                            <span class="category-desc">根据学校年级和学期划分</span>
+                        </div>
+                        <div class="category-controls">
+                            <span class="selected-count" id="grade-based-count">0/20</span>
+                            <button class="select-all-btn" onclick="selectAllInCategory(event, 'grade-based')">全选</button>
+                            <span class="expand-icon">▼</span>
+                        </div>
+                    </div>
+                    <div class="category-content collapsed" id="grade-based-content">
+                        <!-- 小学 -->
+                        <div class="grade-group">
+                            <div class="grade-group-header" onclick="toggleGradeGroup('primary-school')">
+                                <span class="grade-icon">🏫</span>
+                                <span class="grade-name">小学词汇</span>
+                                <span class="grade-count" id="primary-school-count">0/8</span>
+                                <button class="select-all-btn" onclick="selectAllInGrade(event, 'primary-school')">全选</button>
+                                <span class="expand-icon">▶</span>
+                            </div>
+                            <div class="grade-group-content collapsed" id="primary-school-grid">
+                                <!-- 动态生成小学各学期选项 -->
+                            </div>
+                        </div>
+
+                        <!-- 初中 -->
+                        <div class="grade-group">
+                            <div class="grade-group-header" onclick="toggleGradeGroup('middle-school')">
+                                <span class="grade-icon">🏛️</span>
+                                <span class="grade-name">初中词汇</span>
+                                <span class="grade-count" id="middle-school-count">0/6</span>
+                                <button class="select-all-btn" onclick="selectAllInGrade(event, 'middle-school')">全选</button>
+                                <span class="expand-icon">▶</span>
+                            </div>
+                            <div class="grade-group-content collapsed" id="middle-school-grid">
+                                <!-- 动态生成初中各学期选项 -->
+                            </div>
+                        </div>
+
+                        <!-- 高中 -->
+                        <div class="grade-group">
+                            <div class="grade-group-header" onclick="toggleGradeGroup('high-school')">
+                                <span class="grade-icon">🎓</span>
+                                <span class="grade-name">高中词汇</span>
+                                <span class="grade-count" id="high-school-count">0/6</span>
+                                <button class="select-all-btn" onclick="selectAllInGrade(event, 'high-school')">全选</button>
+                                <span class="expand-icon">▶</span>
+                            </div>
+                            <div class="grade-group-content collapsed" id="high-school-grid">
+                                <!-- 动态生成高中各学期选项 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 操作按钮 -->
+            <section class="actions">
+                <button class="btn btn-primary" onclick="saveSettings()">💾 保存设置</button>
+                <button class="btn btn-secondary" onclick="resetToDefault()">🔄 恢复默认</button>
+                <button class="btn btn-success" onclick="applyAndStart()">🎮 应用并开始游戏</button>
+            </section>
+        </main>
+
+        <!-- 状态提示 -->
+        <div id="status-message" class="status-message"></div>
+    </div>
+
+    <script src="vocabulary-manager-v3.js"></script>
+    <script src="settings-v2.js"></script>
+</body>
+</html>

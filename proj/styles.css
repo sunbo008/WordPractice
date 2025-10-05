@@ -228,6 +228,16 @@ button {
     background: #757575;
 }
 
+.settings-btn {
+    background: #9b59b6;
+    color: white;
+    font-size: 0.9em;
+}
+
+.settings-btn:hover {
+    background: #8e44ad;
+}
+
 #pauseBtn {
     background: #ff9800;
     color: white;

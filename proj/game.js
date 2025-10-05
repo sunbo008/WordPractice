@@ -3,7 +3,7 @@ class WordTetrisGame {
     constructor() {
         this.canvas = document.getElementById('gameCanvas');
         this.ctx = this.canvas.getContext('2d');
-        this.vocabularyManager = new VocabularyManager();
+        this.vocabularyManager = new VocabularyManagerV2();
         
         // 高清屏适配
         this.setupHighDPICanvas();
