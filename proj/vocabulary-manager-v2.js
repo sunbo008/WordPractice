@@ -482,6 +482,24 @@ class VocabularyManagerV2 {
         };
     }
     
+    // 获取当前词库中可用的难度等级
+    getAvailableDifficulties() {
+        if (!this.isLoaded || !this.allWords || this.allWords.length === 0) {
+            return [];
+        }
+        
+        const difficulties = new Set();
+        this.allWords.forEach(word => {
+            if (word.difficulty) {
+                difficulties.add(word.difficulty);
+            }
+        });
+        
+        const result = Array.from(difficulties).sort((a, b) => a - b);
+        console.log('📊 可用难度等级:', result);
+        return result;
+    }
+    
     checkAnswer(wordData, userInput) {
         const correctAnswer = wordData.missingLetters.toUpperCase();
         const userAnswer = userInput.toUpperCase().trim();
