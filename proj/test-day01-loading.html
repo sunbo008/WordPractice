@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 01 加载测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        pre {
+            background: #f8f8f8;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .success { color: #27ae60; }
+        .error { color: #e74c3c; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Day 01 加载测试</h1>
+    
+    <div class="test-section">
+        <h2>测试 1: 直接加载 day01.json</h2>
+        <div id="test1-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>测试 2: 使用 VocabularyConfigLoader</h2>
+        <div id="test2-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>测试 3: 查看所有加载的 daily phonics</h2>
+        <div id="test3-result"></div>
+    </div>
+
+    <script src="vocabulary-config-loader.js"></script>
+    <script>
+        async function test1() {
+            try {
+                const response = await fetch('./words/daily-phonics/day01.json');
+                const data = await response.json();
+                document.getElementById('test1-result').innerHTML = `
+                    <p class="success">✅ 成功加载 day01.json</p>
+                    <pre>${JSON.stringify(data.metadata, null, 2)}</pre>
+                `;
+            } catch (error) {
+                document.getElementById('test1-result').innerHTML = `
+                    <p class="error">❌ 加载失败: ${error.message}</p>
+                `;
+            }
+        }
+
+        async function test2() {
+            try {
+                const loader = new VocabularyConfigLoader();
+                const config = await loader.loadConfig();
+                
+                const dailyPhonics = config.categories.find(cat => cat.id === 'daily-phonics');
+                const day01 = dailyPhonics.subcategories.find(item => item.id === 'day01');
+                
+                if (day01) {
+                    document.getElementById('test2-result').innerHTML = `
+                        <p class="success">✅ 在配置中找到 day01</p>
+                        <pre>${JSON.stringify(day01, null, 2)}</pre>
+                    `;
+                } else {
+                    document.getElementById('test2-result').innerHTML = `
+                        <p class="error">❌ 在配置中未找到 day01</p>
+                        <p>共加载了 ${dailyPhonics.subcategories.length} 个课程</p>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('test2-result').innerHTML = `
+                    <p class="error">❌ 配置加载失败: ${error.message}</p>
+                `;
+            }
+        }
+
+        async function test3() {
+            try {
+                const loader = new VocabularyConfigLoader();
+                const config = await loader.loadConfig();
+                
+                const dailyPhonics = config.categories.find(cat => cat.id === 'daily-phonics');
+                
+                const list = dailyPhonics.subcategories.map((item, index) => 
+                    `${index + 1}. ${item.id} - ${item.name}`
+                ).join('\n');
+                
+                document.getElementById('test3-result').innerHTML = `
+                    <p class="success">✅ 共加载 ${dailyPhonics.subcategories.length} 个课程</p>
+                    <pre>${list}</pre>
+                `;
+            } catch (error) {
+                document.getElementById('test3-result').innerHTML = `
+                    <p class="error">❌ 测试失败: ${error.message}</p>
+                `;
+            }
+        }
+
+        // 运行所有测试
+        test1();
+        test2();
+        test3();
+    </script>
+</body>
+</html>
+

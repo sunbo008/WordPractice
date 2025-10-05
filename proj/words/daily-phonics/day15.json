@@ -1,0 +1,55 @@
+{
+  "metadata": {
+    "id": "day15",
+    "name": "Day 15 - 第3周测试",
+    "phoneme": "Review",
+    "description": "复习第11-14天学习的音标和词汇",
+    "day": 15,
+    "category": "daily-phonics",
+    "difficulty": "intermediate",
+    "wordCount": 20,
+    "lastUpdated": "2025-10-06"
+  },
+  "lesson": {
+    "pronunciationTips": [
+      "复习第3周学习的4个音标：/ʌ/, /ɔ:/, /ɜ:/, /ə/",
+      "注意区分长元音和短元音的发音差异",
+      "重点掌握 /ɜ:/ 和 /ə/ 的区别",
+      "通过单词练习巩固音标记忆"
+    ],
+    "phonicsPatterns": [
+      "/ʌ/ - u字母：cup, sun, run, fun, bus",
+      "/ɔ:/ - or/all/oor/our组合：ball, call, door, four, walk",
+      "/ɜ:/ - ir/ur/or组合：bird, girl, word, work, turn",
+      "/ə/ - 非重读音节：about, banana, sofa, camera, pizza"
+    ],
+    "practiceSteps": [
+      "第一步：逐个复习4个音标的发音",
+      "第二步：跟读每个音标的5个核心单词",
+      "第三步：完成听音辨音练习",
+      "第四步：进行单词拼读测试"
+    ]
+  },
+  "words": [
+    {"word": "cup", "phonetic": "[kʌp]", "meaning": "杯子", "difficulty": 2},
+    {"word": "sun", "phonetic": "[sʌn]", "meaning": "太阳", "difficulty": 2},
+    {"word": "run", "phonetic": "[rʌn]", "meaning": "跑", "difficulty": 2},
+    {"word": "fun", "phonetic": "[fʌn]", "meaning": "有趣的", "difficulty": 2},
+    {"word": "bus", "phonetic": "[bʌs]", "meaning": "公交车", "difficulty": 2},
+    {"word": "ball", "phonetic": "[bɔːl]", "meaning": "球", "difficulty": 2},
+    {"word": "call", "phonetic": "[kɔːl]", "meaning": "打电话", "difficulty": 2},
+    {"word": "door", "phonetic": "[dɔː]", "meaning": "门", "difficulty": 2},
+    {"word": "four", "phonetic": "[fɔː]", "meaning": "四", "difficulty": 2},
+    {"word": "walk", "phonetic": "[wɔːk]", "meaning": "走路", "difficulty": 2},
+    {"word": "bird", "phonetic": "[bɜːd]", "meaning": "鸟", "difficulty": 2},
+    {"word": "girl", "phonetic": "[ɡɜːl]", "meaning": "女孩", "difficulty": 2},
+    {"word": "word", "phonetic": "[wɜːd]", "meaning": "单词", "difficulty": 2},
+    {"word": "work", "phonetic": "[wɜːk]", "meaning": "工作", "difficulty": 2},
+    {"word": "turn", "phonetic": "[tɜːn]", "meaning": "转弯", "difficulty": 2},
+    {"word": "about", "phonetic": "[əˈbaʊt]", "meaning": "关于", "difficulty": 3},
+    {"word": "banana", "phonetic": "[bəˈnɑːnə]", "meaning": "香蕉", "difficulty": 3},
+    {"word": "sofa", "phonetic": "[ˈsəʊfə]", "meaning": "沙发", "difficulty": 2},
+    {"word": "camera", "phonetic": "[ˈkæmərə]", "meaning": "相机", "difficulty": 3},
+    {"word": "pizza", "phonetic": "[ˈpiːtsə]", "meaning": "披萨", "difficulty": 2}
+  ]
+}

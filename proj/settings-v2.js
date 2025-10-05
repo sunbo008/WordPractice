@@ -131,7 +131,7 @@ class SettingsManagerV2 {
                 <div class="subcategory-header">
                     <span class="subcategory-title">${day.name}</span>
                     <span class="subcategory-phoneme">${day.phoneme}</span>
-                    ${!fileExists ? '<span class="file-status missing">❌ 未实现</span>' : '<span class="file-status exists">✓</span>'}
+                    ${!fileExists ? '<span class="file-status missing">❌ 未实现</span>' : ''}
                 </div>
                 <div class="subcategory-description">${day.description}</div>
                 <div class="subcategory-meta">
@@ -185,7 +185,7 @@ class SettingsManagerV2 {
                 <div class="subcategory-header">
                     <span class="subcategory-title">${special.name}</span>
                     <span class="subcategory-phoneme">${special.phoneme}</span>
-                    ${!fileExists ? '<span class="file-status missing">❌ 未实现</span>' : '<span class="file-status exists">✓</span>'}
+                    ${!fileExists ? '<span class="file-status missing">❌ 未实现</span>' : ''}
                 </div>
                 <div class="subcategory-description">${special.description}</div>
                 <div class="subcategory-meta">
@@ -230,7 +230,7 @@ class SettingsManagerV2 {
                 item.innerHTML = `
                     <div class="subcategory-header">
                         <span class="subcategory-title">${term.name}</span>
-                        ${!fileExists ? '<span class="file-status missing">❌ 未实现</span>' : '<span class="file-status exists">✓</span>'}
+                        ${!fileExists ? '<span class="file-status missing">❌ 未实现</span>' : ''}
                     </div>
                     <div class="subcategory-description">${term.description}</div>
                     <div class="subcategory-meta">

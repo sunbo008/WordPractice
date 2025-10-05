@@ -9,6 +9,29 @@
     "wordCount": 20,
     "lastUpdated": "2025-10-06"
   },
+  "lesson": {
+    "pronunciationTips": [
+      "口型：嘴巴呈圆形，嘴唇向前突出",
+      "舌位：舌后部抬起，舌尖离开下齿",
+      "发音：类似汉语'奥'，但要拉长",
+      "要点：这是一个长元音，发音时间要长",
+      "对比：/ɔ:/ (door) 比 /ɒ/ (dog) 音更长，嘴更圆"
+    ],
+    "phonicsPatterns": [
+      "or 组合：door, more, for, horse",
+      "our 组合：four, your, pour",
+      "oor 组合：door, floor, poor",
+      "ore 组合：more, store, score, before",
+      "ort 组合：sport, short, sort, port"
+    ],
+    "practiceSteps": [
+      "第一步：嘴唇呈圆形，向前突出",
+      "第二步：舌后部抬起，口腔后部打开",
+      "第三步：发长音'奥——'，保持2拍",
+      "第四步：对比练习：/ɒ/ (hot) vs /ɔ:/ (port)",
+      "第五步：快速连读：door-more-four-floor"
+    ]
+  },
   "words": [
     {"word": "door", "phonetic": "[dɔː]", "meaning": "门", "difficulty": 1},
     {"word": "more", "phonetic": "[mɔː]", "meaning": "更多", "difficulty": 1},

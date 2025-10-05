@@ -9,6 +9,29 @@
     "wordCount": 20,
     "lastUpdated": "2025-10-06"
   },
+  "lesson": {
+    "pronunciationTips": [
+      "口型：嘴巴张大，下巴下垂，比发 /e/ 时更大",
+      "舌位：舌身平放，舌尖轻触下齿",
+      "发音：类似汉语'爱'的韵母，但更短促",
+      "要点：这是英语中口型最大的元音之一",
+      "练习：对着镜子检查，确保嘴巴张得足够大"
+    ],
+    "phonicsPatterns": [
+      "最常见拼写：单个字母 a",
+      "CVC结构：辅音+a+辅音（cat, bat, hat）",
+      "在闭音节中：cap, map, bag, bad",
+      "双辅音前：apple, happy, rabbit",
+      "特殊组合：black, track（bl-/tr- + ack）"
+    ],
+    "practiceSteps": [
+      "第一步：张大嘴巴，下巴明显下垂",
+      "第二步：舌尖轻触下齿，舌身平放",
+      "第三步：发短促的'爱'音，不要拖长",
+      "第四步：对比练习：/e/ (pen) vs /æ/ (pan)",
+      "第五步：快速连读：cat-hat-bat-mat"
+    ]
+  },
   "words": [
     {"word": "cat", "phonetic": "[kæt]", "meaning": "猫", "difficulty": 1},
     {"word": "hat", "phonetic": "[hæt]", "meaning": "帽子", "difficulty": 1},

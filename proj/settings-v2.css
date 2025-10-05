@@ -298,11 +298,6 @@ body {
     background: #fee;
 }
 
-.file-status.exists {
-    color: #27ae60;
-    font-size: 0.8em;
-}
-
 .subcategory-header {
     display: flex;
     justify-content: space-between;

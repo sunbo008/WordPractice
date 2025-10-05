@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学习页面小喇叭测试</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            padding: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+        }
+        
+        .test-section h2 {
+            color: #3498db;
+            margin-bottom: 15px;
+        }
+        
+        .demo-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            margin: 15px 0;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .demo-card:hover {
+            border-color: #3498db;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        
+        .demo-word {
+            font-size: 2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            display: inline-block;
+            position: relative;
+        }
+        
+        .demo-phonetic {
+            color: #3498db;
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            display: inline-block;
+            position: relative;
+        }
+        
+        .demo-meaning {
+            color: #7f8c8d;
+            font-size: 1.2em;
+        }
+        
+        .speaker-icon {
+            display: inline-block;
+            margin-left: 12px;
+            font-size: 1.2em;
+            color: #3498db;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.2s ease;
+            vertical-align: middle;
+        }
+        
+        .demo-word:hover .speaker-icon,
+        .demo-phonetic:hover .speaker-icon {
+            opacity: 1;
+        }
+        
+        .speaker-icon:hover {
+            transform: scale(1.3);
+            color: #2980b9;
+        }
+        
+        .speaker-icon:active {
+            transform: scale(0.9);
+        }
+        
+        .instruction {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #f39c12;
+            margin: 20px 0;
+        }
+        
+        .instruction strong {
+            color: #f39c12;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            background: #3498db;
+            color: white;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px 5px;
+        }
+        
+        .btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .feature {
+            padding: 15px;
+            background: #e8f5e9;
+            border-radius: 8px;
+            border-left: 4px solid #27ae60;
+        }
+        
+        .feature h3 {
+            color: #27ae60;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+        
+        .feature p {
+            color: #555;
+            font-size: 0.95em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔊 学习页面小喇叭功能测试</h1>
+        
+        <div class="instruction">
+            <strong>💡 使用说明：</strong> 将鼠标悬停在单词或音标上，会显示小喇叭图标🔊，悬停在小喇叭上即可自动朗读！
+        </div>
+        
+        <!-- 功能特性 -->
+        <div class="test-section">
+            <h2>✨ 功能特性</h2>
+            <div class="features">
+                <div class="feature">
+                    <h3>悬停显示</h3>
+                    <p>鼠标悬停单词时小喇叭图标淡入显示</p>
+                </div>
+                <div class="feature">
+                    <h3>悬停朗读</h3>
+                    <p>鼠标悬停小喇叭图标自动播放英式发音</p>
+                </div>
+                <div class="feature">
+                    <h3>视觉反馈</h3>
+                    <p>悬停放大、点击缩小动画效果</p>
+                </div>
+                <div class="feature">
+                    <h3>智能停止</h3>
+                    <p>新朗读自动停止当前播放</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 测试示例 -->
+        <div class="test-section">
+            <h2>📝 交互示例</h2>
+            
+            <div class="demo-card">
+                <div class="demo-word">
+                    cat
+                    <span class="speaker-icon" onmouseenter="speakWord('cat')" title="悬停朗读单词">🔊</span>
+                </div>
+                <br>
+                <div class="demo-phonetic">
+                    [kæt]
+                    <span class="speaker-icon" onmouseenter="speakWord('cat')" title="悬停朗读音标">🔊</span>
+                </div>
+                <div class="demo-meaning">猫</div>
+            </div>
+            
+            <div class="demo-card">
+                <div class="demo-word">
+                    apple
+                    <span class="speaker-icon" onmouseenter="speakWord('apple')" title="悬停朗读单词">🔊</span>
+                </div>
+                <br>
+                <div class="demo-phonetic">
+                    [ˈæpl]
+                    <span class="speaker-icon" onmouseenter="speakWord('apple')" title="悬停朗读音标">🔊</span>
+                </div>
+                <div class="demo-meaning">苹果</div>
+            </div>
+            
+            <div class="demo-card">
+                <div class="demo-word">
+                    family
+                    <span class="speaker-icon" onmouseenter="speakWord('family')" title="悬停朗读单词">🔊</span>
+                </div>
+                <br>
+                <div class="demo-phonetic">
+                    [ˈfæməli]
+                    <span class="speaker-icon" onmouseenter="speakWord('family')" title="悬停朗读音标">🔊</span>
+                </div>
+                <div class="demo-meaning">家庭</div>
+            </div>
+        </div>
+        
+        <!-- 测试按钮 -->
+        <div class="test-section">
+            <h2>🎵 直接朗读测试</h2>
+            <p style="margin-bottom: 15px;">点击按钮直接测试朗读功能（无需悬停）：</p>
+            <button class="btn" onclick="speakWord('hello')">🔊 朗读 "hello"</button>
+            <button class="btn" onclick="speakWord('world')">🔊 朗读 "world"</button>
+            <button class="btn" onclick="speakWord('beautiful')">🔊 朗读 "beautiful"</button>
+            <button class="btn" onclick="speakWord('wonderful')">🔊 朗读 "wonderful"</button>
+        </div>
+        
+        <!-- 前往学习页面 -->
+        <div class="test-section">
+            <h2>🎓 前往实际学习页面</h2>
+            <p style="margin-bottom: 15px;">在实际学习页面中体验完整功能：</p>
+            <button class="btn" onclick="window.location.href='./study/phonics-lesson-template.html?lesson=day01'">
+                📖 Day 1 - 长元音 /i:/
+            </button>
+            <button class="btn" onclick="window.location.href='./study/phonics-lesson-template.html?lesson=day08'">
+                📖 Day 8 - 短元音 /æ/
+            </button>
+            <button class="btn" onclick="window.location.href='./settings-v2.html'">
+                ⚙️ 词库设置
+            </button>
+        </div>
+        
+        <!-- 浏览器支持检测 -->
+        <div class="test-section">
+            <h2>🔍 浏览器支持检测</h2>
+            <div id="browser-support"></div>
+        </div>
+    </div>
+    
+    <script>
+        // 朗读单词
+        function speakWord(word) {
+            if ('speechSynthesis' in window) {
+                // 停止当前正在播放的语音
+                speechSynthesis.cancel();
+                
+                const utterance = new SpeechSynthesisUtterance(word);
+                utterance.lang = 'en-GB';  // 英式英语
+                utterance.rate = 0.8;      // 语速
+                utterance.pitch = 1.0;     // 音调
+                utterance.volume = 1.0;    // 音量
+                
+                // 添加事件监听
+                utterance.onstart = () => {
+                    console.log('🔊 开始朗读:', word);
+                };
+                
+                utterance.onend = () => {
+                    console.log('✅ 朗读完成:', word);
+                };
+                
+                utterance.onerror = (event) => {
+                    console.error('❌ 朗读出错:', event);
+                };
+                
+                speechSynthesis.speak(utterance);
+            } else {
+                alert('⚠️ 您的浏览器不支持语音合成功能');
+            }
+        }
+        
+        // 检测浏览器支持
+        function checkBrowserSupport() {
+            const supportDiv = document.getElementById('browser-support');
+            
+            if ('speechSynthesis' in window) {
+                supportDiv.innerHTML = `
+                    <div class="feature">
+                        <h3>✅ 语音合成支持</h3>
+                        <p>您的浏览器支持 Web Speech API</p>
+                        <p style="margin-top: 10px; font-size: 0.9em;">
+                            <strong>已检测到的语音：</strong><br>
+                            <span id="voice-list">正在加载...</span>
+                        </p>
+                    </div>
+                `;
+                
+                // 获取可用的语音列表
+                setTimeout(() => {
+                    const voices = speechSynthesis.getVoices();
+                    const voiceList = document.getElementById('voice-list');
+                    if (voices.length > 0) {
+                        const enVoices = voices.filter(v => v.lang.startsWith('en'));
+                        voiceList.textContent = enVoices.length > 0 
+                            ? `找到 ${enVoices.length} 个英语语音` 
+                            : `共 ${voices.length} 个语音（建议使用 Chrome 或 Edge 浏览器）`;
+                    } else {
+                        voiceList.textContent = '正在初始化语音...';
+                    }
+                }, 100);
+                
+                // 语音列表加载完成后更新
+                speechSynthesis.onvoiceschanged = () => {
+                    const voices = speechSynthesis.getVoices();
+                    const voiceList = document.getElementById('voice-list');
+                    if (voiceList) {
+                        const enVoices = voices.filter(v => v.lang.startsWith('en'));
+                        voiceList.textContent = enVoices.length > 0 
+                            ? `找到 ${enVoices.length} 个英语语音` 
+                            : `共 ${voices.length} 个语音`;
+                    }
+                };
+            } else {
+                supportDiv.innerHTML = `
+                    <div style="background: #ffebee; padding: 15px; border-radius: 8px; border-left: 4px solid #e74c3c;">
+                        <h3 style="color: #e74c3c; margin-bottom: 8px;">❌ 不支持语音合成</h3>
+                        <p style="color: #555;">您的浏览器不支持 Web Speech API</p>
+                        <p style="color: #555; margin-top: 8px; font-size: 0.9em;">
+                            建议使用：Chrome、Edge、Safari 或 Firefox 浏览器
+                        </p>
+                    </div>
+                `;
+            }
+        }
+        
+        // 页面加载时检测
+        document.addEventListener('DOMContentLoaded', checkBrowserSupport);
+    </script>
+</body>
+</html>

@@ -9,6 +9,29 @@
     "wordCount": 20,
     "lastUpdated": "2025-10-06"
   },
+  "lesson": {
+    "pronunciationTips": [
+      "口型：嘴巴张大，呈圆形，但不向前突",
+      "舌位：舌后部稍抬起，舌尖离开下齿",
+      "发音：类似汉语'哦'，但更短促",
+      "要点：这是一个短元音，发音时间要短",
+      "对比：/ɒ/ (hot) 比 /ɔ:/ (port) 音更短，嘴不突出"
+    ],
+    "phonicsPatterns": [
+      "最常见拼写：单个字母 o",
+      "在闭音节中：hot, not, pot, got",
+      "CVC结构：辅音+o+辅音（dog, box, top）",
+      "双辅音结尾：stop, clock, shop",
+      "多音节词：orange, doctor, problem"
+    ],
+    "practiceSteps": [
+      "第一步：嘴巴张大呈圆形，但不前突",
+      "第二步：舌后部稍抬起",
+      "第三步：发短促的'哦'音",
+      "第四步：对比练习：/ɔ:/ (for) vs /ɒ/ (fox)",
+      "第五步：快速连读：hot-not-pot-got"
+    ]
+  },
   "words": [
     {"word": "hot", "phonetic": "[hɒt]", "meaning": "热的", "difficulty": 1},
     {"word": "not", "phonetic": "[nɒt]", "meaning": "不", "difficulty": 1},

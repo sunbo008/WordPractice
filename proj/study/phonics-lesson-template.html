@@ -114,7 +114,7 @@
             border-radius: 10px;
             border: 2px solid #e9ecef;
             transition: all 0.3s ease;
-            cursor: pointer;
+            position: relative;
         }
         
         .word-card:hover {
@@ -128,17 +128,47 @@
             font-weight: bold;
             color: #2c3e50;
             margin-bottom: 5px;
+            position: relative;
+            display: inline-block;
         }
         
         .word-card .phonetic {
             color: #3498db;
             font-size: 1.1em;
             margin-bottom: 5px;
+            position: relative;
+            display: inline-block;
         }
         
         .word-card .meaning {
             color: #7f8c8d;
             font-size: 0.95em;
+        }
+        
+        /* 小喇叭图标 */
+        .speaker-icon {
+            display: inline-block;
+            margin-left: 8px;
+            font-size: 1.2em;
+            color: #3498db;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.2s ease;
+            vertical-align: middle;
+        }
+        
+        .word:hover .speaker-icon,
+        .phonetic:hover .speaker-icon {
+            opacity: 1;
+        }
+        
+        .speaker-icon:hover {
+            transform: scale(1.2);
+            color: #2980b9;
+        }
+        
+        .speaker-icon:active {
+            transform: scale(0.9);
         }
         
         .pronunciation-guide {
@@ -290,235 +320,24 @@
         const urlParams = new URLSearchParams(window.location.search);
         const lessonId = urlParams.get('lesson') || 'day01';
         
-        // 不再需要硬编码课程数据，全部从JSON动态加载
-        // 以下代码已弃用，保留作为参考
-        /*
-        const lessonData = {
-            'day01': {
-                title: 'Day 1 - 长元音 /i:/',
-                phoneme: '/i:/',
-                description: '学习长元音i的发音和拼读规则',
-                pronunciationTips: [
-                    '舌位：舌前部抬高，接近硬腭前部，但不接触',
-                    '唇形：嘴唇微微张开，呈扁平状，嘴角稍微向两侧拉开',
-                    '气流：气流从舌面和硬腭之间通过，声带振动',
-                    '音长：这是一个长元音，发音时间要拉长'
-                ],
-                phonicsPatterns: [
-                    'ee 组合通常发 /i:/ 长音',
-                    'ee 可以在词中（green）或词尾（see, tree）',
-                    '记住：看到 ee，就读长音"衣——"'
-                ]
-            },
-            'day02': {
-                title: 'Day 2 - 短元音 /ʊ/',
-                phoneme: '/ʊ/',
-                description: '学习短元音/ʊ/的发音和拼读规则',
-                pronunciationTips: [
-                    '舌位：舌后部稍微抬高，比/u:/低，舌位较放松',
-                    '唇形：嘴唇收圆，但比/u:/开口稍大，不用太紧张',
-                    '气流：声带振动，气流从口腔通过',
-                    '音长：这是一个短元音，发音短促，不要拉长'
-                ],
-                phonicsPatterns: [
-                    'oo 组合在特定单词中发 /ʊ/ 音（book, look, good）',
-                    'oo + k 组合通常发 /ʊ/ 音（book, cook, took）',
-                    'oo + d 组合通常发 /ʊ/ 音（good, wood, stood）',
-                    'ould 组合发 /ʊd/ 音（could, would, should）',
-                    '注意：并非所有 oo 都发 /ʊ/，有些发 /u:/ 如 moon'
-                ]
-            },
-            'day03': {
-                title: 'Day 3 - 长元音 /u:/',
-                phoneme: '/u:/',
-                description: '学习长元音/u:/的发音和拼读规则',
-                pronunciationTips: [
-                    '舌位：舌后部高高抬起，接近软腭',
-                    '唇形：嘴唇收圆突出，形成圆形',
-                    '气流：声带振动，气流从圆唇中间通过',
-                    '音长：这是一个长元音，发音时间要拉长，类似"乌——"'
-                ],
-                phonicsPatterns: [
-                    'oo 组合通常发 /u:/ 长音（zoo, too, food）',
-                    'oo + n 组合发 /u:/ 音（moon, soon, noon）',
-                    'oo + l 组合发 /u:/ 音（cool, pool, school）',
-                    'oo + m 组合发 /u:/ 音（room, boom, zoom）',
-                    '记住：oo 在大多数情况下发长音 /u:/'
-                ]
-            },
-            'day04': {
-                title: 'Day 4 - 双元音 /eɪ/',
-                phoneme: '/eɪ/',
-                description: '学习双元音/eɪ/的发音和拼读规则',
-                pronunciationTips: [
-                    '舌位：从中前位置向高前位置滑动，有明显的移动过程',
-                    '唇形：从半开到接近闭合，嘴角向两侧展开',
-                    '气流：声带振动，发音时要体现从/e/向/ɪ/滑动',
-                    '音长：这是一个双元音，要完整发出滑动过程，类似"诶——"'
-                ],
-                phonicsPatterns: [
-                    'a + 辅音 + e 结构发 /eɪ/ 音（name, make, cake）',
-                    'ace 组合发 /eɪs/ 音（face, place, space）',
-                    'ame 组合发 /eɪm/ 音（game, same, name）',
-                    'ay 在词尾发 /eɪ/ 音（day, today, play）',
-                    '开音节规则：辅音+a+辅音+不发音的e = /eɪ/'
-                ]
-            },
-            'day06': {
-                title: 'Day 6 - 短元音 /ɪ/',
-                phoneme: '/ɪ/',
-                description: '学习短元音/ɪ/的发音和拼读规则',
-                pronunciationTips: [
-                    '舌位：舌前部抬起，但低于/i:/，较放松',
-                    '唇形：嘴唇微微张开，比/i:/开口大，扁平状',
-                    '气流：声带振动，气流从口腔自然通过',
-                    '音长：这是一个短元音，发音短促清晰，不拉长'
-                ],
-                phonicsPatterns: [
-                    'i 在闭音节中通常发 /ɪ/ 短音（big, sit, six）',
-                    'i + 辅音字母结尾发 /ɪ/ 音（pig, fish, milk）',
-                    'i 在双音节词中发 /ɪ/ 音（chicken, little, visit）',
-                    'y 在词尾或非重读音节中有时发 /ɪ/ 音（happy, candy）',
-                    '闭音节规则：辅音+i+辅音 = /ɪ/'
-                ]
-            },
-            'day07': {
-                title: 'Day 7 - 短元音 /e/',
-                phoneme: '/e/',
-                description: '学习短元音/e/的发音和拼读规则',
-                pronunciationTips: [
-                    '舌位：舌前部中等高度抬起，位于/æ/和/ɪ/之间',
-                    '唇形：嘴唇自然张开，比/ɪ/开口稍大',
-                    '气流：声带振动，气流自然通过口腔',
-                    '音长：这是一个短元音，发音短促，类似"诶"（短音）'
-                ],
-                phonicsPatterns: [
-                    'e 在闭音节中通常发 /e/ 短音（bed, red, pen）',
-                    'e + 辅音字母结尾发 /e/ 音（get, let, ten）',
-                    'e + 辅音 + 辅音发 /e/ 音（best, next, help）',
-                    'ea 组合有时发 /e/ 音（bread, head, ready）',
-                    '闭音节规则：辅音+e+辅音 = /e/'
-                ]
-            },
-            'day08': {
-                title: 'Day 8 - 短元音 /æ/',
-                phoneme: '/æ/',
-                description: '学习短元音/æ/的发音和拼读规则',
-                pronunciationTips: [
-                    '舌位：舌前部放低，接近口腔底部，是前元音中最低的',
-                    '唇形：嘴巴张大，开口度比其他短元音都大',
-                    '气流：声带振动，气流从大开的口腔通过',
-                    '音长：这是一个短元音，但发音要清晰饱满，类似"哎"（短音）'
-                ],
-                phonicsPatterns: [
-                    'a 在闭音节中通常发 /æ/ 短音（cat, hat, bad）',
-                    'a + 辅音字母结尾发 /æ/ 音（bag, map, dad）',
-                    'a + ck/ck 组合发 /æ/ 音（back, black, pack）',
-                    'a 在双音节词开头发 /æ/ 音（apple, family, happy）',
-                    '闭音节规则：辅音+a+辅音 = /æ/'
-                ]
-            },
-            'day09': {
-                title: 'Day 9 - 短元音 /ɒ/',
-                phoneme: '/ɒ/',
-                description: '学习短元音/ɒ/的发音和拼读规则',
-                pronunciationTips: [
-                    '舌位：舌后部稍微抬起，舌位低而靠后',
-                    '唇形：嘴唇呈圆形，但不突出，自然张开',
-                    '气流：声带振动，气流从圆形的口腔通过',
-                    '音长：这是一个短元音，发音短促，类似"奥"（短音）'
-                ],
-                phonicsPatterns: [
-                    'o 在闭音节中通常发 /ɒ/ 短音（dog, hot, box）',
-                    'o + 辅音字母结尾发 /ɒ/ 音（stop, shop, clock）',
-                    'o 在双音节词中发 /ɒ/ 音（doctor, orange, sorry）',
-                    'o + p 组合发 /ɒ/ 音（shop, stop, top）',
-                    '闭音节规则：辅音+o+辅音 = /ɒ/'
-                ]
-            },
-            'day11': {
-                title: 'Day 11 - 短元音 /ʌ/',
-                phoneme: '/ʌ/',
-                description: '学习短元音/ʌ/的发音和拼读规则',
-                pronunciationTips: [
-                    '舌位：舌身中部稍微抬起，舌位在中央位置，较放松',
-                    '唇形：嘴唇自然张开，口型自然放松，不收圆',
-                    '气流：声带振动，气流自然通过口腔',
-                    '音长：这是一个短元音，发音短促，类似"啊"（短而放松）'
-                ],
-                phonicsPatterns: [
-                    'u 在闭音节中通常发 /ʌ/ 短音（sun, run, cup）',
-                    'u + 辅音字母结尾发 /ʌ/ 音（but, bus, fun）',
-                    'o 在某些单词中发 /ʌ/ 音（love, come, some）',
-                    'ou 在某些单词中发 /ʌ/ 音（country, young）',
-                    '特殊拼写：love, come, some 中的 o 发 /ʌ/ 音'
-                ]
-            },
-            'day12': {
-                title: 'Day 12 - 双元音 /əʊ/',
-                phoneme: '/əʊ/',
-                description: '学习双元音/əʊ/的发音和拼读规则',
-                pronunciationTips: [
-                    '舌位：从中央平放位置滑向后部抬高，是一个动态的滑动过程',
-                    '唇形：从自然张开逐渐收圆，嘴唇形状变化明显',
-                    '气流：声带振动，发音时要体现从/ə/向/ʊ/滑动的过程',
-                    '音长：这是一个双元音，发音要完整，不能只发一个音'
-                ],
-                phonicsPatterns: [
-                    'o 在词尾通常发 /əʊ/ 音（go, no, so）',
-                    'o + 辅音 + e 结构发 /əʊ/ 音（home, nose, close）',
-                    'old 组合通常发 /əʊld/ 音（old, cold）',
-                    'o 在开音节中发 /əʊ/ 音（open）',
-                    'ow 在词尾有时发 /əʊ/ 音（yellow）'
-                ]
-            },
-            'day13': {
-                title: 'Day 13 - 长元音 /ɜː/',
-                phoneme: '/ɜː/',
-                description: '学习长元音/ɜː/的发音和拼读规则',
-                pronunciationTips: [
-                    '舌位：舌身平放，舌中部稍微抬高，舌尖不接触任何部位',
-                    '唇形：嘴唇自然张开，口型中等，不收圆也不展开',
-                    '气流：气流从口腔中央通过，声带振动',
-                    '音长：这是一个长元音，发音时间要拉长，类似"额——"'
-                ],
-                phonicsPatterns: [
-                    'ir 组合通常发 /ɜː/ 音（bird, girl, first）',
-                    'ur 组合通常发 /ɜː/ 音（turn, nurse, hurt）',
-                    'er 组合在重读音节发 /ɜː/ 音（her, serve）',
-                    'or 在 w 后面发 /ɜː/ 音（work, word, world）',
-                    'ear 组合有时发 /ɜː/ 音（learn, early, earth）'
-                ]
-            },
-            'day14': {
-                title: 'Day 14 - 中性元音 /ə/',
-                phoneme: '/ə/',
-                description: '学习中性元音/ə/的发音和拼读规则',
-                pronunciationTips: [
-                    '舌位：舌身完全放松，处于中央位置，是最放松的元音',
-                    '唇形：嘴唇自然放松，口型自然，既不张大也不收圆',
-                    '气流：声带振动，气流自然通过放松的口腔',
-                    '音长：通常出现在非重读音节，发音轻而短，最常见的元音'
-                ],
-                phonicsPatterns: [
-                    'a 在非重读音节开头发 /ə/ 音（about, again, around）',
-                    'a 在词尾非重读音节发 /ə/ 音（sofa, banana, pizza）',
-                    'er 在词尾非重读音节发 /ə/ 音（teacher, water, mother）',
-                    'or 在词尾非重读音节发 /ə/ 音（doctor, actor）',
-                    '几乎所有元音字母在非重读音节都可能发 /ə/ 音'
-                ]
-            }
-            // day05, day10, day15 通常是测试日，不需要学习内容
-        };
-        */
-        
         // 加载课程内容（完全从JSON动态加载）
         async function loadLesson() {
             try {
+                // 判断课程类型并构建正确的路径
+                let filePath;
+                if (lessonId.startsWith('special-')) {
+                    // 专项练习：special-ae, special-e, special-or, special-o
+                    const practiceType = lessonId.replace('special-', '');
+                    filePath = `../words/special-practice/${practiceType}-practice.json`;
+                } else {
+                    // 按天学习：day01, day02, ...
+                    filePath = `../words/daily-phonics/${lessonId}.json`;
+                }
+                
                 // 加载对应的JSON文件
-                const response = await fetch(`../words/daily-phonics/${lessonId}.json`);
+                const response = await fetch(filePath);
                 if (!response.ok) {
-                    throw new Error('课程文件未找到');
+                    throw new Error(`课程文件未找到: ${filePath}`);
                 }
                 
                 const data = await response.json();
@@ -535,9 +354,15 @@
                 const wordList = document.getElementById('word-list');
                 if (data.words && data.words.length > 0) {
                     wordList.innerHTML = data.words.map(word => `
-                        <div class="word-card" onclick="speakWord('${word.word}')">
-                            <div class="word">${word.word}</div>
-                            <div class="phonetic">${word.phonetic}</div>
+                        <div class="word-card">
+                            <div class="word">
+                                ${word.word}
+                                <span class="speaker-icon" onmouseenter="speakWord('${word.word}')" title="悬停朗读单词">🔊</span>
+                            </div>
+                            <div class="phonetic">
+                                ${word.phonetic}
+                                <span class="speaker-icon" onmouseenter="speakWord('${word.word}')" title="悬停朗读音标">🔊</span>
+                            </div>
                             <div class="meaning">${word.meaning}</div>
                         </div>
                     `).join('');
@@ -587,17 +412,24 @@
                 
             } catch (error) {
                 console.error('❌ 加载课程失败:', error);
-                alert(`加载课程失败：${error.message}\n\n请检查文件是否存在：../words/daily-phonics/${lessonId}.json`);
+                alert(`加载课程失败：${error.message}`);
             }
         }
         
         // 朗读单词
         function speakWord(word) {
             if ('speechSynthesis' in window) {
+                // 停止之前的朗读
+                speechSynthesis.cancel();
+                
                 const utterance = new SpeechSynthesisUtterance(word);
                 utterance.lang = 'en-GB';
                 utterance.rate = 0.8;
+                utterance.pitch = 1.0;
+                utterance.volume = 1.0;
+                
                 speechSynthesis.speak(utterance);
+                console.log('🔊 朗读单词:', word);
             }
         }
         

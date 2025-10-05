@@ -9,6 +9,29 @@
     "wordCount": 20,
     "lastUpdated": "2025-10-06"
   },
+  "lesson": {
+    "pronunciationTips": [
+      "口型：嘴巴微微张开，比 /æ/ 小，比 /ɪ/ 大",
+      "舌位：舌前部稍抬起，接近上齿龈",
+      "发音：类似汉语'诶'，但更短促",
+      "要点：这是一个短元音，发音时间要短",
+      "对比：/e/ (bed) 比 /æ/ (bad) 口型更小"
+    ],
+    "phonicsPatterns": [
+      "最常见拼写：单个字母 e",
+      "CVC结构：辅音+e+辅音（bed, red, pen）",
+      "在闭音节中：get, let, set, net",
+      "双辅音前：egg, bell, dress",
+      "特殊组合：desk, help, step, best"
+    ],
+    "practiceSteps": [
+      "第一步：嘴巴张开适中，不要太大",
+      "第二步：舌前部稍微抬高",
+      "第三步：发短促的'诶'音",
+      "第四步：对比练习：/æ/ (bad) vs /e/ (bed)",
+      "第五步：快速连读：bed-red-pen-ten"
+    ]
+  },
   "words": [
     {"word": "bed", "phonetic": "[bed]", "meaning": "床", "difficulty": 1},
     {"word": "red", "phonetic": "[red]", "meaning": "红色", "difficulty": 1},
