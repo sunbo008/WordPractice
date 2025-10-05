@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>单词库测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f0f0f0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .warning { background: #fff3cd; color: #856404; }
+        .word-item {
+            background: #f8f9fa;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Word Tetris 单词库测试</h1>
+        
+        <div id="status" class="status warning">正在加载单词库...</div>
+        
+        <div>
+            <button onclick="testWordGeneration()">测试单词生成</button>
+            <button onclick="showAllWords()">显示所有单词</button>
+            <button onclick="testByLevel()">按等级测试</button>
+            <button onclick="testRepetition()">测试重复率</button>
+            <button onclick="clearRecentWords()">清空最近使用</button>
+        </div>
+        
+        <div id="results"></div>
+    </div>
+
+    <script src="vocabulary.js"></script>
+    <script>
+        let vocabularyManager;
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            vocabularyManager = new VocabularyManager();
+            
+            // 等待加载完成
+            const checkLoading = setInterval(() => {
+                if (vocabularyManager.isLoaded) {
+                    clearInterval(checkLoading);
+                    document.getElementById('status').innerHTML = 
+                        `<span class="success">✅ 单词库加载成功！共 ${vocabularyManager.allWords.length} 个单词</span>`;
+                }
+            }, 100);
+            
+            // 超时检查
+            setTimeout(() => {
+                if (!vocabularyManager.isLoaded) {
+                    document.getElementById('status').innerHTML = 
+                        '<span class="error">❌ 单词库加载超时</span>';
+                }
+            }, 5000);
+        });
+        
+        function testWordGeneration() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<h3>单词生成测试</h3>';
+            
+            for (let level = 1; level <= 5; level++) {
+                const word = vocabularyManager.getRandomWord(level);
+                if (word) {
+                    results.innerHTML += `
+                        <div class="word-item">
+                            <strong>等级 ${level}:</strong> ${word.original} (${word.display}) - ${word.meaning}
+                            <br><small>音标: ${word.phonetic || '无'} | 难度: ${word.difficulty}</small>
+                        </div>
+                    `;
+                } else {
+                    results.innerHTML += `
+                        <div class="word-item" style="border-left-color: #dc3545;">
+                            <strong>等级 ${level}:</strong> ❌ 获取单词失败
+                        </div>
+                    `;
+                }
+            }
+        }
+        
+        function showAllWords() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<h3>所有单词列表</h3>';
+            
+            vocabularyManager.allWords.forEach((word, index) => {
+                results.innerHTML += `
+                    <div class="word-item">
+                        ${index + 1}. <strong>${word.word}</strong> - ${word.meaning}
+                        <br><small>音标: ${word.phonetic || '无'} | 难度: ${word.difficulty} | 音素: ${word.phoneme || '无'}</small>
+                    </div>
+                `;
+            });
+        }
+        
+        function testByLevel() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<h3>按等级分类测试</h3>';
+            
+            for (let level = 1; level <= 5; level++) {
+                const words = vocabularyManager.getVocabularyForLevel(level);
+                results.innerHTML += `
+                    <div class="word-item">
+                        <strong>等级 ${level}:</strong> ${words.length} 个单词
+                        <br><small>示例: ${words.slice(0, 3).map(w => w.word).join(', ')}</small>
+                    </div>
+                `;
+            }
+        }
+        
+        function testRepetition() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<h3>重复率测试（生成30个单词）</h3>';
+            
+            const level = 2; // 测试等级2
+            const testCount = 30;
+            const words = [];
+            const wordCounts = {};
+            
+            // 生成30个单词
+            for (let i = 0; i < testCount; i++) {
+                const word = vocabularyManager.getRandomWord(level);
+                if (word) {
+                    words.push(word.original);
+                    wordCounts[word.original] = (wordCounts[word.original] || 0) + 1;
+                }
+            }
+            
+            // 统计重复情况
+            const uniqueWords = Object.keys(wordCounts).length;
+            const totalWords = words.length;
+            const repetitionRate = ((totalWords - uniqueWords) / totalWords * 100).toFixed(1);
+            
+            results.innerHTML += `
+                <div class="word-item">
+                    <strong>统计结果:</strong><br>
+                    总生成: ${totalWords} 个单词<br>
+                    唯一单词: ${uniqueWords} 个<br>
+                    重复率: ${repetitionRate}%<br>
+                    最近使用列表长度: ${vocabularyManager.recentWords.length}
+                </div>
+            `;
+            
+            // 显示重复的单词
+            const repeatedWords = Object.entries(wordCounts).filter(([word, count]) => count > 1);
+            if (repeatedWords.length > 0) {
+                results.innerHTML += `
+                    <div class="word-item" style="border-left-color: #ffc107;">
+                        <strong>重复单词:</strong><br>
+                        ${repeatedWords.map(([word, count]) => `${word} (${count}次)`).join(', ')}
+                    </div>
+                `;
+            }
+            
+            // 显示生成序列
+            results.innerHTML += `
+                <div class="word-item">
+                    <strong>生成序列:</strong><br>
+                    <small>${words.join(' → ')}</small>
+                </div>
+            `;
+        }
+        
+        function clearRecentWords() {
+            vocabularyManager.recentWords = [];
+            alert('已清空最近使用单词列表');
+        }
+    </script>
+</body>
+</html>

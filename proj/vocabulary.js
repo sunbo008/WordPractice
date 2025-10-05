@@ -1,106 +1,213 @@
 // 词汇库管理
 class VocabularyManager {
     constructor() {
-        this.vocabularyBank = {
-            level1: [
-                { word: "CAT", missing: [0], meaning: "猫" },
-                { word: "DOG", missing: [1], meaning: "狗" },
-                { word: "SUN", missing: [1], meaning: "太阳" },
-                { word: "RUN", missing: [0], meaning: "跑" },
-                { word: "FUN", missing: [2], meaning: "有趣" },
-                { word: "BIG", missing: [1], meaning: "大的" },
-                { word: "RED", missing: [1], meaning: "红色" },
-                { word: "BOX", missing: [2], meaning: "盒子" },
-                { word: "HAT", missing: [0], meaning: "帽子" },
-                { word: "BAT", missing: [2], meaning: "蝙蝠" },
-                { word: "CUP", missing: [1], meaning: "杯子" },
-                { word: "PEN", missing: [0], meaning: "钢笔" },
-                { word: "BED", missing: [2], meaning: "床" },
-                { word: "EGG", missing: [0], meaning: "鸡蛋" },
-                { word: "BAG", missing: [1], meaning: "包" },
-                { word: "LEG", missing: [0], meaning: "腿" },
-                { word: "NET", missing: [2], meaning: "网" },
-                { word: "WET", missing: [1], meaning: "湿的" },
-                { word: "HOT", missing: [1], meaning: "热的" },
-                { word: "TOP", missing: [0], meaning: "顶部" }
-            ],
-            level2: [
-                { word: "BOOK", missing: [1], meaning: "书" },
-                { word: "TREE", missing: [1], meaning: "树" },
-                { word: "FISH", missing: [0], meaning: "鱼" },
-                { word: "BIRD", missing: [1], meaning: "鸟" },
-                { word: "HAND", missing: [1], meaning: "手" },
-                { word: "FOOT", missing: [1], meaning: "脚" },
-                { word: "HEAD", missing: [1], meaning: "头" },
-                { word: "FACE", missing: [1], meaning: "脸" },
-                { word: "DOOR", missing: [1], meaning: "门" },
-                { word: "WALL", missing: [1], meaning: "墙" },
-                { word: "DESK", missing: [1], meaning: "桌子" },
-                { word: "CAKE", missing: [1], meaning: "蛋糕" },
-                { word: "MILK", missing: [1], meaning: "牛奶" },
-                { word: "BALL", missing: [1], meaning: "球" },
-                { word: "GAME", missing: [1], meaning: "游戏" },
-                { word: "PLAY", missing: [1], meaning: "玩" },
-                { word: "WORK", missing: [1], meaning: "工作" },
-                { word: "HOME", missing: [1], meaning: "家" },
-                { word: "LOVE", missing: [1], meaning: "爱" },
-                { word: "HELP", missing: [1], meaning: "帮助" }
-            ],
-            level3: [
-                { word: "HOUSE", missing: [1], meaning: "房子" },
-                { word: "WATER", missing: [1, 3], meaning: "水" },
-                { word: "HAPPY", missing: [1], meaning: "快乐的" },
-                { word: "SMILE", missing: [1], meaning: "微笑" },
-                { word: "FRIEND", missing: [1, 4], meaning: "朋友" },
-                { word: "FAMILY", missing: [1, 4], meaning: "家庭" },
-                { word: "SCHOOL", missing: [1, 4], meaning: "学校" },
-                { word: "TEACHER", missing: [1, 5], meaning: "老师" },
-                { word: "STUDENT", missing: [1, 5], meaning: "学生" },
-                { word: "MOTHER", missing: [1, 4], meaning: "妈妈" },
-                { word: "FATHER", missing: [1, 4], meaning: "爸爸" },
-                { word: "SISTER", missing: [1, 4], meaning: "姐妹" },
-                { word: "BROTHER", missing: [1, 5], meaning: "兄弟" },
-                { word: "FLOWER", missing: [1, 4], meaning: "花" },
-                { word: "GARDEN", missing: [1, 4], meaning: "花园" },
-                { word: "ANIMAL", missing: [1, 4], meaning: "动物" },
-                { word: "RABBIT", missing: [1, 4], meaning: "兔子" },
-                { word: "MONKEY", missing: [1, 4], meaning: "猴子" },
-                { word: "ELEPHANT", missing: [1, 6], meaning: "大象" },
-                { word: "BUTTERFLY", missing: [1, 6], meaning: "蝴蝶" }
-            ]
-        };
-        
+        this.wordsData = null;
+        this.allWords = [];
         this.currentVocabulary = [];
         this.missedWords = new Map(); // 存储错过的单词及其次数
+        this.isLoaded = false; // 添加加载状态标志
+        
+        // 最近使用单词跟踪
+        this.recentWords = []; // 存储最近使用的单词
+        this.maxRecentWords = 15; // 最大跟踪数量（可根据单词库大小调整）
+        
+        // 加载单词数据
+        this.loadWordsData();
+    }
+    
+    // 加载JSON单词数据
+    async loadWordsData() {
+        try {
+            const response = await fetch('./words.json');
+            this.wordsData = await response.json();
+            this.processWordsData();
+            this.isLoaded = true;
+            console.log('✅ 单词库加载成功:', this.wordsData.metadata);
+        } catch (error) {
+            console.error('❌ 单词库加载失败:', error);
+            // 使用备用单词库
+            this.loadFallbackWords();
+            this.isLoaded = true;
+        }
+    }
+    
+    // 处理单词数据，创建统一的单词数组
+    processWordsData() {
+        this.allWords = [];
+        
+        if (!this.wordsData || !this.wordsData.phonicsLessons) {
+            console.warn('单词数据格式错误');
+            return;
+        }
+        
+        // 遍历所有课程，收集单词
+        Object.values(this.wordsData.phonicsLessons).forEach(lesson => {
+            if (lesson.words && Array.isArray(lesson.words)) {
+                lesson.words.forEach(wordData => {
+                    this.allWords.push({
+                        word: wordData.word.toUpperCase(),
+                        meaning: wordData.meaning,
+                        phonetic: wordData.phonetic,
+                        difficulty: wordData.difficulty,
+                        phoneme: lesson.phoneme,
+                        description: lesson.description
+                    });
+                });
+            }
+        });
+        
+        console.log(`📚 已加载 ${this.allWords.length} 个单词`);
+    }
+    
+    // 备用单词库（如果JSON加载失败）
+    loadFallbackWords() {
+        console.log('🔄 使用备用单词库');
+        this.allWords = [
+            { word: "CAT", meaning: "猫", difficulty: 1 },
+            { word: "DOG", meaning: "狗", difficulty: 1 },
+            { word: "SUN", meaning: "太阳", difficulty: 1 },
+            { word: "RUN", meaning: "跑", difficulty: 1 },
+            { word: "FUN", meaning: "有趣", difficulty: 1 },
+            { word: "BIG", meaning: "大的", difficulty: 1 },
+            { word: "RED", meaning: "红色", difficulty: 1 },
+            { word: "BOX", meaning: "盒子", difficulty: 1 },
+            { word: "BOOK", meaning: "书", difficulty: 2 },
+            { word: "TREE", meaning: "树", difficulty: 2 },
+            { word: "FISH", meaning: "鱼", difficulty: 2 },
+            { word: "BIRD", meaning: "鸟", difficulty: 2 },
+            { word: "WATER", meaning: "水", difficulty: 3 },
+            { word: "SCHOOL", meaning: "学校", difficulty: 3 },
+            { word: "TEACHER", meaning: "老师", difficulty: 3 }
+        ];
     }
 
     // 获取指定等级的词汇
     getVocabularyForLevel(level) {
-        const levelKey = `level${Math.min(level, 3)}`;
-        return this.vocabularyBank[levelKey] || this.vocabularyBank.level1;
+        if (!this.allWords || this.allWords.length === 0) {
+            console.warn('单词库未加载或为空');
+            return [];
+        }
+        
+        // 根据等级筛选单词
+        let targetDifficulty;
+        if (level <= 2) {
+            targetDifficulty = 1; // 1-2级使用难度1的单词
+        } else if (level <= 4) {
+            targetDifficulty = 2; // 3-4级使用难度2的单词
+        } else {
+            targetDifficulty = 3; // 5级以上使用难度3的单词
+        }
+        
+        const filteredWords = this.allWords.filter(word => 
+            word.difficulty <= targetDifficulty
+        );
+        
+        return filteredWords.length > 0 ? filteredWords : this.allWords;
     }
 
-    // 随机选择一个单词
+    // 智能选择单词（避免短期重复）
     getRandomWord(level, isEndChallenge = false) {
+        // 检查单词库是否已加载
+        if (!this.isLoaded) {
+            console.warn('单词库尚未加载完成，请稍候...');
+            return null;
+        }
+        
         const vocabulary = this.getVocabularyForLevel(level);
-        const randomIndex = Math.floor(Math.random() * vocabulary.length);
-        const wordData = vocabulary[randomIndex];
+        
+        if (vocabulary.length === 0) {
+            console.error('没有可用的单词');
+            return null;
+        }
+        
+        // 动态调整最大跟踪数量（不超过词汇表的70%）
+        this.maxRecentWords = Math.min(15, Math.floor(vocabulary.length * 0.7));
+        
+        let selectedWord = null;
+        let attempts = 0;
+        const maxAttempts = 50; // 防止无限循环
+        
+        // 尝试选择一个不在最近使用列表中的单词
+        while (attempts < maxAttempts) {
+            const randomIndex = Math.floor(Math.random() * vocabulary.length);
+            const wordData = vocabulary[randomIndex];
+            
+            // 检查是否在最近使用列表中
+            if (!this.isWordRecent(wordData.word)) {
+                selectedWord = wordData;
+                break;
+            }
+            
+            attempts++;
+        }
+        
+        // 如果尝试多次仍未找到，选择最不常用的单词
+        if (!selectedWord) {
+            selectedWord = this.selectLeastRecentWord(vocabulary);
+        }
+        
+        // 将选中的单词添加到最近使用列表
+        this.addToRecentWords(selectedWord.word);
         
         // 根据等级确定缺失字母数
         let missingCount = this.getMissingCountForLevel(level, isEndChallenge);
-        let missingIndices = this.generateMissingIndices(wordData.word, missingCount);
+        let missingIndices = this.generateMissingIndices(selectedWord.word, missingCount);
         
         return {
-            original: wordData.word,
-            meaning: wordData.meaning,
+            original: selectedWord.word,
+            meaning: selectedWord.meaning,
+            phonetic: selectedWord.phonetic || '',
+            phoneme: selectedWord.phoneme || '',
+            description: selectedWord.description || '',
             missing: missingIndices,
-            display: this.createDisplayWord(wordData.word, missingIndices),
-            missingLetters: this.getMissingLetters(wordData.word, missingIndices),
-            level: level
+            display: this.createDisplayWord(selectedWord.word, missingIndices),
+            missingLetters: this.getMissingLetters(selectedWord.word, missingIndices),
+            level: level,
+            difficulty: selectedWord.difficulty
         };
     }
+    
+    // 检查单词是否在最近使用列表中
+    isWordRecent(word) {
+        return this.recentWords.includes(word);
+    }
+    
+    // 添加单词到最近使用列表
+    addToRecentWords(word) {
+        // 如果单词已存在，先移除
+        const existingIndex = this.recentWords.indexOf(word);
+        if (existingIndex !== -1) {
+            this.recentWords.splice(existingIndex, 1);
+        }
+        
+        // 添加到列表开头
+        this.recentWords.unshift(word);
+        
+        // 保持列表大小不超过最大值
+        if (this.recentWords.length > this.maxRecentWords) {
+            this.recentWords = this.recentWords.slice(0, this.maxRecentWords);
+        }
+        
+        console.log(`📝 最近使用单词: [${this.recentWords.slice(0, 5).join(', ')}...] (共${this.recentWords.length}个)`);
+    }
+    
+    // 选择最不常用的单词（当所有单词都在最近使用列表中时）
+    selectLeastRecentWord(vocabulary) {
+        // 找到不在最近使用列表中的单词
+        const availableWords = vocabulary.filter(word => !this.isWordRecent(word.word));
+        
+        if (availableWords.length > 0) {
+            // 如果有可用单词，随机选择一个
+            const randomIndex = Math.floor(Math.random() * availableWords.length);
+            return availableWords[randomIndex];
+        } else {
+            // 如果所有单词都在最近使用列表中，选择最早使用的单词
+            const oldestWord = this.recentWords[this.recentWords.length - 1];
+            return vocabulary.find(word => word.word === oldestWord) || vocabulary[0];
+        }
+    }
 
-    // 根据等级确定缺失字母数
+    // 根据等级确定缺失字母数（按设计文档要求）
     getMissingCountForLevel(level, isEndChallenge = false) {
         let baseCount;
         
@@ -109,7 +216,7 @@ class VocabularyManager {
         } else if (level === 2) {
             baseCount = Math.random() < 0.5 ? 1 : 2; // 1-2个字母
         } else if (level === 3) {
-            baseCount = Math.random() < 0.5 ? 1 : 2; // 1-2个字母
+            baseCount = Math.random() < 0.5 ? 1 : 2; // 1-2个字母  
         } else if (level === 4) {
             baseCount = 2; // 2个字母
         } else {
@@ -121,7 +228,7 @@ class VocabularyManager {
             baseCount += 1;
         }
         
-        return baseCount;
+        return Math.max(1, baseCount); // 至少1个字母
     }
 
     // 生成缺失字母的位置
@@ -207,6 +314,22 @@ class VocabularyManager {
         return correctAnswer === userAnswer;
     }
 
+    // 获取重复率统计信息
+    getRepetitionStats() {
+        return {
+            recentWordsCount: this.recentWords.length,
+            maxRecentWords: this.maxRecentWords,
+            recentWords: [...this.recentWords], // 返回副本
+            totalWords: this.allWords.length
+        };
+    }
+    
+    // 重置最近使用单词列表
+    resetRecentWords() {
+        this.recentWords = [];
+        console.log('🔄 已重置最近使用单词列表');
+    }
+    
     // 获取复习单词（从生词本中选择或随机选择）
     getReviewWord(specificWord = null) {
         let wordData;

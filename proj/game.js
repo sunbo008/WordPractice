@@ -525,11 +525,27 @@ class WordTetrisGame {
     }
 
     generateNextWord() {
+        // 检查单词库是否已加载
+        if (!this.vocabularyManager.isLoaded) {
+            console.log('等待单词库加载...');
+            // 延迟重试
+            setTimeout(() => this.generateNextWord(), 100);
+            return;
+        }
+        
         // 检查是否为等级末尾挑战（最后10个单词）
         const wordsUntilNextLevel = Math.ceil((this.targetScore - this.score) / 2); // 假设平均2分/单词
         const isEndChallenge = wordsUntilNextLevel <= 10;
         
         this.nextWord = this.vocabularyManager.getRandomWord(this.level, isEndChallenge);
+        
+        // 如果获取单词失败，重试
+        if (!this.nextWord) {
+            console.warn('获取单词失败，重试中...');
+            setTimeout(() => this.generateNextWord(), 100);
+            return;
+        }
+        
         this.levelWordCount++;
         this.updateNextWordDisplay();
     }
@@ -802,31 +818,9 @@ class WordTetrisGame {
             // 普通显示
             this.ctx.fillStyle = '#ffffff';
             this.ctx.fillText(text, x, y);
-            
-            // 为缺失字母添加红色下划线
-            if (word.missing && word.missing.length > 0) {
-                this.drawMissingLetterUnderlines(word, x, y);
-            }
         }
     }
 
-    drawMissingLetterUnderlines(word, centerX, textY) {
-        const text = word.original;
-        const charWidth = this.ctx.measureText('M').width; // 估算字符宽度
-        const totalWidth = this.ctx.measureText(text).width;
-        const startX = centerX - totalWidth / 2;
-        
-        this.ctx.strokeStyle = '#ff4444';
-        this.ctx.lineWidth = 2;
-        
-        word.missing.forEach(index => {
-            const charX = startX + (charWidth * index);
-            this.ctx.beginPath();
-            this.ctx.moveTo(charX, textY + 5);
-            this.ctx.lineTo(charX + charWidth, textY + 5);
-            this.ctx.stroke();
-        });
-    }
 
     drawStackedWords() {
         // 按设计方案显示堆叠单词：每行多个单词，从底部向上堆叠
