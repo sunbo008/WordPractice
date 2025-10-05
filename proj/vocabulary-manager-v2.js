@@ -13,9 +13,9 @@ class VocabularyManagerV2 {
         this.recentWords = [];
         this.maxRecentWords = 15;
         
-        // 当前配置
+        // 当前配置 (初始占位，会从配置加载器获取实际默认值)
         this.currentConfig = {
-            enabledLibraries: ['basic-phonics', 'common-words'],
+            enabledLibraries: [], // 会从配置加载器的defaultConfig获取
             maxWords: 200,
             difficultyRange: [1, 3],
             categories: ['all']

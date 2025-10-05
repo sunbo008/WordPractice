@@ -55,7 +55,7 @@ class VocabularyConfigLoader {
                     }
                 ],
                 defaultConfig: {
-                    enabledLibraries: dailyPhonics.slice(0, 4).map(item => item.id),
+                    enabledLibraries: dailyPhonics.map(item => item.id), // 加载所有daily-phonics课程
                     maxWords: 200,
                     difficultyRange: [1, 3],
                     categories: ["daily-phonics"]
