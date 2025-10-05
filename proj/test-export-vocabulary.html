@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>导出生词功能测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .button:hover {
+            background: #2980b9;
+        }
+        .button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .vocabulary-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            background: #f8f9fa;
+        }
+        .vocab-item {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+        }
+        .vocab-item:last-child {
+            border-bottom: none;
+        }
+        .word {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .meaning {
+            color: #7f8c8d;
+        }
+        .stats {
+            font-size: 0.9em;
+            color: #95a5a6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📤 导出生词功能测试</h1>
+        <p>测试生词导出为文本文件的功能</p>
+        
+        <div class="test-section">
+            <h3>当前生词本</h3>
+            <div id="vocabulary-display" class="vocabulary-list">
+                <p>暂无生词</p>
+            </div>
+            <p><strong>生词数量：</strong><span id="vocab-count">0</span></p>
+        </div>
+        
+        <div class="test-section">
+            <h3>测试操作</h3>
+            <button class="button" onclick="loadVocabularyManager()">加载单词库</button>
+            <button class="button" onclick="addTestWords()">添加测试生词</button>
+            <button class="button" onclick="clearVocabulary()">清空生词本</button>
+            <button class="button" id="exportBtn" onclick="exportVocabulary()" disabled>导出生词</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>测试结果</h3>
+            <div id="test-results"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>导出文件预览</h3>
+            <div id="export-preview"></div>
+        </div>
+    </div>
+
+    <script src="vocabulary.js"></script>
+    <script>
+        let vocabularyManager = null;
+        
+        function updateStatus(message, type = 'info') {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+        
+        function updateVocabularyDisplay() {
+            if (!vocabularyManager) return;
+            
+            const vocabularyBook = vocabularyManager.getVocabularyBook();
+            const displayDiv = document.getElementById('vocabulary-display');
+            const countSpan = document.getElementById('vocab-count');
+            
+            countSpan.textContent = vocabularyBook.length;
+            
+            if (vocabularyBook.length === 0) {
+                displayDiv.innerHTML = '<p>暂无生词</p>';
+                document.getElementById('exportBtn').disabled = true;
+            } else {
+                let html = '';
+                vocabularyBook.forEach((word, index) => {
+                    html += `
+                        <div class="vocab-item">
+                            <div>
+                                <span class="word">${word.word}</span>
+                                <span class="meaning"> - ${word.meaning}</span>
+                            </div>
+                            <div class="stats">
+                                错误:${word.count} 放弃:${word.giveUpCount || 0} 等级:${word.level}
+                            </div>
+                        </div>
+                    `;
+                });
+                displayDiv.innerHTML = html;
+                document.getElementById('exportBtn').disabled = false;
+            }
+        }
+        
+        async function loadVocabularyManager() {
+            updateStatus('正在加载单词库管理器...', 'info');
+            
+            try {
+                vocabularyManager = new VocabularyManager();
+                
+                // 等待加载完成
+                let waitCount = 0;
+                while (!vocabularyManager.isLoaded && waitCount < 50) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    waitCount++;
+                }
+                
+                if (vocabularyManager.isLoaded) {
+                    updateStatus('✅ 单词库管理器加载成功！', 'success');
+                    updateVocabularyDisplay();
+                } else {
+                    updateStatus('❌ 单词库管理器加载失败或超时', 'error');
+                }
+            } catch (error) {
+                updateStatus(`❌ 加载失败: ${error.message}`, 'error');
+            }
+        }
+        
+        function addTestWords() {
+            if (!vocabularyManager) {
+                updateStatus('❌ 请先加载单词库管理器', 'error');
+                return;
+            }
+            
+            // 添加一些测试生词
+            const testWords = [
+                { word: 'problem', meaning: '问题', count: 3, giveUpCount: 1, failCount: 0, level: 1 },
+                { word: 'father', meaning: '父亲', count: 2, giveUpCount: 0, failCount: 1, level: 1 },
+                { word: 'number', meaning: '数字', count: 4, giveUpCount: 2, failCount: 0, level: 2 },
+                { word: 'sleep', meaning: '睡觉', count: 1, giveUpCount: 0, failCount: 0, level: 1 },
+                { word: 'sister', meaning: '姐妹', count: 2, giveUpCount: 1, failCount: 1, level: 2 }
+            ];
+            
+            testWords.forEach(word => {
+                vocabularyManager.addToVocabulary(word);
+            });
+            
+            updateStatus(`✅ 已添加 ${testWords.length} 个测试生词`, 'success');
+            updateVocabularyDisplay();
+        }
+        
+        function clearVocabulary() {
+            if (!vocabularyManager) {
+                updateStatus('❌ 请先加载单词库管理器', 'error');
+                return;
+            }
+            
+            vocabularyManager.clearCurrentLevelVocabulary();
+            updateStatus('✅ 生词本已清空', 'success');
+            updateVocabularyDisplay();
+        }
+        
+        function exportVocabulary() {
+            if (!vocabularyManager) {
+                updateStatus('❌ 请先加载单词库管理器', 'error');
+                return;
+            }
+            
+            const vocabularyBook = vocabularyManager.getVocabularyBook();
+            if (vocabularyBook.length === 0) {
+                updateStatus('❌ 生词本为空，无法导出！', 'error');
+                return;
+            }
+            
+            // 创建文本格式的数据
+            let textContent = "=== 我的生词本 ===\\n";
+            textContent += `导出时间: ${new Date().toLocaleString()}\\n`;
+            textContent += `总计: ${vocabularyBook.length} 个生词\\n\\n`;
+            
+            vocabularyBook.forEach((word, index) => {
+                textContent += `${index + 1}. ${word.word}\\n`;
+                textContent += `   中文意思: ${word.meaning}\\n`;
+                textContent += `   错误次数: ${word.count}\\n`;
+                textContent += `   放弃次数: ${word.giveUpCount || 0}\\n`;
+                textContent += `   失败次数: ${word.failCount || 0}\\n`;
+                textContent += `   难度等级: ${word.level}\\n`;
+                textContent += "\\n";
+            });
+            
+            textContent += "=== 学习建议 ===\\n";
+            textContent += "1. 重点复习错误次数较多的单词\\n";
+            textContent += "2. 建议每天复习5-10个生词\\n";
+            textContent += "3. 可以制作单词卡片加强记忆\\n";
+            
+            // 显示预览
+            const previewDiv = document.getElementById('export-preview');
+            previewDiv.innerHTML = `<pre style="background: #f8f9fa; padding: 15px; border-radius: 5px; font-size: 0.9em; max-height: 400px; overflow-y: auto;">${textContent}</pre>`;
+            
+            // 创建下载链接
+            const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `我的生词本_${new Date().toISOString().split('T')[0]}.txt`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            updateStatus(`✅ 成功导出 ${vocabularyBook.length} 个生词到文本文件！`, 'success');
+        }
+        
+        // 页面加载时自动加载单词库
+        window.addEventListener('load', () => {
+            updateStatus('页面已加载，点击"加载单词库"开始测试', 'info');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>考试统计测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .button:hover {
+            background: #2980b9;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .exam-stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            background: rgba(255,255,255,0.15);
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+            margin: 15px 0;
+        }
+        .stats-item {
+            text-align: center;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .stats-item .label {
+            font-size: 0.95em;
+            opacity: 0.9;
+            color: #2c3e50;
+        }
+        .stats-item span:not(.label):not(.percentage) {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #3498db;
+        }
+        .stats-item .percentage {
+            font-size: 0.9em;
+            color: #27ae60;
+            font-weight: normal;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 考试统计测试工具</h1>
+        <p>测试考试总单词量的获取和显示</p>
+        
+        <div class="test-section">
+            <h3>当前考试统计</h3>
+            <div class="exam-stats">
+                <div class="stats-item">
+                    <span class="label">考试总词量:</span>
+                    <span id="total-words">0</span>
+                </div>
+                <div class="stats-item">
+                    <span class="label">正确命中:</span>
+                    <span id="hit-words">0</span>
+                    <span class="percentage">(<span id="hit-percentage">0%</span>)</span>
+                </div>
+                <div class="stats-item">
+                    <span class="label">覆盖率:</span>
+                    <span id="coverage-percentage">0%</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h3>测试操作</h3>
+            <button class="button" onclick="testVocabularyManager()">测试单词库管理器</button>
+            <button class="button" onclick="testGameStats()">测试游戏统计</button>
+            <button class="button" onclick="simulateHitWords()">模拟命中单词</button>
+            <button class="button" onclick="resetStats()">重置统计</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>测试结果</h3>
+            <div id="test-results"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>调试信息</h3>
+            <div id="debug-info"></div>
+        </div>
+    </div>
+
+    <script src="vocabulary.js"></script>
+    <script>
+        let vocabularyManager = null;
+        let testHitWords = new Set();
+        
+        function updateStatus(message, type = 'info') {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+        
+        function updateDebugInfo(info) {
+            const debugDiv = document.getElementById('debug-info');
+            debugDiv.innerHTML = `<div class="status info"><pre>${info}</pre></div>`;
+        }
+        
+        function updateExamStats(totalWords, hitWords) {
+            const hitWordsCount = hitWords;
+            const hitPercentage = totalWords > 0 ? Math.round((hitWordsCount / totalWords) * 100) : 0;
+            const coveragePercentage = hitPercentage;
+            
+            document.getElementById('total-words').textContent = totalWords;
+            document.getElementById('hit-words').textContent = hitWordsCount;
+            document.getElementById('hit-percentage').textContent = `${hitPercentage}%`;
+            document.getElementById('coverage-percentage').textContent = `${coveragePercentage}%`;
+        }
+        
+        async function testVocabularyManager() {
+            updateStatus('正在测试单词库管理器...', 'info');
+            
+            try {
+                vocabularyManager = new VocabularyManager();
+                
+                // 等待加载完成
+                let waitCount = 0;
+                while (!vocabularyManager.isLoaded && waitCount < 50) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    waitCount++;
+                }
+                
+                if (vocabularyManager.isLoaded) {
+                    const stats = vocabularyManager.getVocabularyStats();
+                    
+                    updateStatus(`✅ 单词库加载成功！总单词数: ${stats.totalWords}`, 'success');
+                    updateExamStats(stats.totalWords, testHitWords.size);
+                    
+                    updateDebugInfo(`单词库统计:
+总单词数: ${stats.totalWords}
+生词本数量: ${stats.missedWords}
+所有单词数组长度: ${vocabularyManager.allWords ? vocabularyManager.allWords.length : 'null'}
+加载状态: ${vocabularyManager.isLoaded}
+加载错误: ${vocabularyManager.loadError || 'none'}`);
+                } else {
+                    updateStatus('❌ 单词库加载失败或超时', 'error');
+                    updateDebugInfo(`加载失败信息:
+加载状态: ${vocabularyManager.isLoaded}
+加载错误: ${vocabularyManager.loadError || 'none'}
+等待次数: ${waitCount}`);
+                }
+            } catch (error) {
+                updateStatus(`❌ 测试失败: ${error.message}`, 'error');
+                updateDebugInfo(`错误详情: ${error.stack}`);
+            }
+        }
+        
+        async function testGameStats() {
+            updateStatus('正在测试游戏统计逻辑...', 'info');
+            
+            if (!vocabularyManager || !vocabularyManager.isLoaded) {
+                updateStatus('❌ 请先测试单词库管理器', 'error');
+                return;
+            }
+            
+            try {
+                // 模拟游戏统计逻辑
+                const stats = vocabularyManager.getVocabularyStats();
+                const totalWords = stats.totalWords;
+                const hitWordsCount = testHitWords.size;
+                
+                updateExamStats(totalWords, hitWordsCount);
+                updateStatus(`✅ 游戏统计测试成功！总词量: ${totalWords}, 命中: ${hitWordsCount}`, 'success');
+                
+                updateDebugInfo(`游戏统计:
+总单词数: ${totalWords}
+命中单词数: ${hitWordsCount}
+命中率: ${totalWords > 0 ? Math.round((hitWordsCount / totalWords) * 100) : 0}%
+测试命中单词: [${Array.from(testHitWords).join(', ')}]`);
+            } catch (error) {
+                updateStatus(`❌ 游戏统计测试失败: ${error.message}`, 'error');
+            }
+        }
+        
+        function simulateHitWords() {
+            // 模拟命中一些单词
+            const sampleWords = ['cat', 'dog', 'book', 'tree', 'house'];
+            const randomWord = sampleWords[Math.floor(Math.random() * sampleWords.length)];
+            
+            testHitWords.add(randomWord);
+            
+            if (vocabularyManager && vocabularyManager.isLoaded) {
+                const stats = vocabularyManager.getVocabularyStats();
+                updateExamStats(stats.totalWords, testHitWords.size);
+                updateStatus(`✅ 模拟命中单词: ${randomWord}`, 'success');
+            } else {
+                updateStatus('❌ 请先测试单词库管理器', 'error');
+            }
+        }
+        
+        function resetStats() {
+            testHitWords.clear();
+            updateExamStats(0, 0);
+            updateStatus('✅ 统计已重置', 'success');
+            updateDebugInfo('统计数据已清空');
+        }
+        
+        // 页面加载时自动测试
+        window.addEventListener('load', () => {
+            updateStatus('页面已加载，点击"测试单词库管理器"开始测试', 'info');
+        });
+    </script>
+</body>
+</html>

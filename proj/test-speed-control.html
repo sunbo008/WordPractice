@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>速度控制测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .speed-info {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+        .button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .button:hover {
+            background: #2980b9;
+        }
+        .current-level {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 速度控制测试工具</h1>
+        <p>测试每升一级速度是否正确增加5%</p>
+        
+        <div class="test-section">
+            <h3>当前游戏状态</h3>
+            <div class="current-level">等级: <span id="current-level">1</span></div>
+            <div class="speed-info">
+                <div>基础速度: <span id="base-speed">0.333</span> 像素/帧</div>
+                <div>速度倍数: <span id="speed-multiplier">1.0</span></div>
+                <div>当前速度: <span id="current-speed">0.333</span> 像素/帧</div>
+                <div>理论速度: <span id="theoretical-speed">0.333</span> 像素/帧</div>
+                <div>速度差异: <span id="speed-difference">0</span>%</div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h3>速度测试</h3>
+            <button class="button" onclick="simulateLevelUp()">模拟升级</button>
+            <button class="button" onclick="resetTest()">重置测试</button>
+            <button class="button" onclick="testMultipleLevels()">测试多级升级</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>速度计算验证</h3>
+            <div id="speed-calculations"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>实际游戏速度检查</h3>
+            <button class="button" onclick="checkGameSpeed()">检查游戏实例速度</button>
+            <div id="game-speed-info"></div>
+        </div>
+    </div>
+
+    <script src="vocabulary.js"></script>
+    <script src="game.js"></script>
+    <script>
+        let testGame = null;
+        
+        function initTestGame() {
+            // 创建一个测试用的游戏实例
+            testGame = {
+                level: 1,
+                baseSpeed: 1 / 3, // 基础速度：3帧1像素
+                speedMultiplier: 1.0,
+                wordSpeed: 1 / 3,
+                
+                levelUp: function() {
+                    this.level++;
+                    this.speedMultiplier += 0.05; // 每级增加5%
+                    this.wordSpeed = this.baseSpeed * this.speedMultiplier;
+                }
+            };
+            updateDisplay();
+        }
+        
+        function updateDisplay() {
+            if (!testGame) return;
+            
+            const theoreticalSpeed = (1 / 3) * (1 + (testGame.level - 1) * 0.05);
+            const speedDifference = Math.abs(testGame.wordSpeed - theoreticalSpeed) / theoreticalSpeed * 100;
+            
+            document.getElementById('current-level').textContent = testGame.level;
+            document.getElementById('base-speed').textContent = testGame.baseSpeed.toFixed(6);
+            document.getElementById('speed-multiplier').textContent = testGame.speedMultiplier.toFixed(3);
+            document.getElementById('current-speed').textContent = testGame.wordSpeed.toFixed(6);
+            document.getElementById('theoretical-speed').textContent = theoreticalSpeed.toFixed(6);
+            document.getElementById('speed-difference').textContent = speedDifference.toFixed(3);
+        }
+        
+        function simulateLevelUp() {
+            if (!testGame) initTestGame();
+            
+            testGame.levelUp();
+            updateDisplay();
+            
+            console.log(`升级到 ${testGame.level} 级:`);
+            console.log(`  速度倍数: ${testGame.speedMultiplier}`);
+            console.log(`  当前速度: ${testGame.wordSpeed} 像素/帧`);
+        }
+        
+        function resetTest() {
+            initTestGame();
+        }
+        
+        function testMultipleLevels() {
+            initTestGame();
+            
+            let calculations = '<h4>多级升级速度计算：</h4>';
+            calculations += '<table border="1" style="border-collapse: collapse; width: 100%;">';
+            calculations += '<tr><th>等级</th><th>速度倍数</th><th>实际速度</th><th>理论速度</th><th>帧数/像素</th></tr>';
+            
+            for (let level = 1; level <= 10; level++) {
+                testGame.level = level;
+                testGame.speedMultiplier = 1.0 + (level - 1) * 0.05;
+                testGame.wordSpeed = testGame.baseSpeed * testGame.speedMultiplier;
+                
+                const theoreticalSpeed = (1 / 3) * (1 + (level - 1) * 0.05);
+                const framesPerPixel = 1 / testGame.wordSpeed;
+                
+                calculations += `<tr>`;
+                calculations += `<td>${level}</td>`;
+                calculations += `<td>${testGame.speedMultiplier.toFixed(3)}</td>`;
+                calculations += `<td>${testGame.wordSpeed.toFixed(6)}</td>`;
+                calculations += `<td>${theoreticalSpeed.toFixed(6)}</td>`;
+                calculations += `<td>${framesPerPixel.toFixed(2)}</td>`;
+                calculations += `</tr>`;
+            }
+            
+            calculations += '</table>';
+            calculations += '<p><strong>说明：</strong></p>';
+            calculations += '<ul>';
+            calculations += '<li>基础速度：1/3 = 0.333像素/帧（3帧1像素）</li>';
+            calculations += '<li>每级增加5%：speedMultiplier = 1.0 + (level-1) * 0.05</li>';
+            calculations += '<li>当前速度 = 基础速度 × 速度倍数</li>';
+            calculations += '</ul>';
+            
+            document.getElementById('speed-calculations').innerHTML = calculations;
+        }
+        
+        function checkGameSpeed() {
+            // 检查实际游戏实例的速度
+            let gameInfo = '<h4>实际游戏实例速度信息：</h4>';
+            
+            try {
+                // 尝试访问全局游戏实例
+                if (typeof window.game !== 'undefined') {
+                    const game = window.game;
+                    gameInfo += `<div class="speed-info">`;
+                    gameInfo += `<div>游戏等级: ${game.level}</div>`;
+                    gameInfo += `<div>基础速度: ${game.baseSpeed}</div>`;
+                    gameInfo += `<div>速度倍数: ${game.speedMultiplier}</div>`;
+                    gameInfo += `<div>当前速度: ${game.wordSpeed}</div>`;
+                    gameInfo += `<div>理论速度: ${(game.baseSpeed * (1 + (game.level - 1) * 0.05)).toFixed(6)}</div>`;
+                    gameInfo += `</div>`;
+                } else {
+                    gameInfo += '<p style="color: orange;">未找到游戏实例。请先启动游戏。</p>';
+                    gameInfo += '<p>请在主游戏页面的控制台中运行以下命令来检查速度：</p>';
+                    gameInfo += '<code style="background: #f0f0f0; padding: 5px;">console.log("Level:", game.level, "Speed:", game.wordSpeed, "Multiplier:", game.speedMultiplier);</code>';
+                }
+            } catch (error) {
+                gameInfo += `<p style="color: red;">检查游戏速度时出错: ${error.message}</p>`;
+            }
+            
+            document.getElementById('game-speed-info').innerHTML = gameInfo;
+        }
+        
+        // 页面加载时初始化
+        window.addEventListener('load', () => {
+            initTestGame();
+            testMultipleLevels();
+        });
+    </script>
+</body>
+</html>

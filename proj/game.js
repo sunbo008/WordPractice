@@ -28,6 +28,10 @@ class WordTetrisGame {
         this.lastHitTime = 0; // 上次击中时间
         this.levelWordCount = 0; // 当前等级单词数
         
+        // 考试统计系统
+        this.hitWords = new Set(); // 正确命中的单词集合（去重）
+        this.totalWords = 135; // 考试总单词量（从单词库获取）
+        
         // 缓冲区状态
         this.bufferState = 'idle'; // idle, countdown, ready
         this.bufferTimer = 0;
@@ -76,6 +80,57 @@ class WordTetrisGame {
         this.setupSpeechSynthesis();
         
         this.init();
+    }
+    
+    // 初始化考试统计
+    async initExamStats() {
+        console.log('🔍 开始初始化考试统计...');
+        
+        // 等待单词库加载完成
+        let waitCount = 0;
+        while (!this.vocabularyManager.isLoaded) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            waitCount++;
+            if (waitCount > 100) { // 最多等待10秒
+                console.error('❌ 单词库加载超时');
+                break;
+            }
+        }
+        
+        if (this.vocabularyManager.isLoaded) {
+            // 获取总单词数
+            const stats = this.vocabularyManager.getVocabularyStats();
+            this.totalWords = stats.totalWords;
+            
+            console.log(`📊 单词库统计: 总单词数 = ${this.totalWords}`);
+            console.log(`📊 生词本数量: ${stats.missedWords}`);
+            
+            // 更新显示
+            this.updateExamStats();
+        } else {
+            console.error('❌ 单词库未能成功加载，使用默认值');
+            this.totalWords = 135; // 使用默认值
+            this.updateExamStats();
+        }
+    }
+    
+    // 更新考试统计显示
+    updateExamStats() {
+        const hitWordsCount = this.hitWords.size;
+        const hitPercentage = this.totalWords > 0 ? Math.round((hitWordsCount / this.totalWords) * 100) : 0;
+        const coveragePercentage = hitPercentage; // 覆盖率等于命中率
+        
+        console.log(`📊 更新考试统计: 总词量=${this.totalWords}, 命中=${hitWordsCount}, 命中率=${hitPercentage}%`);
+        
+        const totalWordsElement = document.getElementById('total-words');
+        const hitWordsElement = document.getElementById('hit-words');
+        const hitPercentageElement = document.getElementById('hit-percentage');
+        const coveragePercentageElement = document.getElementById('coverage-percentage');
+        
+        if (totalWordsElement) totalWordsElement.textContent = this.totalWords;
+        if (hitWordsElement) hitWordsElement.textContent = hitWordsCount;
+        if (hitPercentageElement) hitPercentageElement.textContent = `${hitPercentage}%`;
+        if (coveragePercentageElement) coveragePercentageElement.textContent = `${coveragePercentage}%`;
     }
 
     setupSpeechSynthesis() {
@@ -264,6 +319,7 @@ class WordTetrisGame {
         this.bindEvents();
         this.updateUI();
         this.generateNextWord();
+        this.initExamStats(); // 初始化考试统计
         this.gameLoop();
     }
 
@@ -332,7 +388,6 @@ class WordTetrisGame {
         document.getElementById('resetBtn').addEventListener('click', () => this.resetGame());
         // 提交按钮已移除，使用实时输入自动射击机制
         document.getElementById('giveUpBtn').addEventListener('click', () => this.giveUpCurrentWord());
-        document.getElementById('reviewBtn').addEventListener('click', () => this.startReviewMode());
         document.getElementById('exportBtn').addEventListener('click', () => this.exportVocabulary());
         document.getElementById('toggleSpeechBtn').addEventListener('click', () => this.toggleSpeech());
         
@@ -359,12 +414,12 @@ class WordTetrisGame {
                 return;
             }
             
-            // 等级提升弹窗快捷键
-            if (this.gameState === 'levelup' && (e.code === 'Enter' || e.code === 'Space')) {
-                e.preventDefault();
-                this.continueGame();
-                return;
-            }
+            // 等级提升弹窗现在自动进入下一级，不需要键盘快捷键
+            // if (this.gameState === 'levelup' && (e.code === 'Enter' || e.code === 'Space')) {
+            //     e.preventDefault();
+            //     this.continueGame();
+            //     return;
+            // }
             
             // 字母输入处理（游戏进行中）
             if (this.gameState === 'playing' && e.key.match(/^[a-zA-Z]$/)) {
@@ -460,12 +515,24 @@ class WordTetrisGame {
         this.spawnTimer = 0;
         this.speedMultiplier = 1.0;
         this.wordSpeed = this.baseSpeed;
+        
+        // 重置游戏时清空生词本和统计数据
+        this.vocabularyManager.clearCurrentLevelVocabulary();
+        this.totalWordsHit = 0;
+        this.totalWordsGivenUp = 0;
+        this.totalWordsFailed = 0;
+        this.maxCombo = 0;
+        this.perfectLevels = 0;
+        this.hitWords = new Set(); // 重置命中单词集合（去重用）
+        console.log('🔄 游戏重置，生词本已清空，统计数据已重置');
+        
         this.resetBufferLights();
         this.generateNextWord();
         this.updateUI();
         this.updateButtons();
         this.clearInput();
         this.hideModals();
+        this.updateExamStats(); // 更新考试统计显示
     }
 
     restartGame() {
@@ -485,6 +552,16 @@ class WordTetrisGame {
         if (this.levelUpCountdownTimer) {
             clearInterval(this.levelUpCountdownTimer);
             this.levelUpCountdownTimer = null;
+        }
+        
+        // 注意：升级时不清空生词本，生词本会一直累积
+        // 只有重置游戏时才清空生词本
+        console.log('✅ 升级完成，生词本保留，开始新等级');
+        
+        // 恢复继续游戏按钮的显示（为其他功能保留）
+        const continueBtn = document.getElementById('continueBtn');
+        if (continueBtn) {
+            continueBtn.style.display = '';
         }
         
         this.hideModals();
@@ -587,8 +664,8 @@ class WordTetrisGame {
         this.gameState = 'levelup';
         this.showLevelUpModal(vocabularyStats.totalWords);
         
-        // 清空当前等级生词本
-        this.vocabularyManager.clearCurrentLevelVocabulary();
+        // 注意：生词本将在用户点击"继续游戏"时清空
+        // 这样用户可以在升级弹窗中看到当前等级的生词本统计
         
         // 保存游戏数据
         this.saveGameData();
@@ -883,17 +960,84 @@ class WordTetrisGame {
                     this.ctx.fillText(letter, currentX + this.ctx.measureText(letter).width/2, y);
                     currentX += this.ctx.measureText(letter).width;
                 } else {
-                    // 普通字母
-                    this.ctx.fillStyle = '#ffffff';
-                    this.ctx.fillText(part, currentX + this.ctx.measureText(part).width/2, y);
+                    // 普通字母或下划线
+                    this.drawTextWithCustomUnderlines(part, currentX, y);
                     currentX += this.ctx.measureText(part).width;
                 }
             });
         } else {
-            // 普通显示
-            this.ctx.fillStyle = '#ffffff';
-            this.ctx.fillText(text, x, y);
+            // 普通显示 - 处理下划线
+            this.drawTextWithCustomUnderlines(text, x, y, true);
         }
+    }
+    
+    // 绘制带有自定义下划线的文本
+    drawTextWithCustomUnderlines(text, x, y, centered = false) {
+        this.ctx.fillStyle = '#ffffff';
+        
+        if (centered) {
+            // 居中显示
+            const totalWidth = this.measureTextWithCustomUnderlines(text);
+            let currentX = x - totalWidth / 2;
+            
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                if (char === '_') {
+                    this.drawCustomUnderscore(currentX, y);
+                    currentX += this.getCustomUnderscoreWidth();
+                } else {
+                    this.ctx.fillText(char, currentX + this.ctx.measureText(char).width/2, y);
+                    currentX += this.ctx.measureText(char).width;
+                }
+            }
+        } else {
+            // 左对齐显示
+            let currentX = x;
+            
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                if (char === '_') {
+                    this.drawCustomUnderscore(currentX, y);
+                    currentX += this.getCustomUnderscoreWidth();
+                } else {
+                    this.ctx.fillText(char, currentX + this.ctx.measureText(char).width/2, y);
+                    currentX += this.ctx.measureText(char).width;
+                }
+            }
+        }
+    }
+    
+    // 绘制自定义下划线（缩短4像素）
+    drawCustomUnderscore(x, y) {
+        const underscoreWidth = this.ctx.measureText('_').width;
+        const customWidth = underscoreWidth - 4; // 缩短4像素
+        const startX = x + 2; // 左右各缩短2像素
+        
+        this.ctx.strokeStyle = '#ffffff';
+        this.ctx.lineWidth = 2;
+        this.ctx.beginPath();
+        this.ctx.moveTo(startX, y + 5); // 下划线位置
+        this.ctx.lineTo(startX + customWidth, y + 5);
+        this.ctx.stroke();
+    }
+    
+    // 获取自定义下划线的宽度
+    getCustomUnderscoreWidth() {
+        return this.ctx.measureText('_').width; // 保持原始字符宽度，只是绘制时缩短
+    }
+    
+    // 测量包含自定义下划线的文本宽度
+    measureTextWithCustomUnderlines(text) {
+        let totalWidth = 0;
+        for (let i = 0; i < text.length; i++) {
+            const char = text[i];
+            if (char === '_') {
+                totalWidth += this.getCustomUnderscoreWidth();
+            } else {
+                totalWidth += this.ctx.measureText(char).width;
+            }
+        }
+        return totalWidth;
     }
 
 
@@ -1121,7 +1265,6 @@ class WordTetrisGame {
     updateButtons() {
         const startBtn = document.getElementById('startBtn');
         const pauseBtn = document.getElementById('pauseBtn');
-        const reviewBtn = document.getElementById('reviewBtn');
         
         switch (this.gameState) {
             case 'stopped':
@@ -1141,8 +1284,7 @@ class WordTetrisGame {
                 break;
         }
         
-        const hasVocabulary = this.vocabularyManager.getVocabularyStats().totalWords > 0;
-        reviewBtn.disabled = !hasVocabulary;
+        const hasVocabulary = this.vocabularyManager.getVocabularyStats().missedWords > 0;
         document.getElementById('exportBtn').disabled = !hasVocabulary;
     }
 
@@ -1167,13 +1309,19 @@ class WordTetrisGame {
             let displayWord = currentWord.original;
             let inputIndex = 0;
             
-            // 替换缺失的字母为输入的字母
-            for (let i = 0; i < currentWord.missing.length && inputIndex < currentInput.length; i++) {
+            // 替换缺失的字母为输入的字母（只替换已输入的字母）
+            for (let i = 0; i < currentWord.missing.length; i++) {
                 const missingIndex = currentWord.missing[i];
-                displayWord = displayWord.substring(0, missingIndex) + 
-                             `[${currentInput[inputIndex]}]` + 
-                             displayWord.substring(missingIndex + 1);
-                inputIndex++;
+                if (inputIndex < currentInput.length) {
+                    // 有输入的字母，显示输入的字母
+                    displayWord = displayWord.substring(0, missingIndex) + 
+                                 `[${currentInput[inputIndex]}]` + 
+                                 displayWord.substring(missingIndex + 1);
+                    inputIndex++;
+                } else {
+                    // 没有输入的字母，保持下划线
+                    // displayWord 已经包含下划线，不需要修改
+                }
             }
             
             // 检查输入是否正确
@@ -1417,6 +1565,10 @@ class WordTetrisGame {
         this.totalWordsHit = (this.totalWordsHit || 0) + 1;
         this.maxCombo = Math.max(this.maxCombo || 0, this.combo);
         
+        // 更新考试统计（去重）
+        this.hitWords.add(word.original.toLowerCase());
+        this.updateExamStats();
+        
         // 显示击中效果
         this.showHitEffect(word, points);
         this.clearInput();
@@ -1426,12 +1578,6 @@ class WordTetrisGame {
             this.levelUp();
         }
         
-        // 复习模式处理
-        if (this.reviewMode && this.reviewMode.isActive) {
-            this.reviewMode.correctCount++;
-            this.reviewMode.currentIndex++;
-            setTimeout(() => this.startReviewWord(), 1000); // 1秒后下一个单词
-        }
         
         this.updateUI();
     }
@@ -1680,38 +1826,46 @@ class WordTetrisGame {
         document.getElementById('levelVocabulary').textContent = vocabularyCount;
         document.getElementById('levelUpModal').style.display = 'block';
         
-        // 5秒后自动关闭弹窗
+        // 3秒后自动关闭弹窗
         this.levelUpAutoCloseTimer = setTimeout(() => {
             this.continueGame();
-        }, 5000);
+        }, 3000);
         
-        // 添加键盘快捷键提示
+        // 隐藏继续游戏按钮，因为现在是自动进入下一级
+        const continueBtn = document.getElementById('continueBtn');
+        if (continueBtn) {
+            continueBtn.style.display = 'none';
+        }
+        
+        // 添加倒计时提示
         const modalContent = document.querySelector('#levelUpModal .modal-content');
         let keyboardHint = modalContent.querySelector('.keyboard-hint');
         if (!keyboardHint) {
             keyboardHint = document.createElement('p');
             keyboardHint.className = 'keyboard-hint';
-            keyboardHint.style.fontSize = '14px';
-            keyboardHint.style.color = '#666';
-            keyboardHint.style.marginTop = '10px';
+            keyboardHint.style.fontSize = '16px';
+            keyboardHint.style.color = '#2c3e50';
+            keyboardHint.style.marginTop = '15px';
+            keyboardHint.style.fontWeight = 'bold';
+            keyboardHint.style.textAlign = 'center';
             modalContent.insertBefore(keyboardHint, modalContent.querySelector('.modal-buttons'));
         }
-        keyboardHint.textContent = '按 Enter 或 Space 继续游戏 (5秒后自动继续)';
+        keyboardHint.textContent = '3秒后自动开始下一级...';
         
         // 开始倒计时显示
         this.startLevelUpCountdown();
     }
     
     startLevelUpCountdown() {
-        let countdown = 5;
+        let countdown = 3;
         const keyboardHint = document.querySelector('#levelUpModal .keyboard-hint');
         
         this.levelUpCountdownTimer = setInterval(() => {
             countdown--;
             if (countdown > 0) {
-                keyboardHint.textContent = `按 Enter 或 Space 继续游戏 (${countdown}秒后自动继续)`;
+                keyboardHint.textContent = `${countdown}秒后自动开始下一级...`;
             } else {
-                keyboardHint.textContent = '自动继续游戏...';
+                keyboardHint.textContent = '开始下一级...';
                 clearInterval(this.levelUpCountdownTimer);
                 this.levelUpCountdownTimer = null;
             }
@@ -1728,56 +1882,6 @@ class WordTetrisGame {
         document.getElementById('levelUpModal').style.display = 'none';
     }
 
-    startReviewMode() {
-        const vocabularyBook = this.vocabularyManager.getVocabularyBook();
-        if (vocabularyBook.length === 0) {
-            alert('生词本为空，无法开始复习模式！');
-            return;
-        }
-        
-        // 切换到复习模式
-        this.gameState = 'review';
-        this.reviewMode = {
-            isActive: true,
-            currentIndex: 0,
-            reviewWords: [...vocabularyBook],
-            correctCount: 0,
-            totalCount: vocabularyBook.length
-        };
-        
-        this.startReviewWord();
-        this.updateButtons();
-    }
-
-    startReviewWord() {
-        if (!this.reviewMode || this.reviewMode.currentIndex >= this.reviewMode.reviewWords.length) {
-            this.endReviewMode();
-            return;
-        }
-        
-        const currentReviewWord = this.reviewMode.reviewWords[this.reviewMode.currentIndex];
-        this.nextWord = this.vocabularyManager.getReviewWord(currentReviewWord);
-        
-        // 清空游戏区域
-        this.fallingWords = [];
-        this.clearInput();
-        
-        // 立即开始缓冲区倒计时
-        this.startBufferCountdown();
-        
-        this.updateNextWordDisplay();
-    }
-
-    endReviewMode() {
-        const correctRate = (this.reviewMode.correctCount / this.reviewMode.totalCount * 100).toFixed(1);
-        
-        alert(`复习完成！\n正确率: ${correctRate}%\n复习单词: ${this.reviewMode.totalCount}个\n正确: ${this.reviewMode.correctCount}个`);
-        
-        // 退出复习模式
-        this.reviewMode = null;
-        this.gameState = 'stopped';
-        this.updateButtons();
-    }
 
     exportVocabulary() {
         const vocabularyBook = this.vocabularyManager.getVocabularyBook();
@@ -1786,25 +1890,38 @@ class WordTetrisGame {
             return;
         }
         
-        // 创建CSV格式的数据
-        let csvContent = "单词,中文意思,总错误次数,放弃次数,失败次数,等级\n";
+        // 创建文本格式的数据
+        let textContent = "=== 我的生词本 ===\n";
+        textContent += `导出时间: ${new Date().toLocaleString()}\n`;
+        textContent += `总计: ${vocabularyBook.length} 个生词\n\n`;
         
-        vocabularyBook.forEach(word => {
-            csvContent += `${word.word},${word.meaning},${word.count},${word.giveUpCount || 0},${word.failCount || 0},${word.level}\n`;
+        vocabularyBook.forEach((word, index) => {
+            textContent += `${index + 1}. ${word.word}\n`;
+            textContent += `   中文意思: ${word.meaning}\n`;
+            textContent += `   错误次数: ${word.count}\n`;
+            textContent += `   放弃次数: ${word.giveUpCount || 0}\n`;
+            textContent += `   失败次数: ${word.failCount || 0}\n`;
+            textContent += `   难度等级: ${word.level}\n`;
+            textContent += "\n";
         });
         
+        textContent += "=== 学习建议 ===\n";
+        textContent += "1. 重点复习错误次数较多的单词\n";
+        textContent += "2. 建议每天复习5-10个生词\n";
+        textContent += "3. 可以制作单词卡片加强记忆\n";
+        
         // 创建下载链接
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8;' });
         const link = document.createElement('a');
         const url = URL.createObjectURL(blob);
         link.setAttribute('href', url);
-        link.setAttribute('download', `生词本_${new Date().toISOString().split('T')[0]}.csv`);
+        link.setAttribute('download', `我的生词本_${new Date().toISOString().split('T')[0]}.txt`);
         link.style.visibility = 'hidden';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
         
-        alert(`成功导出 ${vocabularyBook.length} 个生词到CSV文件！`);
+        alert(`成功导出 ${vocabularyBook.length} 个生词到文本文件！`);
     }
 
     // 游戏主循环

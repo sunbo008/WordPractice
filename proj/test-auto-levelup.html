@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自动升级测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .button:hover {
+            background: #2980b9;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        /* 模拟升级弹窗样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: none;
+            border-radius: 10px;
+            width: 400px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        
+        .modal-content h2 {
+            color: #27ae60;
+            margin-bottom: 15px;
+        }
+        
+        .modal-content p {
+            margin: 10px 0;
+            font-size: 1.1em;
+        }
+        
+        .modal-buttons {
+            margin-top: 20px;
+        }
+        
+        .modal-buttons button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 0 10px;
+        }
+        
+        .keyboard-hint {
+            font-size: 16px;
+            color: #2c3e50;
+            margin-top: 15px;
+            font-weight: bold;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 自动升级弹窗测试</h1>
+        <p>测试新的升级弹窗行为：3秒倒计时后自动进入下一级</p>
+        
+        <div class="test-section">
+            <h3>测试说明</h3>
+            <div class="status info">
+                <strong>新行为：</strong>
+                <ul style="text-align: left; margin: 10px 0;">
+                    <li>升级弹窗显示3秒</li>
+                    <li>倒计时显示：3秒 → 2秒 → 1秒</li>
+                    <li>自动关闭弹窗并开始下一级</li>
+                    <li>不需要用户点击"继续游戏"按钮</li>
+                    <li>隐藏"继续游戏"按钮</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h3>模拟测试</h3>
+            <button class="button" onclick="simulateLevelUp()">模拟升级弹窗</button>
+            <button class="button" onclick="resetTest()">重置测试</button>
+            <div id="test-status"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>实际游戏测试</h3>
+            <p>在主游戏中达到升级条件来测试实际效果：</p>
+            <ol>
+                <li>启动游戏并获得100分（升到2级）</li>
+                <li>观察升级弹窗是否显示3秒倒计时</li>
+                <li>确认弹窗自动关闭并开始下一级</li>
+                <li>验证"继续游戏"按钮是否被隐藏</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- 模拟升级弹窗 -->
+    <div id="testLevelUpModal" class="modal">
+        <div class="modal-content">
+            <h2>🎉 等级提升！</h2>
+            <p>恭喜升到第 <span id="testNewLevel">2</span> 级！</p>
+            <p>本级收集生词: <span id="testLevelVocabulary">5</span> 个</p>
+            <p class="keyboard-hint" id="testCountdownHint">3秒后自动开始下一级...</p>
+            <div class="modal-buttons">
+                <button id="testContinueBtn" style="display: none;">继续游戏</button>
+                <button>查看生词</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let testTimer = null;
+        let countdownTimer = null;
+        
+        function simulateLevelUp() {
+            // 显示模拟弹窗
+            document.getElementById('testLevelUpModal').style.display = 'block';
+            
+            // 隐藏继续游戏按钮
+            document.getElementById('testContinueBtn').style.display = 'none';
+            
+            // 开始倒计时
+            startTestCountdown();
+            
+            // 3秒后自动关闭
+            testTimer = setTimeout(() => {
+                closeTestModal();
+            }, 3000);
+            
+            updateTestStatus('升级弹窗已显示，开始3秒倒计时...', 'info');
+        }
+        
+        function startTestCountdown() {
+            let countdown = 3;
+            const hintElement = document.getElementById('testCountdownHint');
+            
+            countdownTimer = setInterval(() => {
+                countdown--;
+                if (countdown > 0) {
+                    hintElement.textContent = `${countdown}秒后自动开始下一级...`;
+                } else {
+                    hintElement.textContent = '开始下一级...';
+                    clearInterval(countdownTimer);
+                    countdownTimer = null;
+                }
+            }, 1000);
+        }
+        
+        function closeTestModal() {
+            document.getElementById('testLevelUpModal').style.display = 'none';
+            
+            // 恢复继续游戏按钮显示
+            document.getElementById('testContinueBtn').style.display = '';
+            
+            // 清理定时器
+            if (testTimer) {
+                clearTimeout(testTimer);
+                testTimer = null;
+            }
+            if (countdownTimer) {
+                clearInterval(countdownTimer);
+                countdownTimer = null;
+            }
+            
+            updateTestStatus('✅ 弹窗已自动关闭，模拟进入下一级成功！', 'success');
+        }
+        
+        function resetTest() {
+            closeTestModal();
+            document.getElementById('testCountdownHint').textContent = '3秒后自动开始下一级...';
+            updateTestStatus('测试已重置，可以重新开始测试。', 'info');
+        }
+        
+        function updateTestStatus(message, type) {
+            const statusDiv = document.getElementById('test-status');
+            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+        
+        // 页面加载完成后的提示
+        window.addEventListener('load', () => {
+            updateTestStatus('点击"模拟升级弹窗"按钮开始测试新的自动升级行为。', 'info');
+        });
+    </script>
+</body>
+</html>

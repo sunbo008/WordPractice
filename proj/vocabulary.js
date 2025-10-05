@@ -37,6 +37,8 @@ class VocabularyManager {
     // 处理单词数据，创建统一的单词数组
     processWordsData() {
         this.allWords = [];
+        const wordMap = new Map(); // 用于检测重复单词
+        const duplicates = [];
         
         if (!this.wordsData || !this.wordsData.phonicsLessons) {
             console.warn('单词数据格式错误');
@@ -44,22 +46,82 @@ class VocabularyManager {
         }
         
         // 遍历所有课程，收集单词
-        Object.values(this.wordsData.phonicsLessons).forEach(lesson => {
+        Object.entries(this.wordsData.phonicsLessons).forEach(([lessonKey, lesson]) => {
             if (lesson.words && Array.isArray(lesson.words)) {
                 lesson.words.forEach(wordData => {
-                    this.allWords.push({
+                    const wordKey = wordData.word.toLowerCase();
+                    
+                    // 检查重复
+                    if (wordMap.has(wordKey)) {
+                        const existing = wordMap.get(wordKey);
+                        duplicates.push({
+                            word: wordData.word,
+                            existing: existing,
+                            current: {
+                                lesson: lessonKey,
+                                difficulty: wordData.difficulty,
+                                meaning: wordData.meaning
+                            }
+                        });
+                        console.warn(`⚠️ 发现重复单词: "${wordData.word}" 在 ${lessonKey} 和 ${existing.lesson} 中都存在`);
+                        return; // 跳过重复单词
+                    }
+                    
+                    const processedWord = {
                         word: wordData.word.toLowerCase(),
                         meaning: wordData.meaning,
                         phonetic: wordData.phonetic,
                         difficulty: wordData.difficulty,
                         phoneme: lesson.phoneme,
-                        description: lesson.description
+                        description: lesson.description,
+                        lesson: lessonKey // 添加来源课程信息
+                    };
+                    
+                    this.allWords.push(processedWord);
+                    wordMap.set(wordKey, {
+                        lesson: lessonKey,
+                        difficulty: wordData.difficulty,
+                        meaning: wordData.meaning
                     });
                 });
             }
         });
         
-        console.log(`📚 已加载 ${this.allWords.length} 个单词`);
+        // 报告重复情况
+        if (duplicates.length > 0) {
+            console.error(`❌ 发现 ${duplicates.length} 个重复单词，已自动跳过重复项`);
+            duplicates.forEach(dup => {
+                console.error(`   - "${dup.word}": ${dup.existing.lesson}(难度${dup.existing.difficulty}) vs ${dup.current.lesson}(难度${dup.current.difficulty})`);
+            });
+        }
+        
+        // 验证难度级别分布
+        this.validateDifficultyDistribution();
+        
+        console.log(`📚 已加载 ${this.allWords.length} 个唯一单词`);
+    }
+    
+    // 验证难度级别分布
+    validateDifficultyDistribution() {
+        const difficultyStats = { 1: 0, 2: 0, 3: 0 };
+        
+        this.allWords.forEach(word => {
+            if (difficultyStats[word.difficulty] !== undefined) {
+                difficultyStats[word.difficulty]++;
+            }
+        });
+        
+        console.log('📊 难度级别分布:');
+        console.log(`   - 难度1 (Level 1-2): ${difficultyStats[1]} 个单词`);
+        console.log(`   - 难度2 (Level 3-4): ${difficultyStats[2]} 个单词`);
+        console.log(`   - 难度3 (Level 5+): ${difficultyStats[3]} 个单词`);
+        
+        // 检查是否有足够的单词
+        Object.entries(difficultyStats).forEach(([difficulty, count]) => {
+            if (count < 10) {
+                console.warn(`⚠️ 难度${difficulty}只有${count}个单词，可能影响游戏体验`);
+            }
+        });
     }
     
     // 显示加载错误信息
@@ -130,28 +192,36 @@ class VocabularyManager {
         });
     }
 
-    // 获取指定等级的词汇
+    // 获取指定等级的词汇（确保级别互斥）
     getVocabularyForLevel(level) {
         if (!this.allWords || this.allWords.length === 0) {
             console.warn('单词库未加载或为空');
             return [];
         }
         
-        // 根据等级筛选单词
+        // 根据等级筛选单词 - 每个级别使用独立的难度单词
         let targetDifficulty;
         if (level <= 2) {
-            targetDifficulty = 1; // 1-2级使用难度1的单词
+            targetDifficulty = 1; // 1-2级：仅使用难度1的单词
         } else if (level <= 4) {
-            targetDifficulty = 2; // 3-4级使用难度2的单词
+            targetDifficulty = 2; // 3-4级：仅使用难度2的单词
         } else {
-            targetDifficulty = 3; // 5级以上使用难度3的单词
+            targetDifficulty = 3; // 5级以上：仅使用难度3的单词
         }
         
+        // 严格筛选：只选择指定难度的单词，确保级别互斥
         const filteredWords = this.allWords.filter(word => 
-            word.difficulty <= targetDifficulty
+            word.difficulty === targetDifficulty
         );
         
-        return filteredWords.length > 0 ? filteredWords : this.allWords;
+        // 如果指定难度没有单词，记录警告但不降级
+        if (filteredWords.length === 0) {
+            console.warn(`难度${targetDifficulty}没有可用单词，等级${level}可能无法正常游戏`);
+            // 紧急情况下使用所有单词，但这违反了互斥原则
+            return this.allWords;
+        }
+        
+        return filteredWords;
     }
 
     // 智能选择单词（避免短期重复）
@@ -355,7 +425,8 @@ class VocabularyManager {
     // 获取生词本统计
     getVocabularyStats() {
         return {
-            totalWords: this.missedWords.size,
+            totalWords: this.allWords ? this.allWords.length : 0, // 单词库总数
+            missedWords: this.missedWords.size, // 生词本数量
             words: this.getVocabularyBook()
         };
     }
@@ -383,42 +454,4 @@ class VocabularyManager {
         console.log('🔄 已重置最近使用单词列表');
     }
     
-    // 获取复习单词（从生词本中选择或随机选择）
-    getReviewWord(specificWord = null) {
-        let wordData;
-        
-        if (specificWord) {
-            // 复习特定单词
-            wordData = specificWord;
-        } else {
-            // 随机选择生词本中的单词
-            const vocabularyBook = this.getVocabularyBook();
-            if (vocabularyBook.length === 0) return null;
-            
-            const randomIndex = Math.floor(Math.random() * vocabularyBook.length);
-            wordData = vocabularyBook[randomIndex];
-        }
-        
-        // 随机选择1-2个字母作为缺失字母
-        const word = wordData.word;
-        const missingCount = Math.random() < 0.5 ? 1 : 2;
-        const missingIndices = [];
-        
-        while (missingIndices.length < missingCount && missingIndices.length < word.length) {
-            const randomIndex = Math.floor(Math.random() * word.length);
-            if (!missingIndices.includes(randomIndex)) {
-                missingIndices.push(randomIndex);
-            }
-        }
-        
-        return {
-            original: word,
-            meaning: wordData.meaning,
-            missing: missingIndices,
-            display: this.createDisplayWord(word, missingIndices),
-            missingLetters: this.getMissingLetters(word, missingIndices),
-            isReview: true,
-            reviewData: wordData
-        };
-    }
 }

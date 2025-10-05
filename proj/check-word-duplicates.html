@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>单词重复检查工具</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .duplicate-item {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 5px 0;
+        }
+        .duplicate-word {
+            font-weight: bold;
+            color: #721c24;
+        }
+        .difficulty-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .difficulty-card {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        .difficulty-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .word-list {
+            max-height: 200px;
+            overflow-y: auto;
+            font-size: 0.9em;
+        }
+        .test-button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 单词重复检查工具</h1>
+        <p>检查单词库中是否存在重复单词，确保每个单词只出现在一个难度级别中</p>
+        
+        <div id="status" class="status warning">准备检查...</div>
+        
+        <button class="test-button" onclick="checkDuplicates()">开始检查重复</button>
+        <button class="test-button" onclick="showDifficultyStats()">显示难度统计</button>
+        <button class="test-button" onclick="generateFixedWords()">生成修复后的单词库</button>
+        
+        <div id="results"></div>
+        
+        <div id="difficultyStats" class="difficulty-stats"></div>
+    </div>
+
+    <script>
+        let wordsData = null;
+        let allWords = [];
+        
+        async function loadWordsData() {
+            try {
+                const response = await fetch('./words.json');
+                wordsData = await response.json();
+                
+                // 处理单词数据
+                allWords = [];
+                Object.entries(wordsData.phonicsLessons).forEach(([lessonKey, lesson]) => {
+                    lesson.words.forEach(wordObj => {
+                        allWords.push({
+                            ...wordObj,
+                            lesson: lessonKey,
+                            lessonDescription: lesson.description
+                        });
+                    });
+                });
+                
+                return true;
+            } catch (error) {
+                console.error('加载单词库失败:', error);
+                return false;
+            }
+        }
+        
+        function updateStatus(message, type = 'warning') {
+            const statusElement = document.getElementById('status');
+            statusElement.textContent = message;
+            statusElement.className = `status ${type}`;
+        }
+        
+        async function checkDuplicates() {
+            updateStatus('正在加载单词库...', 'warning');
+            
+            const loaded = await loadWordsData();
+            if (!loaded) {
+                updateStatus('❌ 单词库加载失败', 'error');
+                return;
+            }
+            
+            updateStatus('正在检查重复单词...', 'warning');
+            
+            // 检查重复单词
+            const wordMap = new Map();
+            const duplicates = [];
+            
+            allWords.forEach(wordObj => {
+                const word = wordObj.word.toLowerCase();
+                if (wordMap.has(word)) {
+                    // 发现重复
+                    const existing = wordMap.get(word);
+                    if (!duplicates.find(d => d.word === word)) {
+                        duplicates.push({
+                            word: word,
+                            occurrences: [existing, wordObj]
+                        });
+                    } else {
+                        const duplicate = duplicates.find(d => d.word === word);
+                        duplicate.occurrences.push(wordObj);
+                    }
+                } else {
+                    wordMap.set(word, wordObj);
+                }
+            });
+            
+            // 显示结果
+            const resultsDiv = document.getElementById('results');
+            
+            if (duplicates.length === 0) {
+                updateStatus('✅ 检查完成：没有发现重复单词', 'success');
+                resultsDiv.innerHTML = `
+                    <div class="status success">
+                        <h3>🎉 检查结果：无重复</h3>
+                        <p>单词库中的 ${allWords.length} 个单词都是唯一的，没有重复。</p>
+                    </div>
+                `;
+            } else {
+                updateStatus(`❌ 发现 ${duplicates.length} 个重复单词`, 'error');
+                
+                let duplicateHtml = `
+                    <div class="status error">
+                        <h3>⚠️ 发现重复单词</h3>
+                        <p>找到 ${duplicates.length} 个重复的单词，需要修复：</p>
+                    </div>
+                `;
+                
+                duplicates.forEach(duplicate => {
+                    duplicateHtml += `
+                        <div class="duplicate-item">
+                            <div class="duplicate-word">"${duplicate.word}"</div>
+                            <div>出现在以下位置：</div>
+                            <ul>
+                    `;
+                    
+                    duplicate.occurrences.forEach(occurrence => {
+                        duplicateHtml += `
+                            <li>
+                                <strong>${occurrence.lesson}</strong> (${occurrence.lessonDescription}) 
+                                - 难度: ${occurrence.difficulty}
+                                - 释义: ${occurrence.meaning}
+                            </li>
+                        `;
+                    });
+                    
+                    duplicateHtml += `
+                            </ul>
+                        </div>
+                    `;
+                });
+                
+                resultsDiv.innerHTML = duplicateHtml;
+            }
+        }
+        
+        async function showDifficultyStats() {
+            if (!wordsData) {
+                const loaded = await loadWordsData();
+                if (!loaded) return;
+            }
+            
+            // 按难度统计
+            const difficultyStats = {
+                1: { words: [], count: 0 },
+                2: { words: [], count: 0 },
+                3: { words: [], count: 0 }
+            };
+            
+            allWords.forEach(wordObj => {
+                const difficulty = wordObj.difficulty;
+                if (difficultyStats[difficulty]) {
+                    difficultyStats[difficulty].words.push(wordObj.word);
+                    difficultyStats[difficulty].count++;
+                }
+            });
+            
+            // 显示统计
+            const statsDiv = document.getElementById('difficultyStats');
+            let statsHtml = '<h3>📊 难度级别统计</h3>';
+            
+            Object.entries(difficultyStats).forEach(([difficulty, stats]) => {
+                const difficultyNames = {
+                    '1': '初级 (Level 1-2)',
+                    '2': '中级 (Level 3-4)', 
+                    '3': '高级 (Level 5+)'
+                };
+                
+                statsHtml += `
+                    <div class="difficulty-card">
+                        <div class="difficulty-title">
+                            难度 ${difficulty} - ${difficultyNames[difficulty]}
+                        </div>
+                        <div><strong>单词数量:</strong> ${stats.count}</div>
+                        <div class="word-list">
+                            <strong>单词列表:</strong><br>
+                            ${stats.words.join(', ')}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            statsDiv.innerHTML = statsHtml;
+        }
+        
+        async function generateFixedWords() {
+            if (!wordsData) {
+                const loaded = await loadWordsData();
+                if (!loaded) return;
+            }
+            
+            updateStatus('正在生成修复建议...', 'warning');
+            
+            // 这里可以实现自动修复逻辑
+            // 例如：将重复单词分配到不同难度级别
+            
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `
+                <div class="status warning">
+                    <h3>🔧 修复建议</h3>
+                    <p>基于单词互斥原则的修复建议：</p>
+                    <ol>
+                        <li><strong>保持难度1单词纯净</strong>：只包含最基础的3-4字母单词</li>
+                        <li><strong>难度2单词独立</strong>：4-6字母单词，不与难度1重复</li>
+                        <li><strong>难度3单词高级</strong>：5-8字母复杂单词，完全独立</li>
+                        <li><strong>重复处理策略</strong>：
+                            <ul>
+                                <li>保留在最适合的难度级别</li>
+                                <li>从其他级别中移除</li>
+                                <li>确保每个级别有足够的单词数量</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </div>
+            `;
+        }
+        
+        // 页面加载时自动检查
+        window.addEventListener('load', () => {
+            setTimeout(checkDuplicates, 1000);
+        });
+    </script>
+</body>
+</html>

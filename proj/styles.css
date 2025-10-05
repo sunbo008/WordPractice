@@ -20,6 +20,7 @@ body {
     grid-template-areas: 
         "header header"
         "info info"
+        "stats stats"
         "main sidebar";
     grid-template-columns: 1fr 300px;
     gap: 20px;
@@ -69,6 +70,44 @@ body {
     font-size: 1.5em;
     font-weight: bold;
     color: #ffd700;
+}
+
+/* 考试统计栏 */
+.exam-stats {
+    grid-area: stats;
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    background: rgba(255,255,255,0.15);
+    padding: 12px 20px;
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.stats-item {
+    text-align: center;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.stats-item .label {
+    font-size: 0.95em;
+    opacity: 0.9;
+    color: #e8f4fd;
+}
+
+.stats-item span:not(.label):not(.percentage) {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #4fc3f7;
+}
+
+.stats-item .percentage {
+    font-size: 0.9em;
+    color: #81c784;
+    font-weight: normal;
 }
 
 /* 游戏主体 */
@@ -304,11 +343,6 @@ button:disabled {
     opacity: 0.7;
 }
 
-#reviewBtn {
-    width: 100%;
-    background: #2196f3;
-    color: white;
-}
 
 /* 游戏说明 */
 .game-instructions ul {
