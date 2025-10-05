@@ -402,6 +402,7 @@ class VocabularyManager {
             this.missedWords.set(word, {
                 word: word,
                 meaning: wordData.meaning,
+                phonetic: wordData.phonetic || '',
                 count: 1,
                 giveUpCount: isGiveUp ? 1 : 0,
                 failCount: isGiveUp ? 0 : 1,

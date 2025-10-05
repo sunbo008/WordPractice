@@ -1306,23 +1306,21 @@ class WordTetrisGame {
         if (currentWord && currentInput.length > 0) {
             // 创建实时显示的单词
             const expectedLetters = currentWord.missingLetters.toUpperCase();
-            let displayWord = currentWord.original;
+            
+            // 使用字符数组来避免索引问题
+            let displayChars = currentWord.original.split('');
             let inputIndex = 0;
             
-            // 替换缺失的字母为输入的字母（只替换已输入的字母）
-            for (let i = 0; i < currentWord.missing.length; i++) {
+            // 只替换已输入字母对应的缺失位置
+            for (let i = 0; i < currentWord.missing.length && inputIndex < currentInput.length; i++) {
                 const missingIndex = currentWord.missing[i];
-                if (inputIndex < currentInput.length) {
-                    // 有输入的字母，显示输入的字母
-                    displayWord = displayWord.substring(0, missingIndex) + 
-                                 `[${currentInput[inputIndex]}]` + 
-                                 displayWord.substring(missingIndex + 1);
-                    inputIndex++;
-                } else {
-                    // 没有输入的字母，保持下划线
-                    // displayWord 已经包含下划线，不需要修改
-                }
+                // 替换为带括号的输入字母
+                displayChars[missingIndex] = `[${currentInput[inputIndex]}]`;
+                inputIndex++;
             }
+            
+            // 将字符数组重新组合成字符串
+            const displayWord = displayChars.join('');
             
             // 检查输入是否正确
             const isCorrect = currentInput === expectedLetters.substring(0, currentInput.length);
@@ -1890,32 +1888,20 @@ class WordTetrisGame {
             return;
         }
         
-        // 创建文本格式的数据
-        let textContent = "=== 我的生词本 ===\n";
-        textContent += `导出时间: ${new Date().toLocaleString()}\n`;
-        textContent += `总计: ${vocabularyBook.length} 个生词\n\n`;
+        // 创建简化的文本格式
+        let textContent = "";
         
         vocabularyBook.forEach((word, index) => {
-            textContent += `${index + 1}. ${word.word}\n`;
-            textContent += `   中文意思: ${word.meaning}\n`;
-            textContent += `   错误次数: ${word.count}\n`;
-            textContent += `   放弃次数: ${word.giveUpCount || 0}\n`;
-            textContent += `   失败次数: ${word.failCount || 0}\n`;
-            textContent += `   难度等级: ${word.level}\n`;
-            textContent += "\n";
+            const phonetic = word.phonetic || '[音标缺失]';
+            textContent += `${word.word}, ${phonetic}, ${word.meaning}\n`;
         });
-        
-        textContent += "=== 学习建议 ===\n";
-        textContent += "1. 重点复习错误次数较多的单词\n";
-        textContent += "2. 建议每天复习5-10个生词\n";
-        textContent += "3. 可以制作单词卡片加强记忆\n";
         
         // 创建下载链接
         const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8;' });
         const link = document.createElement('a');
         const url = URL.createObjectURL(blob);
         link.setAttribute('href', url);
-        link.setAttribute('download', `我的生词本_${new Date().toISOString().split('T')[0]}.txt`);
+        link.setAttribute('download', `生词本_${new Date().toISOString().split('T')[0]}.txt`);
         link.style.visibility = 'hidden';
         document.body.appendChild(link);
         link.click();

@@ -192,17 +192,17 @@
                 return;
             }
             
-            // 添加一些测试生词
+            // 添加一些测试生词（包含音标）
             const testWords = [
-                { word: 'problem', meaning: '问题', count: 3, giveUpCount: 1, failCount: 0, level: 1 },
-                { word: 'father', meaning: '父亲', count: 2, giveUpCount: 0, failCount: 1, level: 1 },
-                { word: 'number', meaning: '数字', count: 4, giveUpCount: 2, failCount: 0, level: 2 },
-                { word: 'sleep', meaning: '睡觉', count: 1, giveUpCount: 0, failCount: 0, level: 1 },
-                { word: 'sister', meaning: '姐妹', count: 2, giveUpCount: 1, failCount: 1, level: 2 }
+                { original: 'problem', meaning: '问题', phonetic: '[ˈprɒbləm]', giveUp: true },
+                { original: 'father', meaning: '父亲', phonetic: '[ˈfɑːðə(r)]', giveUp: false },
+                { original: 'number', meaning: '数字', phonetic: '[ˈnʌmbə(r)]', giveUp: true },
+                { original: 'sleep', meaning: '睡觉', phonetic: '[sliːp]', giveUp: false },
+                { original: 'sister', meaning: '姐妹', phonetic: '[ˈsɪstə(r)]', giveUp: true }
             ];
             
             testWords.forEach(word => {
-                vocabularyManager.addToVocabulary(word);
+                vocabularyManager.addMissedWord(word);
             });
             
             updateStatus(`✅ 已添加 ${testWords.length} 个测试生词`, 'success');
@@ -232,25 +232,13 @@
                 return;
             }
             
-            // 创建文本格式的数据
-            let textContent = "=== 我的生词本 ===\\n";
-            textContent += `导出时间: ${new Date().toLocaleString()}\\n`;
-            textContent += `总计: ${vocabularyBook.length} 个生词\\n\\n`;
+            // 创建简化的文本格式
+            let textContent = "";
             
             vocabularyBook.forEach((word, index) => {
-                textContent += `${index + 1}. ${word.word}\\n`;
-                textContent += `   中文意思: ${word.meaning}\\n`;
-                textContent += `   错误次数: ${word.count}\\n`;
-                textContent += `   放弃次数: ${word.giveUpCount || 0}\\n`;
-                textContent += `   失败次数: ${word.failCount || 0}\\n`;
-                textContent += `   难度等级: ${word.level}\\n`;
-                textContent += "\\n";
+                const phonetic = word.phonetic || '[音标缺失]';
+                textContent += `${word.word}, ${phonetic}, ${word.meaning}\\n`;
             });
-            
-            textContent += "=== 学习建议 ===\\n";
-            textContent += "1. 重点复习错误次数较多的单词\\n";
-            textContent += "2. 建议每天复习5-10个生词\\n";
-            textContent += "3. 可以制作单词卡片加强记忆\\n";
             
             // 显示预览
             const previewDiv = document.getElementById('export-preview');
@@ -261,7 +249,7 @@
             const link = document.createElement('a');
             const url = URL.createObjectURL(blob);
             link.setAttribute('href', url);
-            link.setAttribute('download', `我的生词本_${new Date().toISOString().split('T')[0]}.txt`);
+            link.setAttribute('download', `生词本_${new Date().toISOString().split('T')[0]}.txt`);
             link.style.visibility = 'hidden';
             document.body.appendChild(link);
             link.click();

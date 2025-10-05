@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>多字母输入显示测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .button:hover {
+            background: #2980b9;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .test-word {
+            font-size: 2em;
+            font-weight: bold;
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+        }
+        .input-section {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .input-section input {
+            font-size: 1.5em;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            text-align: center;
+            width: 200px;
+        }
+        .test-cases {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+        .test-case {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            background: #f8f9fa;
+        }
+        .test-case h4 {
+            margin: 0 0 10px 0;
+            color: #2c3e50;
+        }
+        .expected, .actual {
+            font-family: 'Courier New', monospace;
+            font-size: 1.2em;
+            margin: 5px 0;
+        }
+        .expected {
+            color: #27ae60;
+        }
+        .actual {
+            color: #3498db;
+        }
+        .result {
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .result.pass {
+            color: #27ae60;
+        }
+        .result.fail {
+            color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔤 多字母输入显示测试</h1>
+        <p>测试当单词有多个缺失字母时，输入显示是否正确</p>
+        
+        <div class="test-section">
+            <h3>当前测试单词</h3>
+            <div class="test-word" id="current-word">H_LL_</div>
+            <div class="input-section">
+                <label>输入缺失字母：</label>
+                <input type="text" id="test-input" maxlength="3" placeholder="输入字母">
+            </div>
+            <div class="test-word" id="display-result">H_LL_</div>
+        </div>
+        
+        <div class="test-section">
+            <h3>测试操作</h3>
+            <button class="button" onclick="loadTestWord('HELLO', [1, 4])">测试 HELLO (缺失E,O)</button>
+            <button class="button" onclick="loadTestWord('WORLD', [1, 3])">测试 WORLD (缺失O,L)</button>
+            <button class="button" onclick="loadTestWord('SCHOOL', [0, 3, 5])">测试 SCHOOL (缺失S,O,L)</button>
+            <button class="button" onclick="clearInput()">清空输入</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>自动测试用例</h3>
+            <button class="button" onclick="runAllTests()">运行所有测试</button>
+            <div id="test-results" class="test-cases"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>测试说明</h3>
+            <ul>
+                <li><strong>正确行为</strong>：输入第一个字母时，只显示第一个缺失位置的字母，其他位置保持下划线</li>
+                <li><strong>错误行为</strong>：输入第一个字母时，所有缺失位置都显示字母</li>
+                <li><strong>示例</strong>：HELLO缺失E,O → 输入E → 应显示H[E]LL_，而不是H[E]LL[O]</li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="vocabulary.js"></script>
+    <script>
+        let currentTestWord = null;
+        
+        // 模拟游戏中的单词对象结构
+        function createTestWord(original, missingIndices) {
+            const missingLetters = missingIndices.map(i => original[i]).join('');
+            let display = original.split('');
+            missingIndices.forEach(i => display[i] = '_');
+            
+            return {
+                original: original,
+                missing: missingIndices,
+                missingLetters: missingLetters,
+                display: display.join(''),
+                realTimeDisplay: display.join(''),
+                inputCorrect: true
+            };
+        }
+        
+        // 模拟游戏中的updateRealTimeDisplay逻辑
+        function updateRealTimeDisplay(word, currentInput) {
+            if (!word || currentInput.length === 0) {
+                return word.display;
+            }
+            
+            const expectedLetters = word.missingLetters.toUpperCase();
+            
+            // 使用字符数组来避免索引问题
+            let displayChars = word.original.split('');
+            let inputIndex = 0;
+            
+            // 只替换已输入字母对应的缺失位置
+            for (let i = 0; i < word.missing.length && inputIndex < currentInput.length; i++) {
+                const missingIndex = word.missing[i];
+                // 替换为带括号的输入字母
+                displayChars[missingIndex] = `[${currentInput[inputIndex]}]`;
+                inputIndex++;
+            }
+            
+            // 将字符数组重新组合成字符串
+            return displayChars.join('');
+        }
+        
+        function loadTestWord(original, missingIndices) {
+            currentTestWord = createTestWord(original, missingIndices);
+            
+            document.getElementById('current-word').textContent = currentTestWord.display;
+            document.getElementById('display-result').textContent = currentTestWord.display;
+            document.getElementById('test-input').value = '';
+            
+            console.log('加载测试单词:', currentTestWord);
+        }
+        
+        function clearInput() {
+            document.getElementById('test-input').value = '';
+            if (currentTestWord) {
+                document.getElementById('display-result').textContent = currentTestWord.display;
+            }
+        }
+        
+        // 监听输入变化
+        document.getElementById('test-input').addEventListener('input', function(e) {
+            const input = e.target.value.toUpperCase();
+            e.target.value = input; // 确保显示大写
+            
+            if (currentTestWord) {
+                const result = updateRealTimeDisplay(currentTestWord, input);
+                document.getElementById('display-result').textContent = result;
+                
+                console.log(`输入: "${input}" -> 显示: "${result}"`);
+            }
+        });
+        
+        function runAllTests() {
+            const testCases = [
+                {
+                    name: 'HELLO缺失E,O',
+                    word: 'HELLO',
+                    missing: [1, 4],
+                    inputs: [
+                        { input: 'E', expected: 'H[E]LL_' },
+                        { input: 'EO', expected: 'H[E]LL[O]' }
+                    ]
+                },
+                {
+                    name: 'WORLD缺失O,L',
+                    word: 'WORLD',
+                    missing: [1, 3],
+                    inputs: [
+                        { input: 'O', expected: 'W[O]R_D' },
+                        { input: 'OL', expected: 'W[O]R[L]D' }
+                    ]
+                },
+                {
+                    name: 'SCHOOL缺失S,O,L',
+                    word: 'SCHOOL',
+                    missing: [0, 3, 5],
+                    inputs: [
+                        { input: 'S', expected: '[S]CH_O_' },
+                        { input: 'SO', expected: '[S]CH[O]O_' },
+                        { input: 'SOL', expected: '[S]CH[O]O[L]' }
+                    ]
+                },
+                {
+                    name: 'CAT缺失A',
+                    word: 'CAT',
+                    missing: [1],
+                    inputs: [
+                        { input: 'A', expected: 'C[A]T' }
+                    ]
+                }
+            ];
+            
+            let resultsHtml = '';
+            let totalTests = 0;
+            let passedTests = 0;
+            
+            testCases.forEach(testCase => {
+                const word = createTestWord(testCase.word, testCase.missing);
+                
+                testCase.inputs.forEach(test => {
+                    totalTests++;
+                    const actual = updateRealTimeDisplay(word, test.input);
+                    const passed = actual === test.expected;
+                    if (passed) passedTests++;
+                    
+                    resultsHtml += `
+                        <div class="test-case">
+                            <h4>${testCase.name} - 输入"${test.input}"</h4>
+                            <div class="expected">期望: ${test.expected}</div>
+                            <div class="actual">实际: ${actual}</div>
+                            <div class="result ${passed ? 'pass' : 'fail'}">
+                                ${passed ? '✅ 通过' : '❌ 失败'}
+                            </div>
+                        </div>
+                    `;
+                });
+            });
+            
+            document.getElementById('test-results').innerHTML = `
+                <div class="status ${passedTests === totalTests ? 'success' : 'error'}">
+                    测试结果: ${passedTests}/${totalTests} 通过 (${Math.round(passedTests/totalTests*100)}%)
+                </div>
+                ${resultsHtml}
+            `;
+        }
+        
+        // 页面加载时初始化
+        window.addEventListener('load', () => {
+            loadTestWord('HELLO', [1, 4]);
+        });
+    </script>
+</body>
+</html>
