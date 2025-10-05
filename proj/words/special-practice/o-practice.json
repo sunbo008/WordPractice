@@ -1,0 +1,34 @@
+{
+  "metadata": {
+    "id": "special-o",
+    "name": "音标 /ɒ/ 专项练习",
+    "phoneme": "/ɒ/",
+    "description": "针对音标/ɒ/的20个重点单词强化练习",
+    "category": "special-practice",
+    "difficulty": "intermediate",
+    "wordCount": 20,
+    "lastUpdated": "2025-10-06"
+  },
+  "words": [
+    {"word": "hot", "phonetic": "[hɒt]", "meaning": "热的", "difficulty": 1},
+    {"word": "not", "phonetic": "[nɒt]", "meaning": "不", "difficulty": 1},
+    {"word": "pot", "phonetic": "[pɒt]", "meaning": "锅", "difficulty": 1},
+    {"word": "got", "phonetic": "[ɡɒt]", "meaning": "得到", "difficulty": 1},
+    {"word": "lot", "phonetic": "[lɒt]", "meaning": "很多", "difficulty": 1},
+    {"word": "dog", "phonetic": "[dɒɡ]", "meaning": "狗", "difficulty": 1},
+    {"word": "frog", "phonetic": "[frɒɡ]", "meaning": "青蛙", "difficulty": 1},
+    {"word": "log", "phonetic": "[lɒɡ]", "meaning": "木头", "difficulty": 1},
+    {"word": "box", "phonetic": "[bɒks]", "meaning": "盒子", "difficulty": 1},
+    {"word": "fox", "phonetic": "[fɒks]", "meaning": "狐狸", "difficulty": 1},
+    {"word": "stop", "phonetic": "[stɒp]", "meaning": "停止", "difficulty": 1},
+    {"word": "top", "phonetic": "[tɒp]", "meaning": "顶部", "difficulty": 1},
+    {"word": "job", "phonetic": "[dʒɒb]", "meaning": "工作", "difficulty": 1},
+    {"word": "rob", "phonetic": "[rɒb]", "meaning": "抢劫", "difficulty": 2},
+    {"word": "mop", "phonetic": "[mɒp]", "meaning": "拖把", "difficulty": 1},
+    {"word": "orange", "phonetic": "[ˈɒrɪndʒ]", "meaning": "橙子", "difficulty": 1},
+    {"word": "doctor", "phonetic": "[ˈdɒktə]", "meaning": "医生", "difficulty": 1},
+    {"word": "problem", "phonetic": "[ˈprɒbləm]", "meaning": "问题", "difficulty": 2},
+    {"word": "bottle", "phonetic": "[ˈbɒtl]", "meaning": "瓶子", "difficulty": 2},
+    {"word": "coffee", "phonetic": "[ˈkɒfi]", "meaning": "咖啡", "difficulty": 1}
+  ]
+}

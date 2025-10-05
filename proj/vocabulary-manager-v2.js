@@ -54,12 +54,13 @@ class VocabularyManagerV2 {
     
     // 加载配置文件
     async loadConfig() {
-        const response = await fetch('./words/config-v2.json');
-        if (!response.ok) {
-            throw new Error(`配置文件加载失败: HTTP ${response.status}`);
-        }
-        this.wordsConfig = await response.json();
-        console.log('📋 词库配置加载成功:', this.wordsConfig.metadata);
+        console.log('📋 使用运行时动态配置加载...');
+        
+        // 使用动态配置加载器
+        const configLoader = new VocabularyConfigLoader();
+        this.wordsConfig = await configLoader.loadConfig();
+        
+        console.log('✅ 词库配置加载成功:', this.wordsConfig.metadata);
     }
     
     // 加载用户设置

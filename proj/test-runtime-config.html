@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>运行时配置加载测试</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            padding: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #7f8c8d;
+            margin-bottom: 30px;
+        }
+        
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        .status.loading {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+        
+        .status.success {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+        
+        .status.error {
+            background: #ffebee;
+            color: #d32f2f;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .stat-card {
+            padding: 20px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
+        }
+        
+        .section {
+            margin: 30px 0;
+        }
+        
+        .section h2 {
+            color: #34495e;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+        }
+        
+        .category-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+        }
+        
+        .category-card {
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .category-card:hover {
+            border-color: #3498db;
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .category-icon {
+            font-size: 2em;
+        }
+        
+        .category-name {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .category-count {
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        
+        .item-list {
+            margin-top: 10px;
+            padding-left: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .item {
+            padding: 5px 0;
+            color: #555;
+            font-size: 0.9em;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            background: #3498db;
+            color: white;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+        }
+        
+        .btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+        }
+        
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+        
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9em;
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 运行时配置加载测试</h1>
+        <p class="subtitle">测试 JavaScript 动态扫描和生成词库配置</p>
+        
+        <div id="status" class="status loading">
+            ⏳ 正在加载配置...
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">每日音标课程</div>
+                <div class="stat-value" id="daily-count">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">专项练习</div>
+                <div class="stat-value" id="special-count">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">年级分类</div>
+                <div class="stat-value" id="grade-count">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">总计词库</div>
+                <div class="stat-value" id="total-count">0</div>
+            </div>
+        </div>
+        
+        <div style="margin: 20px 0;">
+            <button class="btn" onclick="testLoad()">🔄 重新加载</button>
+            <button class="btn btn-secondary" onclick="showJSON()">📄 查看JSON</button>
+            <button class="btn btn-secondary" onclick="window.location.href='./settings-v2.html'">⚙️ 前往设置页面</button>
+        </div>
+        
+        <div class="section">
+            <h2>📋 配置详情</h2>
+            <div class="category-list" id="category-list">
+                <!-- 动态生成 -->
+            </div>
+        </div>
+        
+        <div class="section" id="json-section" style="display: none;">
+            <h2>📄 完整配置 JSON</h2>
+            <pre><code id="json-output"></code></pre>
+        </div>
+    </div>
+    
+    <script src="vocabulary-config-loader.js"></script>
+    <script>
+        let config = null;
+        
+        async function testLoad() {
+            const statusEl = document.getElementById('status');
+            statusEl.className = 'status loading';
+            statusEl.textContent = '⏳ 正在加载配置...';
+            
+            try {
+                const startTime = performance.now();
+                
+                const loader = new VocabularyConfigLoader();
+                config = await loader.loadConfig();
+                
+                const endTime = performance.now();
+                const loadTime = (endTime - startTime).toFixed(2);
+                
+                statusEl.className = 'status success';
+                statusEl.textContent = `✅ 配置加载成功！耗时 ${loadTime}ms`;
+                
+                displayStats(config);
+                displayCategories(config);
+                
+            } catch (error) {
+                statusEl.className = 'status error';
+                statusEl.textContent = `❌ 配置加载失败: ${error.message}`;
+                console.error(error);
+            }
+        }
+        
+        function displayStats(config) {
+            const dailyPhonics = config.categories.find(c => c.id === 'daily-phonics');
+            const specialPractice = config.categories.find(c => c.id === 'special-practice');
+            const gradeBased = config.categories.find(c => c.id === 'grade-based');
+            
+            const dailyCount = dailyPhonics?.subcategories?.length || 0;
+            const specialCount = specialPractice?.subcategories?.length || 0;
+            const gradeCount = gradeBased?.subcategories?.reduce((sum, cat) => sum + cat.items.length, 0) || 0;
+            const totalCount = dailyCount + specialCount + gradeCount;
+            
+            document.getElementById('daily-count').textContent = dailyCount;
+            document.getElementById('special-count').textContent = specialCount;
+            document.getElementById('grade-count').textContent = gradeCount;
+            document.getElementById('total-count').textContent = totalCount;
+        }
+        
+        function displayCategories(config) {
+            const container = document.getElementById('category-list');
+            container.innerHTML = '';
+            
+            config.categories.forEach(category => {
+                const card = document.createElement('div');
+                card.className = 'category-card';
+                
+                let itemsHTML = '';
+                let itemCount = 0;
+                
+                if (category.id === 'grade-based') {
+                    // 年级分类特殊处理
+                    itemCount = category.subcategories.reduce((sum, sub) => sum + sub.items.length, 0);
+                    const samples = [];
+                    category.subcategories.forEach(sub => {
+                        samples.push(...sub.items.slice(0, 2).map(item => `${item.name} (${item.wordCount}词)`));
+                    });
+                    itemsHTML = samples.slice(0, 5).map(item => `<div class="item">• ${item}</div>`).join('');
+                    if (itemCount > 5) {
+                        itemsHTML += `<div class="item">... 还有 ${itemCount - 5} 个学期</div>`;
+                    }
+                } else {
+                    // 普通分类
+                    itemCount = category.subcategories?.length || 0;
+                    const items = category.subcategories || [];
+                    itemsHTML = items.slice(0, 5).map(item => 
+                        `<div class="item">• ${item.name} (${item.wordCount}词)</div>`
+                    ).join('');
+                    if (itemCount > 5) {
+                        itemsHTML += `<div class="item">... 还有 ${itemCount - 5} 个课程</div>`;
+                    }
+                }
+                
+                card.innerHTML = `
+                    <div class="category-header">
+                        <span class="category-icon">${category.icon}</span>
+                        <div>
+                            <div class="category-name">${category.name}</div>
+                            <div class="category-count">${itemCount} 个课程/学期</div>
+                        </div>
+                    </div>
+                    <div class="item-list">${itemsHTML}</div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+        
+        function showJSON() {
+            const section = document.getElementById('json-section');
+            const output = document.getElementById('json-output');
+            
+            if (section.style.display === 'none') {
+                section.style.display = 'block';
+                if (config) {
+                    output.textContent = JSON.stringify(config, null, 2);
+                }
+            } else {
+                section.style.display = 'none';
+            }
+        }
+        
+        // 页面加载时自动测试
+        document.addEventListener('DOMContentLoaded', testLoad);
+    </script>
+</body>
+</html>

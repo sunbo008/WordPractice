@@ -1,0 +1,94 @@
+{
+  "metadata": {
+    "id": "day11",
+    "name": "Day 11 - 短元音 /ʌ/",
+    "phoneme": "/ʌ/",
+    "description": "学习/ʌ/的发音和拼读规则",
+    "day": 11,
+    "category": "daily-phonics",
+    "difficulty": "intermediate",
+    "wordCount": 10,
+    "lastUpdated": "2025-10-06"
+  },
+  "words": [
+    {
+      "word": "sun",
+      "phonetic": "[sʌn]",
+      "meaning": "太阳",
+      "difficulty": 1
+    },
+    {
+      "word": "run",
+      "phonetic": "[rʌn]",
+      "meaning": "跑",
+      "difficulty": 1
+    },
+    {
+      "word": "fun",
+      "phonetic": "[fʌn]",
+      "meaning": "有趣的",
+      "difficulty": 1
+    },
+    {
+      "word": "cup",
+      "phonetic": "[kʌp]",
+      "meaning": "杯子",
+      "difficulty": 1
+    },
+    {
+      "word": "but",
+      "phonetic": "[bʌt]",
+      "meaning": "但是",
+      "difficulty": 1
+    },
+    {
+      "word": "bus",
+      "phonetic": "[bʌs]",
+      "meaning": "公共汽车",
+      "difficulty": 1
+    },
+    {
+      "word": "love",
+      "phonetic": "[lʌv]",
+      "meaning": "爱",
+      "difficulty": 1
+    },
+    {
+      "word": "come",
+      "phonetic": "[kʌm]",
+      "meaning": "来",
+      "difficulty": 1
+    },
+    {
+      "word": "some",
+      "phonetic": "[sʌm]",
+      "meaning": "一些",
+      "difficulty": 1
+    },
+    {
+      "word": "lunch",
+      "phonetic": "[lʌntʃ]",
+      "meaning": "午餐",
+      "difficulty": 1
+    }
+  ],
+  "lesson": {
+    "pronunciationTips": [
+      "舌位：舌中部稍微抬起，舌位较低",
+      "唇形：嘴唇自然放松，微微张开",
+      "气流：声带振动，气流自然通过",
+      "音长：这是一个短元音，发音短促有力"
+    ],
+    "phonicsPatterns": [
+      "u 在闭音节中通常发 /ʌ/ 短音（sun, run, fun）",
+      "u + 辅音字母结尾发 /ʌ/ 音（cup, but, bus）",
+      "o 在特定单词中发 /ʌ/ 音（love, come, some）"
+    ],
+    "practiceSteps": [
+      "准备动作：嘴巴自然放松",
+      "舌位调整：舌中部稍微抬起",
+      "发音：发短促的\"啊\"音（比/æ/更放松）",
+      "检查：感受喉咙的轻微震动"
+    ]
+  }
+}

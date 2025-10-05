@@ -280,6 +280,29 @@ body {
     font-weight: bold;
 }
 
+.subcategory-item.file-missing {
+    opacity: 0.7;
+    border-color: #e74c3c;
+}
+
+.file-status {
+    font-size: 0.85em;
+    margin-left: 10px;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-weight: bold;
+}
+
+.file-status.missing {
+    color: #e74c3c;
+    background: #fee;
+}
+
+.file-status.exists {
+    color: #27ae60;
+    font-size: 0.8em;
+}
+
 .subcategory-header {
     display: flex;
     justify-content: space-between;
@@ -341,6 +364,62 @@ body {
 .difficulty-advanced {
     background: #f8d7da;
     color: #e74c3c;
+}
+
+/* 操作按钮 */
+.subcategory-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 1px solid #e9ecef;
+}
+
+.action-btn {
+    flex: 1;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.learn-btn {
+    background: #3498db;
+    color: white;
+}
+
+.learn-btn:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+}
+
+.select-btn {
+    background: #ecf0f1;
+    color: #2c3e50;
+}
+
+.select-btn:hover {
+    background: #d5d8dc;
+}
+
+.subcategory-item.selected .select-btn {
+    background: #27ae60;
+    color: white;
+}
+
+.action-btn:disabled {
+    background: #bdc3c7;
+    color: #7f8c8d;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.action-btn:disabled:hover {
+    transform: none;
+    background: #bdc3c7;
 }
 
 /* 年级组 */

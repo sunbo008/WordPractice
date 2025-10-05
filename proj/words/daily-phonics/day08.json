@@ -1,0 +1,94 @@
+{
+  "metadata": {
+    "id": "day08",
+    "name": "Day 8 - 短元音 /æ/",
+    "phoneme": "/æ/",
+    "description": "学习/æ/的发音和拼读规则",
+    "day": 8,
+    "category": "daily-phonics",
+    "difficulty": "beginner",
+    "wordCount": 10,
+    "lastUpdated": "2025-10-06"
+  },
+  "words": [
+    {
+      "word": "cat",
+      "phonetic": "[kæt]",
+      "meaning": "猫",
+      "difficulty": 1
+    },
+    {
+      "word": "hat",
+      "phonetic": "[hæt]",
+      "meaning": "帽子",
+      "difficulty": 1
+    },
+    {
+      "word": "bad",
+      "phonetic": "[bæd]",
+      "meaning": "坏的",
+      "difficulty": 1
+    },
+    {
+      "word": "dad",
+      "phonetic": "[dæd]",
+      "meaning": "爸爸",
+      "difficulty": 1
+    },
+    {
+      "word": "bag",
+      "phonetic": "[bæɡ]",
+      "meaning": "包",
+      "difficulty": 1
+    },
+    {
+      "word": "black",
+      "phonetic": "[blæk]",
+      "meaning": "黑色",
+      "difficulty": 2
+    },
+    {
+      "word": "back",
+      "phonetic": "[bæk]",
+      "meaning": "后面",
+      "difficulty": 1
+    },
+    {
+      "word": "map",
+      "phonetic": "[mæp]",
+      "meaning": "地图",
+      "difficulty": 1
+    },
+    {
+      "word": "apple",
+      "phonetic": "[ˈæpl]",
+      "meaning": "苹果",
+      "difficulty": 1
+    },
+    {
+      "word": "family",
+      "phonetic": "[ˈfæməli]",
+      "meaning": "家庭",
+      "difficulty": 1
+    }
+  ],
+  "lesson": {
+    "pronunciationTips": [
+      "舌位：舌前部平放，处于最低位置",
+      "唇形：嘴巴张大，下巴明显下降",
+      "气流：声带振动，气流从大开的口腔通过",
+      "音长：这是一个短元音，发音短促有力"
+    ],
+    "phonicsPatterns": [
+      "a 在闭音节中通常发 /æ/ 短音（cat, hat, bad）",
+      "a + 辅音字母结尾发 /æ/ 音（bag, map, cap）",
+      "a 在重读音节中发 /æ/ 音（apple, family, happy）"
+    ],
+    "practiceSteps": [
+      "准备动作：嘴巴张大，下巴下降",
+      "舌位调整：舌头平放，放松",
+      "发音：发夸张的\"啊\"音（但嘴型扁平）",
+      "检查：感受下巴的明显下降"
+    ]
+  }
+}

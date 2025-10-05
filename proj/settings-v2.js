@@ -28,12 +28,13 @@ class SettingsManagerV2 {
     }
     
     async loadConfig() {
-        const response = await fetch('./words/config-v2.json');
-        if (!response.ok) {
-            throw new Error(`配置文件加载失败: HTTP ${response.status}`);
-        }
-        this.config = await response.json();
-        console.log('📋 配置加载成功:', this.config.metadata);
+        console.log('📋 使用运行时动态配置加载...');
+        
+        // 使用动态配置加载器
+        const configLoader = new VocabularyConfigLoader();
+        this.config = await configLoader.loadConfig();
+        
+        console.log('✅ 词库配置加载成功:', this.config.metadata);
     }
     
     loadUserSettings() {
@@ -109,25 +110,28 @@ class SettingsManagerV2 {
         });
     }
     
-    renderDailyPhonics(category) {
+    async renderDailyPhonics(category) {
         const grid = document.getElementById('daily-phonics-grid');
         grid.innerHTML = '';
         
         let selectedCount = 0;
         
-        category.subcategories.forEach(day => {
+        for (const day of category.subcategories) {
             const isSelected = this.selectedLibraries.has(day.id);
             if (isSelected) selectedCount++;
             
+            // 检查文件是否存在
+            const fileExists = await this.checkFileExists(`./words/${day.filename}`);
+            
             const item = document.createElement('div');
-            item.className = `subcategory-item ${isSelected ? 'selected' : ''}`;
+            item.className = `subcategory-item ${isSelected ? 'selected' : ''} ${!fileExists ? 'file-missing' : ''}`;
             item.dataset.id = day.id;
-            item.onclick = () => this.toggleSelection(day.id, 'daily-phonics');
             
             item.innerHTML = `
                 <div class="subcategory-header">
                     <span class="subcategory-title">${day.name}</span>
                     <span class="subcategory-phoneme">${day.phoneme}</span>
+                    ${!fileExists ? '<span class="file-status missing">❌ 未实现</span>' : '<span class="file-status exists">✓</span>'}
                 </div>
                 <div class="subcategory-description">${day.description}</div>
                 <div class="subcategory-meta">
@@ -136,34 +140,52 @@ class SettingsManagerV2 {
                         ${this.getDifficultyName(day.difficulty)}
                     </span>
                 </div>
+                <div class="subcategory-actions">
+                    <button class="action-btn learn-btn" ${!fileExists ? 'disabled' : ''} onclick="openLesson(event, '${day.id}')">📖 学习</button>
+                    <button class="action-btn select-btn" ${!fileExists ? 'disabled' : ''} onclick="event.stopPropagation(); window.settingsManager.toggleSelection('${day.id}', 'daily-phonics')">
+                        ${isSelected ? '✓ 已选' : '选择'}
+                    </button>
+                </div>
             `;
             
             grid.appendChild(item);
-        });
+        }
         
         document.getElementById('daily-phonics-count').textContent = 
             `${selectedCount}/${category.subcategories.length}`;
     }
     
-    renderSpecialPractice(category) {
+    async checkFileExists(filepath) {
+        try {
+            const response = await fetch(filepath, { method: 'HEAD' });
+            return response.ok;
+        } catch (error) {
+            return false;
+        }
+    }
+    
+    async renderSpecialPractice(category) {
         const grid = document.getElementById('special-practice-grid');
         grid.innerHTML = '';
         
         let selectedCount = 0;
         
-        category.subcategories.forEach(special => {
+        for (const special of category.subcategories) {
             const isSelected = this.selectedLibraries.has(special.id);
             if (isSelected) selectedCount++;
             
+            // 检查文件是否存在
+            const fileExists = await this.checkFileExists(`./words/${special.filename}`);
+            
             const item = document.createElement('div');
-            item.className = `subcategory-item ${isSelected ? 'selected' : ''}`;
+            item.className = `subcategory-item ${isSelected ? 'selected' : ''} ${!fileExists ? 'file-missing' : ''}`;
             item.dataset.id = special.id;
-            item.onclick = () => this.toggleSelection(special.id, 'special-practice');
             
             item.innerHTML = `
                 <div class="subcategory-header">
                     <span class="subcategory-title">${special.name}</span>
                     <span class="subcategory-phoneme">${special.phoneme}</span>
+                    ${!fileExists ? '<span class="file-status missing">❌ 未实现</span>' : '<span class="file-status exists">✓</span>'}
                 </div>
                 <div class="subcategory-description">${special.description}</div>
                 <div class="subcategory-meta">
@@ -172,34 +194,43 @@ class SettingsManagerV2 {
                         ${this.getDifficultyName(special.difficulty)}
                     </span>
                 </div>
+                <div class="subcategory-actions">
+                    <button class="action-btn learn-btn" ${!fileExists ? 'disabled' : ''} onclick="openLesson(event, '${special.id}')">📖 学习</button>
+                    <button class="action-btn select-btn" ${!fileExists ? 'disabled' : ''} onclick="event.stopPropagation(); window.settingsManager.toggleSelection('${special.id}', 'special-practice')">
+                        ${isSelected ? '✓ 已选' : '选择'}
+                    </button>
+                </div>
             `;
             
             grid.appendChild(item);
-        });
+        }
         
         document.getElementById('special-practice-count').textContent = 
             `${selectedCount}/${category.subcategories.length}`;
     }
     
-    renderGradeBased(category) {
-        category.subcategories.forEach(gradeLevel => {
+    async renderGradeBased(category) {
+        for (const gradeLevel of category.subcategories) {
             const grid = document.getElementById(`${gradeLevel.id}-grid`);
             grid.innerHTML = '';
             
             let selectedCount = 0;
             
-            gradeLevel.items.forEach(term => {
+            for (const term of gradeLevel.items) {
                 const isSelected = this.selectedLibraries.has(term.id);
                 if (isSelected) selectedCount++;
                 
+                // 检查文件是否存在
+                const fileExists = await this.checkFileExists(`./words/${term.filename}`);
+                
                 const item = document.createElement('div');
-                item.className = `subcategory-item ${isSelected ? 'selected' : ''}`;
+                item.className = `subcategory-item ${isSelected ? 'selected' : ''} ${!fileExists ? 'file-missing' : ''}`;
                 item.dataset.id = term.id;
-                item.onclick = () => this.toggleSelection(term.id, 'grade-based');
                 
                 item.innerHTML = `
                     <div class="subcategory-header">
                         <span class="subcategory-title">${term.name}</span>
+                        ${!fileExists ? '<span class="file-status missing">❌ 未实现</span>' : '<span class="file-status exists">✓</span>'}
                     </div>
                     <div class="subcategory-description">${term.description}</div>
                     <div class="subcategory-meta">
@@ -208,14 +239,20 @@ class SettingsManagerV2 {
                             ${this.getDifficultyName(term.difficulty)}
                         </span>
                     </div>
+                    <div class="subcategory-actions">
+                        <button class="action-btn learn-btn" ${!fileExists ? 'disabled' : ''} onclick="openLesson(event, '${term.id}')">📖 学习</button>
+                        <button class="action-btn select-btn" ${!fileExists ? 'disabled' : ''} onclick="event.stopPropagation(); window.settingsManager.toggleSelection('${term.id}', 'grade-based')">
+                            ${isSelected ? '✓ 已选' : '选择'}
+                        </button>
+                    </div>
                 `;
                 
                 grid.appendChild(item);
-            });
+            }
             
             document.getElementById(`${gradeLevel.id}-count`).textContent = 
                 `${selectedCount}/${gradeLevel.items.length}`;
-        });
+        }
         
         // 更新年级分类总计数
         this.updateGradeBasedCount();
@@ -249,7 +286,20 @@ class SettingsManagerV2 {
         // 更新界面
         const element = document.querySelector(`[data-id="${id}"]`);
         if (element) {
-            element.classList.toggle('selected');
+            const isSelected = this.selectedLibraries.has(id);
+            
+            // 更新 selected 类
+            if (isSelected) {
+                element.classList.add('selected');
+            } else {
+                element.classList.remove('selected');
+            }
+            
+            // 更新按钮文本
+            const selectBtn = element.querySelector('.select-btn');
+            if (selectBtn) {
+                selectBtn.textContent = isSelected ? '✓ 已选' : '选择';
+            }
         }
         
         // 更新统计
@@ -426,6 +476,12 @@ function applyAndStart() {
     if (window.settingsManager) {
         window.settingsManager.applyAndStart();
     }
+}
+
+// 打开学习页面
+function openLesson(event, lessonId) {
+    event.stopPropagation();
+    window.location.href = `./study/phonics-lesson-template.html?lesson=${lessonId}`;
 }
 
 // 页面加载完成后初始化

@@ -1,0 +1,34 @@
+{
+  "metadata": {
+    "id": "special-ae",
+    "name": "音标 /æ/ 专项练习",
+    "phoneme": "/æ/",
+    "description": "针对音标/æ/的20个重点单词强化练习",
+    "category": "special-practice",
+    "difficulty": "intermediate",
+    "wordCount": 20,
+    "lastUpdated": "2025-10-06"
+  },
+  "words": [
+    {"word": "cat", "phonetic": "[kæt]", "meaning": "猫", "difficulty": 1},
+    {"word": "hat", "phonetic": "[hæt]", "meaning": "帽子", "difficulty": 1},
+    {"word": "bat", "phonetic": "[bæt]", "meaning": "蝙蝠", "difficulty": 1},
+    {"word": "rat", "phonetic": "[ræt]", "meaning": "老鼠", "difficulty": 1},
+    {"word": "mat", "phonetic": "[mæt]", "meaning": "垫子", "difficulty": 1},
+    {"word": "bag", "phonetic": "[bæɡ]", "meaning": "包", "difficulty": 1},
+    {"word": "map", "phonetic": "[mæp]", "meaning": "地图", "difficulty": 1},
+    {"word": "cap", "phonetic": "[kæp]", "meaning": "帽子", "difficulty": 1},
+    {"word": "jam", "phonetic": "[dʒæm]", "meaning": "果酱", "difficulty": 1},
+    {"word": "man", "phonetic": "[mæn]", "meaning": "男人", "difficulty": 1},
+    {"word": "bad", "phonetic": "[bæd]", "meaning": "坏的", "difficulty": 1},
+    {"word": "dad", "phonetic": "[dæd]", "meaning": "爸爸", "difficulty": 1},
+    {"word": "sad", "phonetic": "[sæd]", "meaning": "悲伤的", "difficulty": 1},
+    {"word": "mad", "phonetic": "[mæd]", "meaning": "疯狂的", "difficulty": 1},
+    {"word": "glad", "phonetic": "[ɡlæd]", "meaning": "高兴的", "difficulty": 2},
+    {"word": "apple", "phonetic": "[ˈæpl]", "meaning": "苹果", "difficulty": 1},
+    {"word": "black", "phonetic": "[blæk]", "meaning": "黑色", "difficulty": 2},
+    {"word": "back", "phonetic": "[bæk]", "meaning": "后面", "difficulty": 1},
+    {"word": "pack", "phonetic": "[pæk]", "meaning": "包装", "difficulty": 1},
+    {"word": "track", "phonetic": "[træk]", "meaning": "轨道", "difficulty": 2}
+  ]
+}

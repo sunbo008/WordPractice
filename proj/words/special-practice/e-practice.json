@@ -1,0 +1,34 @@
+{
+  "metadata": {
+    "id": "special-e",
+    "name": "音标 /e/ 专项练习",
+    "phoneme": "/e/",
+    "description": "针对音标/e/的20个重点单词强化练习",
+    "category": "special-practice",
+    "difficulty": "intermediate",
+    "wordCount": 20,
+    "lastUpdated": "2025-10-06"
+  },
+  "words": [
+    {"word": "bed", "phonetic": "[bed]", "meaning": "床", "difficulty": 1},
+    {"word": "red", "phonetic": "[red]", "meaning": "红色", "difficulty": 1},
+    {"word": "pen", "phonetic": "[pen]", "meaning": "钢笔", "difficulty": 1},
+    {"word": "ten", "phonetic": "[ten]", "meaning": "十", "difficulty": 1},
+    {"word": "hen", "phonetic": "[hen]", "meaning": "母鸡", "difficulty": 1},
+    {"word": "leg", "phonetic": "[leɡ]", "meaning": "腿", "difficulty": 1},
+    {"word": "egg", "phonetic": "[eɡ]", "meaning": "鸡蛋", "difficulty": 1},
+    {"word": "get", "phonetic": "[ɡet]", "meaning": "得到", "difficulty": 1},
+    {"word": "let", "phonetic": "[let]", "meaning": "让", "difficulty": 1},
+    {"word": "set", "phonetic": "[set]", "meaning": "设置", "difficulty": 1},
+    {"word": "yes", "phonetic": "[jes]", "meaning": "是的", "difficulty": 1},
+    {"word": "net", "phonetic": "[net]", "meaning": "网", "difficulty": 1},
+    {"word": "wet", "phonetic": "[wet]", "meaning": "湿的", "difficulty": 1},
+    {"word": "pet", "phonetic": "[pet]", "meaning": "宠物", "difficulty": 1},
+    {"word": "met", "phonetic": "[met]", "meaning": "遇见", "difficulty": 1},
+    {"word": "desk", "phonetic": "[desk]", "meaning": "桌子", "difficulty": 1},
+    {"word": "help", "phonetic": "[help]", "meaning": "帮助", "difficulty": 1},
+    {"word": "step", "phonetic": "[step]", "meaning": "步骤", "difficulty": 1},
+    {"word": "best", "phonetic": "[best]", "meaning": "最好的", "difficulty": 1},
+    {"word": "rest", "phonetic": "[rest]", "meaning": "休息", "difficulty": 1}
+  ]
+}

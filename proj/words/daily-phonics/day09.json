@@ -1,0 +1,94 @@
+{
+  "metadata": {
+    "id": "day09",
+    "name": "Day 9 - 短元音 /ɒ/",
+    "phoneme": "/ɒ/",
+    "description": "学习/ɒ/的发音和拼读规则",
+    "day": 9,
+    "category": "daily-phonics",
+    "difficulty": "beginner",
+    "wordCount": 10,
+    "lastUpdated": "2025-10-06"
+  },
+  "words": [
+    {
+      "word": "dog",
+      "phonetic": "[dɒɡ]",
+      "meaning": "狗",
+      "difficulty": 1
+    },
+    {
+      "word": "hot",
+      "phonetic": "[hɒt]",
+      "meaning": "热的",
+      "difficulty": 1
+    },
+    {
+      "word": "box",
+      "phonetic": "[bɒks]",
+      "meaning": "盒子",
+      "difficulty": 1
+    },
+    {
+      "word": "stop",
+      "phonetic": "[stɒp]",
+      "meaning": "停止",
+      "difficulty": 1
+    },
+    {
+      "word": "shop",
+      "phonetic": "[ʃɒp]",
+      "meaning": "商店",
+      "difficulty": 1
+    },
+    {
+      "word": "clock",
+      "phonetic": "[klɒk]",
+      "meaning": "时钟",
+      "difficulty": 1
+    },
+    {
+      "word": "doctor",
+      "phonetic": "[ˈdɒktə(r)]",
+      "meaning": "医生",
+      "difficulty": 1
+    },
+    {
+      "word": "sorry",
+      "phonetic": "[ˈsɒri]",
+      "meaning": "对不起",
+      "difficulty": 1
+    },
+    {
+      "word": "orange",
+      "phonetic": "[ˈɒrɪndʒ]",
+      "meaning": "橙子",
+      "difficulty": 1
+    },
+    {
+      "word": "problem",
+      "phonetic": "[ˈprɒbləm]",
+      "meaning": "问题",
+      "difficulty": 2
+    }
+  ],
+  "lesson": {
+    "pronunciationTips": [
+      "舌位：舌后部稍微抬起，舌位低而后",
+      "唇形：嘴唇自然张开，呈圆形",
+      "气流：声带振动，气流从圆形口腔通过",
+      "音长：这是一个短元音，发音短促"
+    ],
+    "phonicsPatterns": [
+      "o 在闭音节中通常发 /ɒ/ 短音（dog, hot, box）",
+      "o + 辅音字母结尾发 /ɒ/ 音（stop, shop, clock）",
+      "o 在重读音节中发 /ɒ/ 音（doctor, orange, problem）"
+    ],
+    "practiceSteps": [
+      "准备动作：嘴巴自然张开呈圆形",
+      "舌位调整：舌后部稍微抬起",
+      "发音：发短促的\"哦\"音",
+      "检查：保持嘴型圆润"
+    ]
+  }
+}

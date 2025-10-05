@@ -1,0 +1,126 @@
+{
+  "metadata": {
+    "id": "day14",
+    "name": "Day 14 - 中性元音 /ə/",
+    "phoneme": "/ə/",
+    "description": "学习/ə/的发音和拼读规则",
+    "day": 14,
+    "category": "daily-phonics",
+    "difficulty": "intermediate",
+    "wordCount": 15,
+    "lastUpdated": "2025-10-06"
+  },
+  "words": [
+    {
+      "word": "about",
+      "phonetic": "[əˈbaʊt]",
+      "meaning": "关于",
+      "difficulty": 1
+    },
+    {
+      "word": "again",
+      "phonetic": "[əˈɡen]",
+      "meaning": "再次",
+      "difficulty": 1
+    },
+    {
+      "word": "around",
+      "phonetic": "[əˈraʊnd]",
+      "meaning": "周围",
+      "difficulty": 1
+    },
+    {
+      "word": "away",
+      "phonetic": "[əˈweɪ]",
+      "meaning": "离开",
+      "difficulty": 1
+    },
+    {
+      "word": "sofa",
+      "phonetic": "[ˈsəʊfə]",
+      "meaning": "沙发",
+      "difficulty": 1
+    },
+    {
+      "word": "banana",
+      "phonetic": "[bəˈnɑːnə]",
+      "meaning": "香蕉",
+      "difficulty": 1
+    },
+    {
+      "word": "camera",
+      "phonetic": "[ˈkæmərə]",
+      "meaning": "相机",
+      "difficulty": 2
+    },
+    {
+      "word": "together",
+      "phonetic": "[təˈɡeðə(r)]",
+      "meaning": "一起",
+      "difficulty": 2
+    },
+    {
+      "word": "another",
+      "phonetic": "[əˈnʌðə(r)]",
+      "meaning": "另一个",
+      "difficulty": 2
+    },
+    {
+      "word": "letter",
+      "phonetic": "[ˈletə(r)]",
+      "meaning": "信",
+      "difficulty": 1
+    },
+    {
+      "word": "teacher",
+      "phonetic": "[ˈtiːtʃə(r)]",
+      "meaning": "老师",
+      "difficulty": 1
+    },
+    {
+      "word": "water",
+      "phonetic": "[ˈwɔːtə(r)]",
+      "meaning": "水",
+      "difficulty": 1
+    },
+    {
+      "word": "mother",
+      "phonetic": "[ˈmʌðə(r)]",
+      "meaning": "母亲",
+      "difficulty": 1
+    },
+    {
+      "word": "father",
+      "phonetic": "[ˈfɑːðə(r)]",
+      "meaning": "父亲",
+      "difficulty": 1
+    },
+    {
+      "word": "brother",
+      "phonetic": "[ˈbrʌðə(r)]",
+      "meaning": "兄弟",
+      "difficulty": 1
+    }
+  ],
+  "lesson": {
+    "pronunciationTips": [
+      "舌位：舌头处于中央，完全放松",
+      "唇形：嘴巴自然半开，完全不用力",
+      "气流：声带轻微振动，气流自然通过",
+      "音长：这是最短最轻的元音，几乎听不清"
+    ],
+    "phonicsPatterns": [
+      "a 在非重读音节发 /ə/ 音（about, ago, banana）",
+      "e 在非重读音节发 /ə/ 音（the, happen, happen）",
+      "o 在非重读音节发 /ə/ 音（second, memory, today）",
+      "er 在词尾非重读音节发 /ə/ 音（teacher, water, mother）",
+      "几乎所有元音字母在非重读音节都可能发 /ə/ 音"
+    ],
+    "practiceSteps": [
+      "准备动作：完全放松嘴巴",
+      "舌位调整：舌头自然平放",
+      "发音：发最轻的\"呃\"音，几乎无声",
+      "检查：确保是最轻松的发音"
+    ]
+  }
+}

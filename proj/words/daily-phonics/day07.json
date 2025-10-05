@@ -1,0 +1,94 @@
+{
+  "metadata": {
+    "id": "day07",
+    "name": "Day 7 - 短元音 /e/",
+    "phoneme": "/e/",
+    "description": "学习/e/的发音和拼读规则",
+    "day": 7,
+    "category": "daily-phonics",
+    "difficulty": "beginner",
+    "wordCount": 10,
+    "lastUpdated": "2025-10-06"
+  },
+  "words": [
+    {
+      "word": "bed",
+      "phonetic": "[bed]",
+      "meaning": "床",
+      "difficulty": 1
+    },
+    {
+      "word": "red",
+      "phonetic": "[red]",
+      "meaning": "红色",
+      "difficulty": 1
+    },
+    {
+      "word": "pen",
+      "phonetic": "[pen]",
+      "meaning": "钢笔",
+      "difficulty": 1
+    },
+    {
+      "word": "ten",
+      "phonetic": "[ten]",
+      "meaning": "十",
+      "difficulty": 1
+    },
+    {
+      "word": "hen",
+      "phonetic": "[hen]",
+      "meaning": "母鸡",
+      "difficulty": 1
+    },
+    {
+      "word": "get",
+      "phonetic": "[ɡet]",
+      "meaning": "得到",
+      "difficulty": 1
+    },
+    {
+      "word": "let",
+      "phonetic": "[let]",
+      "meaning": "让",
+      "difficulty": 1
+    },
+    {
+      "word": "best",
+      "phonetic": "[best]",
+      "meaning": "最好的",
+      "difficulty": 1
+    },
+    {
+      "word": "next",
+      "phonetic": "[nekst]",
+      "meaning": "下一个",
+      "difficulty": 2
+    },
+    {
+      "word": "help",
+      "phonetic": "[help]",
+      "meaning": "帮助",
+      "difficulty": 1
+    }
+  ],
+  "lesson": {
+    "pronunciationTips": [
+      "舌位：舌前部中等高度抬起，位于/æ/和/ɪ/之间",
+      "唇形：嘴唇自然张开，比/ɪ/开口稍大",
+      "气流：声带振动，气流自然通过",
+      "音长：这是一个短元音，发音短促明确"
+    ],
+    "phonicsPatterns": [
+      "e 在闭音节中通常发 /e/ 短音（bed, pen, ten）",
+      "e + 辅音字母结尾发 /e/ 音（red, get, let）",
+      "e 在重读音节中发 /e/ 音（best, next, help）"
+    ],
+    "practiceSteps": [
+      "准备动作：嘴巴自然张开",
+      "舌位调整：舌前部中等高度抬起",
+      "发音：发清晰的\"诶\"音（但不滑向/ɪ/）",
+      "检查：确保是单元音，不是双元音"
+    ]
+  }
+}

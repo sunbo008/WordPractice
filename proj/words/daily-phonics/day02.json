@@ -1,0 +1,95 @@
+{
+  "metadata": {
+    "id": "day02",
+    "name": "Day 2 - 短元音 /ʊ/",
+    "phoneme": "/ʊ/",
+    "description": "学习/ʊ/的发音和拼读规则",
+    "day": 2,
+    "category": "daily-phonics",
+    "difficulty": "beginner",
+    "wordCount": 10,
+    "lastUpdated": "2025-10-06"
+  },
+  "words": [
+    {
+      "word": "book",
+      "phonetic": "[bʊk]",
+      "meaning": "书",
+      "difficulty": 1
+    },
+    {
+      "word": "look",
+      "phonetic": "[lʊk]",
+      "meaning": "看",
+      "difficulty": 1
+    },
+    {
+      "word": "good",
+      "phonetic": "[ɡʊd]",
+      "meaning": "好的",
+      "difficulty": 1
+    },
+    {
+      "word": "foot",
+      "phonetic": "[fʊt]",
+      "meaning": "脚",
+      "difficulty": 1
+    },
+    {
+      "word": "took",
+      "phonetic": "[tʊk]",
+      "meaning": "拿（过去式）",
+      "difficulty": 1
+    },
+    {
+      "word": "cook",
+      "phonetic": "[kʊk]",
+      "meaning": "烹饪",
+      "difficulty": 1
+    },
+    {
+      "word": "wood",
+      "phonetic": "[wʊd]",
+      "meaning": "木头",
+      "difficulty": 1
+    },
+    {
+      "word": "stood",
+      "phonetic": "[stʊd]",
+      "meaning": "站立（过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "could",
+      "phonetic": "[kʊd]",
+      "meaning": "能够",
+      "difficulty": 2
+    },
+    {
+      "word": "would",
+      "phonetic": "[wʊd]",
+      "meaning": "将要",
+      "difficulty": 2
+    }
+  ],
+  "lesson": {
+    "pronunciationTips": [
+      "舌位：舌后部稍微抬高，比/u:/低，舌位较放松",
+      "唇形：嘴唇收圆，但比/u:/开口稍大，不用太紧张",
+      "气流：声带振动，气流从口腔通过",
+      "音长：这是一个短元音，发音短促，不要拉长"
+    ],
+    "phonicsPatterns": [
+      "oo 组合在特定单词中发 /ʊ/ 音（book, look, good）",
+      "oo + k 组合通常发 /ʊ/ 音（book, cook, took）",
+      "oo + d 组合通常发 /ʊ/ 音（good, wood, stood）",
+      "ould 组合发 /ʊd/ 音（could, would, should）"
+    ],
+    "practiceSteps": [
+      "准备动作：嘴唇自然收圆",
+      "舌位调整：舌后部稍微抬高，保持放松",
+      "发音：发短促的\"屋\"音，不要拉长",
+      "检查：感受发音的短促性"
+    ]
+  }
+}

@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>禁用按钮测试 - 词库状态</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        .test-section h2 {
+            color: #3498db;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background: #3498db;
+            color: white;
+            font-weight: bold;
+        }
+        tr:hover {
+            background: #f8f9fa;
+        }
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+        .status-exists {
+            background: #d5f4e6;
+            color: #27ae60;
+        }
+        .status-missing {
+            background: #fee;
+            color: #e74c3c;
+        }
+        .button-preview {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+        .btn-learn {
+            background: #3498db;
+            color: white;
+        }
+        .btn-select {
+            background: #ecf0f1;
+            color: #2c3e50;
+        }
+        .btn:disabled {
+            background: #bdc3c7;
+            color: #7f8c8d;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 词库状态与按钮禁用测试</h1>
+        
+        <!-- 按天学习音标 -->
+        <div class="test-section">
+            <h2>📅 按天学习音标（12个课程）</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>课程</th>
+                        <th>音标</th>
+                        <th>文件状态</th>
+                        <th>按钮预览</th>
+                    </tr>
+                </thead>
+                <tbody id="daily-phonics-table">
+                    <!-- 动态生成 -->
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- 专项强化练习 -->
+        <div class="test-section">
+            <h2>🎯 专项强化练习（4个专项）</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>课程</th>
+                        <th>音标</th>
+                        <th>文件状态</th>
+                        <th>按钮预览</th>
+                    </tr>
+                </thead>
+                <tbody id="special-practice-table">
+                    <!-- 动态生成 -->
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- 按年级分类 -->
+        <div class="test-section">
+            <h2>🎓 按年级分类（20个学期，抽样显示）</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>课程</th>
+                        <th>单词数</th>
+                        <th>文件状态</th>
+                        <th>按钮预览</th>
+                    </tr>
+                </thead>
+                <tbody id="grade-based-table">
+                    <!-- 动态生成 -->
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- 统计摘要 -->
+        <div class="test-section">
+            <h2>📊 统计摘要</h2>
+            <div id="summary" style="font-size: 1.1em; line-height: 2;">
+                <!-- 动态生成 -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function checkFileExists(filepath) {
+            try {
+                const response = await fetch(filepath, { method: 'HEAD' });
+                return response.ok;
+            } catch (error) {
+                return false;
+            }
+        }
+        
+        async function testDailyPhonics() {
+            const tbody = document.getElementById('daily-phonics-table');
+            const courses = [
+                { id: 'day01', name: 'Day 1', phoneme: '/i:/', file: 'daily-phonics/day01.json' },
+                { id: 'day02', name: 'Day 2', phoneme: '/ʊ/', file: 'daily-phonics/day02.json' },
+                { id: 'day03', name: 'Day 3', phoneme: '/u:/', file: 'daily-phonics/day03.json' },
+                { id: 'day04', name: 'Day 4', phoneme: '/eɪ/', file: 'daily-phonics/day04.json' },
+                { id: 'day06', name: 'Day 6', phoneme: '/ɪ/', file: 'daily-phonics/day06.json' },
+                { id: 'day07', name: 'Day 7', phoneme: '/e/', file: 'daily-phonics/day07.json' },
+                { id: 'day08', name: 'Day 8', phoneme: '/æ/', file: 'daily-phonics/day08.json' },
+                { id: 'day09', name: 'Day 9', phoneme: '/ɒ/', file: 'daily-phonics/day09.json' },
+                { id: 'day11', name: 'Day 11', phoneme: '/ʌ/', file: 'daily-phonics/day11.json' },
+                { id: 'day12', name: 'Day 12', phoneme: '/əʊ/', file: 'daily-phonics/day12.json' },
+                { id: 'day13', name: 'Day 13', phoneme: '/ɜː/', file: 'daily-phonics/day13.json' },
+                { id: 'day14', name: 'Day 14', phoneme: '/ə/', file: 'daily-phonics/day14.json' }
+            ];
+            
+            let existsCount = 0;
+            let missingCount = 0;
+            
+            for (const course of courses) {
+                const exists = await checkFileExists(`./words/${course.file}`);
+                if (exists) existsCount++; else missingCount++;
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${course.name}</td>
+                    <td><strong>${course.phoneme}</strong></td>
+                    <td><span class="status-badge ${exists ? 'status-exists' : 'status-missing'}">
+                        ${exists ? '✓ 已实现' : '❌ 未实现'}
+                    </span></td>
+                    <td>
+                        <div class="button-preview">
+                            <button class="btn btn-learn" ${!exists ? 'disabled' : ''}>📖 学习</button>
+                            <button class="btn btn-select" ${!exists ? 'disabled' : ''}>选择</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            }
+            
+            return { total: courses.length, exists: existsCount, missing: missingCount };
+        }
+        
+        async function testSpecialPractice() {
+            const tbody = document.getElementById('special-practice-table');
+            const courses = [
+                { id: 'special-ae', name: '音标 /æ/ 专项', phoneme: '/æ/', file: 'special-practice/ae-practice.json' },
+                { id: 'special-e', name: '音标 /e/ 专项', phoneme: '/e/', file: 'special-practice/e-practice.json' },
+                { id: 'special-or', name: '音标 /ɔ:/ 专项', phoneme: '/ɔ:/', file: 'special-practice/or-practice.json' },
+                { id: 'special-o', name: '音标 /ɒ/ 专项', phoneme: '/ɒ/', file: 'special-practice/o-practice.json' }
+            ];
+            
+            let existsCount = 0;
+            let missingCount = 0;
+            
+            for (const course of courses) {
+                const exists = await checkFileExists(`./words/${course.file}`);
+                if (exists) existsCount++; else missingCount++;
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${course.name}</td>
+                    <td><strong>${course.phoneme}</strong></td>
+                    <td><span class="status-badge ${exists ? 'status-exists' : 'status-missing'}">
+                        ${exists ? '✓ 已实现' : '❌ 未实现'}
+                    </span></td>
+                    <td>
+                        <div class="button-preview">
+                            <button class="btn btn-learn" ${!exists ? 'disabled' : ''}>📖 学习</button>
+                            <button class="btn btn-select" ${!exists ? 'disabled' : ''}>选择</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            }
+            
+            return { total: courses.length, exists: existsCount, missing: missingCount };
+        }
+        
+        async function testGradeBased() {
+            const tbody = document.getElementById('grade-based-table');
+            const courses = [
+                { name: '三年级上学期', words: 50, file: 'grade-based/primary/grade3-term1.json' },
+                { name: '三年级下学期', words: 50, file: 'grade-based/primary/grade3-term2.json' },
+                { name: '四年级上学期', words: 60, file: 'grade-based/primary/grade4-term1.json' },
+                { name: '七年级上学期', words: 100, file: 'grade-based/middle/grade7-term1.json' },
+                { name: '高一上学期', words: 200, file: 'grade-based/high/grade10-term1.json' }
+            ];
+            
+            let existsCount = 0;
+            let missingCount = 0;
+            
+            for (const course of courses) {
+                const exists = await checkFileExists(`./words/${course.file}`);
+                if (exists) existsCount++; else missingCount++;
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${course.name}</td>
+                    <td>${course.words} 个单词</td>
+                    <td><span class="status-badge ${exists ? 'status-exists' : 'status-missing'}">
+                        ${exists ? '✓ 已实现' : '❌ 未实现'}
+                    </span></td>
+                    <td>
+                        <div class="button-preview">
+                            <button class="btn btn-learn" ${!exists ? 'disabled' : ''}>📖 学习</button>
+                            <button class="btn btn-select" ${!exists ? 'disabled' : ''}>选择</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            }
+            
+            return { total: 20, exists: existsCount, missing: missingCount };
+        }
+        
+        async function runAllTests() {
+            const daily = await testDailyPhonics();
+            const special = await testSpecialPractice();
+            const grade = await testGradeBased();
+            
+            const totalCourses = daily.total + special.total + grade.total;
+            const totalExists = daily.exists + special.exists + grade.exists;
+            const totalMissing = daily.missing + special.missing + grade.missing;
+            
+            const summary = document.getElementById('summary');
+            summary.innerHTML = `
+                <p><strong>📚 按天学习音标：</strong> ${daily.exists}/${daily.total} 已实现 (${Math.round(daily.exists/daily.total*100)}%)</p>
+                <p><strong>🎯 专项强化练习：</strong> ${special.exists}/${special.total} 已实现 (${Math.round(special.exists/special.total*100)}%)</p>
+                <p><strong>🎓 按年级分类（抽样）：</strong> ${grade.exists}/${grade.total} 已实现 (${Math.round(grade.exists/grade.total*100)}%)</p>
+                <hr style="margin: 15px 0;">
+                <p style="font-size: 1.2em; color: #2c3e50;"><strong>总计：</strong> ${totalExists}/${totalCourses} 已实现，${totalMissing}/${totalCourses} 未实现</p>
+                <p style="color: #7f8c8d; font-size: 0.95em;">
+                    ✅ 已实现的课程：学习和选择按钮可用<br>
+                    ❌ 未实现的课程：学习和选择按钮灰色禁用
+                </p>
+            `;
+        }
+        
+        document.addEventListener('DOMContentLoaded', runAllTests);
+    </script>
+</body>
+</html>

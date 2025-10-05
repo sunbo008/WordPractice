@@ -1,0 +1,34 @@
+{
+  "metadata": {
+    "id": "special-or",
+    "name": "音标 /ɔ:/ 专项练习",
+    "phoneme": "/ɔ:/",
+    "description": "针对音标/ɔ:/的20个重点单词强化练习",
+    "category": "special-practice",
+    "difficulty": "intermediate",
+    "wordCount": 20,
+    "lastUpdated": "2025-10-06"
+  },
+  "words": [
+    {"word": "door", "phonetic": "[dɔː]", "meaning": "门", "difficulty": 1},
+    {"word": "more", "phonetic": "[mɔː]", "meaning": "更多", "difficulty": 1},
+    {"word": "four", "phonetic": "[fɔː]", "meaning": "四", "difficulty": 1},
+    {"word": "your", "phonetic": "[jɔː]", "meaning": "你的", "difficulty": 1},
+    {"word": "for", "phonetic": "[fɔː]", "meaning": "为了", "difficulty": 1},
+    {"word": "floor", "phonetic": "[flɔː]", "meaning": "地板", "difficulty": 1},
+    {"word": "store", "phonetic": "[stɔː]", "meaning": "商店", "difficulty": 1},
+    {"word": "score", "phonetic": "[skɔː]", "meaning": "分数", "difficulty": 2},
+    {"word": "sport", "phonetic": "[spɔːt]", "meaning": "运动", "difficulty": 1},
+    {"word": "short", "phonetic": "[ʃɔːt]", "meaning": "短的", "difficulty": 1},
+    {"word": "horse", "phonetic": "[hɔːs]", "meaning": "马", "difficulty": 1},
+    {"word": "north", "phonetic": "[nɔːθ]", "meaning": "北方", "difficulty": 2},
+    {"word": "corn", "phonetic": "[kɔːn]", "meaning": "玉米", "difficulty": 1},
+    {"word": "fork", "phonetic": "[fɔːk]", "meaning": "叉子", "difficulty": 1},
+    {"word": "born", "phonetic": "[bɔːn]", "meaning": "出生", "difficulty": 2},
+    {"word": "morning", "phonetic": "[ˈmɔːnɪŋ]", "meaning": "早晨", "difficulty": 1},
+    {"word": "important", "phonetic": "[ɪmˈpɔːtənt]", "meaning": "重要的", "difficulty": 3},
+    {"word": "before", "phonetic": "[bɪˈfɔː]", "meaning": "在...之前", "difficulty": 2},
+    {"word": "order", "phonetic": "[ˈɔːdə]", "meaning": "命令", "difficulty": 2},
+    {"word": "corner", "phonetic": "[ˈkɔːnə]", "meaning": "角落", "difficulty": 2}
+  ]
+}
