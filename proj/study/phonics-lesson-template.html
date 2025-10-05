@@ -222,6 +222,44 @@
             margin-top: 0;
         }
         
+        /* 语音激活提示 */
+        .speech-hint {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(52, 152, 219, 0.95);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            font-size: 0.9em;
+            z-index: 1000;
+            animation: slideIn 0.5s ease;
+            cursor: pointer;
+        }
+        
+        .speech-hint:hover {
+            background: rgba(41, 128, 185, 0.95);
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: translateX(400px);
+            }
+        }
+        
         .practice-button-container {
             text-align: center;
             margin: 40px 0;
@@ -416,20 +454,128 @@
             }
         }
         
+        // 语音合成是否已初始化
+        let speechInitialized = false;
+        let hintElement = null;
+        let britishVoice = null; // 存储选中的英式语音
+        
+        // 显示激活提示
+        function showSpeechHint() {
+            if (!hintElement) {
+                hintElement = document.createElement('div');
+                hintElement.className = 'speech-hint';
+                hintElement.innerHTML = '💡 点击页面任意位置激活语音功能';
+                hintElement.onclick = hideSpeechHint;
+                document.body.appendChild(hintElement);
+            }
+        }
+        
+        // 隐藏激活提示
+        function hideSpeechHint() {
+            if (hintElement) {
+                hintElement.style.animation = 'fadeOut 0.5s ease';
+                setTimeout(() => {
+                    if (hintElement && hintElement.parentNode) {
+                        hintElement.parentNode.removeChild(hintElement);
+                        hintElement = null;
+                    }
+                }, 500);
+            }
+        }
+        
+        // 选择英式发音
+        function selectBritishVoice() {
+            if ('speechSynthesis' in window) {
+                const voices = speechSynthesis.getVoices();
+                
+                // 优先级：英国英语 > 英式英语相关
+                britishVoice = voices.find(voice => 
+                    voice.lang === 'en-GB' && voice.name.includes('UK')
+                ) || voices.find(voice => 
+                    voice.lang === 'en-GB' && voice.name.includes('British')
+                ) || voices.find(voice => 
+                    voice.lang === 'en-GB'
+                ) || voices.find(voice => 
+                    voice.lang.startsWith('en-') && voice.name.includes('UK')
+                ) || voices.find(voice => 
+                    voice.lang.startsWith('en-') && voice.name.includes('British')
+                );
+                
+                if (britishVoice) {
+                    console.log('✅ 已选择英式语音:', britishVoice.name, britishVoice.lang);
+                } else {
+                    console.warn('⚠️ 未找到英式语音，将使用系统默认英语语音');
+                }
+            }
+        }
+        
+        // 初始化语音合成（需要用户交互）
+        function initSpeech() {
+            if (!speechInitialized && 'speechSynthesis' in window) {
+                // 选择英式语音
+                selectBritishVoice();
+                
+                // 创建一个静音的utterance来激活语音合成
+                const utterance = new SpeechSynthesisUtterance('');
+                utterance.volume = 0;
+                speechSynthesis.speak(utterance);
+                speechInitialized = true;
+                console.log('✅ 语音合成已激活');
+                
+                // 隐藏提示
+                hideSpeechHint();
+            }
+        }
+        
+        // 当语音列表加载完成时，重新选择英式语音
+        if ('speechSynthesis' in window) {
+            speechSynthesis.onvoiceschanged = () => {
+                if (speechInitialized) {
+                    selectBritishVoice();
+                }
+            };
+        }
+        
+        // 页面加载完成后显示提示
+        window.addEventListener('load', () => {
+            setTimeout(showSpeechHint, 1000);
+        });
+        
+        // 页面点击时初始化（绕过浏览器限制）
+        document.addEventListener('click', initSpeech, { once: true });
+        document.addEventListener('keydown', initSpeech, { once: true });
+        
         // 朗读单词
         function speakWord(word) {
             if ('speechSynthesis' in window) {
+                // 如果还没初始化，先初始化
+                if (!speechInitialized) {
+                    initSpeech();
+                }
+                
+                // 如果还没有选择语音，尝试选择
+                if (!britishVoice) {
+                    selectBritishVoice();
+                }
+                
                 // 停止之前的朗读
                 speechSynthesis.cancel();
                 
                 const utterance = new SpeechSynthesisUtterance(word);
+                
+                // 优先使用选中的英式语音
+                if (britishVoice) {
+                    utterance.voice = britishVoice;
+                }
+                
+                // 设置语言为英式英语
                 utterance.lang = 'en-GB';
                 utterance.rate = 0.8;
                 utterance.pitch = 1.0;
                 utterance.volume = 1.0;
                 
                 speechSynthesis.speak(utterance);
-                console.log('🔊 朗读单词:', word);
+                console.log('🔊 朗读单词:', word, '语音:', britishVoice ? britishVoice.name : '默认');
             }
         }
         
