@@ -30,6 +30,7 @@ class WordTetrisGame {
         
         // 考试统计系统
         this.hitWords = new Set(); // 正确命中的单词集合（去重）
+        this.fallenWords = new Set(); // 下落的单词集合（去重，包括命中和未命中）
         this.totalWords = 135; // 考试总单词量（从单词库获取）
         
         // 缓冲区状态
@@ -117,10 +118,15 @@ class WordTetrisGame {
     // 更新考试统计显示
     updateExamStats() {
         const hitWordsCount = this.hitWords.size;
-        const hitPercentage = this.totalWords > 0 ? Math.round((hitWordsCount / this.totalWords) * 100) : 0;
-        const coveragePercentage = hitPercentage; // 覆盖率等于命中率
+        const fallenWordsCount = this.fallenWords.size;
         
-        console.log(`📊 更新考试统计: 总词量=${this.totalWords}, 命中=${hitWordsCount}, 命中率=${hitPercentage}%`);
+        // 命中率：命中单词数 / 下落单词数（去重）
+        const hitPercentage = fallenWordsCount > 0 ? Math.round((hitWordsCount / fallenWordsCount) * 100) : 0;
+        
+        // 覆盖率：命中单词数 / 总单词库数量
+        const coveragePercentage = this.totalWords > 0 ? Math.round((hitWordsCount / this.totalWords) * 100) : 0;
+        
+        console.log(`📊 更新考试统计: 总词量=${this.totalWords}, 下落=${fallenWordsCount}, 命中=${hitWordsCount}, 命中率=${hitPercentage}%, 覆盖率=${coveragePercentage}%`);
         
         const totalWordsElement = document.getElementById('total-words');
         const hitWordsElement = document.getElementById('hit-words');
@@ -385,7 +391,7 @@ class WordTetrisGame {
         // 按钮事件
         document.getElementById('startBtn').addEventListener('click', () => this.startGame());
         document.getElementById('pauseBtn').addEventListener('click', () => this.pauseGame());
-        document.getElementById('resetBtn').addEventListener('click', () => this.resetGame());
+        document.getElementById('resetBtn').addEventListener('click', () => this.resetGame(true));
         // 提交按钮已移除，使用实时输入自动射击机制
         document.getElementById('giveUpBtn').addEventListener('click', () => this.giveUpCurrentWord());
         document.getElementById('exportBtn').addEventListener('click', () => this.exportVocabulary());
@@ -424,7 +430,7 @@ class WordTetrisGame {
             // 字母输入处理（游戏进行中）
             if (this.gameState === 'playing' && e.key.match(/^[a-zA-Z]$/)) {
                 e.preventDefault();
-                this.handleLetterInput(e.key.toUpperCase());
+                this.handleLetterInput(e.key.toLowerCase());
                 return;
             }
             
@@ -445,7 +451,7 @@ class WordTetrisGame {
         
         // 只允许输入字母，并实时更新显示
         letterInput.addEventListener('input', (e) => {
-            e.target.value = e.target.value.replace(/[^a-zA-Z]/g, '').toUpperCase();
+            e.target.value = e.target.value.replace(/[^a-zA-Z]/g, '').toLowerCase();
             this.updateRealTimeDisplay();
         });
     }
@@ -498,7 +504,7 @@ class WordTetrisGame {
         this.updateButtons();
     }
 
-    resetGame() {
+    resetGame(autoStart = false) {
         this.stopSpeaking(); // 重置时停止朗读
         
         this.gameState = 'stopped';
@@ -524,6 +530,7 @@ class WordTetrisGame {
         this.maxCombo = 0;
         this.perfectLevels = 0;
         this.hitWords = new Set(); // 重置命中单词集合（去重用）
+        this.fallenWords = new Set(); // 重置下落单词集合（去重用）
         console.log('🔄 游戏重置，生词本已清空，统计数据已重置');
         
         this.resetBufferLights();
@@ -533,6 +540,14 @@ class WordTetrisGame {
         this.clearInput();
         this.hideModals();
         this.updateExamStats(); // 更新考试统计显示
+        
+        // 如果指定自动开始，则在重置完成后自动开始游戏
+        if (autoStart) {
+            setTimeout(() => {
+                this.startGame();
+                console.log('🎮 重置完成，自动开始游戏');
+            }, 200); // 稍微延迟确保重置完成
+        }
     }
 
     restartGame() {
@@ -742,6 +757,9 @@ class WordTetrisGame {
         
         this.fallingWords.push(fallingWord);
         
+        // 记录下落的单词（用于统计命中率）
+        this.fallenWords.add(this.nextWord.original.toLowerCase());
+        
         // 开始语音朗读（立即播放，并每5秒重复）
         this.startRepeatedSpeech(this.nextWord.original);
         
@@ -914,7 +932,7 @@ class WordTetrisGame {
         // 绘制下一个单词
         if (this.nextWord && this.bufferState === 'countdown') {
             this.ctx.fillStyle = '#ffffff';
-            this.ctx.font = '24px Arial';
+            this.ctx.font = '28px Arial';  // 从24px增加到28px
             this.ctx.fillText(this.nextWord.display, this.canvasWidth / 2, 55);
         }
     }
@@ -943,7 +961,7 @@ class WordTetrisGame {
     }
 
     drawWordWithHighlight(text, x, y, word) {
-        this.ctx.font = '20px Arial';
+        this.ctx.font = '32px Arial';  // 从20px增加到32px，更醒目
         this.ctx.textAlign = 'center';
         
         // 如果有实时显示，需要特殊处理高亮
@@ -1300,7 +1318,7 @@ class WordTetrisGame {
     updateRealTimeDisplay() {
         if ((this.gameState !== 'playing' && this.gameState !== 'review') || this.fallingWords.length === 0) return;
         
-        const currentInput = document.getElementById('letterInput').value.toUpperCase();
+        const currentInput = document.getElementById('letterInput').value; // 保持小写
         const currentWord = this.fallingWords[0]; // 假设只有一个下降单词
         
         if (currentWord && currentInput.length > 0) {
@@ -1314,7 +1332,7 @@ class WordTetrisGame {
             // 只替换已输入字母对应的缺失位置
             for (let i = 0; i < currentWord.missing.length && inputIndex < currentInput.length; i++) {
                 const missingIndex = currentWord.missing[i];
-                // 替换下划线为带括号的输入字母
+                // 替换下划线为带括号的输入字母（显示小写）
                 displayChars[missingIndex] = `[${currentInput[inputIndex]}]`;
                 inputIndex++;
             }
@@ -1322,8 +1340,8 @@ class WordTetrisGame {
             // 将字符数组重新组合成字符串
             const displayWord = displayChars.join('');
             
-            // 检查输入是否正确
-            const isCorrect = currentInput === expectedLetters.substring(0, currentInput.length);
+            // 检查输入是否正确（比较时转为大写）
+            const isCorrect = currentInput.toUpperCase() === expectedLetters.substring(0, currentInput.length);
             currentWord.realTimeDisplay = displayWord;
             currentWord.inputCorrect = isCorrect;
             
@@ -1786,6 +1804,12 @@ class WordTetrisGame {
         const vocabularyList = document.getElementById('vocabularyList');
         const vocabularyBook = this.vocabularyManager.getVocabularyBook();
         
+        // 更新生词本总数显示
+        const vocabTotalCount = document.getElementById('vocab-total-count');
+        if (vocabTotalCount) {
+            vocabTotalCount.textContent = vocabularyBook.length;
+        }
+        
         if (vocabularyBook.length === 0) {
             vocabularyList.innerHTML = '<p>暂无生词</p>';
         } else {
@@ -1923,4 +1947,10 @@ class WordTetrisGame {
 // 游戏初始化
 document.addEventListener('DOMContentLoaded', () => {
     const game = new WordTetrisGame();
+    
+    // 页面加载时自动重置游戏
+    setTimeout(() => {
+        game.resetGame();
+        console.log('🔄 页面刷新，自动重置游戏');
+    }, 100); // 稍微延迟确保初始化完成
 });

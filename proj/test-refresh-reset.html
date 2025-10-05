@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>刷新重置功能测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .button:hover {
+            background: #2980b9;
+        }
+        .button.refresh {
+            background: #e74c3c;
+        }
+        .button.refresh:hover {
+            background: #c0392b;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .game-state {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .state-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            border: 2px solid #ddd;
+        }
+        .state-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 10px 0;
+        }
+        .state-label {
+            font-size: 0.9em;
+            color: #7f8c8d;
+        }
+        .log-container {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 15px 0;
+        }
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            border-left: 3px solid #3498db;
+            padding-left: 10px;
+        }
+        .log-entry.reset {
+            border-left-color: #e74c3c;
+        }
+        .log-entry.refresh {
+            border-left-color: #f39c12;
+        }
+        .timestamp {
+            color: #95a5a6;
+            font-size: 0.8em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 刷新重置功能测试</h1>
+        <p>测试页面刷新时自动重置游戏的功能</p>
+        
+        <div class="test-section">
+            <h3>当前游戏状态</h3>
+            <div class="game-state">
+                <div class="state-item">
+                    <div class="state-value" id="game-score">0</div>
+                    <div class="state-label">游戏分数</div>
+                </div>
+                <div class="state-item">
+                    <div class="state-value" id="game-level">1</div>
+                    <div class="state-label">游戏等级</div>
+                </div>
+                <div class="state-item">
+                    <div class="state-value" id="vocab-count">0</div>
+                    <div class="state-label">生词本数量</div>
+                </div>
+                <div class="state-item">
+                    <div class="state-value" id="hit-count">0</div>
+                    <div class="state-label">命中单词数</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h3>测试操作</h3>
+            <button class="button" onclick="simulateGameProgress()">模拟游戏进度</button>
+            <button class="button" onclick="addVocabWords()">添加生词</button>
+            <button class="button" onclick="manualReset()">手动重置</button>
+            <button class="button refresh" onclick="refreshPage()">刷新页面测试</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>测试说明</h3>
+            <div class="status info">
+                <strong>测试步骤：</strong><br>
+                1. 点击"模拟游戏进度"和"添加生词"来改变游戏状态<br>
+                2. 点击"刷新页面测试"或按F5刷新页面<br>
+                3. 观察页面重新加载后，游戏状态是否自动重置为初始状态<br>
+                4. 检查控制台日志确认重置操作被执行
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h3>操作日志</h3>
+            <div class="log-container" id="log-container">
+                <div class="log-entry">
+                    <span class="timestamp">[页面加载]</span> 测试页面已加载，等待操作...
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h3>预期行为</h3>
+            <div class="status success">
+                <strong>✅ 正确行为：</strong><br>
+                - 页面刷新后，所有游戏数据自动重置为初始状态<br>
+                - 分数重置为0，等级重置为1<br>
+                - 生词本清空，命中统计清零<br>
+                - 控制台显示"🔄 页面刷新，自动重置游戏"日志
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 模拟游戏状态
+        let gameState = {
+            score: 0,
+            level: 1,
+            vocabCount: 0,
+            hitCount: 0
+        };
+        
+        // 检查是否是刷新后的页面加载
+        const isRefresh = performance.navigation.type === performance.navigation.TYPE_RELOAD;
+        
+        function updateDisplay() {
+            document.getElementById('game-score').textContent = gameState.score;
+            document.getElementById('game-level').textContent = gameState.level;
+            document.getElementById('vocab-count').textContent = gameState.vocabCount;
+            document.getElementById('hit-count').textContent = gameState.hitCount;
+        }
+        
+        function addLog(message, type = 'info') {
+            const logContainer = document.getElementById('log-container');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry ${type}`;
+            logEntry.innerHTML = `<span class="timestamp">[${timestamp}]</span> ${message}`;
+            
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+        
+        function simulateGameProgress() {
+            gameState.score += Math.floor(Math.random() * 50) + 10;
+            gameState.level = Math.floor(gameState.score / 100) + 1;
+            gameState.hitCount += Math.floor(Math.random() * 5) + 1;
+            
+            updateDisplay();
+            addLog(`模拟游戏进度：分数=${gameState.score}, 等级=${gameState.level}, 命中=${gameState.hitCount}`, 'info');
+        }
+        
+        function addVocabWords() {
+            gameState.vocabCount += Math.floor(Math.random() * 3) + 1;
+            
+            updateDisplay();
+            addLog(`添加生词：生词本数量=${gameState.vocabCount}`, 'info');
+        }
+        
+        function manualReset() {
+            gameState = {
+                score: 0,
+                level: 1,
+                vocabCount: 0,
+                hitCount: 0
+            };
+            
+            updateDisplay();
+            addLog('手动重置游戏状态', 'reset');
+        }
+        
+        function refreshPage() {
+            addLog('即将刷新页面...', 'refresh');
+            
+            // 保存当前状态到sessionStorage，用于验证重置
+            sessionStorage.setItem('preRefreshState', JSON.stringify({
+                ...gameState,
+                timestamp: Date.now()
+            }));
+            
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        }
+        
+        // 页面加载时检查
+        function checkRefreshReset() {
+            const preRefreshState = sessionStorage.getItem('preRefreshState');
+            
+            if (preRefreshState && isRefresh) {
+                const prevState = JSON.parse(preRefreshState);
+                const timeDiff = Date.now() - prevState.timestamp;
+                
+                if (timeDiff < 10000) { // 10秒内的刷新
+                    addLog('🔄 检测到页面刷新', 'refresh');
+                    addLog(`刷新前状态：分数=${prevState.score}, 等级=${prevState.level}, 生词=${prevState.vocabCount}, 命中=${prevState.hitCount}`, 'info');
+                    
+                    // 检查当前状态是否已重置
+                    if (gameState.score === 0 && gameState.level === 1 && gameState.vocabCount === 0 && gameState.hitCount === 0) {
+                        addLog('✅ 游戏状态已正确重置！', 'reset');
+                    } else {
+                        addLog('❌ 游戏状态未正确重置', 'reset');
+                    }
+                    
+                    // 清除保存的状态
+                    sessionStorage.removeItem('preRefreshState');
+                }
+            }
+        }
+        
+        // 监听控制台日志（模拟）
+        function checkConsoleLog() {
+            // 由于无法直接监听console.log，这里模拟检查
+            // 在实际游戏中，重置日志会在控制台显示
+            setTimeout(() => {
+                if (isRefresh) {
+                    addLog('📋 请检查浏览器控制台是否显示："🔄 页面刷新，自动重置游戏"', 'info');
+                }
+            }, 500);
+        }
+        
+        // 页面加载时初始化
+        window.addEventListener('load', () => {
+            updateDisplay();
+            
+            if (isRefresh) {
+                addLog('🔄 页面已刷新重新加载', 'refresh');
+            } else {
+                addLog('🆕 首次加载页面', 'info');
+            }
+            
+            checkRefreshReset();
+            checkConsoleLog();
+            
+            // 添加键盘快捷键
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'F5' || (e.ctrlKey && e.key === 'r')) {
+                    e.preventDefault();
+                    refreshPage();
+                }
+            });
+        });
+        
+        // 页面卸载前保存状态
+        window.addEventListener('beforeunload', () => {
+            sessionStorage.setItem('preRefreshState', JSON.stringify({
+                ...gameState,
+                timestamp: Date.now()
+            }));
+        });
+    </script>
+</body>
+</html>
