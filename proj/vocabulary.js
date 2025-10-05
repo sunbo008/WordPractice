@@ -45,7 +45,7 @@ class VocabularyManager {
             if (lesson.words && Array.isArray(lesson.words)) {
                 lesson.words.forEach(wordData => {
                     this.allWords.push({
-                        word: wordData.word.toUpperCase(),
+                        word: wordData.word.toLowerCase(),
                         meaning: wordData.meaning,
                         phonetic: wordData.phonetic,
                         difficulty: wordData.difficulty,
@@ -63,21 +63,21 @@ class VocabularyManager {
     loadFallbackWords() {
         console.log('🔄 使用备用单词库');
         this.allWords = [
-            { word: "CAT", meaning: "猫", difficulty: 1 },
-            { word: "DOG", meaning: "狗", difficulty: 1 },
-            { word: "SUN", meaning: "太阳", difficulty: 1 },
-            { word: "RUN", meaning: "跑", difficulty: 1 },
-            { word: "FUN", meaning: "有趣", difficulty: 1 },
-            { word: "BIG", meaning: "大的", difficulty: 1 },
-            { word: "RED", meaning: "红色", difficulty: 1 },
-            { word: "BOX", meaning: "盒子", difficulty: 1 },
-            { word: "BOOK", meaning: "书", difficulty: 2 },
-            { word: "TREE", meaning: "树", difficulty: 2 },
-            { word: "FISH", meaning: "鱼", difficulty: 2 },
-            { word: "BIRD", meaning: "鸟", difficulty: 2 },
-            { word: "WATER", meaning: "水", difficulty: 3 },
-            { word: "SCHOOL", meaning: "学校", difficulty: 3 },
-            { word: "TEACHER", meaning: "老师", difficulty: 3 }
+            { word: "cat", meaning: "猫", difficulty: 1 },
+            { word: "dog", meaning: "狗", difficulty: 1 },
+            { word: "sun", meaning: "太阳", difficulty: 1 },
+            { word: "run", meaning: "跑", difficulty: 1 },
+            { word: "fun", meaning: "有趣", difficulty: 1 },
+            { word: "big", meaning: "大的", difficulty: 1 },
+            { word: "red", meaning: "红色", difficulty: 1 },
+            { word: "box", meaning: "盒子", difficulty: 1 },
+            { word: "book", meaning: "书", difficulty: 2 },
+            { word: "tree", meaning: "树", difficulty: 2 },
+            { word: "fish", meaning: "鱼", difficulty: 2 },
+            { word: "bird", meaning: "鸟", difficulty: 2 },
+            { word: "water", meaning: "水", difficulty: 3 },
+            { word: "school", meaning: "学校", difficulty: 3 },
+            { word: "teacher", meaning: "老师", difficulty: 3 }
         ];
     }
 
