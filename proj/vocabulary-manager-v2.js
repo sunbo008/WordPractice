@@ -54,7 +54,7 @@ class VocabularyManagerV2 {
     
     // 加载配置文件
     async loadConfig() {
-        const response = await fetch('./words/config.json');
+        const response = await fetch('./words/config-v2.json');
         if (!response.ok) {
             throw new Error(`配置文件加载失败: HTTP ${response.status}`);
         }
@@ -65,19 +65,19 @@ class VocabularyManagerV2 {
     // 加载用户设置
     loadUserSettings() {
         try {
-            const savedSettings = localStorage.getItem('wordTetris_vocabularySettings');
-            if (savedSettings) {
-                const settings = JSON.parse(savedSettings);
-                this.currentConfig = { ...this.currentConfig, ...settings };
-                console.log('⚙️ 用户设置加载成功:', this.currentConfig);
+            const savedLibraries = localStorage.getItem('wordTetris_selectedLibraries');
+            if (savedLibraries) {
+                const libraries = JSON.parse(savedLibraries);
+                this.currentConfig.enabledLibraries = libraries;
+                console.log('⚙️ 用户词库选择加载成功:', libraries);
             } else {
                 // 使用默认配置
-                this.currentConfig = { ...this.wordsConfig.defaultConfig };
-                console.log('⚙️ 使用默认配置:', this.currentConfig);
+                this.currentConfig.enabledLibraries = [...this.wordsConfig.defaultConfig.enabledLibraries];
+                console.log('⚙️ 使用默认配置:', this.currentConfig.enabledLibraries);
             }
         } catch (error) {
             console.warn('⚠️ 用户设置加载失败，使用默认配置:', error);
-            this.currentConfig = { ...this.wordsConfig.defaultConfig };
+            this.currentConfig.enabledLibraries = [...this.wordsConfig.defaultConfig.enabledLibraries];
         }
     }
     
@@ -97,7 +97,7 @@ class VocabularyManagerV2 {
         const loadPromises = [];
         
         for (const libraryId of enabledIds) {
-            const libraryInfo = this.wordsConfig.availableLibraries.find(lib => lib.id === libraryId);
+            const libraryInfo = this.findLibraryInfo(libraryId);
             if (libraryInfo) {
                 loadPromises.push(this.loadSingleLibrary(libraryInfo));
             } else {
@@ -106,6 +106,30 @@ class VocabularyManagerV2 {
         }
         
         await Promise.all(loadPromises);
+    }
+    
+    // 在层级结构中查找词库信息
+    findLibraryInfo(libraryId) {
+        // 遍历所有分类
+        for (const category of this.wordsConfig.categories) {
+            if (category.subcategories) {
+                for (const sub of category.subcategories) {
+                    // 检查二层结构（如：按天学习）
+                    if (sub.id === libraryId) {
+                        return sub;
+                    }
+                    // 检查三层结构（如：按年级分类）
+                    if (sub.items) {
+                        for (const item of sub.items) {
+                            if (item.id === libraryId) {
+                                return item;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return null;
     }
     
     // 加载单个词库

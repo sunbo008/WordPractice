@@ -71,24 +71,24 @@ class SettingsManagerV2 {
     renderOverview() {
         document.getElementById('enabled-count').textContent = this.selectedLibraries.size;
         
-        // 计算总单词数（简化版，实际需要根据加载的库计算）
+        // 计算总单词数
         let totalWords = 0;
         this.config.categories.forEach(category => {
             if (category.subcategories) {
                 category.subcategories.forEach(sub => {
-                    if (this.selectedLibraries.has(sub.id)) {
-                        totalWords += sub.wordCount || 0;
-                    }
-                });
-            } else if (category.items) {
-                // 处理年级分类的三层结构
-                category.subcategories.forEach(grade => {
-                    if (grade.items) {
-                        grade.items.forEach(item => {
+                    // 检查是否是三层结构（年级分类）
+                    if (sub.items) {
+                        // 处理年级分类的三层结构（如：按年级分类 -> 小学词汇 -> 三年级上学期）
+                        sub.items.forEach(item => {
                             if (this.selectedLibraries.has(item.id)) {
                                 totalWords += item.wordCount || 0;
                             }
                         });
+                    } else {
+                        // 处理二层结构（如：按天学习 -> Day 1）
+                        if (this.selectedLibraries.has(sub.id)) {
+                            totalWords += sub.wordCount || 0;
+                        }
                     }
                 });
             }

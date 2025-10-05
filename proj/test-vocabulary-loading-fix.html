@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>词库加载修复测试</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        .test-section h2 {
+            color: #3498db;
+            margin-bottom: 15px;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .status.success { background: #d5f4e6; color: #27ae60; }
+        .status.error { background: #f8d7da; color: #e74c3c; }
+        .status.info { background: #d1ecf1; color: #0c5460; }
+        .btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: #2980b9;
+        }
+        .result-box {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            margin-top: 10px;
+            font-family: monospace;
+        }
+        .highlight {
+            background: #fff3cd;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 词库加载修复测试</h1>
+        
+        <!-- 测试1: LocalStorage检查 -->
+        <div class="test-section">
+            <h2>1️⃣ LocalStorage 用户选择检查</h2>
+            <div id="storage-status" class="status info">准备检查...</div>
+            <button class="btn" onclick="checkLocalStorage()">检查存储</button>
+            <button class="btn" onclick="clearLocalStorage()">清空存储</button>
+            <button class="btn" onclick="setTestSelection()">设置测试选择（只选Day1）</button>
+            <div id="storage-result"></div>
+        </div>
+        
+        <!-- 测试2: VocabularyManager加载 -->
+        <div class="test-section">
+            <h2>2️⃣ VocabularyManagerV2 加载测试</h2>
+            <div id="vocab-status" class="status info">准备加载...</div>
+            <button class="btn" onclick="testVocabularyManager()">测试加载</button>
+            <div id="vocab-result"></div>
+        </div>
+        
+        <!-- 测试3: 单词数统计 -->
+        <div class="test-section">
+            <h2>3️⃣ 单词数统计验证</h2>
+            <div id="count-status" class="status info">准备统计...</div>
+            <button class="btn" onclick="testWordCount()">验证单词数</button>
+            <div id="count-result"></div>
+        </div>
+    </div>
+
+    <script src="vocabulary-manager-v2.js"></script>
+    <script>
+        let vocabularyManager = null;
+        
+        function updateStatus(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `status ${type}`;
+        }
+        
+        function checkLocalStorage() {
+            const savedLibraries = localStorage.getItem('wordTetris_selectedLibraries');
+            const resultDiv = document.getElementById('storage-result');
+            
+            if (savedLibraries) {
+                try {
+                    const libraries = JSON.parse(savedLibraries);
+                    updateStatus('storage-status', `✅ 找到用户选择: ${libraries.length}个词库`, 'success');
+                    
+                    resultDiv.innerHTML = `
+                        <div class="result-box">
+                            <strong>已选择的词库ID:</strong><br>
+                            ${libraries.map(id => `<span class="highlight">${id}</span>`).join(', ')}
+                        </div>
+                    `;
+                } catch (error) {
+                    updateStatus('storage-status', '❌ 数据格式错误', 'error');
+                    resultDiv.innerHTML = `<div class="result-box">错误: ${error.message}</div>`;
+                }
+            } else {
+                updateStatus('storage-status', '⚠️ 未找到用户选择，将使用默认配置', 'info');
+                resultDiv.innerHTML = `<div class="result-box">LocalStorage中没有保存的选择</div>`;
+            }
+        }
+        
+        function clearLocalStorage() {
+            localStorage.removeItem('wordTetris_selectedLibraries');
+            updateStatus('storage-status', '🗑️ 已清空存储', 'info');
+            document.getElementById('storage-result').innerHTML = '';
+        }
+        
+        function setTestSelection() {
+            // 只选择Day 1
+            const testSelection = ['day01'];
+            localStorage.setItem('wordTetris_selectedLibraries', JSON.stringify(testSelection));
+            updateStatus('storage-status', '✅ 已设置测试选择（只选Day1 - 10个单词）', 'success');
+            checkLocalStorage();
+        }
+        
+        async function testVocabularyManager() {
+            try {
+                updateStatus('vocab-status', '正在初始化VocabularyManagerV2...', 'info');
+                
+                vocabularyManager = new VocabularyManagerV2();
+                
+                // 等待加载完成
+                let attempts = 0;
+                while (!vocabularyManager.isLoaded && attempts < 100) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    attempts++;
+                }
+                
+                if (!vocabularyManager.isLoaded) {
+                    throw new Error('加载超时');
+                }
+                
+                updateStatus('vocab-status', '✅ VocabularyManagerV2加载成功！', 'success');
+                
+                // 显示加载的词库信息
+                const stats = vocabularyManager.getLibraryStats();
+                const config = vocabularyManager.getCurrentConfig();
+                
+                const resultDiv = document.getElementById('vocab-result');
+                resultDiv.innerHTML = `
+                    <div class="result-box">
+                        <strong>加载统计:</strong><br>
+                        已加载词库数: <span class="highlight">${stats.totalLibraries}</span><br>
+                        总单词数: <span class="highlight">${stats.totalWords}</span><br>
+                        <br>
+                        <strong>当前配置:</strong><br>
+                        启用的词库: ${config.enabledLibraries.map(id => `<span class="highlight">${id}</span>`).join(', ')}<br>
+                        <br>
+                        <strong>各词库详情:</strong><br>
+                        ${stats.libraries.map(lib => 
+                            `- ${lib.name}: ${lib.wordCount}个单词 (难度: ${lib.difficulty})`
+                        ).join('<br>')}
+                    </div>
+                `;
+                
+            } catch (error) {
+                updateStatus('vocab-status', `❌ 加载失败: ${error.message}`, 'error');
+                console.error('加载失败:', error);
+            }
+        }
+        
+        async function testWordCount() {
+            if (!vocabularyManager) {
+                updateStatus('count-status', '❌ 请先加载VocabularyManager', 'error');
+                return;
+            }
+            
+            try {
+                updateStatus('count-status', '正在统计单词数...', 'info');
+                
+                const stats = vocabularyManager.getVocabularyStats();
+                const config = vocabularyManager.getCurrentConfig();
+                
+                // 手动计算期望的单词数
+                let expectedWords = 0;
+                const savedLibraries = localStorage.getItem('wordTetris_selectedLibraries');
+                let selectedIds = config.enabledLibraries;
+                
+                if (savedLibraries) {
+                    selectedIds = JSON.parse(savedLibraries);
+                }
+                
+                // 从config-v2.json读取期望值
+                const configResponse = await fetch('./words/config-v2.json');
+                const configData = await configResponse.json();
+                
+                for (const categoryData of configData.categories) {
+                    if (categoryData.subcategories) {
+                        for (const sub of categoryData.subcategories) {
+                            if (sub.items) {
+                                for (const item of sub.items) {
+                                    if (selectedIds.includes(item.id)) {
+                                        expectedWords += item.wordCount || 0;
+                                    }
+                                }
+                            } else {
+                                if (selectedIds.includes(sub.id)) {
+                                    expectedWords += sub.wordCount || 0;
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                const isCorrect = stats.totalWords === expectedWords;
+                
+                updateStatus('count-status', 
+                    isCorrect ? '✅ 单词数统计正确！' : '❌ 单词数统计不匹配！', 
+                    isCorrect ? 'success' : 'error'
+                );
+                
+                const resultDiv = document.getElementById('count-result');
+                resultDiv.innerHTML = `
+                    <div class="result-box">
+                        <strong>统计结果:</strong><br>
+                        实际加载单词数: <span class="highlight">${stats.totalWords}</span><br>
+                        期望单词数: <span class="highlight">${expectedWords}</span><br>
+                        匹配状态: <span class="highlight ${isCorrect ? 'success' : 'error'}">${isCorrect ? '✓ 正确' : '✗ 不匹配'}</span><br>
+                        <br>
+                        <strong>已选词库:</strong><br>
+                        ${selectedIds.map(id => `<span class="highlight">${id}</span>`).join(', ')}
+                    </div>
+                `;
+                
+            } catch (error) {
+                updateStatus('count-status', `❌ 统计失败: ${error.message}`, 'error');
+                console.error('统计失败:', error);
+            }
+        }
+        
+        // 页面加载时自动检查LocalStorage
+        document.addEventListener('DOMContentLoaded', () => {
+            checkLocalStorage();
+        });
+    </script>
+</body>
+</html>
