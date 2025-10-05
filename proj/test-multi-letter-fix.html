@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>多字母输入修复验证</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .button:hover {
+            background: #2980b9;
+        }
+        .test-word {
+            font-size: 2.5em;
+            font-weight: bold;
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            border: 2px solid #ddd;
+        }
+        .input-section {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .input-section input {
+            font-size: 1.8em;
+            padding: 15px;
+            border: 3px solid #3498db;
+            border-radius: 8px;
+            text-align: center;
+            width: 300px;
+            font-family: 'Courier New', monospace;
+        }
+        .step-by-step {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .step {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            background: #f8f9fa;
+            text-align: center;
+        }
+        .step.current {
+            border-color: #3498db;
+            background: #e3f2fd;
+        }
+        .step.correct {
+            border-color: #27ae60;
+            background: #d5f4e6;
+        }
+        .step.error {
+            border-color: #e74c3c;
+            background: #fdeaea;
+        }
+        .step-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        .step-display {
+            font-family: 'Courier New', monospace;
+            font-size: 1.5em;
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+        }
+        .expected {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .actual {
+            color: #3498db;
+            font-weight: bold;
+        }
+        .debug-info {
+            background: #2c3e50;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            margin: 10px 0;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔤 多字母输入修复验证</h1>
+        <p>详细测试多字母缺失时的输入显示逻辑</p>
+        
+        <div class="test-section">
+            <h3>当前测试：HELLO缺失E和O</h3>
+            <div class="test-word" id="current-word">H_LL_</div>
+            <div class="input-section">
+                <label><strong>输入缺失字母：</strong></label><br><br>
+                <input type="text" id="test-input" maxlength="2" placeholder="输入EO">
+            </div>
+            <div class="test-word" id="display-result">H_LL_</div>
+        </div>
+        
+        <div class="test-section">
+            <h3>逐步验证</h3>
+            <div class="step-by-step" id="step-container">
+                <!-- 动态生成步骤 -->
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h3>调试信息</h3>
+            <div class="debug-info" id="debug-info">等待输入...</div>
+        </div>
+        
+        <div class="test-section">
+            <h3>测试其他单词</h3>
+            <button class="button" onclick="loadTestCase('HELLO', [1, 4], 'EO')">HELLO (缺失E,O)</button>
+            <button class="button" onclick="loadTestCase('WORLD', [1, 3], 'OL')">WORLD (缺失O,L)</button>
+            <button class="button" onclick="loadTestCase('SCHOOL', [0, 3, 5], 'SOL')">SCHOOL (缺失S,O,L)</button>
+            <button class="button" onclick="loadTestCase('FRIEND', [2, 4], 'IE')">FRIEND (缺失I,E)</button>
+        </div>
+    </div>
+
+    <script>
+        let currentTestWord = null;
+        
+        // 模拟单词对象结构
+        function createTestWord(original, missingIndices, expectedInput) {
+            const missingLetters = missingIndices.map(i => original[i]).join('');
+            let display = original.split('');
+            missingIndices.forEach(i => display[i] = '_');
+            
+            return {
+                original: original,
+                missing: missingIndices,
+                missingLetters: missingLetters,
+                display: display.join(''),
+                expectedInput: expectedInput,
+                realTimeDisplay: display.join(''),
+                inputCorrect: true
+            };
+        }
+        
+        // 模拟修复后的updateRealTimeDisplay逻辑
+        function updateRealTimeDisplay(word, currentInput) {
+            if (!word || currentInput.length === 0) {
+                return word.display;
+            }
+            
+            const expectedLetters = word.missingLetters.toUpperCase();
+            
+            // 使用显示单词（包含下划线）作为基础
+            let displayChars = word.display.split('');
+            let inputIndex = 0;
+            
+            // 只替换已输入字母对应的缺失位置
+            for (let i = 0; i < word.missing.length && inputIndex < currentInput.length; i++) {
+                const missingIndex = word.missing[i];
+                // 替换下划线为带括号的输入字母
+                displayChars[missingIndex] = `[${currentInput[inputIndex]}]`;
+                inputIndex++;
+            }
+            
+            // 将字符数组重新组合成字符串
+            return displayChars.join('');
+        }
+        
+        function loadTestCase(original, missingIndices, expectedInput) {
+            currentTestWord = createTestWord(original, missingIndices, expectedInput);
+            
+            document.getElementById('current-word').textContent = currentTestWord.display;
+            document.getElementById('display-result').textContent = currentTestWord.display;
+            document.getElementById('test-input').value = '';
+            document.getElementById('test-input').setAttribute('maxlength', expectedInput.length);
+            document.getElementById('test-input').setAttribute('placeholder', `输入${expectedInput}`);
+            
+            updateSteps();
+            updateDebugInfo('');
+            
+            console.log('加载测试用例:', currentTestWord);
+        }
+        
+        function updateSteps() {
+            if (!currentTestWord) return;
+            
+            const container = document.getElementById('step-container');
+            const expectedInput = currentTestWord.expectedInput;
+            let stepsHtml = '';
+            
+            // 生成每一步的期望结果
+            for (let i = 0; i <= expectedInput.length; i++) {
+                const input = expectedInput.substring(0, i);
+                const expected = updateRealTimeDisplay(currentTestWord, input);
+                
+                stepsHtml += `
+                    <div class="step" id="step-${i}">
+                        <div class="step-title">步骤 ${i}: 输入"${input}"</div>
+                        <div class="step-display expected">期望: ${expected}</div>
+                        <div class="step-display actual" id="actual-${i}">实际: 等待输入</div>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = stepsHtml;
+        }
+        
+        function updateDebugInfo(input) {
+            if (!currentTestWord) return;
+            
+            const debugInfo = `测试单词信息:
+原始单词: ${currentTestWord.original}
+显示单词: ${currentTestWord.display}
+缺失位置: [${currentTestWord.missing.join(', ')}]
+缺失字母: ${currentTestWord.missingLetters}
+期望输入: ${currentTestWord.expectedInput}
+
+当前输入: "${input}"
+输入长度: ${input.length}
+
+处理过程:
+1. 基础显示: ${currentTestWord.display}
+2. 字符数组: [${currentTestWord.display.split('').map(c => `'${c}'`).join(', ')}]
+3. 替换逻辑: 
+${currentTestWord.missing.map((pos, i) => {
+    if (i < input.length) {
+        return `   位置${pos}: '_' → '[${input[i]}]'`;
+    } else {
+        return `   位置${pos}: '_' (保持不变)`;
+    }
+}).join('\n')}
+4. 最终结果: ${updateRealTimeDisplay(currentTestWord, input)}`;
+            
+            document.getElementById('debug-info').textContent = debugInfo;
+        }
+        
+        // 监听输入变化
+        document.getElementById('test-input').addEventListener('input', function(e) {
+            const input = e.target.value.toUpperCase();
+            e.target.value = input; // 确保显示大写
+            
+            if (currentTestWord) {
+                const result = updateRealTimeDisplay(currentTestWord, input);
+                document.getElementById('display-result').textContent = result;
+                
+                // 更新步骤显示
+                for (let i = 0; i <= currentTestWord.expectedInput.length; i++) {
+                    const stepElement = document.getElementById(`step-${i}`);
+                    const actualElement = document.getElementById(`actual-${i}`);
+                    
+                    if (i === input.length) {
+                        stepElement.className = 'step current';
+                        actualElement.textContent = `实际: ${result}`;
+                        actualElement.className = 'step-display actual';
+                        
+                        // 检查是否正确
+                        const expected = updateRealTimeDisplay(currentTestWord, currentTestWord.expectedInput.substring(0, i));
+                        if (result === expected) {
+                            stepElement.className = 'step correct';
+                        } else {
+                            stepElement.className = 'step error';
+                        }
+                    } else if (i < input.length) {
+                        const partialInput = currentTestWord.expectedInput.substring(0, i);
+                        const partialResult = updateRealTimeDisplay(currentTestWord, partialInput);
+                        actualElement.textContent = `实际: ${partialResult}`;
+                        
+                        const expected = updateRealTimeDisplay(currentTestWord, partialInput);
+                        stepElement.className = partialResult === expected ? 'step correct' : 'step error';
+                    } else {
+                        stepElement.className = 'step';
+                        actualElement.textContent = '实际: 等待输入';
+                        actualElement.className = 'step-display actual';
+                    }
+                }
+                
+                updateDebugInfo(input);
+                console.log(`输入: "${input}" -> 显示: "${result}"`);
+            }
+        });
+        
+        // 页面加载时初始化
+        window.addEventListener('load', () => {
+            loadTestCase('HELLO', [1, 4], 'EO');
+        });
+    </script>
+</body>
+</html>

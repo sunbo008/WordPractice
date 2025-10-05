@@ -1307,14 +1307,14 @@ class WordTetrisGame {
             // 创建实时显示的单词
             const expectedLetters = currentWord.missingLetters.toUpperCase();
             
-            // 使用字符数组来避免索引问题
-            let displayChars = currentWord.original.split('');
+            // 使用显示单词（包含下划线）作为基础
+            let displayChars = currentWord.display.split('');
             let inputIndex = 0;
             
             // 只替换已输入字母对应的缺失位置
             for (let i = 0; i < currentWord.missing.length && inputIndex < currentInput.length; i++) {
                 const missingIndex = currentWord.missing[i];
-                // 替换为带括号的输入字母
+                // 替换下划线为带括号的输入字母
                 displayChars[missingIndex] = `[${currentInput[inputIndex]}]`;
                 inputIndex++;
             }
