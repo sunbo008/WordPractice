@@ -1,6 +1,5 @@
 # 图片缓存目录（不提交到 Git）
-cache/
-cache-metadata.json
+
 
 # 预置图片库（可选提交）
 # words/
