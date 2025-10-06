@@ -387,7 +387,7 @@ button:disabled {
 .modal-content {
     background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
     margin: 15% auto;
-    padding: 30px;
+    padding: 0;
     border-radius: 15px;
     width: 90%;
     max-width: 500px;
@@ -395,34 +395,41 @@ button:disabled {
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     animation: slideIn 0.3s ease;
     position: relative;
+    overflow: hidden;
+}
+
+.modal-body {
+    padding: 50px 30px 30px 30px;
 }
 
 .close-btn {
     position: absolute;
-    top: 15px;
-    right: 25px;
-    font-size: 56px;
+    top: 8px;
+    right: 8px;
+    font-size: 40px;
     font-weight: bold;
-    color: #ff4444;
+    color: #ff3333;
     cursor: pointer;
     line-height: 1;
     transition: all 0.3s ease;
-    z-index: 10;
-    width: 60px;
-    height: 60px;
+    z-index: 1000;
+    width: 45px;
+    height: 45px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    background: rgba(255, 68, 68, 0.2);
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    background: rgba(255, 51, 51, 0.2);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    border: 2px solid rgba(255, 51, 51, 0.4);
 }
 
 .close-btn:hover {
     color: #ffffff;
-    background: #ff4444;
-    transform: scale(1.15) rotate(90deg);
-    box-shadow: 0 0 20px rgba(255, 68, 68, 0.6);
+    background: #ff3333;
+    transform: scale(1.2) rotate(90deg);
+    box-shadow: 0 0 25px rgba(255, 51, 51, 0.8);
+    border-color: #ff3333;
 }
 
 .modal-content h2 {

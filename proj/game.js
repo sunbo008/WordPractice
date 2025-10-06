@@ -669,15 +669,19 @@ class WordTetrisGame {
             this.perfectLevels = (this.perfectLevels || 0) + 1;
         }
         
+        console.log('🎉 升级前堆叠区单词数:', this.stackedWords.length);
+        
         // 收集当前堆叠的单词到生词本
         this.stackedWords.forEach(word => {
             this.vocabularyManager.addMissedWord(word);
         });
         
         const vocabularyStats = this.vocabularyManager.getVocabularyStats();
+        console.log('📚 错词本统计:', vocabularyStats);
         
         // 清空堆叠区
         this.stackedWords = [];
+        console.log('🧹 升级后清空堆叠区');
         
         // 升级
         this.level++;
@@ -901,8 +905,11 @@ class WordTetrisGame {
             const word = this.fallingWords[i];
             word.y += this.wordSpeed;
             
-            // 检查是否到达底部
-            if (word.y + word.height >= this.canvasHeight) {
+            // 计算堆叠区顶部位置
+            const stackTopY = this.getStackTopY();
+            
+            // 检查是否接触到堆叠区（失败判定）
+            if (word.y + word.height >= stackTopY) {
                 // 停止语音朗读
                 this.stopSpeaking();
                 
@@ -923,9 +930,38 @@ class WordTetrisGame {
             }
         }
     }
+    
+    // 获取堆叠区顶部位置
+    getStackTopY() {
+        if (this.stackedWords.length === 0) {
+            // 如果堆叠区为空，返回画布底部
+            return this.canvasHeight;
+        }
+        
+        // 计算堆叠区最顶部单词的Y坐标
+        const wordsPerRow = 5;
+        const wordHeight = 50;  // 与drawStackedWords中的wordHeight保持一致
+        const topRow = Math.floor((this.stackedWords.length - 1) / wordsPerRow);
+        const stackTopY = this.canvasHeight - wordHeight - topRow * (wordHeight + 2);
+        
+        return stackTopY;
+    }
 
     addToStack(word) {
-        // 添加到生词本
+        console.log('📦 addToStack 被调用:', {
+            original: word.original,
+            meaning: word.meaning,
+            giveUp: word.giveUp,
+            当前堆叠数: this.stackedWords.length
+        });
+        
+        // 验证单词对象
+        if (!word || !word.original) {
+            console.error('❌ 无效的单词对象:', word);
+            return;
+        }
+        
+        // 添加到生词本（只在这里添加一次，避免重复）
         this.vocabularyManager.addMissedWord(word);
         
         // 计算堆叠位置（按新的布局）
@@ -936,17 +972,26 @@ class WordTetrisGame {
         word.stackRow = row;
         word.stackCol = col;
         
+        // 添加到堆叠数组
         this.stackedWords.push(word);
+        
+        console.log('✅ 已添加到堆叠区:', {
+            单词: word.original,
+            位置: `row:${row}, col:${col}`,
+            堆叠总数: this.stackedWords.length,
+            堆叠列表: this.stackedWords.map(w => w.original).join(', ')
+        });
     }
 
     checkGameOver() {
         // 检查堆叠是否到达顶部（接近缓冲区）
-        const wordsPerRow = 5;
-        const wordHeight = 27; // 25 + 2 padding
-        const maxRows = Math.floor((this.gameAreaHeight - 50) / wordHeight);
-        const currentRows = Math.ceil(this.stackedWords.length / wordsPerRow);
+        const stackTopY = this.getStackTopY();
         
-        if (currentRows >= maxRows) {
+        // 如果堆叠区顶部接近或到达缓冲区底部，游戏结束
+        // 留出一个单词的高度作为缓冲（50像素）
+        if (stackTopY <= this.gameAreaTop + 50) {
+            console.log('💀 堆叠区到达顶部，游戏结束！');
+            console.log(`   堆叠区顶部Y: ${stackTopY}, 缓冲区底部Y: ${this.gameAreaTop}`);
             this.gameOver();
         }
     }
@@ -954,6 +999,17 @@ class WordTetrisGame {
     gameOver() {
         this.stopSpeaking(); // 游戏结束时停止朗读
         this.gameState = 'gameOver';
+        
+        console.log('💀 游戏结束，堆叠区单词数:', this.stackedWords.length);
+        
+        // 确保堆叠区的单词都已添加到错词本
+        // 注意：正常情况下单词在addToStack时已添加，这里是双重保险
+        this.stackedWords.forEach(word => {
+            this.vocabularyManager.addMissedWord(word);
+        });
+        
+        console.log('📚 游戏结束后错词本统计:', this.vocabularyManager.getVocabularyStats());
+        
         this.saveGameData(); // 保存最终数据
         this.showGameOverModal();
     }
@@ -1151,11 +1207,16 @@ class WordTetrisGame {
     drawStackedWords() {
         // 按设计方案显示堆叠单词：每行多个单词，从底部向上堆叠
         const wordsPerRow = 5; // 每行5个单词
-        const wordWidth = 100;
-        const wordHeight = 25;
+        const wordWidth = 200;  // 放大一倍：100 -> 200
+        const wordHeight = 50;  // 放大一倍：25 -> 50
         const padding = 10;
         
         this.stackedWords.forEach((word, index) => {
+            // 验证单词对象
+            if (!word || !word.original) {
+                console.error('❌ 堆叠区发现无效单词对象，索引:', index, '对象:', word);
+                return;
+            }
             const row = Math.floor(index / wordsPerRow);
             const col = index % wordsPerRow;
             const x = padding + col * (wordWidth + 5);
@@ -1177,16 +1238,16 @@ class WordTetrisGame {
             this.ctx.lineWidth = 1;
             this.ctx.strokeRect(x, y, wordWidth, wordHeight);
             
-            // 单词文本
+            // 单词文本 - 字体放大一倍
             this.ctx.fillStyle = '#ffffff';
-            this.ctx.font = '14px Arial';
+            this.ctx.font = '28px Arial';  // 放大一倍：14px -> 28px
             this.ctx.textAlign = 'center';
-            this.ctx.fillText(word.original, x + wordWidth/2, y + wordHeight/2 + 5);
+            this.ctx.fillText(word.original, x + wordWidth/2, y + wordHeight/2 + 10);
             
-            // 显示中文意思（小字）
+            // 显示中文意思（小字）- 字体放大一倍
             this.ctx.fillStyle = '#cccccc';
-            this.ctx.font = '10px Arial';
-            this.ctx.fillText(word.meaning || '', x + wordWidth/2, y + wordHeight - 3);
+            this.ctx.font = '20px Arial';  // 放大一倍：10px -> 20px
+            this.ctx.fillText(word.meaning || '', x + wordWidth/2, y + wordHeight - 6);
         });
     }
 
@@ -1852,12 +1913,32 @@ class WordTetrisGame {
     }
 
     giveUpCurrentWord() {
-        if (this.gameState !== 'playing' || this.fallingWords.length === 0) return;
+        console.log('🚫 giveUpCurrentWord 被调用');
+        
+        if (this.gameState !== 'playing') {
+            console.warn('⚠️ 游戏状态不是playing:', this.gameState);
+            return;
+        }
+        
+        if (this.fallingWords.length === 0) {
+            console.warn('⚠️ 没有下降的单词');
+            return;
+        }
         
         // 停止语音朗读
         this.stopSpeaking();
         
         const currentWord = this.fallingWords[0];
+        console.log('🚫 准备放弃单词:', currentWord.original, '堆叠区当前数量:', this.stackedWords.length);
+        
+        // 确保单词对象有完整信息
+        if (!currentWord.original) {
+            console.error('❌ 放弃的单词缺少original属性', currentWord);
+            return;
+        }
+        
+        // 标记为放弃的单词（在移除之前标记）
+        currentWord.giveUp = true;
         
         // 移除下降单词
         this.fallingWords.splice(0, 1);
@@ -1869,14 +1950,13 @@ class WordTetrisGame {
         this.combo = 0;
         this.perfectLevel = false;
         
-        // 标记为放弃的单词
-        currentWord.giveUp = true;
-        
         // 更新统计
         this.totalWordsGivenUp = (this.totalWordsGivenUp || 0) + 1;
         
         // 添加到堆叠区
+        console.log('➡️ 准备调用 addToStack');
         this.addToStack(currentWord);
+        console.log('✅ addToStack 调用完成，堆叠区数量:', this.stackedWords.length);
         
         // 清空输入
         this.clearInput();
