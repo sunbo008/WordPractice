@@ -95,7 +95,7 @@ class WordTetrisGame {
         this.ctx = this.canvas.getContext('2d');
         this.vocabularyManager = new VocabularyManagerV2();
         
-        // 高清屏适配
+        // 高清屏适配并根据左栏高度设置画布显示高度
         this.setupHighDPICanvas();
         
         // 游戏状态
@@ -135,7 +135,7 @@ class WordTetrisGame {
         this.spawnTimer = 0;
         this.speedMultiplier = 1.0; // 速度倍数
         
-        // 画布设置（逻辑尺寸）
+        // 画布设置（逻辑尺寸） - 在setupHighDPICanvas中会根据显示尺寸同步
         this.canvasWidth = 600;
         this.canvasHeight = 500;
         this.bufferHeight = 80;
@@ -390,11 +390,13 @@ class WordTetrisGame {
         // 获取设备像素比
         const dpr = window.devicePixelRatio || 1;
         
-        // 获取Canvas的显示尺寸（CSS尺寸）
+        // 以左侧面板的总高度为目标高度，至少500px
+        const leftPanel = document.querySelector('.left-panel');
+        const targetDisplayHeight = Math.max(500, leftPanel ? leftPanel.offsetHeight : 500);
         const displayWidth = 600;
-        const displayHeight = 500;
+        const displayHeight = targetDisplayHeight;
         
-        // 设置Canvas的实际像素尺寸
+        // 设置Canvas的实际像素尺寸（同时会重置变换矩阵）
         this.canvas.width = displayWidth * dpr;
         this.canvas.height = displayHeight * dpr;
         
@@ -408,6 +410,51 @@ class WordTetrisGame {
         // 启用更好的图像平滑
         this.ctx.imageSmoothingEnabled = true;
         this.ctx.imageSmoothingQuality = 'high';
+        
+        // 同步逻辑尺寸和依赖值
+        this.syncCanvasLogicalSize(displayWidth, displayHeight);
+        
+        // 在窗口尺寸或左栏布局变化后同步画布，并重算与尺寸相关的参数
+        const resizeHandler = () => {
+            const lp = document.querySelector('.left-panel');
+            const h = Math.max(500, lp ? lp.offsetHeight : 500);
+            this.setupHighDPICanvasWith(displayWidth, h);
+        };
+        window.addEventListener('resize', resizeHandler);
+        // 监听左栏尺寸变化（网格切换/字重变化等也能触发）
+        const lpEl = document.querySelector('.left-panel');
+        if (lpEl && window.ResizeObserver) {
+            const ro = new ResizeObserver(() => resizeHandler());
+            ro.observe(lpEl);
+            this._leftPanelRO = ro;
+        }
+    }
+
+    setupHighDPICanvasWith(displayWidth, displayHeight) {
+        const dpr = window.devicePixelRatio || 1;
+        this.canvas.width = displayWidth * dpr;
+        this.canvas.height = displayHeight * dpr;
+        this.canvas.style.width = displayWidth + 'px';
+        this.canvas.style.height = displayHeight + 'px';
+        // 重置scale（设置width/height已重置变换，这里再次设置）
+        this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+        this.ctx.scale(dpr, dpr);
+        this.ctx.imageSmoothingEnabled = true;
+        this.ctx.imageSmoothingQuality = 'high';
+        this.syncCanvasLogicalSize(displayWidth, displayHeight);
+    }
+
+    syncCanvasLogicalSize(displayWidth, displayHeight) {
+        this.canvasWidth = displayWidth;
+        this.canvasHeight = displayHeight;
+        this.bufferHeight = 80;
+        this.gameAreaTop = this.bufferHeight;
+        this.gameAreaHeight = this.canvasHeight - this.bufferHeight;
+        // 更新炮管位置
+        if (this.cannon) {
+            this.cannon.x = this.canvasWidth / 2;
+            this.cannon.y = this.canvasHeight - 30;
+        }
     }
 
     init() {
@@ -1134,7 +1181,7 @@ class WordTetrisGame {
         // 清空画布
         this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
         
-        // 绘制背景
+        // 绘制背景（统一深蓝底色）
         this.drawBackground();
         
         // 绘制缓冲区
@@ -1166,9 +1213,9 @@ class WordTetrisGame {
     }
 
     drawBackground() {
-        // 游戏区域背景
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-        this.ctx.fillRect(0, this.gameAreaTop, this.canvasWidth, this.gameAreaHeight);
+        // 主区域统一深蓝底色，避免上下色差
+        this.ctx.fillStyle = '#0e1f3d';
+        this.ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
         
         // 缓冲区背景
         this.ctx.fillStyle = 'rgba(255, 215, 0, 0.1)';

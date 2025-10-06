@@ -59,18 +59,26 @@
             </div>
         </div>
 
-        <!-- 游戏主体 -->
-        <div class="game-main">
-            <!-- 游戏画布 -->
-            <canvas id="gameCanvas" width="600" height="500"></canvas>
-            
+        <!-- 左侧面板：图片展示区 + 控制区 -->
+        <aside class="left-panel">
+            <section class="image-showcase">
+                <div class="picture">
+                    <img id="wordImage" alt="单词图片" src="" onerror="this.style.display='none'">
+                </div>
+                <div class="word-info">
+                    <span id="wordText" class="word">hello</span>
+                    <span id="wordPhonetic" class="phonetic">/həˈləʊ/</span>
+                </div>
+                <div id="wordTranslation" class="translation">你好</div>
+            </section>
+
             <!-- 游戏控制 -->
             <div class="game-controls">
                 <div class="input-section">
                     <label for="letterInput">输入缺失字母:</label>
                     <input type="text" id="letterInput" maxlength="3" placeholder="直接按键盘输入">
-                    <button id="giveUpBtn" class="give-up-btn">放弃 (空格键)</button>
                     <div id="realTimePreview" class="real-time-preview">实时预览: SRort</div>
+                    <button id="giveUpBtn" class="give-up-btn">放弃 (空格键)</button>
                     <div class="keyboard-hint">💡 直接按键盘字母键输入，Enter提交，Backspace删除，Space放弃</div>
                 </div>
                 
@@ -82,6 +90,12 @@
                     <button id="toggleSpeechBtn" class="toggle-speech">🔊 语音开</button>
                 </div>
             </div>
+        </aside>
+
+        <!-- 游戏主体：仅画布 -->
+        <div class="game-main">
+            <!-- 游戏画布 -->
+            <canvas id="gameCanvas" width="600" height="500"></canvas>
         </div>
 
         <!-- 侧边栏 -->
