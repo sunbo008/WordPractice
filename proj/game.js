@@ -888,6 +888,8 @@ class WordTetrisGame {
         
         this.levelWordCount++;
         this.updateNextWordDisplay();
+        // 预加载展示图
+        this.updateImageShowcase();
     }
     
     // 检查是否所有单词都已掉落完毕
@@ -1644,6 +1646,46 @@ class WordTetrisGame {
         } else {
             nextWordElement.textContent = '准备中...';
         }
+    }
+
+    // 更新图片展示区
+    updateImageShowcase() {
+        try {
+            const img = document.getElementById('wordImage');
+            if (!img) return;
+            const word = (this.nextWord && this.nextWord.original) ? this.nextWord.original.toLowerCase() : '';
+            if (!word) { img.src = ''; return; }
+            debugLog.info(`🖼️ 更新图片展示，目标单词: ${word}`);
+            // 先使用本地缓存（jpg → png）
+            const localJpg = `images/cache/${word}.jpg`;
+            this.tryLoadImage(img, localJpg, '本地JPG', () => {
+                const localPng = `images/cache/${word}.png`;
+                this.tryLoadImage(img, localPng, '本地PNG', () => {
+                    // 在线兜底：增加sig避免缓存命中
+                    const sig = Math.floor(Math.random() * 1e6);
+                    const online = `https://source.unsplash.com/300x300/?${encodeURIComponent(word)}&sig=${sig}`;
+                    this.tryLoadImage(img, online, '在线兜底', null);
+                });
+            });
+        } catch (e) {
+            console.error('更新图片展示失败:', e);
+            debugLog.error(`🖼️ 图片展示异常: ${e?.message || e}`);
+        }
+    }
+
+    tryLoadImage(img, url, label = '未知来源', onError) {
+        debugLog.info(`➡️ 开始加载图片 [${label}]: ${url}`);
+        const test = new Image();
+        // 不跨域读取像素，仅展示即可
+        test.onload = () => {
+            debugLog.success(`✅ 图片加载成功 [${label}]: ${url}`);
+            img.src = url;
+        };
+        test.onerror = (ev) => {
+            debugLog.error(`❌ 图片加载失败 [${label}]: ${url}`);
+            if (onError) onError(ev);
+        };
+        test.src = url;
     }
 
     updateRealTimeDisplay() {

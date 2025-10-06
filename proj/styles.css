@@ -129,7 +129,7 @@ body {
 /* 图片展示区 */
 .image-showcase {
     display: grid;
-    grid-template-rows: 1fr auto auto;
+    grid-template-rows: 1fr;
     gap: 8px;
     border: 2px solid;
     border-image: linear-gradient(135deg, #ffd700, #ffed4e) 1;
@@ -155,32 +155,7 @@ body {
     object-fit: cover;
 }
 
-.image-showcase .word-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    font-weight: bold;
-}
-
-.image-showcase .word-info .word {
-    font-size: 18px;
-    color: #ffffff;
-}
-
-.image-showcase .word-info .phonetic {
-    font-size: 14px;
-    color: #74c0fc;
-    font-style: italic;
-}
-
-.image-showcase .translation {
-    background: rgba(0,0,0,0.5);
-    color: #ffd700;
-    font-weight: bold;
-    padding: 6px 8px;
-    border-radius: 6px;
-    text-align: center;
-}
+/* 仅展示图片，不显示翻译和音标 */
 
 /* 游戏主体（仅画布居中） */
 .game-main {
