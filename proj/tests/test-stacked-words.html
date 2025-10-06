@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>堆叠区测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        
+        h2 {
+            color: #3498db;
+            margin-top: 0;
+        }
+        
+        .test-info {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        button:hover {
+            background: #2980b9;
+        }
+        
+        button:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+        }
+        
+        #console-output {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .console-line {
+            margin: 5px 0;
+            padding: 2px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .console-error {
+            color: #e74c3c;
+        }
+        
+        .console-success {
+            color: #2ecc71;
+        }
+        
+        .console-info {
+            color: #3498db;
+        }
+        
+        .log-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        .log-table th {
+            background: #3498db;
+            color: white;
+            padding: 10px;
+            text-align: left;
+        }
+        
+        .log-table td {
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+        
+        .log-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 堆叠区功能测试</h1>
+    
+    <div class="test-section">
+        <h2>测试说明</h2>
+        <div class="test-info">
+            <p><strong>目的：</strong>验证单词失败后是否正确加入堆叠区和错词本</p>
+            <p><strong>步骤：</strong></p>
+            <ol>
+                <li>点击"模拟单词失败"按钮</li>
+                <li>观察控制台输出，查看是否有完整的日志序列</li>
+                <li>检查堆叠区数组和错词本是否正确更新</li>
+            </ol>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>快速测试</h2>
+        <button onclick="runSimpleTest()">模拟单词失败</button>
+        <button onclick="runMultipleFailures()">模拟5个单词失败</button>
+        <button onclick="clearResults()">清空结果</button>
+        <div id="test-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>当前状态</h2>
+        <table class="log-table">
+            <tr>
+                <th>项目</th>
+                <th>数值</th>
+            </tr>
+            <tr>
+                <td>堆叠区单词数</td>
+                <td id="stacked-count">0</td>
+            </tr>
+            <tr>
+                <td>错词本单词数</td>
+                <td id="missed-count">0</td>
+            </tr>
+            <tr>
+                <td>堆叠区单词列表</td>
+                <td id="stacked-words">-</td>
+            </tr>
+            <tr>
+                <td>错词本单词列表</td>
+                <td id="missed-words">-</td>
+            </tr>
+        </table>
+    </div>
+    
+    <div class="test-section">
+        <h2>控制台输出</h2>
+        <button onclick="clearConsole()">清空控制台</button>
+        <div id="console-output"></div>
+    </div>
+    
+    <script>
+        // 模拟游戏环境
+        class MockGame {
+            constructor() {
+                this.stackedWords = [];
+                this.missedWords = new Map();
+                this.fallingWords = [];
+                this.canvasHeight = 500;
+            }
+            
+            // 模拟getStackTopY方法
+            getStackTopY() {
+                if (this.stackedWords.length === 0) {
+                    return this.canvasHeight;
+                }
+                
+                const wordsPerRow = 5;
+                const wordHeight = 50;
+                const topRow = Math.floor((this.stackedWords.length - 1) / wordsPerRow);
+                const stackTopY = this.canvasHeight - wordHeight - topRow * (wordHeight + 2);
+                
+                return stackTopY;
+            }
+            
+            // 模拟addToStack方法（带调试日志）
+            addToStack(word) {
+                logConsole('📦 addToStack 被调用:', 'info');
+                logConsole(JSON.stringify({
+                    original: word?.original,
+                    meaning: word?.meaning,
+                    giveUp: word?.giveUp,
+                    当前堆叠数: this.stackedWords.length
+                }, null, 2), 'info');
+                
+                // 验证单词对象
+                if (!word) {
+                    logConsole('❌ 单词对象为空或undefined', 'error');
+                    return;
+                }
+                
+                if (!word.original) {
+                    logConsole('❌ 单词对象缺少original属性', 'error');
+                    logConsole('完整对象: ' + JSON.stringify(word, null, 2), 'error');
+                    return;
+                }
+                
+                // 添加到错词本
+                logConsole('📚 准备添加到错词本: ' + word.original, 'info');
+                this.addMissedWord(word);
+                logConsole('✅ 已添加到错词本', 'success');
+                
+                // 计算堆叠位置
+                const wordsPerRow = 5;
+                const row = Math.floor(this.stackedWords.length / wordsPerRow);
+                const col = this.stackedWords.length % wordsPerRow;
+                
+                word.stackRow = row;
+                word.stackCol = col;
+                
+                // 添加到堆叠数组
+                logConsole('📦 准备添加到堆叠数组...', 'info');
+                this.stackedWords.push(word);
+                logConsole('✅ 已添加到堆叠数组', 'success');
+                
+                logConsole('✅ 添加完成，堆叠区信息:', 'success');
+                logConsole(JSON.stringify({
+                    单词: word.original,
+                    位置: `row:${row}, col:${col}`,
+                    堆叠总数: this.stackedWords.length,
+                    堆叠列表: this.stackedWords.map(w => w.original).join(', ')
+                }, null, 2), 'success');
+                
+                // 验证添加是否成功
+                if (this.stackedWords.includes(word)) {
+                    logConsole('✅ 验证成功：单词已在堆叠数组中', 'success');
+                } else {
+                    logConsole('❌ 验证失败：单词未在堆叠数组中！', 'error');
+                }
+            }
+            
+            // 模拟addMissedWord方法
+            addMissedWord(wordData) {
+                const word = wordData.original;
+                const isGiveUp = wordData.giveUp || false;
+                
+                if (this.missedWords.has(word)) {
+                    const existing = this.missedWords.get(word);
+                    this.missedWords.set(word, {
+                        ...existing,
+                        count: existing.count + 1,
+                        giveUpCount: existing.giveUpCount + (isGiveUp ? 1 : 0),
+                        failCount: existing.failCount + (isGiveUp ? 0 : 1)
+                    });
+                } else {
+                    this.missedWords.set(word, {
+                        word: word,
+                        meaning: wordData.meaning,
+                        phonetic: wordData.phonetic || '',
+                        count: 1,
+                        giveUpCount: isGiveUp ? 1 : 0,
+                        failCount: isGiveUp ? 0 : 1
+                    });
+                }
+            }
+            
+            // 模拟单词失败
+            simulateWordFailure(wordText, meaning) {
+                const word = {
+                    original: wordText,
+                    meaning: meaning,
+                    phonetic: '/test/',
+                    y: 460,
+                    height: 40,
+                    giveUp: false
+                };
+                
+                logConsole('', 'info');
+                logConsole('='.repeat(60), 'info');
+                logConsole('💥 模拟单词失败: ' + wordText, 'info');
+                logConsole('='.repeat(60), 'info');
+                
+                const stackTopY = this.getStackTopY();
+                logConsole('单词底部Y: ' + (word.y + word.height) + ', 堆叠区顶部Y: ' + stackTopY, 'info');
+                
+                if (word.y + word.height >= stackTopY) {
+                    logConsole('✅ 失败判定触发', 'success');
+                    this.addToStack(word);
+                } else {
+                    logConsole('❌ 失败判定未触发（不应该出现）', 'error');
+                }
+                
+                updateStatus();
+            }
+        }
+        
+        const game = new MockGame();
+        
+        // 日志输出到页面
+        function logConsole(message, type = 'info') {
+            const consoleDiv = document.getElementById('console-output');
+            const line = document.createElement('div');
+            line.className = 'console-line console-' + type;
+            line.textContent = message;
+            consoleDiv.appendChild(line);
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+            
+            // 同时输出到浏览器控制台
+            if (type === 'error') {
+                console.error(message);
+            } else if (type === 'success') {
+                console.log('%c' + message, 'color: green');
+            } else {
+                console.log(message);
+            }
+        }
+        
+        function clearConsole() {
+            document.getElementById('console-output').innerHTML = '';
+        }
+        
+        function updateStatus() {
+            document.getElementById('stacked-count').textContent = game.stackedWords.length;
+            document.getElementById('missed-count').textContent = game.missedWords.size;
+            document.getElementById('stacked-words').textContent = 
+                game.stackedWords.map(w => w.original).join(', ') || '-';
+            document.getElementById('missed-words').textContent = 
+                Array.from(game.missedWords.keys()).join(', ') || '-';
+        }
+        
+        function runSimpleTest() {
+            const words = [
+                { text: 'tree', meaning: '树' },
+                { text: 'house', meaning: '房子' },
+                { text: 'water', meaning: '水' },
+                { text: 'fire', meaning: '火' },
+                { text: 'earth', meaning: '土地' }
+            ];
+            
+            const word = words[Math.floor(Math.random() * words.length)];
+            game.simulateWordFailure(word.text, word.meaning);
+            
+            showTestResult('已模拟1个单词失败，请查看控制台输出', 'success');
+        }
+        
+        function runMultipleFailures() {
+            const words = [
+                { text: 'tree', meaning: '树' },
+                { text: 'house', meaning: '房子' },
+                { text: 'water', meaning: '水' },
+                { text: 'fire', meaning: '火' },
+                { text: 'earth', meaning: '土地' }
+            ];
+            
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    game.simulateWordFailure(words[i].text, words[i].meaning);
+                }, i * 500);
+            }
+            
+            showTestResult('已开始模拟5个单词失败（间隔0.5秒），请查看控制台输出', 'success');
+        }
+        
+        function showTestResult(message, type) {
+            const resultsDiv = document.getElementById('test-results');
+            const result = document.createElement('div');
+            result.className = 'test-result ' + type;
+            result.textContent = message;
+            resultsDiv.appendChild(result);
+        }
+        
+        function clearResults() {
+            document.getElementById('test-results').innerHTML = '';
+            game.stackedWords = [];
+            game.missedWords.clear();
+            updateStatus();
+            clearConsole();
+            showTestResult('已清空所有测试结果', 'info');
+        }
+        
+        // 初始化
+        updateStatus();
+        logConsole('测试环境已准备就绪', 'success');
+        logConsole('点击"模拟单词失败"按钮开始测试', 'info');
+    </script>
+</body>
+</html>

@@ -525,3 +525,109 @@ button:disabled {
         flex-wrap: wrap;
     }
 }
+
+/* 调试日志面板 */
+.debug-panel {
+    background: #1e1e1e;
+    border-radius: 8px;
+    margin-top: 20px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.debug-header {
+    background: #2d2d2d;
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #3498db;
+}
+
+.debug-header h3 {
+    margin: 0;
+    color: #3498db;
+    font-size: 16px;
+}
+
+.debug-controls {
+    display: flex;
+    gap: 10px;
+}
+
+.debug-btn {
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background 0.3s;
+}
+
+.debug-btn:hover {
+    background: #2980b9;
+}
+
+.debug-console {
+    background: #1e1e1e;
+    color: #e0e0e0;
+    padding: 15px;
+    font-family: 'Courier New', Consolas, monospace;
+    font-size: 12px;
+    max-height: 400px;
+    overflow-y: auto;
+    line-height: 1.6;
+}
+
+.debug-console::-webkit-scrollbar {
+    width: 8px;
+}
+
+.debug-console::-webkit-scrollbar-track {
+    background: #2d2d2d;
+}
+
+.debug-console::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 4px;
+}
+
+.debug-console::-webkit-scrollbar-thumb:hover {
+    background: #666;
+}
+
+.debug-line {
+    margin: 3px 0;
+    padding: 3px 5px;
+    border-left: 3px solid transparent;
+}
+
+.debug-line.error {
+    color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.1);
+    border-left-color: #ff6b6b;
+}
+
+.debug-line.success {
+    color: #51cf66;
+    background: rgba(81, 207, 102, 0.1);
+    border-left-color: #51cf66;
+}
+
+.debug-line.info {
+    color: #74c0fc;
+    background: rgba(116, 192, 252, 0.1);
+    border-left-color: #74c0fc;
+}
+
+.debug-line.warning {
+    color: #ffd43b;
+    background: rgba(255, 212, 59, 0.1);
+    border-left-color: #ffd43b;
+}
+
+.debug-panel.hidden .debug-console {
+    display: none;
+}
