@@ -2289,9 +2289,9 @@ class WordTetrisGame {
             continueBtn.style.display = 'none';
         }
         
-        // 添加倒计时提示
-        const modalContent = document.querySelector('#levelUpModal .modal-content');
-        let keyboardHint = modalContent.querySelector('.keyboard-hint');
+        // 添加倒计时提示（应插入到 .modal-body 内，位于 .modal-buttons 之前）
+        const modalBody = document.querySelector('#levelUpModal .modal-body');
+        let keyboardHint = modalBody ? modalBody.querySelector('.keyboard-hint') : null;
         if (!keyboardHint) {
             keyboardHint = document.createElement('p');
             keyboardHint.className = 'keyboard-hint';
@@ -2300,7 +2300,12 @@ class WordTetrisGame {
             keyboardHint.style.marginTop = '15px';
             keyboardHint.style.fontWeight = 'bold';
             keyboardHint.style.textAlign = 'center';
-            modalContent.insertBefore(keyboardHint, modalContent.querySelector('.modal-buttons'));
+            const buttonsInBody = modalBody ? modalBody.querySelector('.modal-buttons') : null;
+            if (modalBody && buttonsInBody && buttonsInBody.parentNode === modalBody) {
+                modalBody.insertBefore(keyboardHint, buttonsInBody);
+            } else if (modalBody) {
+                modalBody.appendChild(keyboardHint);
+            }
         }
         keyboardHint.textContent = '3秒后自动开始下一级...';
         
