@@ -723,10 +723,17 @@ class WordTetrisGame {
         const wordsUntilNextLevel = Math.ceil((this.targetScore - this.score) / 2); // 假设平均2分/单词
         const isEndChallenge = wordsUntilNextLevel <= 10;
         
-        this.nextWord = this.vocabularyManager.getRandomWord(this.level, isEndChallenge);
+        // 取消难度限制：从所有难度中随机选择单词
+        this.nextWord = this.vocabularyManager.getRandomWordFromAll(isEndChallenge);
         
-        // 如果获取单词失败，重试
+        // 如果获取单词失败，检查是否所有单词都已用完
         if (!this.nextWord) {
+            // 检查是否所有单词都已掉落完毕
+            if (this.checkAllWordsCompleted()) {
+                console.log('🎉 所有单词已完成，等待最后一个单词处理...');
+                // 不立即结束游戏，等待当前单词被处理
+                return;
+            }
             console.warn('获取单词失败，重试中...');
             setTimeout(() => this.generateNextWord(), 100);
             return;
@@ -734,6 +741,50 @@ class WordTetrisGame {
         
         this.levelWordCount++;
         this.updateNextWordDisplay();
+    }
+    
+    // 检查是否所有单词都已掉落完毕
+    checkAllWordsCompleted() {
+        if (!this.vocabularyManager.isLoaded) {
+            return false;
+        }
+        
+        // 获取总单词数
+        const totalWords = this.vocabularyManager.allWords.length;
+        
+        // 获取已下落的单词数（去重）
+        const fallenWordsCount = this.fallenWords.size;
+        
+        // 如果所有单词都已下落过，游戏结束
+        if (totalWords > 0 && fallenWordsCount >= totalWords) {
+            console.log(`📊 游戏完成统计: 总单词=${totalWords}, 已下落=${fallenWordsCount}`);
+            return true;
+        }
+        
+        return false;
+    }
+    
+    // 检查游戏是否完成（所有单词已下落且没有正在下落的单词）
+    checkGameCompletion() {
+        // 检查是否所有单词都已下落
+        if (!this.checkAllWordsCompleted()) {
+            return;
+        }
+        
+        // 检查是否还有单词在处理中
+        const hasWordsInProgress = this.fallingWords.length > 0 || this.bufferState !== 'idle';
+        
+        if (!hasWordsInProgress) {
+            console.log('🎉 所有单词已处理完毕，游戏结束！');
+            console.log(`📊 最终统计: 总单词=${this.vocabularyManager.allWords.length}, 已下落=${this.fallenWords.size}, 命中=${this.hitWords.size}`);
+            
+            // 延迟500ms让动画完成
+            setTimeout(() => {
+                if (this.gameState === 'playing') {
+                    this.gameOver();
+                }
+            }, 500);
+        }
     }
 
     startBufferCountdown() {
@@ -749,12 +800,19 @@ class WordTetrisGame {
         
         this.bufferTimer++;
         
-        if (this.bufferTimer === 60) { // 1秒
+        if (this.bufferTimer === 60) { // 1秒 - 只亮红灯
             this.bufferLights.red = true;
-        } else if (this.bufferTimer === 120) { // 2秒
+            this.bufferLights.yellow = false;
+            this.bufferLights.green = false;
+        } else if (this.bufferTimer === 120) { // 2秒 - 只亮黄灯
+            this.bufferLights.red = false;
             this.bufferLights.yellow = true;
-        } else if (this.bufferTimer === 180) { // 3秒
+            this.bufferLights.green = false;
+        } else if (this.bufferTimer === 180) { // 3秒 - 只亮绿灯
+            this.bufferLights.red = false;
+            this.bufferLights.yellow = false;
             this.bufferLights.green = true;
+        } else if (this.bufferTimer === 240) { // 4秒 - 绿灯亮满1秒后释放单词
             this.releaseWord();
         }
         
@@ -790,6 +848,9 @@ class WordTetrisGame {
         
         // 生成下一个单词
         this.generateNextWord();
+        
+        // 检查是否所有单词都已下落（在生成下一个单词后检查）
+        this.checkGameCompletion();
     }
 
     updateGame() {
@@ -810,6 +871,9 @@ class WordTetrisGame {
             this.spawnTimer = 0;
         }
         
+        // 更新炮管瞄准角度
+        this.updateCannonAngle();
+        
         // 更新下降单词
         this.updateFallingWords();
         
@@ -827,6 +891,9 @@ class WordTetrisGame {
         
         // 检查游戏结束条件
         this.checkGameOver();
+        
+        // 检查游戏是否完成（所有单词都已处理）
+        this.checkGameCompletion();
     }
 
     updateFallingWords() {
@@ -850,6 +917,9 @@ class WordTetrisGame {
                 
                 // 更新统计
                 this.totalWordsFailed = (this.totalWordsFailed || 0) + 1;
+                
+                // 检查游戏是否完成
+                this.checkGameCompletion();
             }
         }
     }
@@ -1121,19 +1191,8 @@ class WordTetrisGame {
     }
 
     drawCannon() {
+        // 炮管在游戏进行时始终显示
         if (this.gameState !== 'playing' && this.gameState !== 'review') return;
-        
-        // 更新炮管瞄准角度
-        if (this.fallingWords.length > 0) {
-            const targetWord = this.fallingWords[0];
-            const dx = targetWord.x - this.cannon.x;
-            const dy = targetWord.y - this.cannon.y;
-            this.cannon.targetAngle = Math.atan2(dy, dx) - Math.PI / 2;
-        }
-        
-        // 平滑过渡炮管角度
-        const angleDiff = this.cannon.targetAngle - this.cannon.angle;
-        this.cannon.angle += angleDiff * 0.1;
         
         this.ctx.save();
         this.ctx.translate(this.cannon.x, this.cannon.y);
@@ -1158,6 +1217,23 @@ class WordTetrisGame {
         this.ctx.fillRect(-10, -42, 20, 4);
         
         this.ctx.restore();
+    }
+    
+    // 更新炮管瞄准角度（在updateGame中调用）
+    updateCannonAngle() {
+        if (this.gameState !== 'playing' && this.gameState !== 'review') return;
+        
+        // 更新炮管瞄准角度
+        if (this.fallingWords.length > 0) {
+            const targetWord = this.fallingWords[0];
+            const dx = targetWord.x - this.cannon.x;
+            const dy = targetWord.y - this.cannon.y;
+            this.cannon.targetAngle = Math.atan2(dy, dx) - Math.PI / 2;
+        }
+        
+        // 平滑过渡炮管角度
+        const angleDiff = this.cannon.targetAngle - this.cannon.angle;
+        this.cannon.angle += angleDiff * 0.1;
     }
 
     drawBullets() {
@@ -1613,6 +1689,8 @@ class WordTetrisGame {
             this.levelUp();
         }
         
+        // 检查游戏是否完成
+        this.checkGameCompletion();
         
         this.updateUI();
     }
@@ -1806,6 +1884,9 @@ class WordTetrisGame {
         // 显示放弃效果
         this.showGiveUpEffect(currentWord);
         
+        // 检查游戏是否完成
+        this.checkGameCompletion();
+        
         this.updateUI();
     }
 
@@ -1858,7 +1939,7 @@ class WordTetrisGame {
     showGameOverModal() {
         document.getElementById('finalScore').textContent = this.score;
         document.getElementById('finalLevel').textContent = this.level;
-        document.getElementById('finalVocabulary').textContent = this.vocabularyManager.getVocabularyStats().totalWords;
+        document.getElementById('finalVocabulary').textContent = this.vocabularyManager.getVocabularyStats().missedWords;
         document.getElementById('gameOverModal').style.display = 'block';
     }
 

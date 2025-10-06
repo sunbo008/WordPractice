@@ -29,7 +29,7 @@
                 <span id="target">100</span>
             </div>
             <div class="info-item">
-                <span class="label">生词本:</span>
+                <span class="label">单词总数:</span>
                 <span id="vocabulary-count">0</span>
             </div>
             <div class="info-item">
@@ -97,13 +97,13 @@
                 <div id="nextWord">准备中...</div>
             </div>
 
-            <!-- 生词本 -->
+            <!-- 错词本 -->
             <div class="vocabulary-book">
-                <h3>生词本 (<span id="vocab-total-count">0</span>)</h3>
+                <h3>错词本 (<span id="vocab-total-count">0</span>)</h3>
                 <div id="vocabularyList">
-                    <p>暂无生词</p>
+                    <p>暂无错词</p>
                 </div>
-                <button id="exportBtn" disabled>导出生词</button>
+                <button id="exportBtn" disabled>导出错词</button>
             </div>
 
             <!-- 游戏说明 -->
@@ -123,13 +123,14 @@
     <!-- 游戏结束弹窗 -->
     <div id="gameOverModal" class="modal">
         <div class="modal-content">
+            <span class="close-btn" onclick="document.getElementById('gameOverModal').style.display='none'">&times;</span>
             <h2>游戏结束</h2>
             <p>最终分数: <span id="finalScore">0</span></p>
             <p>达到等级: <span id="finalLevel">1</span></p>
-            <p>收集生词: <span id="finalVocabulary">0</span> 个</p>
+            <p>收集错词: <span id="finalVocabulary">0</span> 个</p>
             <div class="modal-buttons">
                 <button id="restartBtn">重新开始</button>
-                <button id="reviewVocabBtn">查看生词本</button>
+                <button id="reviewVocabBtn">查看错词本</button>
             </div>
         </div>
     </div>
@@ -139,10 +140,10 @@
         <div class="modal-content">
             <h2>🎉 等级提升！</h2>
             <p>恭喜升到第 <span id="newLevel">2</span> 级！</p>
-            <p>本级收集生词: <span id="levelVocabulary">0</span> 个</p>
+            <p>本级收集错词: <span id="levelVocabulary">0</span> 个</p>
             <div class="modal-buttons">
                 <button id="continueBtn">继续游戏</button>
-                <button id="viewVocabBtn">查看生词</button>
+                <button id="viewVocabBtn">查看错词</button>
             </div>
         </div>
     </div>

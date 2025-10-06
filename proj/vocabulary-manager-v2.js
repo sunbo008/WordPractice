@@ -13,6 +13,9 @@ class VocabularyManagerV2 {
         this.recentWords = [];
         this.maxRecentWords = 15;
         
+        // 已使用单词跟踪（用于确保所有单词都被使用）
+        this.usedWords = new Set();
+        
         // 当前配置 (初始占位，会从配置加载器获取实际默认值)
         this.currentConfig = {
             enabledLibraries: [], // 会从配置加载器的defaultConfig获取
@@ -342,12 +345,59 @@ class VocabularyManagerV2 {
         return this.getVocabularyForLevel(level, isEndChallenge);
     }
     
+    // 从所有难度中随机选择单词（取消难度限制）
+    getRandomWordFromAll(isEndChallenge = false) {
+        if (!this.isLoaded || this.allWords.length === 0) {
+            return null;
+        }
+        
+        // 优先选择未使用过的单词
+        const unusedWords = this.allWords.filter(word => !this.usedWords.has(word.word));
+        
+        // 如果所有单词都用过了，重置已使用列表（开始新一轮）
+        if (unusedWords.length === 0) {
+            console.log('🔄 所有单词已使用完毕，开始新一轮');
+            this.usedWords.clear();
+            var availableWords = this.allWords;
+        } else {
+            var availableWords = unusedWords;
+        }
+        
+        // 在可用单词中，优先选择非最近使用的单词
+        const nonRecentWords = availableWords.filter(word => !this.isWordRecent(word.word));
+        const finalWords = nonRecentWords.length > 0 ? nonRecentWords : availableWords;
+        
+        // 随机选择单词
+        const selectedWord = finalWords[Math.floor(Math.random() * finalWords.length)];
+        
+        // 添加到已使用列表和最近使用列表
+        this.usedWords.add(selectedWord.word);
+        this.addToRecentWords(selectedWord.word);
+        
+        // 随机选择1-2个字母作为缺失字母
+        const missingCount = Math.random() < 0.5 ? 1 : 2;
+        let missingIndices = this.generateMissingIndices(selectedWord.word, missingCount);
+        
+        return {
+            original: selectedWord.word,
+            meaning: selectedWord.meaning,
+            phonetic: selectedWord.phonetic || '',
+            phoneme: selectedWord.phoneme || '',
+            description: selectedWord.description || '',
+            missing: missingIndices,
+            display: this.createDisplayWord(selectedWord.word, missingIndices),
+            missingLetters: this.getMissingLetters(selectedWord.word, missingIndices),
+            level: selectedWord.difficulty,
+            difficulty: selectedWord.difficulty
+        };
+    }
+    
     getVocabularyForLevel(targetDifficulty, isEndChallenge = false) {
         if (!this.isLoaded || this.allWords.length === 0) {
             return null;
         }
         
-        // 严格筛选：只选择指定难度的单词，确保级别互斥
+        // 筛选指定难度的单词
         const filteredWords = this.allWords.filter(word => 
             word.difficulty === targetDifficulty
         );
@@ -357,14 +407,30 @@ class VocabularyManagerV2 {
             return null;
         }
         
-        // 优先选择非最近使用的单词
-        const nonRecentWords = filteredWords.filter(word => !this.isWordRecent(word.word));
-        const availableWords = nonRecentWords.length > 0 ? nonRecentWords : filteredWords;
+        // 优先选择未使用过的单词
+        const unusedWords = filteredWords.filter(word => !this.usedWords.has(word.word));
+        
+        // 如果所有单词都用过了，重置已使用列表（开始新一轮）
+        if (unusedWords.length === 0) {
+            console.log(`🔄 难度${targetDifficulty}的所有单词已使用完毕，开始新一轮`);
+            // 清空该难度的已使用单词
+            filteredWords.forEach(word => this.usedWords.delete(word.word));
+            // 重新筛选未使用的单词
+            const newUnusedWords = filteredWords.filter(word => !this.usedWords.has(word.word));
+            var availableWords = newUnusedWords.length > 0 ? newUnusedWords : filteredWords;
+        } else {
+            var availableWords = unusedWords;
+        }
+        
+        // 在可用单词中，优先选择非最近使用的单词
+        const nonRecentWords = availableWords.filter(word => !this.isWordRecent(word.word));
+        const finalWords = nonRecentWords.length > 0 ? nonRecentWords : availableWords;
         
         // 随机选择单词
-        const selectedWord = availableWords[Math.floor(Math.random() * availableWords.length)];
+        const selectedWord = finalWords[Math.floor(Math.random() * finalWords.length)];
         
-        // 添加到最近使用列表
+        // 添加到已使用列表和最近使用列表
+        this.usedWords.add(selectedWord.word);
         this.addToRecentWords(selectedWord.word);
         
         // 随机选择1-2个字母作为缺失字母

@@ -101,7 +101,7 @@
         </div>
     </div>
 
-    <script src="vocabulary-manager-v2.js"></script>
+    <script src="../vocabulary-manager-v2.js"></script>
     <script>
         let vocabularyManager = null;
         
@@ -218,7 +218,7 @@
                 }
                 
                 // 从config-v2.json读取期望值
-                const configResponse = await fetch('./words/config-v2.json');
+                const configResponse = await fetch('../words/config-v2.json');
                 const configData = await configResponse.json();
                 
                 for (const categoryData of configData.categories) {

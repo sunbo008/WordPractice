@@ -394,6 +394,35 @@ button:disabled {
     text-align: center;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     animation: slideIn 0.3s ease;
+    position: relative;
+}
+
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 25px;
+    font-size: 56px;
+    font-weight: bold;
+    color: #ff4444;
+    cursor: pointer;
+    line-height: 1;
+    transition: all 0.3s ease;
+    z-index: 10;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 68, 68, 0.2);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.close-btn:hover {
+    color: #ffffff;
+    background: #ff4444;
+    transform: scale(1.15) rotate(90deg);
+    box-shadow: 0 0 20px rgba(255, 68, 68, 0.6);
 }
 
 .modal-content h2 {

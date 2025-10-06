@@ -45,11 +45,11 @@
         <div id="test3-result"></div>
     </div>
 
-    <script src="vocabulary-config-loader.js"></script>
+    <script src="../vocabulary-config-loader.js"></script>
     <script>
         async function test1() {
             try {
-                const response = await fetch('./words/daily-phonics/day01.json');
+                const response = await fetch('../words/daily-phonics/day01.json');
                 const data = await response.json();
                 document.getElementById('test1-result').innerHTML = `
                     <p class="success">✅ 成功加载 day01.json</p>

@@ -106,7 +106,7 @@
         
         async function loadWordsData() {
             try {
-                const response = await fetch('./words.json');
+                const response = await fetch('../words.json');
                 wordsData = await response.json();
                 
                 // 处理单词数据
