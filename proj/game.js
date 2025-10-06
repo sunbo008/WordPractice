@@ -112,6 +112,9 @@ class WordTetrisGame {
         this.currentWord = null;
         this.nextWord = null;
         
+        // 堆叠区渲染日志优化
+        this._lastStackedWordsCount = 0;
+        
         // 评分系统
         this.combo = 0; // 连击数
         this.perfectLevel = true; // 当前等级是否完美
@@ -696,6 +699,7 @@ class WordTetrisGame {
         this.spawnTimer = 0;
         this.speedMultiplier = 1.0;
         this.wordSpeed = this.baseSpeed;
+        this._lastStackedWordsCount = 0;
         
         // 重置游戏时清空生词本和统计数据
         this.vocabularyManager.clearCurrentLevelVocabulary();
@@ -1389,8 +1393,9 @@ class WordTetrisGame {
         const wordHeight = 50;  // 保持50px高度
         const padding = 5;      // 减小边距
         
-        // 添加调试信息：每次渲染时输出堆叠区状态
-        if (this.stackedWords.length > 0 && Math.random() < 0.02) { // 2%概率输出
+        // 添加调试信息：只在堆叠区数量变化时输出
+        if (this.stackedWords.length > 0 && this._lastStackedWordsCount !== this.stackedWords.length) {
+            this._lastStackedWordsCount = this.stackedWords.length;
             debugLog.info(`🎨 渲染堆叠区: ${this.stackedWords.length}个单词 [${this.stackedWords.map(w => w.original).join(', ')}]`);
         }
         
@@ -1670,10 +1675,10 @@ class WordTetrisGame {
             if (!word) { img.src = ''; return; }
             debugLog.info(`🖼️ 更新图片展示，目标单词: ${word}`);
             // 先使用本地缓存（jpg → jpeg → png）
-            const localJpg = `images/cache/${word}.jpg`;
-            this.tryLoadImage(img, localJpg, '本地JPG', () => {
-                const localJpeg = `images/cache/${word}.jpeg`;
-                this.tryLoadImage(img, localJpeg, '本地JPEG', () => {
+            const localJpg = `images/cache/${word}.jpeg`;
+            this.tryLoadImage(img, localJpg, '本地JPEG', () => {
+                const localJpeg = `images/cache/${word}.jpg`;
+                this.tryLoadImage(img, localJpeg, '本地JPG', () => {
                     const localPng = `images/cache/${word}.png`;
                     this.tryLoadImage(img, localPng, '本地PNG', () => {
                         // 在线兜底（多源级联，避免单一服务报错）
