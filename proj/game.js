@@ -1373,7 +1373,7 @@ class WordTetrisGame {
             this.ctx.fillText(word.original, x + wordWidth/2, y + wordHeight/2 + 10);
             
             // 显示中文意思（小字）- 字体放大一倍
-            this.ctx.fillStyle = '#cccccc';
+            this.ctx.fillStyle = '#87CEEB';  // 淡蓝色 (Sky Blue)
             this.ctx.font = '20px Arial';  // 放大一倍：10px -> 20px
             this.ctx.fillText(word.meaning || '', x + wordWidth/2, y + wordHeight - 6);
         });
