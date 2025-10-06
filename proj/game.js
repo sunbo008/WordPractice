@@ -1669,18 +1669,21 @@ class WordTetrisGame {
             const word = (wordStr || (this.nextWord && this.nextWord.original) || '').toLowerCase();
             if (!word) { img.src = ''; return; }
             debugLog.info(`🖼️ 更新图片展示，目标单词: ${word}`);
-            // 先使用本地缓存（jpg → png）
+            // 先使用本地缓存（jpg → jpeg → png）
             const localJpg = `images/cache/${word}.jpg`;
             this.tryLoadImage(img, localJpg, '本地JPG', () => {
-                const localPng = `images/cache/${word}.png`;
-                this.tryLoadImage(img, localPng, '本地PNG', () => {
-                    // 在线兜底（多源级联，避免单一服务报错）
-                    const sig = Math.floor(Math.random() * 1e6);
-                    const candidates = [
-                        `https://loremflickr.com/300/300/${encodeURIComponent(word)}?random=${sig}`,
-                        `https://picsum.photos/seed/${encodeURIComponent(word)}-${sig}/300/300`
-                    ];
-                    this.loadImageFromCandidates(img, candidates, 0, word);
+                const localJpeg = `images/cache/${word}.jpeg`;
+                this.tryLoadImage(img, localJpeg, '本地JPEG', () => {
+                    const localPng = `images/cache/${word}.png`;
+                    this.tryLoadImage(img, localPng, '本地PNG', () => {
+                        // 在线兜底（多源级联，避免单一服务报错）
+                        const sig = Math.floor(Math.random() * 1e6);
+                        const candidates = [
+                            `https://loremflickr.com/300/300/${encodeURIComponent(word)}?random=${sig}`,
+                            `https://picsum.photos/seed/${encodeURIComponent(word)}-${sig}/300/300`
+                        ];
+                        this.loadImageFromCandidates(img, candidates, 0, word);
+                    });
                 });
             });
         } catch (e) {
