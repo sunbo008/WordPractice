@@ -390,9 +390,8 @@ class WordTetrisGame {
         // 获取设备像素比
         const dpr = window.devicePixelRatio || 1;
         
-        // 以左侧面板的总高度为目标高度，至少500px
-        const leftPanel = document.querySelector('.left-panel');
-        const targetDisplayHeight = Math.max(500, leftPanel ? leftPanel.offsetHeight : 500);
+        // 以左侧面板实际内容高度为目标高度（图片展示区 + 控制区 + 间距），至少500px
+        const targetDisplayHeight = Math.max(500, this.computeLeftPanelContentHeight());
         const displayWidth = 600;
         const displayHeight = targetDisplayHeight;
         
@@ -416,8 +415,7 @@ class WordTetrisGame {
         
         // 在窗口尺寸或左栏布局变化后同步画布，并重算与尺寸相关的参数
         const resizeHandler = () => {
-            const lp = document.querySelector('.left-panel');
-            const h = Math.max(500, lp ? lp.offsetHeight : 500);
+            const h = Math.max(500, this.computeLeftPanelContentHeight());
             this.setupHighDPICanvasWith(displayWidth, h);
         };
         window.addEventListener('resize', resizeHandler);
@@ -455,6 +453,21 @@ class WordTetrisGame {
             this.cannon.x = this.canvasWidth / 2;
             this.cannon.y = this.canvasHeight - 30;
         }
+    }
+
+    // 计算左侧面板实际内容高度（避免被右侧列撑高）
+    computeLeftPanelContentHeight() {
+        const lp = document.querySelector('.left-panel');
+        if (!lp) return 500;
+        const img = lp.querySelector('.image-showcase');
+        const ctrl = lp.querySelector('.game-controls');
+        const styles = window.getComputedStyle(lp);
+        const gap = parseFloat(styles.gap || '0') || 0;
+        const imgH = img ? img.offsetHeight : 0;
+        const ctrlH = ctrl ? ctrl.offsetHeight : 0;
+        const paddingTop = parseFloat(styles.paddingTop || '0') || 0;
+        const paddingBottom = parseFloat(styles.paddingBottom || '0') || 0;
+        return imgH + ctrlH + gap + paddingTop + paddingBottom;
     }
 
     init() {
@@ -888,8 +901,6 @@ class WordTetrisGame {
         
         this.levelWordCount++;
         this.updateNextWordDisplay();
-        // 预加载展示图
-        this.updateImageShowcase();
     }
     
     // 检查是否所有单词都已掉落完毕
@@ -982,6 +993,8 @@ class WordTetrisGame {
         };
         
         this.fallingWords.push(fallingWord);
+        // 同步展示当前单词的图片，确保与下落单词一致
+        this.updateImageShowcase(fallingWord.original);
         
         // 记录下落的单词（用于统计命中率）
         this.fallenWords.add(this.nextWord.original.toLowerCase());
@@ -1649,11 +1662,11 @@ class WordTetrisGame {
     }
 
     // 更新图片展示区
-    updateImageShowcase() {
+    updateImageShowcase(wordStr) {
         try {
             const img = document.getElementById('wordImage');
             if (!img) return;
-            const word = (this.nextWord && this.nextWord.original) ? this.nextWord.original.toLowerCase() : '';
+            const word = (wordStr || (this.nextWord && this.nextWord.original) || '').toLowerCase();
             if (!word) { img.src = ''; return; }
             debugLog.info(`🖼️ 更新图片展示，目标单词: ${word}`);
             // 先使用本地缓存（jpg → png）
@@ -1661,10 +1674,13 @@ class WordTetrisGame {
             this.tryLoadImage(img, localJpg, '本地JPG', () => {
                 const localPng = `images/cache/${word}.png`;
                 this.tryLoadImage(img, localPng, '本地PNG', () => {
-                    // 在线兜底：增加sig避免缓存命中
+                    // 在线兜底（多源级联，避免单一服务报错）
                     const sig = Math.floor(Math.random() * 1e6);
-                    const online = `https://source.unsplash.com/300x300/?${encodeURIComponent(word)}&sig=${sig}`;
-                    this.tryLoadImage(img, online, '在线兜底', null);
+                    const candidates = [
+                        `https://loremflickr.com/300/300/${encodeURIComponent(word)}?random=${sig}`,
+                        `https://picsum.photos/seed/${encodeURIComponent(word)}-${sig}/300/300`
+                    ];
+                    this.loadImageFromCandidates(img, candidates, 0, word);
                 });
             });
         } catch (e) {
@@ -1686,6 +1702,22 @@ class WordTetrisGame {
             if (onError) onError(ev);
         };
         test.src = url;
+    }
+
+    loadImageFromCandidates(img, list, index, word) {
+        if (!list || index >= list.length) {
+            debugLog.error(`❌ 所有在线图片源均失败: ${word}`);
+            // 设置一个友好占位图
+            img.src = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(
+                `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300">
+                    <rect width="100%" height="100%" fill="#2c3e50"/>
+                    <text x="50%" y="50%" fill="#bdc3c7" font-size="20" text-anchor="middle" dy=".3em">No Image</text>
+                </svg>`
+            );
+            return;
+        }
+        const url = list[index];
+        this.tryLoadImage(img, url, `在线兜底#${index+1}`, () => this.loadImageFromCandidates(img, list, index + 1, word));
     }
 
     updateRealTimeDisplay() {
