@@ -216,6 +216,9 @@ class WordTetrisGame {
         // 爆炸效果系统
         this.explosions = [];
         
+        // 炮口火花系统
+        this.muzzleFlashes = [];
+        
         // 中文翻译爆炸动画系统
         this.meaningExplosions = [];
         
@@ -795,6 +798,7 @@ class WordTetrisGame {
         // 重置炮弹和爆炸效果
         this.bullets = [];
         this.explosions = [];
+        this.muzzleFlashes = [];
         this.meaningExplosions = [];
         this.errorMarks = [];
         
@@ -1248,6 +1252,9 @@ class WordTetrisGame {
         // 更新爆炸效果
         this.updateExplosions();
         
+        // 更新炮口火花
+        this.updateMuzzleFlashes();
+        
         // 更新中文翻译爆炸动画
         this.updateMeaningExplosions();
         
@@ -1419,6 +1426,9 @@ class WordTetrisGame {
         
         // 绘制爆炸效果
         this.drawExplosions();
+        
+        // 绘制炮口火花
+        this.drawMuzzleFlashes();
         
         // 绘制中文翻译爆炸动画（在粒子之上）
         this.drawMeaningExplosions();
@@ -2386,6 +2396,40 @@ class WordTetrisGame {
         });
     }
 
+    drawMuzzleFlashes() {
+        this.muzzleFlashes.forEach(flash => {
+            flash.particles.forEach(particle => {
+                if (particle.life > 0) {
+                    const alpha = particle.life / particle.maxLife;
+                    // 火花带光晕效果
+                    this.ctx.save();
+                    
+                    // 外层光晕
+                    const gradient = this.ctx.createRadialGradient(
+                        particle.x, particle.y, 0,
+                        particle.x, particle.y, particle.size * 2
+                    );
+                    gradient.addColorStop(0, `rgba(${particle.color.r}, ${particle.color.g}, ${particle.color.b}, ${alpha})`);
+                    gradient.addColorStop(0.5, `rgba(${particle.color.r}, ${particle.color.g}, ${particle.color.b}, ${alpha * 0.5})`);
+                    gradient.addColorStop(1, `rgba(${particle.color.r}, ${particle.color.g}, ${particle.color.b}, 0)`);
+                    
+                    this.ctx.fillStyle = gradient;
+                    this.ctx.beginPath();
+                    this.ctx.arc(particle.x, particle.y, particle.size * 2, 0, Math.PI * 2);
+                    this.ctx.fill();
+                    
+                    // 核心亮点
+                    this.ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+                    this.ctx.beginPath();
+                    this.ctx.arc(particle.x, particle.y, particle.size * 0.5, 0, Math.PI * 2);
+                    this.ctx.fill();
+                    
+                    this.ctx.restore();
+                }
+            });
+        });
+    }
+
     drawGameInfo() {
         // 绘制游戏状态信息
         if (this.gameState === 'paused') {
@@ -2774,6 +2818,9 @@ class WordTetrisGame {
         const muzzleX = this.cannon.x + Math.sin(this.cannon.angle) * muzzleDistance;
         const muzzleY = this.cannon.y - Math.cos(this.cannon.angle) * muzzleDistance;
         
+        // 创建炮口火花效果
+        this.createMuzzleFlash(muzzleX, muzzleY, this.cannon.angle);
+        
         // 创建火球炮弹对象
         const bullet = {
             x: muzzleX,
@@ -2919,6 +2966,47 @@ class WordTetrisGame {
         });
     }
 
+    createMuzzleFlash(x, y, angle) {
+        // 创建炮口火花粒子（沿着炮管方向喷射）
+        const particleCount = 20; // 火花数量
+        const particles = [];
+        
+        // 火花颜色：橙色、黄色、白色
+        const colors = [
+            { r: 255, g: 140, b: 0 },   // 橙色
+            { r: 255, g: 215, b: 0 },   // 金色
+            { r: 255, g: 255, b: 200 }, // 淡黄白色
+            { r: 255, g: 69, b: 0 },    // 橙红色
+            { r: 255, g: 255, b: 255 }  // 白色
+        ];
+        
+        for (let i = 0; i < particleCount; i++) {
+            // 在炮管方向的锥形范围内随机发射（扩散角度±30度）
+            const spreadAngle = (Math.random() - 0.5) * Math.PI / 3; // ±30度
+            const particleAngle = angle + spreadAngle;
+            
+            const speed = 3 + Math.random() * 5; // 速度3-8
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            
+            particles.push({
+                x: x,
+                y: y,
+                vx: Math.sin(particleAngle) * speed,
+                vy: -Math.cos(particleAngle) * speed,
+                size: 2 + Math.random() * 3,
+                life: 1,
+                maxLife: 1,
+                decay: 0.05 + Math.random() * 0.05, // 快速衰减（0.05-0.1）
+                color: color
+            });
+        }
+        
+        this.muzzleFlashes.push({
+            particles: particles,
+            life: 1
+        });
+    }
+
     updateExplosions() {
         for (let i = this.explosions.length - 1; i >= 0; i--) {
             const explosion = this.explosions[i];
@@ -2936,6 +3024,27 @@ class WordTetrisGame {
             
             if (allDead) {
                 this.explosions.splice(i, 1);
+            }
+        }
+    }
+
+    updateMuzzleFlashes() {
+        for (let i = this.muzzleFlashes.length - 1; i >= 0; i--) {
+            const flash = this.muzzleFlashes[i];
+            let allDead = true;
+            
+            flash.particles.forEach(particle => {
+                if (particle.life > 0) {
+                    allDead = false;
+                    particle.x += particle.vx;
+                    particle.y += particle.vy;
+                    particle.vy += 0.2; // 轻微重力
+                    particle.life -= particle.decay;
+                }
+            });
+            
+            if (allDead) {
+                this.muzzleFlashes.splice(i, 1);
             }
         }
     }
