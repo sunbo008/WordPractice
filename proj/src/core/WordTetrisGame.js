@@ -222,6 +222,20 @@ class WordTetrisGame {
         // 中文翻译爆炸动画系统
         this.meaningExplosions = [];
         
+        // 引信燃烧系统
+        this.fuseParticles = [];
+        
+        // 引信摆动物理系统
+        this.fuse = {
+            length: 12, // 引信长度
+            angle: 0, // 引信相对炮管的角度（初始垂直向下）
+            angleVelocity: 0, // 角速度
+            damping: 0.95, // 阻尼系数
+            gravity: 0.3, // 重力影响
+            attachX: 18, // 附着点X（相对炮管）
+            attachY: -60 // 附着点Y（相对炮管）
+        };
+        
         // 错误标记系统
         this.errorMarks = []; // 存储错误红叉标记
         
@@ -230,6 +244,9 @@ class WordTetrisGame {
         this.currentSpeech = null;
         this.speechTimer = null;
         this.setupSpeechSynthesis();
+        
+        // 炮塔基座纹理缓存（静态生成，避免每帧重新计算）
+        this.baseTexture = this.generateBaseTexture();
         
         this.init();
     }
@@ -2010,25 +2027,132 @@ class WordTetrisGame {
         this.ctx.lineWidth = 2;
         this.ctx.strokeRect(-8, -12, 16, 8);
         
-        // 9. 发射准备指示灯
+        // 9. 燃烧引信效果（绳子摆动版）
         if (this.fallingWords.length > 0) {
-            // 绿色指示灯（在炮管侧面）
-            const glowGradient = this.ctx.createRadialGradient(18, -60, 0, 18, -60, 8);
-            glowGradient.addColorStop(0, '#2ECC71');
-            glowGradient.addColorStop(0.5, '#27AE60');
-            glowGradient.addColorStop(1, 'rgba(46, 204, 113, 0.2)');
+            // 更新引信摆动物理
+            // 计算重力对引信的影响（总是向下）
+            const cannonAngle = this.cannon.angle;
+            const worldDownAngle = Math.PI / 2; // 世界坐标系向下 = 90度
+            
+            // 引信在炮管坐标系中的目标角度（受重力影响）
+            // 当炮管向上时，引信应该垂直向下
+            // 需要将世界坐标的重力转换到炮管坐标系
+            const targetAngle = worldDownAngle - cannonAngle;
+            
+            // 角加速度 = 重力扭矩
+            const angleAccel = Math.sin(targetAngle - this.fuse.angle) * this.fuse.gravity;
+            this.fuse.angleVelocity += angleAccel;
+            this.fuse.angleVelocity *= this.fuse.damping; // 阻尼
+            this.fuse.angle += this.fuse.angleVelocity;
+            
+            // 计算引信末端位置（在炮管坐标系中）
+            const fuseAttachX = this.fuse.attachX;
+            const fuseAttachY = this.fuse.attachY;
+            const fuseEndX = fuseAttachX + Math.sin(this.fuse.angle) * this.fuse.length;
+            const fuseEndY = fuseAttachY + Math.cos(this.fuse.angle) * this.fuse.length;
+            
+            // 绘制引信绳子（深棕色线条）
+            this.ctx.strokeStyle = '#3E2723';
+            this.ctx.lineWidth = 2;
+            this.ctx.lineCap = 'round';
+            this.ctx.beginPath();
+            this.ctx.moveTo(fuseAttachX, fuseAttachY);
+            this.ctx.lineTo(fuseEndX, fuseEndY);
+            this.ctx.stroke();
+            
+            // 引信末端燃烧点（橙色发光）
+            const glowGradient = this.ctx.createRadialGradient(fuseEndX, fuseEndY, 0, fuseEndX, fuseEndY, 6);
+            glowGradient.addColorStop(0, '#FFC800');
+            glowGradient.addColorStop(0.4, '#FF6400');
+            glowGradient.addColorStop(1, 'rgba(255, 100, 0, 0)');
             this.ctx.fillStyle = glowGradient;
             this.ctx.beginPath();
-            this.ctx.arc(18, -60, 5, 0, Math.PI * 2);
+            this.ctx.arc(fuseEndX, fuseEndY, 5, 0, Math.PI * 2);
             this.ctx.fill();
             
-            // 指示灯闪烁
-            if (Math.floor(Date.now() / 300) % 2 === 0) {
-                this.ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-                this.ctx.beginPath();
-                this.ctx.arc(18, -60, 2.5, 0, Math.PI * 2);
-                this.ctx.fill();
+            // 引信末端亮核（闪烁效果）
+            const time = Date.now();
+            const flicker = 0.7 + Math.sin(time * 0.01) * 0.3;
+            this.ctx.fillStyle = `rgba(255, 255, 200, ${flicker})`;
+            this.ctx.beginPath();
+            this.ctx.arc(fuseEndX, fuseEndY, 2, 0, Math.PI * 2);
+            this.ctx.fill();
+            
+            // 计算火焰方向（沿引信延伸方向）
+            const fuseDirection = this.fuse.angle;
+            const flameVx = Math.sin(fuseDirection);
+            const flameVy = Math.cos(fuseDirection);
+            
+            // 生成燃烧粒子（沿引信方向）
+            if (Math.random() < 0.4) {
+                const spreadAngle = (Math.random() - 0.5) * 0.5; // ±15度扩散
+                const vx = flameVx * (1.5 + Math.random() * 1) * Math.cos(spreadAngle);
+                const vy = flameVy * (1.5 + Math.random() * 1) * Math.sin(spreadAngle);
+                
+                this.fuseParticles.push({
+                    x: fuseEndX + (Math.random() - 0.5) * 2,
+                    y: fuseEndY + (Math.random() - 0.5) * 2,
+                    vx: vx,
+                    vy: vy,
+                    life: 1.0,
+                    size: 1.5 + Math.random() * 1.5,
+                    color: Math.random() > 0.5 ? '#FFC800' : '#FF6400'
+                });
             }
+            
+            // 偶尔生成火花（沿引信方向飞溅）
+            if (Math.random() < 0.05) {
+                const sparkAngle = fuseDirection + (Math.random() - 0.5) * 1;
+                const sparkSpeed = 2 + Math.random() * 2;
+                
+                this.fuseParticles.push({
+                    x: fuseEndX,
+                    y: fuseEndY,
+                    vx: Math.sin(sparkAngle) * sparkSpeed,
+                    vy: Math.cos(sparkAngle) * sparkSpeed,
+                    life: 1.0,
+                    size: 1 + Math.random(),
+                    color: '#FFFFC8',
+                    isSpark: true
+                });
+            }
+            
+            // 绘制燃烧粒子
+            this.fuseParticles.forEach(particle => {
+                this.ctx.save();
+                this.ctx.globalAlpha = particle.life;
+                
+                if (particle.isSpark) {
+                    // 火花：亮黄色点
+                    this.ctx.fillStyle = particle.color;
+                    this.ctx.beginPath();
+                    this.ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+                    this.ctx.fill();
+                } else {
+                    // 火焰：发光圆点
+                    const pGradient = this.ctx.createRadialGradient(
+                        particle.x, particle.y, 0,
+                        particle.x, particle.y, particle.size
+                    );
+                    pGradient.addColorStop(0, particle.color);
+                    pGradient.addColorStop(1, 'rgba(255, 100, 0, 0)');
+                    this.ctx.fillStyle = pGradient;
+                    this.ctx.beginPath();
+                    this.ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+                    this.ctx.fill();
+                }
+                
+                this.ctx.restore();
+            });
+            
+            // 更新粒子状态
+            this.fuseParticles = this.fuseParticles.filter(particle => {
+                particle.x += particle.vx;
+                particle.y += particle.vy;
+                particle.vy += 0.05; // 轻微重力
+                particle.life -= 0.02;
+                return particle.life > 0;
+            });
         }
         
         // 10. 绘制炮台基座（最后绘制，遮挡相交部分）
@@ -2182,6 +2306,74 @@ class WordTetrisGame {
         this.ctx.closePath();
     }
 
+    // 生成炮塔基座纹理（静态，只在初始化时生成一次）
+    generateBaseTexture() {
+        const texture = {
+            scratches: [], // 划痕数据
+            rustSpots: [], // 锈迹数据
+            rivets: [      // 铆钉位置
+                { angle: Math.PI * 0.3, radius: 50 },
+                { angle: Math.PI * 0.5, radius: 50 },
+                { angle: Math.PI * 0.7, radius: 50 },
+                { angle: Math.PI * 0.2, radius: 35 },
+                { angle: Math.PI * 0.8, radius: 35 }
+            ],
+            shineStripes: [] // 光泽条纹数据
+        };
+        
+        // 生成50条随机划痕
+        for (let i = 0; i < 50; i++) {
+            const angle = Math.PI + Math.random() * Math.PI;
+            const radius = 10 + Math.random() * 50;
+            const x = Math.cos(angle) * radius;
+            const y = 23 + Math.sin(angle) * radius;
+            
+            const scratchLength = 5 + Math.random() * 15;
+            const scratchAngle = Math.random() * Math.PI * 2;
+            const scratchEndX = x + Math.cos(scratchAngle) * scratchLength;
+            const scratchEndY = y + Math.sin(scratchAngle) * scratchLength;
+            
+            texture.scratches.push({
+                startX: x,
+                startY: y,
+                endX: scratchEndX,
+                endY: scratchEndY,
+                color: Math.random() > 0.5 ? '#9BA5A8' : '#3A3C3E',
+                width: 0.5 + Math.random() * 1
+            });
+        }
+        
+        // 生成15个锈迹斑点
+        for (let i = 0; i < 15; i++) {
+            const angle = Math.PI + Math.random() * Math.PI;
+            const radius = 15 + Math.random() * 45;
+            const x = Math.cos(angle) * radius;
+            const y = 23 + Math.sin(angle) * radius;
+            
+            texture.rustSpots.push({
+                x: x,
+                y: y,
+                radius: 1 + Math.random() * 3
+            });
+        }
+        
+        // 生成3条光泽条纹数据
+        for (let i = 0; i < 3; i++) {
+            const angle = Math.PI * (0.3 + i * 0.2);
+            const radius1 = 20;
+            const radius2 = 55;
+            
+            texture.shineStripes.push({
+                x1: Math.cos(angle) * radius1,
+                y1: 23 + Math.sin(angle) * radius1,
+                x2: Math.cos(angle) * radius2,
+                y2: 23 + Math.sin(angle) * radius2
+            });
+        }
+        
+        return texture;
+    }
+
     // 顶层半圆基座覆盖：统一在render()末尾调用，避免被后续内容再覆盖
     drawBaseOverlay() {
         // 仅在playing/review时显示
@@ -2219,55 +2411,31 @@ class WordTetrisGame {
         this.ctx.closePath();
         this.ctx.fill();
         
-        // === 铁皮纹理效果 ===
-        // 1. 添加不规则铁皮划痕和噪点
+        // === 铁皮纹理效果（使用预生成的静态纹理）===
+        // 1. 绘制不规则铁皮划痕
         this.ctx.globalAlpha = 0.15;
-        for (let i = 0; i < 50; i++) {
-            const angle = Math.PI + Math.random() * Math.PI;
-            const radius = 10 + Math.random() * 50;
-            const x = Math.cos(angle) * radius;
-            const y = 23 + Math.sin(angle) * radius;
-            
-            const scratchLength = 5 + Math.random() * 15;
-            const scratchAngle = Math.random() * Math.PI * 2;
-            
-            this.ctx.strokeStyle = Math.random() > 0.5 ? '#9BA5A8' : '#3A3C3E';
-            this.ctx.lineWidth = 0.5 + Math.random() * 1;
+        this.baseTexture.scratches.forEach(scratch => {
+            this.ctx.strokeStyle = scratch.color;
+            this.ctx.lineWidth = scratch.width;
             this.ctx.beginPath();
-            this.ctx.moveTo(x, y);
-            this.ctx.lineTo(
-                x + Math.cos(scratchAngle) * scratchLength,
-                y + Math.sin(scratchAngle) * scratchLength
-            );
+            this.ctx.moveTo(scratch.startX, scratch.startY);
+            this.ctx.lineTo(scratch.endX, scratch.endY);
             this.ctx.stroke();
-        }
+        });
         this.ctx.globalAlpha = 1;
         
-        // 2. 添加金属锈迹斑点
+        // 2. 绘制金属锈迹斑点
         this.ctx.globalAlpha = 0.2;
-        for (let i = 0; i < 15; i++) {
-            const angle = Math.PI + Math.random() * Math.PI;
-            const radius = 15 + Math.random() * 45;
-            const x = Math.cos(angle) * radius;
-            const y = 23 + Math.sin(angle) * radius;
-            
-            this.ctx.fillStyle = '#8B4513';
+        this.ctx.fillStyle = '#8B4513';
+        this.baseTexture.rustSpots.forEach(spot => {
             this.ctx.beginPath();
-            this.ctx.arc(x, y, 1 + Math.random() * 3, 0, Math.PI * 2);
+            this.ctx.arc(spot.x, spot.y, spot.radius, 0, Math.PI * 2);
             this.ctx.fill();
-        }
+        });
         this.ctx.globalAlpha = 1;
         
-        // 3. 添加铆钉效果
-        const rivets = [
-            { angle: Math.PI * 0.3, radius: 50 },
-            { angle: Math.PI * 0.5, radius: 50 },
-            { angle: Math.PI * 0.7, radius: 50 },
-            { angle: Math.PI * 0.2, radius: 35 },
-            { angle: Math.PI * 0.8, radius: 35 }
-        ];
-        
-        rivets.forEach(rivet => {
+        // 3. 绘制铆钉效果
+        this.baseTexture.rivets.forEach(rivet => {
             const x = Math.cos(rivet.angle) * rivet.radius;
             const y = 23 + Math.sin(rivet.angle) * rivet.radius;
             
@@ -2294,19 +2462,10 @@ class WordTetrisGame {
             this.ctx.fill();
         });
         
-        // 4. 添加金属光泽条纹
+        // 4. 绘制金属光泽条纹
         this.ctx.globalAlpha = 0.1;
-        for (let i = 0; i < 3; i++) {
-            const angle = Math.PI * (0.3 + i * 0.2);
-            const radius1 = 20;
-            const radius2 = 55;
-            
-            const x1 = Math.cos(angle) * radius1;
-            const y1 = 23 + Math.sin(angle) * radius1;
-            const x2 = Math.cos(angle) * radius2;
-            const y2 = 23 + Math.sin(angle) * radius2;
-            
-            const shineGrad = this.ctx.createLinearGradient(x1, y1, x2, y2);
+        this.baseTexture.shineStripes.forEach(stripe => {
+            const shineGrad = this.ctx.createLinearGradient(stripe.x1, stripe.y1, stripe.x2, stripe.y2);
             shineGrad.addColorStop(0, 'rgba(255, 255, 255, 0)');
             shineGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.6)');
             shineGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
@@ -2314,10 +2473,10 @@ class WordTetrisGame {
             this.ctx.strokeStyle = shineGrad;
             this.ctx.lineWidth = 8;
             this.ctx.beginPath();
-            this.ctx.moveTo(x1, y1);
-            this.ctx.lineTo(x2, y2);
+            this.ctx.moveTo(stripe.x1, stripe.y1);
+            this.ctx.lineTo(stripe.x2, stripe.y2);
             this.ctx.stroke();
-        }
+        });
         this.ctx.globalAlpha = 1;
         
         // 顶缘描边（加强深色边缘）
