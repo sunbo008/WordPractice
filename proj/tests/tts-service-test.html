@@ -324,6 +324,14 @@
                     🔄 测试所有提供商
                 </button>
             </div>
+            <div class="button-group" style="margin-top: 15px; padding-top: 15px; border-top: 2px dashed rgba(102, 126, 234, 0.3);">
+                <button class="btn-secondary" onclick="clearWebSpeechCache()" style="background: #e74c3c;">
+                    🗑️ 清空 Web Speech 缓存
+                </button>
+                <button class="btn-secondary" onclick="reinitializeTTS()" style="background: #f39c12;">
+                    🔄 重新初始化 TTS
+                </button>
+            </div>
         </div>
 
         <!-- 日志输出 -->
@@ -343,7 +351,7 @@
 
     <script>
         let ttsService;
-        const testWord = 'see';
+        const testWord = 'English';
 
         // 劫持 console 方法，显示在页面上
         const originalConsole = {
@@ -517,47 +525,191 @@
                 return;
             }
 
-            const providers = ttsService.getAvailableProviders();
+            const providersDetails = ttsService.getAvailableProvidersDetails();
             
-            if (providers.length === 0) {
+            if (providersDetails.length === 0) {
                 addLog('没有可用的提供商', 'error');
                 return;
             }
 
-            addLog(`开始测试所有 ${providers.length} 个提供商...`, 'info');
+            addLog(`🚀 开始并行测试所有 ${providersDetails.length} 个提供商（2秒超时）...`, 'info');
 
             const testAllBtn = document.getElementById('testAllBtn');
             testAllBtn.disabled = true;
 
-            for (let i = 0; i < providers.length; i++) {
-                addLog(`\n测试提供商 ${i + 1}/${providers.length}: ${providers[i]}`, 'info');
-                
-                try {
-                    await ttsService.speak(testWord, {
-                        showError: false,
-                        onSuccess: (providerName) => {
-                            addLog(`  ✅ ${providerName} 测试成功`, 'success');
-                        },
-                        onError: (error) => {
-                            addLog(`  ❌ 测试失败: ${error.message}`, 'error');
-                        }
-                    });
+            // 创建所有测试任务（并行执行）
+            const testPromises = providersDetails.map((provider, index) => {
+                return testSingleProvider(provider, index, providersDetails.length);
+            });
 
-                    // 等待 1.5 秒再测试下一个
-                    await new Promise(resolve => setTimeout(resolve, 1500));
+            // 等待所有测试完成
+            const results = await Promise.allSettled(testPromises);
 
-                } catch (error) {
-                    addLog(`  ❌ 测试异常: ${error.message}`, 'error');
-                }
-            }
+            // 统计结果
+            const successCount = results.filter(r => r.status === 'fulfilled' && r.value === true).length;
+            const failCount = results.length - successCount;
 
-            addLog('\n✅ 所有提供商测试完成', 'success');
+            addLog(`\n📊 测试完成: 成功 ${successCount} 个, 失败 ${failCount} 个`, 'info');
             testAllBtn.disabled = false;
+        }
+
+
+        /**
+         * 测试单个提供商（带超时控制，真实发声测试）
+         */
+        async function testSingleProvider(provider, index, total) {
+            const startTime = performance.now();
+            
+            addLog(`🔬 [${index + 1}/${total}] 测试 ${provider.name}...`, 'info');
+
+            try {
+                // 创建超时Promise
+                const timeoutPromise = new Promise((resolve, reject) => {
+                    setTimeout(() => reject(new Error('超时')), 2000);
+                });
+
+                // 创建测试Promise（静音测试，不真正发声）
+                const testPromise = new Promise(async (resolve, reject) => {
+                    const providerObj = ttsService.availableProviders[index];
+                    if (!providerObj) {
+                        reject(new Error('提供商不存在'));
+                        return;
+                    }
+
+                    try {
+                        // 使用 TTSService 的公共真实发声测试方法
+                        const result = await ttsService._testProviderWithRealSpeak(
+                            providerObj,
+                            testWord,
+                            2000, // 2秒超时
+                            0.1   // 音量 10%
+                        );
+                        
+                        if (result) {
+                            resolve();
+                        } else {
+                            reject(new Error('真实发声测试失败'));
+                        }
+                    } catch (error) {
+                        reject(error);
+                    }
+                });
+
+                // 竞速：测试 vs 超时
+                await Promise.race([testPromise, timeoutPromise]);
+
+                const responseTime = performance.now() - startTime;
+                addLog(`  ✅ ${provider.name} 测试成功（${responseTime.toFixed(0)}ms）`, 'success');
+                return true;
+
+            } catch (error) {
+                const responseTime = performance.now() - startTime;
+                addLog(`  ❌ ${provider.name} 测试失败: ${error.message}（${responseTime.toFixed(0)}ms）`, 'error');
+                return false;
+            }
         }
 
         function updateCurrentProvider() {
             const current = ttsService.getCurrentProvider();
             document.getElementById('currentProvider').textContent = current || '无';
+        }
+
+        /**
+         * 清空 Web Speech API 缓存
+         * 注意：浏览器的语音缓存是系统级的，JavaScript 无法直接清除
+         * 这里提供几种方法来"重置"状态
+         */
+        function clearWebSpeechCache() {
+            addLog('正在尝试清空 Web Speech API 缓存...', 'info');
+            
+            if (!('speechSynthesis' in window)) {
+                addLog('浏览器不支持 Web Speech API', 'error');
+                return;
+            }
+
+            try {
+                // 方法 1: 取消所有正在进行的朗读
+                speechSynthesis.cancel();
+                addLog('✓ 已取消所有朗读任务', 'info');
+
+                // 方法 2: 重置语音列表（触发重新加载）
+                const voices = speechSynthesis.getVoices();
+                addLog(`✓ 当前语音数量: ${voices.length}`, 'info');
+
+                // 显示本地语音和在线语音的数量
+                const localVoices = voices.filter(v => v.localService);
+                const remoteVoices = voices.filter(v => !v.localService);
+                addLog(`  📊 本地语音: ${localVoices.length} 个`, 'info');
+                addLog(`  📊 在线语音: ${remoteVoices.length} 个`, 'info');
+
+                // 提示用户真正的清除方法
+                addLog('\n⚠️ 注意：浏览器的语音缓存无法通过 JavaScript 清除', 'warning');
+                addLog('如需真正清除，请使用以下方法：', 'info');
+                addLog('1. Chrome: 设置 → 隐私和安全 → 清除浏览数据 → Cookie 和其他网站数据', 'info');
+                addLog('2. 或者使用无痕模式（Ctrl+Shift+N）测试', 'info');
+                addLog('3. 或者清除浏览器缓存和 Cookie', 'info');
+
+            } catch (error) {
+                addLog(`❌ 操作失败: ${error.message}`, 'error');
+            }
+        }
+
+        /**
+         * 重新初始化 TTS 服务
+         */
+        async function reinitializeTTS() {
+            addLog('正在重新初始化 TTS 服务...', 'info');
+            
+            if (!ttsService) {
+                addLog('TTS 服务未加载', 'error');
+                return;
+            }
+
+            try {
+                // 停止当前朗读
+                ttsService.stop();
+
+                // 重置测试状态
+                ttsService.providerTested = false;
+                ttsService.availableProviders = [];
+                ttsService.currentAvailableIndex = 0;
+
+                // 更新 UI
+                updateStatus('warning', '⏳ 重新初始化中...');
+                document.getElementById('providerCount').textContent = '-';
+                document.getElementById('currentProvider').textContent = '-';
+                document.getElementById('providerList').innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: #666;">
+                        正在重新检测 TTS 服务...
+                    </div>
+                `;
+
+                // 禁用按钮
+                document.getElementById('speakBtn').disabled = true;
+                document.getElementById('testAllBtn').disabled = true;
+
+                // 重新初始化
+                await ttsService.initialize();
+
+                // 更新 UI
+                const providersDetails = ttsService.getAvailableProvidersDetails();
+                const currentProvider = ttsService.getCurrentProvider();
+
+                updateStatus('success', `✅ 重新初始化完成`);
+                document.getElementById('providerCount').textContent = providersDetails.length;
+                document.getElementById('currentProvider').textContent = currentProvider || '无';
+
+                displayProviders(ttsService.getAvailableProviders());
+
+                document.getElementById('speakBtn').disabled = false;
+                document.getElementById('testAllBtn').disabled = false;
+
+                addLog(`✅ 重新初始化成功，找到 ${providersDetails.length} 个可用提供商`, 'success');
+
+            } catch (error) {
+                addLog(`❌ 重新初始化失败: ${error.message}`, 'error');
+                updateStatus('error', '❌ 初始化失败');
+            }
         }
 
         // 页面加载完成后初始化

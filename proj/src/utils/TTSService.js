@@ -24,6 +24,8 @@ class TTSService {
         this.providerTested = false; // 标记是否已测试过提供商
         this.availableProviders = []; // 缓存所有可用的提供商（数组）
         this.currentAvailableIndex = 0; // 当前使用的可用提供商索引（用于轮换）
+        this.activeAudios = []; // 所有正在播放的 Audio 对象（用于停止播放）
+        this.providerFailureCount = new Map(); // 记录每个提供商的连续失败次数
         
         // 定义 TTS 提供商列表（按优先级排序）
         this.providers = [
@@ -35,33 +37,36 @@ class TTSService {
                     // 因为语音列表可能异步加载，初始为空是正常的
                     return ('speechSynthesis' in window);
                 },
-                speak: (word) => this._speakWithWebSpeechAPI(word)
+                speak: (word, volume = 1.0) => this._speakWithWebSpeechAPI(word, volume)
             },
             {
                 name: '百度翻译 TTS',
                 description: '百度翻译语音合成（国内稳定可用）',
                 test: () => true,
-                speak: (word) => this._speakWithAudioURL(
+                speak: (word, volume = 1.0) => this._speakWithAudioURL(
                     `https://fanyi.baidu.com/gettts?lan=en&text=${encodeURIComponent(word)}&spd=5&source=web`,
-                    '百度翻译 TTS'
+                    '百度翻译 TTS',
+                    volume
                 )
             },
             {
                 name: '有道智云 TTS',
                 description: '有道词典语音合成（国内稳定可用）',
                 test: () => true,
-                speak: (word) => this._speakWithAudioURL(
+                speak: (word, volume = 1.0) => this._speakWithAudioURL(
                     `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(word)}&type=1`,
-                    '有道智云 TTS'
+                    '有道智云 TTS',
+                    volume
                 )
             },
             {
                 name: '微软 Bing TTS',
                 description: '微软 Bing 语音合成（备用方案）',
                 test: () => true,
-                speak: (word) => this._speakWithAudioURL(
+                speak: (word, volume = 1.0) => this._speakWithAudioURL(
                     `https://www.bing.com/tts?text=${encodeURIComponent(word)}&lang=en-US&format=audio/mp3`,
-                    '微软 Bing TTS'
+                    '微软 Bing TTS',
+                    volume
                 )
             }
         ];
@@ -83,79 +88,239 @@ class TTSService {
     /**
      * 初始化并测试 TTS 提供商（异步）
      * 在第一次使用前调用，找到所有可用的提供商
-     * 真正测试每个提供商是否能成功朗读
+     * 真正测试每个提供商是否能成功朗读，并按响应速度排序
      */
     async initialize() {
         if (this.providerTested) {
             return; // 已经测试过了
         }
         
-        console.log('🔍 TTSService: 开始严格测试所有 TTS 提供商（使用测试单词 "test"）...');
+        console.log('🔍 TTSService: 开始并行测试所有 TTS 提供商（使用测试单词 "see"）...');
+        console.log('⏱️ TTSService: 将并行测试真实播放能力并按响应速度排序');
         
-        // 测试每个提供商，收集所有可用的
-        for (let i = 0; i < this.providers.length; i++) {
-            const provider = this.providers[i];
-            
-            try {
-                // 第一步：基础测试
-                if (!provider.test()) {
-                    console.log(`⏭️ TTSService: ${provider.name} 不可用（基础测试失败）`);
-                    continue;
-                }
-                
-                // 第二步：真实朗读测试（使用静音方式）
-                console.log(`🔬 TTSService: 测试 ${provider.name}...`);
-                
-                // 对于 Web Speech API，特殊处理
-                if (provider.name === 'Web Speech API') {
-                    this._initWebSpeechAPI();
-                    
-                    // 等待语音列表加载（最多等待 2 秒）
-                    const voices = await this._waitForVoices(2000);
-                    
-                    if (voices.length > 0) {
-                        this.availableProviders.push({
-                            ...provider,
-                            index: i
-                        });
-                        console.log(`✅ TTSService: ${provider.name} 可用（找到 ${voices.length} 个语音）`);
-                    } else {
-                        console.log(`⏭️ TTSService: ${provider.name} 不可用（未找到语音）`);
-                    }
-                    continue;
-                }
-                
-                // 对于基于 URL 的提供商，尝试真正加载音频
-                const testResult = await this._testAudioProvider(provider, 'test');
-                
-                if (testResult) {
-                    // 添加到可用列表
-                    this.availableProviders.push({
-                        ...provider,
-                        index: i
-                    });
-                    console.log(`✅ TTSService: ${provider.name} 可用`);
-                } else {
-                    console.log(`⏭️ TTSService: ${provider.name} 不可用（音频测试失败）`);
-                }
-                
-            } catch (error) {
-                console.warn(`❌ TTSService: ${provider.name} 测试异常:`, error.message);
-            }
-        }
+        // 创建所有测试任务
+        const testPromises = this.providers.map((provider, i) => {
+            return this._testSingleProvider(provider, i, 'see');
+        });
+        
+        // 并行执行所有测试
+        const testResults = await Promise.all(testPromises);
+        
+        // 收集成功的候选者
+        const candidates = testResults.filter(result => result !== null);
+        
+        // 按响应速度排序（快的在前）
+        candidates.sort((a, b) => a.responseTime - b.responseTime);
+        
+        // 将排序后的结果赋值给 availableProviders
+        this.availableProviders = candidates;
         
         this.providerTested = true;
         
         // 输出测试结果
         if (this.availableProviders.length > 0) {
-            console.log(`🎯 TTSService: 找到 ${this.availableProviders.length} 个可用的 TTS 提供商:`);
+            console.log(`🎯 TTSService: 找到 ${this.availableProviders.length} 个可用的 TTS 提供商（已按响应速度排序）:`);
             this.availableProviders.forEach((provider, idx) => {
-                console.log(`   ${idx + 1}. ${provider.name} (${provider.description})`);
+                const speedBadge = idx === 0 ? '⚡' : '  ';
+                console.log(`${speedBadge} ${idx + 1}. ${provider.name} - ${provider.responseTime.toFixed(0)}ms`);
             });
-            console.log(`📌 TTSService: 将在这些提供商之间轮换使用，提高稳定性`);
+            console.log(`📌 TTSService: 优先使用速度最快的提供商`);
         } else {
             console.error('❌ TTSService: 没有找到可用的 TTS 提供商');
         }
+    }
+    
+    /**
+     * 测试单个提供商（异步独立测试）
+     * @param {Object} provider - 提供商对象
+     * @param {number} index - 提供商索引
+     * @param {string} testWord - 测试单词
+     * @returns {Promise<Object|null>} 测试结果或 null
+     */
+    async _testSingleProvider(provider, index, testWord) {
+        try {
+            // 第一步：基础测试
+            if (!provider.test()) {
+                console.log(`⏭️ TTSService: ${provider.name} 不可用（基础测试失败）`);
+                return null;
+            }
+            
+            console.log(`🔬 TTSService: 测试 ${provider.name}...`);
+            const startTime = performance.now();
+            
+            // 对于 Web Speech API，特殊处理
+            if (provider.name === 'Web Speech API') {
+                this._initWebSpeechAPI();
+                
+                // 等待语音列表加载（最多等待 2 秒）
+                const voices = await this._waitForVoices(2000);
+                
+                if (voices.length === 0) {
+                    console.log(`⏭️ TTSService: ${provider.name} 不可用（未找到语音）`);
+                    return null;
+                }
+                
+                // 输出语音信息
+                const localVoices = voices.filter(v => v.localService);
+                const remoteVoices = voices.filter(v => !v.localService);
+                console.log(`   📊 ${provider.name}: 本地语音 ${localVoices.length} 个, 在线语音 ${remoteVoices.length} 个`);
+            }
+            
+            // 初始化时使用静音测试（因为没有用户交互，真实发声会被浏览器阻止）
+            // 对于 Web Speech API，使用静音测试
+            if (provider.name === 'Web Speech API') {
+                console.log(`🔇 TTSService: 使用静音测试 ${provider.name}...`);
+                
+                // 检查选中的语音类型
+                if (this.britishVoice) {
+                    if (this.britishVoice.localService) {
+                        console.log(`   ✅ 使用本地语音，无需网络`);
+                    } else {
+                        console.log(`   ⚠️ 使用在线语音，需要 VPN（初始化时无法真实测试）`);
+                    }
+                }
+                
+                const canSpeak = await this._testProviderWithTimeout(provider, testWord, 1000);
+                const responseTime = performance.now() - startTime;
+                
+                if (canSpeak) {
+                    // 如果是在线语音，标记为需要进一步验证
+                    const needsVerification = this.britishVoice && !this.britishVoice.localService;
+                    if (needsVerification) {
+                        console.log(`⚠️ TTSService: ${provider.name} 静音测试通过，但使用在线语音，实际使用时可能需要 VPN（响应时间: ${responseTime.toFixed(0)}ms）`);
+                    } else {
+                        console.log(`✅ TTSService: ${provider.name} 可用（静音测试通过，响应时间: ${responseTime.toFixed(0)}ms）`);
+                    }
+                    return {
+                        ...provider,
+                        index: index,
+                        responseTime: responseTime,
+                        needsVerification: needsVerification  // 标记需要验证
+                    };
+                } else {
+                    console.log(`⏭️ TTSService: ${provider.name} 不可用（静音测试失败或超时）`);
+                    return null;
+                }
+            }
+            
+            // 对于基于 URL 的提供商，使用音频加载测试
+            console.log(`🔇 TTSService: 使用音频加载测试 ${provider.name}...`);
+            const canSpeak = await this._testAudioProvider(provider, testWord);
+            const responseTime = performance.now() - startTime;
+            
+            if (canSpeak) {
+                console.log(`✅ TTSService: ${provider.name} 可用（音频加载测试通过，响应时间: ${responseTime.toFixed(0)}ms）`);
+                return {
+                    ...provider,
+                    index: index,
+                    responseTime: responseTime
+                };
+            } else {
+                console.log(`⏭️ TTSService: ${provider.name} 不可用（音频加载测试失败或超时）`);
+                return null;
+            }
+            
+        } catch (error) {
+            console.warn(`❌ TTSService: ${provider.name} 测试异常:`, error.message);
+            return null;
+        }
+    }
+    
+    /**
+     * 真实发声测试（公共方法）
+     * 用于初始化和测试页面的真实发声测试
+     * @param {Object} provider - 提供商对象
+     * @param {string} testWord - 测试单词
+     * @param {number} timeout - 超时时间（毫秒）
+     * @param {number} volume - 音量（0.0-1.0）
+     * @returns {Promise<boolean>} 是否可用
+     */
+    async _testProviderWithRealSpeak(provider, testWord, timeout = 2000, volume = 0.1) {
+        return new Promise(async (resolve) => {
+            let timeoutId;
+            let resolved = false;
+            
+            // 设置超时
+            timeoutId = setTimeout(() => {
+                if (!resolved) {
+                    resolved = true;
+                    // 停止可能的播放
+                    if (provider.name === 'Web Speech API' && 'speechSynthesis' in window) {
+                        speechSynthesis.cancel();
+                    }
+                    resolve(false);
+                }
+            }, timeout);
+            
+            try {
+                // 调用提供商的真实 speak 方法（使用小音量）
+                console.log(`   🎯 调用 ${provider.name}.speak("${testWord}", ${volume})...`);
+                await provider.speak(testWord, volume);
+                
+                if (!resolved) {
+                    resolved = true;
+                    clearTimeout(timeoutId);
+                    console.log(`   ✅ ${provider.name} speak() 完成`);
+                    resolve(true);
+                }
+            } catch (error) {
+                if (!resolved) {
+                    resolved = true;
+                    clearTimeout(timeoutId);
+                    console.log(`   ❌ ${provider.name} speak() 异常: ${error.message}`);
+                    resolve(false);
+                }
+            }
+        });
+    }
+    
+    /**
+     * 统一的提供商测试方法（带超时控制）
+     * @param {Object} provider - 提供商对象
+     * @param {string} testWord - 测试单词
+     * @param {number} timeout - 超时时间（毫秒）
+     * @returns {Promise<boolean>} 是否可用
+     */
+    async _testProviderWithTimeout(provider, testWord, timeout = 1000) {
+        return new Promise(async (resolve) => {
+            let timeoutId;
+            let resolved = false;
+            
+            // 设置超时
+            timeoutId = setTimeout(() => {
+                if (!resolved) {
+                    resolved = true;
+                    // 停止可能的播放
+                    if (provider.name === 'Web Speech API' && 'speechSynthesis' in window) {
+                        speechSynthesis.cancel();
+                    }
+                    resolve(false);
+                }
+            }, timeout);
+            
+            try {
+                // 调用提供商的 speak 方法（静音测试）
+                if (provider.name === 'Web Speech API') {
+                    // Web Speech API 特殊处理（极低音量、极快速度）
+                    await this._testWebSpeechAPI(testWord);
+                } else {
+                    // 基于 URL 的提供商
+                    await this._testAudioProvider(provider, testWord);
+                }
+                
+                if (!resolved) {
+                    resolved = true;
+                    clearTimeout(timeoutId);
+                    resolve(true);
+                }
+            } catch (error) {
+                if (!resolved) {
+                    resolved = true;
+                    clearTimeout(timeoutId);
+                    resolve(false);
+                }
+            }
+        });
     }
     
     /**
@@ -240,6 +405,74 @@ class TTSService {
     }
     
     /**
+     * 测试 Web Speech API 是否真正能播放
+     * @param {string} testWord - 测试单词
+     * @returns {Promise<boolean>} 是否可用
+     */
+    _testWebSpeechAPI(testWord) {
+        return new Promise((resolve) => {
+            if (!('speechSynthesis' in window)) {
+                resolve(false);
+                return;
+            }
+            
+            try {
+                // 先检查是否有可用的语音
+                const voices = speechSynthesis.getVoices();
+                if (voices.length === 0) {
+                    resolve(false);
+                    return;
+                }
+                
+                const utterance = new SpeechSynthesisUtterance(testWord);
+                utterance.volume = 0; // 完全静音测试
+                utterance.rate = 10; // 极快速度
+                utterance.pitch = 1;
+                
+                let resolved = false;
+                
+                utterance.onstart = () => {
+                    if (!resolved) {
+                        resolved = true;
+                        speechSynthesis.cancel();
+                        resolve(true);
+                    }
+                };
+                
+                utterance.onerror = (event) => {
+                    if (!resolved) {
+                        resolved = true;
+                        speechSynthesis.cancel();
+                        resolve(false);
+                    }
+                };
+                
+                utterance.onend = () => {
+                    if (!resolved) {
+                        resolved = true;
+                        resolve(true);
+                    }
+                };
+                
+                // 开始播放
+                speechSynthesis.speak(utterance);
+                
+                // 额外检查：50ms 后检查是否在播放队列中
+                setTimeout(() => {
+                    if (!resolved && speechSynthesis.speaking) {
+                        resolved = true;
+                        speechSynthesis.cancel();
+                        resolve(true);
+                    }
+                }, 50);
+                
+            } catch (error) {
+                resolve(false);
+            }
+        });
+    }
+    
+    /**
      * 初始化 Web Speech API
      */
     _initWebSpeechAPI() {
@@ -262,21 +495,34 @@ class TTSService {
         
         const voices = speechSynthesis.getVoices();
         
-        // 优先级：英国英语 > 英式英语相关
+        // 强制使用在线语音（用于测试网络能力）
+        // 1. 优先：在线英式语音
         this.britishVoice = voices.find(voice => 
-            voice.lang === 'en-GB' && voice.name.includes('UK')
+            !voice.localService && voice.lang === 'en-GB' && voice.name.includes('UK')
         ) || voices.find(voice => 
-            voice.lang === 'en-GB' && voice.name.includes('British')
+            !voice.localService && voice.lang === 'en-GB' && voice.name.includes('British')
         ) || voices.find(voice => 
-            voice.lang === 'en-GB'
+            !voice.localService && voice.lang === 'en-GB'
         ) || voices.find(voice => 
-            voice.lang.startsWith('en-') && voice.name.includes('UK')
+            !voice.localService && voice.lang.startsWith('en-') && voice.name.includes('UK')
         ) || voices.find(voice => 
-            voice.lang.startsWith('en-') && voice.name.includes('British')
+            !voice.localService && voice.lang.startsWith('en-') && voice.name.includes('British')
+        ) || voices.find(voice => 
+            !voice.localService && voice.lang.startsWith('en-')
         );
         
+        // 2. 如果没有在线语音，才使用本地语音（降级方案）
+        if (!this.britishVoice) {
+            this.britishVoice = voices.find(voice => 
+                voice.localService && voice.lang === 'en-GB'
+            ) || voices.find(voice => 
+                voice.localService && voice.lang.startsWith('en-')
+            );
+        }
+        
         if (this.britishVoice) {
-            console.log('✅ TTSService: 已选择英式语音:', this.britishVoice.name, this.britishVoice.lang);
+            const voiceType = this.britishVoice.localService ? '本地语音' : '在线语音';
+            console.log(`✅ TTSService: 已选择英式语音 (${voiceType}): ${this.britishVoice.name} ${this.britishVoice.lang}`);
         }
     }
     
@@ -300,7 +546,7 @@ class TTSService {
     /**
      * 使用 Web Speech API 朗读
      */
-    _speakWithWebSpeechAPI(word) {
+    _speakWithWebSpeechAPI(word, volume = 1.0) {
         return new Promise((resolve, reject) => {
             if (!('speechSynthesis' in window)) {
                 reject(new Error('浏览器不支持 Web Speech API'));
@@ -325,34 +571,97 @@ class TTSService {
             // 优先使用选中的英式语音
             if (this.britishVoice) {
                 utterance.voice = this.britishVoice;
+                console.log(`   🎤 使用语音: ${this.britishVoice.name} (${this.britishVoice.localService ? '本地' : '在线'})`);
             }
             
             // 设置语言为英式英语
             utterance.lang = 'en-GB';
             utterance.rate = 0.8;  // 语速
             utterance.pitch = 1.0; // 音调
-            utterance.volume = 1.0; // 音量
+            utterance.volume = volume; // 音量（支持外部传入）
             
-            utterance.onend = () => resolve();
-            utterance.onerror = (e) => reject(e);
+            let resolved = false;
             
-            speechSynthesis.speak(utterance);
+            utterance.onstart = () => {
+                console.log(`   🔊 Web Speech API 开始播放...`);
+            };
+            
+            utterance.onend = () => {
+                if (!resolved) {
+                    resolved = true;
+                    console.log(`   ✅ Web Speech API 播放完成`);
+                    resolve();
+                }
+            };
+            
+            utterance.onerror = (e) => {
+                if (!resolved) {
+                    resolved = true;
+                    console.log(`   ❌ Web Speech API 错误: ${e.error}`);
+                    // 特殊处理 not-allowed 错误
+                    if (e.error === 'not-allowed') {
+                        reject(new Error('Web Speech API 需要用户交互激活'));
+                    } else if (e.error === 'network') {
+                        reject(new Error('Web Speech API 网络错误，可能需要 VPN'));
+                    } else {
+                        reject(new Error(`Web Speech API 错误: ${e.error}`));
+                    }
+                }
+            };
+            
+            try {
+                speechSynthesis.speak(utterance);
+                console.log(`   📤 Web Speech API speak() 已调用`);
+            } catch (error) {
+                if (!resolved) {
+                    resolved = true;
+                    reject(error);
+                }
+            }
         });
     }
     
     /**
      * 使用音频 URL 朗读
      */
-    _speakWithAudioURL(url, providerName) {
+    _speakWithAudioURL(url, providerName, volume = 1.0) {
         return new Promise((resolve, reject) => {
             const audio = new Audio(url);
+            audio.volume = volume; // 设置音量
             
-            audio.onended = () => resolve();
+            // 添加到活动音频列表（用于 stop()）
+            this.activeAudios.push(audio);
+            console.log(`🎵 创建音频对象: ${providerName}, 活动音频数: ${this.activeAudios.length}`);
+            
+            audio.onended = () => {
+                // 播放完成后从列表移除
+                const index = this.activeAudios.indexOf(audio);
+                if (index > -1) {
+                    this.activeAudios.splice(index, 1);
+                    console.log(`✅ 音频播放完成，移除: ${providerName}, 活动音频数: ${this.activeAudios.length}`);
+                }
+                resolve();
+            };
+            
             audio.onerror = (e) => {
+                // 出错时从列表移除
+                const index = this.activeAudios.indexOf(audio);
+                if (index > -1) {
+                    this.activeAudios.splice(index, 1);
+                    console.log(`❌ 音频出错，移除: ${providerName}, 活动音频数: ${this.activeAudios.length}`);
+                }
                 reject(new Error(`${providerName} 音频加载失败`));
             };
             
-            audio.play().catch(reject);
+            audio.play().catch((error) => {
+                // 播放失败时从列表移除
+                const index = this.activeAudios.indexOf(audio);
+                if (index > -1) {
+                    this.activeAudios.splice(index, 1);
+                    console.log(`❌ 音频播放失败，移除: ${providerName}, 活动音频数: ${this.activeAudios.length}`);
+                }
+                reject(error);
+            });
         });
     }
     
@@ -370,6 +679,7 @@ class TTSService {
             showError = true,
             onSuccess = null,
             onError = null,
+            volume = 1.0, // 音量：0.0 到 1.0
             _isRetry = false // 内部参数：是否是重试调用
         } = options;
         
@@ -396,29 +706,77 @@ class TTSService {
                 const provider = this.availableProviders[this.currentAvailableIndex];
                 
                 try {
-                    await provider.speak(word);
+                    // 创建3秒超时Promise
+                    const timeoutPromise = new Promise((_, reject) => {
+                        setTimeout(() => reject(new Error('超时（3秒）')), 3000);
+                    });
+                    
+                    // 竞速：朗读 vs 超时
+                    await Promise.race([
+                        provider.speak(word, volume),
+                        timeoutPromise
+                    ]);
+                    
                     console.log(`✅ TTSService: 使用 ${provider.name} 朗读: ${word} [${this.currentAvailableIndex + 1}/${this.availableProviders.length}]`);
+                    
+                    // 成功后，重置该提供商的失败计数
+                    this.providerFailureCount.set(provider.name, 0);
                     
                     if (onSuccess) {
                         onSuccess(provider.name);
                     }
                     
-                    // 成功后，轮换到下一个提供商（为下次调用准备）
-                    this.currentAvailableIndex = (this.currentAvailableIndex + 1) % this.availableProviders.length;
-                    
+                    // 成功后，保持使用当前提供商，不轮换
                     this.isSpeaking = false;
                     return;
                     
                 } catch (error) {
                     console.warn(`❌ TTSService: ${provider.name} 失败 [${this.currentAvailableIndex + 1}/${this.availableProviders.length}]:`, error.message);
                     
-                    // 尝试下一个提供商
-                    this.currentAvailableIndex = (this.currentAvailableIndex + 1) % this.availableProviders.length;
+                    // 停止当前提供商的播放（清理资源）
+                    this.stop();
+                    
+                    // 记录失败次数
+                    const failCount = (this.providerFailureCount.get(provider.name) || 0) + 1;
+                    this.providerFailureCount.set(provider.name, failCount);
+                    console.log(`   📊 ${provider.name} 连续失败 ${failCount} 次`);
+                    
+                    // 如果连续失败3次，从可用列表移除
+                    if (failCount >= 3) {
+                        console.warn(`⚠️ TTSService: ${provider.name} 连续失败3次，从可用列表移除`);
+                        this.availableProviders.splice(this.currentAvailableIndex, 1);
+                        
+                        // 调整索引
+                        if (this.availableProviders.length === 0) {
+                            console.error(`❌ TTSService: 所有提供商都已被移除`);
+                            this.isSpeaking = false;
+                            if (onError) {
+                                onError(new Error('所有 TTS 提供商都不可用'));
+                            }
+                            return;
+                        }
+                        
+                        // 保持当前索引（因为删除了一个元素，索引自动指向下一个）
+                        if (this.currentAvailableIndex >= this.availableProviders.length) {
+                            this.currentAvailableIndex = 0;
+                        }
+                    } else {
+                        // 失败次数小于3次，移到队列尾部
+                        console.log(`   🔄 将 ${provider.name} 移到队列尾部`);
+                        this.availableProviders.splice(this.currentAvailableIndex, 1);
+                        this.availableProviders.push(provider);
+                        
+                        // 索引不变（因为删除了当前元素，索引自动指向下一个）
+                        if (this.currentAvailableIndex >= this.availableProviders.length) {
+                            this.currentAvailableIndex = 0;
+                        }
+                    }
+                    
                     attemptCount++;
                     
                     // 如果还有其他提供商可尝试
                     if (attemptCount < this.availableProviders.length) {
-                        console.log(`🔄 TTSService: 切换到下一个提供商: ${this.availableProviders[this.currentAvailableIndex].name}`);
+                        console.log(`🔄 TTSService: 切换到: ${this.availableProviders[this.currentAvailableIndex].name}`);
                     }
                 }
             }
@@ -542,6 +900,18 @@ class TTSService {
     }
     
     /**
+     * 获取可用的 TTS 提供商详细信息（包含响应时间）
+     * @returns {Array} 可用提供商的详细信息数组
+     */
+    getAvailableProvidersDetails() {
+        return this.availableProviders.map(p => ({
+            name: p.name,
+            description: p.description,
+            responseTime: p.responseTime
+        }));
+    }
+    
+    /**
      * 获取当前使用的 TTS 提供商
      * @returns {string|null} 当前提供商名称
      */
@@ -556,9 +926,34 @@ class TTSService {
      * 停止当前朗读
      */
     stop() {
+        // 停止 Web Speech API
         if ('speechSynthesis' in window) {
             speechSynthesis.cancel();
+            console.log('⏹️ TTSService: 已停止 Web Speech API');
         }
+        
+        // 停止所有正在播放的 Audio 对象
+        if (this.activeAudios.length > 0) {
+            console.log(`⏹️ TTSService: 正在停止 ${this.activeAudios.length} 个活动音频...`);
+            
+            // 复制数组以避免在迭代时修改
+            const audiosToStop = [...this.activeAudios];
+            this.activeAudios = [];
+            
+            audiosToStop.forEach((audio, index) => {
+                try {
+                    audio.pause();
+                    audio.currentTime = 0;
+                    audio.src = ''; // 清空源以释放资源
+                    console.log(`  ⏹️ 已停止音频 ${index + 1}/${audiosToStop.length}`);
+                } catch (error) {
+                    console.warn(`  ⚠️ 停止音频 ${index + 1} 时出错:`, error);
+                }
+            });
+            
+            console.log(`✅ TTSService: 已停止所有音频，活动音频数: ${this.activeAudios.length}`);
+        }
+        
         this.isSpeaking = false;
         console.log('⏹️ TTSService: 已停止朗读');
     }

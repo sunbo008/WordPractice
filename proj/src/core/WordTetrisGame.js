@@ -327,15 +327,16 @@ class WordTetrisGame {
             
             // 异步初始化 TTS 服务（提前测试找到可用的提供商）
             this.ttsService.initialize().then(() => {
-                // 获取可用的提供商列表
-                const availableProviders = this.ttsService.getAvailableProviders();
+                // 获取可用的提供商详细信息（包含响应时间）
+                const providersDetails = this.ttsService.getAvailableProvidersDetails();
                 const currentProvider = this.ttsService.getCurrentProvider();
                 
-                if (availableProviders.length > 0) {
-                    debugLog.success(`✅ TTS 服务初始化完成，找到 ${availableProviders.length} 个可用提供商:`);
-                    availableProviders.forEach((name, index) => {
-                        const prefix = (name === currentProvider) ? '👉' : '  ';
-                        debugLog.info(`${prefix} ${index + 1}. ${name}`);
+                if (providersDetails.length > 0) {
+                    debugLog.success(`✅ TTS 服务初始化完成，找到 ${providersDetails.length} 个可用提供商（已按速度排序）:`);
+                    providersDetails.forEach((provider, index) => {
+                        const prefix = (provider.name === currentProvider) ? '⚡' : '  ';
+                        const responseTime = provider.responseTime ? `${provider.responseTime.toFixed(0)}ms` : '-';
+                        debugLog.info(`${prefix} ${index + 1}. ${provider.name} - ${responseTime}`);
                     });
                 } else {
                     debugLog.warning('⚠️ TTS 服务初始化完成，但没有找到可用的提供商');
@@ -380,18 +381,28 @@ class WordTetrisGame {
         // 先停止之前的朗读
         this.stopSpeaking();
         
-        // 立即播放第一次
-        this.speakWord(word);
-
-        // 设置定时器，每5秒重复播放
-        this.speechTimer = setInterval(() => {
-            debugLog.info(`⏰ 定时重复朗读: "${word}"`);
+        // 2秒后播放第一次
+        this.firstSpeechTimer = setTimeout(() => {
+            debugLog.info(`🔊 首次朗读: "${word}"`);
             this.speakWord(word);
-        }, 5000); // 5秒 = 5000毫秒
+            
+            // 首次播放后，设置定时器每5秒重复播放
+            this.speechTimer = setInterval(() => {
+                debugLog.info(`⏰ 定时重复朗读: "${word}"`);
+                this.speakWord(word);
+            }, 5000); // 5秒 = 5000毫秒
+        }, 2000); // 2秒后首次播放
     }
 
     stopSpeaking() {
-        // 取消定时器
+        // 取消首次朗读定时器
+        if (this.firstSpeechTimer) {
+            clearTimeout(this.firstSpeechTimer);
+            this.firstSpeechTimer = null;
+            debugLog.info('⏹️ 停止首次朗读定时器');
+        }
+        
+        // 取消重复朗读定时器
         if (this.speechTimer) {
             clearInterval(this.speechTimer);
             this.speechTimer = null;
@@ -844,6 +855,9 @@ class WordTetrisGame {
         }
         
         if (hitWord) {
+            // 停止语音朗读（单词已被成功击落）
+            this.stopSpeaking();
+            
             // 击落成功 - 计算分数
             let points = this.calculateScore(hitWord);
             this.score += points;
