@@ -5,12 +5,20 @@
     {
       "src": "proj/public/**",
       "use": "@vercel/static"
+    },
+    {
+      "src": "proj/src/**",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
     {
       "src": "/",
       "dest": "/proj/public/index.html"
+    },
+    {
+      "src": "/src/(.*)",
+      "dest": "/proj/src/$1"
     },
     {
       "src": "/(.*)",
