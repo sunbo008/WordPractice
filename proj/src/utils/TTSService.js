@@ -497,19 +497,6 @@ class TTSService {
         console.log('⏹️ TTSService: 已停止朗读');
     }
     
-    /**
-     * 获取可用的 TTS 提供商列表
-     */
-    getAvailableProviders() {
-        return this.providers.filter(provider => provider.test());
-    }
-    
-    /**
-     * 获取当前使用的提供商
-     */
-    getCurrentProvider() {
-        return this.providers[this.currentProviderIndex];
-    }
     
     /**
      * 手动切换到指定的提供商
