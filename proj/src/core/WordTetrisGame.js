@@ -2206,23 +2206,127 @@ class WordTetrisGame {
         this.ctx.arc(0, 23, 63, Math.PI, 0);
         this.ctx.closePath();
         this.ctx.fill();
-        // 主体渐变
+        
+        // 主体渐变（深色金属底色）
         const grad = this.ctx.createRadialGradient(0, 23, 0, 0, 23, 61);
-        grad.addColorStop(0, '#8B8D8F');
-        grad.addColorStop(0.3, '#7F8C8D');
-        grad.addColorStop(0.6, '#6C7A7E');
-        grad.addColorStop(1, '#5D6D7E');
+        grad.addColorStop(0, '#6B6D6F');
+        grad.addColorStop(0.3, '#5F6C6D');
+        grad.addColorStop(0.6, '#4C5A5E');
+        grad.addColorStop(1, '#3D4D5E');
         this.ctx.fillStyle = grad;
         this.ctx.beginPath();
         this.ctx.arc(0, 23, 61, Math.PI, 0);
         this.ctx.closePath();
         this.ctx.fill();
-        // 顶缘描边
-        this.ctx.strokeStyle = '#2C3E50';
+        
+        // === 铁皮纹理效果 ===
+        // 1. 添加不规则铁皮划痕和噪点
+        this.ctx.globalAlpha = 0.15;
+        for (let i = 0; i < 50; i++) {
+            const angle = Math.PI + Math.random() * Math.PI;
+            const radius = 10 + Math.random() * 50;
+            const x = Math.cos(angle) * radius;
+            const y = 23 + Math.sin(angle) * radius;
+            
+            const scratchLength = 5 + Math.random() * 15;
+            const scratchAngle = Math.random() * Math.PI * 2;
+            
+            this.ctx.strokeStyle = Math.random() > 0.5 ? '#9BA5A8' : '#3A3C3E';
+            this.ctx.lineWidth = 0.5 + Math.random() * 1;
+            this.ctx.beginPath();
+            this.ctx.moveTo(x, y);
+            this.ctx.lineTo(
+                x + Math.cos(scratchAngle) * scratchLength,
+                y + Math.sin(scratchAngle) * scratchLength
+            );
+            this.ctx.stroke();
+        }
+        this.ctx.globalAlpha = 1;
+        
+        // 2. 添加金属锈迹斑点
+        this.ctx.globalAlpha = 0.2;
+        for (let i = 0; i < 15; i++) {
+            const angle = Math.PI + Math.random() * Math.PI;
+            const radius = 15 + Math.random() * 45;
+            const x = Math.cos(angle) * radius;
+            const y = 23 + Math.sin(angle) * radius;
+            
+            this.ctx.fillStyle = '#8B4513';
+            this.ctx.beginPath();
+            this.ctx.arc(x, y, 1 + Math.random() * 3, 0, Math.PI * 2);
+            this.ctx.fill();
+        }
+        this.ctx.globalAlpha = 1;
+        
+        // 3. 添加铆钉效果
+        const rivets = [
+            { angle: Math.PI * 0.3, radius: 50 },
+            { angle: Math.PI * 0.5, radius: 50 },
+            { angle: Math.PI * 0.7, radius: 50 },
+            { angle: Math.PI * 0.2, radius: 35 },
+            { angle: Math.PI * 0.8, radius: 35 }
+        ];
+        
+        rivets.forEach(rivet => {
+            const x = Math.cos(rivet.angle) * rivet.radius;
+            const y = 23 + Math.sin(rivet.angle) * rivet.radius;
+            
+            // 铆钉阴影
+            this.ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+            this.ctx.beginPath();
+            this.ctx.arc(x + 1, y + 1, 4, 0, Math.PI * 2);
+            this.ctx.fill();
+            
+            // 铆钉主体
+            const rivetGrad = this.ctx.createRadialGradient(x - 1, y - 1, 0, x, y, 4);
+            rivetGrad.addColorStop(0, '#A8B0B3');
+            rivetGrad.addColorStop(0.5, '#7A8288');
+            rivetGrad.addColorStop(1, '#5A6268');
+            this.ctx.fillStyle = rivetGrad;
+            this.ctx.beginPath();
+            this.ctx.arc(x, y, 4, 0, Math.PI * 2);
+            this.ctx.fill();
+            
+            // 铆钉高光
+            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+            this.ctx.beginPath();
+            this.ctx.arc(x - 1.5, y - 1.5, 1.5, 0, Math.PI * 2);
+            this.ctx.fill();
+        });
+        
+        // 4. 添加金属光泽条纹
+        this.ctx.globalAlpha = 0.1;
+        for (let i = 0; i < 3; i++) {
+            const angle = Math.PI * (0.3 + i * 0.2);
+            const radius1 = 20;
+            const radius2 = 55;
+            
+            const x1 = Math.cos(angle) * radius1;
+            const y1 = 23 + Math.sin(angle) * radius1;
+            const x2 = Math.cos(angle) * radius2;
+            const y2 = 23 + Math.sin(angle) * radius2;
+            
+            const shineGrad = this.ctx.createLinearGradient(x1, y1, x2, y2);
+            shineGrad.addColorStop(0, 'rgba(255, 255, 255, 0)');
+            shineGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.6)');
+            shineGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+            
+            this.ctx.strokeStyle = shineGrad;
+            this.ctx.lineWidth = 8;
+            this.ctx.beginPath();
+            this.ctx.moveTo(x1, y1);
+            this.ctx.lineTo(x2, y2);
+            this.ctx.stroke();
+        }
+        this.ctx.globalAlpha = 1;
+        
+        // 顶缘描边（加强深色边缘）
+        this.ctx.strokeStyle = '#1C2C3E';
         this.ctx.lineWidth = 3;
         this.ctx.beginPath();
         this.ctx.arc(0, 23, 61, Math.PI, 0);
         this.ctx.stroke();
+        
         this.ctx.restore();
         
         this.ctx.restore();
