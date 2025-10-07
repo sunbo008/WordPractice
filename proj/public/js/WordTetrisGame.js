@@ -1192,6 +1192,9 @@ class WordTetrisGame {
         // 开始语音朗读（立即播放，并每5秒重复）
         this.startRepeatedSpeech(this.nextWord.original);
         
+        // 清空用户输入（新单词开始，清空之前的输入）
+        this.clearInput();
+        
         // 重置缓冲区
         this.bufferState = 'idle';
         this.bufferTimer = 0;
