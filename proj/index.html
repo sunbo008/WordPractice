@@ -3,79 +3,219 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Word Tetris - 正在跳转...</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            font-family: Arial, sans-serif;
-            color: white;
-        }
-        .redirect-container {
-            text-align: center;
-            padding: 40px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        }
-        h1 {
-            color: #ffd700;
-            margin-bottom: 20px;
-            font-size: 2em;
-        }
-        .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid #ffd700;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        p {
-            font-size: 1.1em;
-            margin: 15px 0;
-        }
-        .manual-link {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 12px 24px;
-            background: #4CAF50;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            transition: background 0.3s;
-        }
-        .manual-link:hover {
-            background: #45a049;
-        }
-    </style>
+    <title>Word Tetris - 单词俄罗斯方块</title>
+    <link rel="stylesheet" href="css/styles.css?v=20251007-3">
 </head>
 <body>
-    <div class="redirect-container">
-        <h1>🎮 Word Tetris</h1>
-        <div class="spinner"></div>
-        <p>正在跳转到新版本...</p>
-        <p><small>项目已重构为模块化结构</small></p>
-        <a href="public/index.html" class="manual-link">立即进入游戏 →</a>
+    <div class="game-container">
+        <!-- 游戏标题 -->
+        <header class="game-header">
+            <h1>Word Tetris</h1>
+            <p>单词俄罗斯方块 - 在游戏中学习英语</p>
+        </header>
+
+        <!-- 游戏信息栏 -->
+        <div class="game-info">
+            <div class="info-item">
+                <span class="label">分数:</span>
+                <span id="score">0</span>
+            </div>
+            <div class="info-item">
+                <span class="label">等级:</span>
+                <span id="level">1</span>
+            </div>
+            <div class="info-item">
+                <span class="label">目标:</span>
+                <span id="target">100</span>
+            </div>
+            <div class="info-item">
+                <span class="label">单词总数:</span>
+                <span id="vocabulary-count">0</span>
+            </div>
+            <div class="info-item">
+                <span class="label">时间:</span>
+                <span id="time">00:00</span>
+            </div>
+            <div class="info-item">
+                <span class="label">连击:</span>
+                <span id="combo">0</span>
+            </div>
+        </div>
+        
+        <!-- 考试统计栏 -->
+        <div class="exam-stats">
+            <div class="stats-item">
+                <span class="label">剩余待测:</span>
+                <span id="total-words">135</span>
+            </div>
+            <div class="stats-item">
+                <span class="label">正确命中:</span>
+                <span id="hit-words">0</span>
+                <span class="percentage">(<span id="hit-percentage">0%</span>)</span>
+            </div>
+            <div class="stats-item">
+                <span class="label">覆盖率:</span>
+                <span id="coverage-percentage">0%</span>
+            </div>
+        </div>
+
+        <!-- 左侧面板：图片展示区 + 控制区 -->
+        <aside class="left-panel">
+            <section class="image-showcase">
+                <div class="picture">
+                    <img id="wordImage" alt="单词图片" src="" />
+                </div>
+            </section>
+
+            <!-- 游戏控制 -->
+            <div class="game-controls">
+                <div class="input-section">
+                    <label for="letterInput">输入缺失字母:</label>
+                    <input type="text" id="letterInput" placeholder="直接按键盘输入">
+                    <div id="realTimePreview" class="real-time-preview">实时预览: SRort</div>
+                    <button id="giveUpBtn" class="give-up-btn">放弃 (空格键)</button>
+                    <div class="keyboard-hint">💡 直接按键盘字母键输入，Enter提交，Backspace删除，Space放弃</div>
+                </div>
+                
+                <div class="control-buttons">
+                    <button id="startBtn">开始游戏</button>
+                    <button id="pauseBtn" disabled>暂停</button>
+                    <button id="resetBtn">重置</button>
+                    <button id="settingsBtn" class="settings-btn">⚙️ 词库设置</button>
+                    <button id="toggleSpeechBtn" class="toggle-speech">🔊 语音开</button>
+                    <button id="testBtn" class="test-btn">🧪 单测</button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 游戏主体：仅画布 -->
+        <div class="game-main">
+            <!-- 游戏画布 -->
+            <canvas id="gameCanvas" width="600" height="500"></canvas>
+        </div>
+
+        <!-- 侧边栏 -->
+        <div class="sidebar">
+            <!-- 缓冲区指示器 -->
+            <div class="buffer-indicator">
+                <h3>单词准备区</h3>
+                <div class="traffic-lights">
+                    <div class="light red" id="redLight"></div>
+                    <div class="light yellow" id="yellowLight"></div>
+                    <div class="light green" id="greenLight"></div>
+                </div>
+                <div id="nextWord">准备中...</div>
+            </div>
+
+            <!-- 错词本 -->
+            <div class="vocabulary-book">
+                <h3>错词本 (<span id="vocab-total-count">0</span>)</h3>
+                <div id="vocabularyList">
+                    <p>暂无错词</p>
+                </div>
+                <button id="exportBtn" disabled>导出错词</button>
+            </div>
+
+            <!-- 游戏说明 -->
+            <div class="game-instructions">
+                <h3>游戏说明</h3>
+                <ul>
+                    <li>单词从上方下降</li>
+                    <li>输入缺失的字母击落单词</li>
+                    <li>未击落的单词会堆叠</li>
+                    <li>堆叠满时游戏结束</li>
+                    <li>达到目标分数升级</li>
+                </ul>
+            </div>
+            
+            <!-- 调试日志面板 -->
+            <div id="debugPanel" class="debug-panel hidden">
+                <div class="debug-header">
+                    <h3>🔍 调试日志</h3>
+                    <div class="debug-controls">
+                        <button id="toggleDebugBtn" class="debug-btn">显示</button>
+                        <button id="clearDebugBtn" class="debug-btn">清空</button>
+                        <button id="exportDebugBtn" class="debug-btn">导出</button>
+                    </div>
+                </div>
+                <div id="debugConsole" class="debug-console"></div>
+            </div>
+        </div>
     </div>
 
+    <!-- 游戏结束弹窗 -->
+    <div id="gameOverModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="document.getElementById('gameOverModal').style.display='none'">×</span>
+            <div class="modal-body">
+                <h2>游戏结束</h2>
+                <p>最终分数: <span id="finalScore">0</span></p>
+                <p>达到等级: <span id="finalLevel">1</span></p>
+                <p>收集错词: <span id="finalVocabulary">0</span> 个</p>
+                <div class="modal-buttons">
+                    <button id="restartBtn">重新开始</button>
+                    <button id="reviewVocabBtn">查看错词本</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 等级提升弹窗 -->
+    <div id="levelUpModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="document.getElementById('levelUpModal').style.display='none'">×</span>
+            <div class="modal-body">
+                <h2>🎉 等级提升！</h2>
+                <p>恭喜升到第 <span id="newLevel">2</span> 级！</p>
+                <p>本级收集错词: <span id="levelVocabulary">0</span> 个</p>
+                <div class="modal-buttons">
+                    <button id="continueBtn">继续游戏</button>
+                    <button id="viewVocabBtn">查看错词</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 一次性清理旧配置（仅在2025-10-06之前的旧版本运行过） -->
     <script>
-        // 自动跳转到新版本
-        setTimeout(() => {
-            window.location.href = 'public/index.html';
-        }, 2000);
+        // 检查并清理旧的4天配置缓存（只清理一次）
+        (function() {
+            const cleanupFlag = localStorage.getItem('wordTetris_configCleanedV2');
+            if (!cleanupFlag) {
+                // 第一次运行新版本，检查是否需要清理
+                const savedLibraries = localStorage.getItem('wordTetris_selectedLibraries');
+                if (savedLibraries) {
+                    try {
+                        const libs = JSON.parse(savedLibraries);
+                        // 只有当保存的配置恰好是 ['day01', 'day02', 'day03', 'day04'] 时才清除
+                        // 这是旧版本的默认配置
+                        const isOldDefaultConfig = 
+                            libs.length === 4 && 
+                            libs.includes('day01') && 
+                            libs.includes('day02') && 
+                            libs.includes('day03') && 
+                            libs.includes('day04');
+                        
+                        if (isOldDefaultConfig) {
+                            console.log('🔄 检测到旧版本默认配置（day01-04），正在清理...');
+                            localStorage.removeItem('wordTetris_selectedLibraries');
+                            console.log('✅ 旧配置已清理，将使用新的默认配置（包含所有15天课程）');
+                        } else {
+                            console.log('✅ 用户自定义配置保留:', libs);
+                        }
+                    } catch (e) {
+                        console.error('配置检查失败:', e);
+                    }
+                }
+                // 标记已清理，下次不再执行
+                localStorage.setItem('wordTetris_configCleanedV2', 'true');
+            }
+        })();
     </script>
+    
+    <script src="/src/core/vocabulary-config-loader.js?v=20251007-4"></script>
+    <script src="/src/core/vocabulary-manager-v2.js?v=20251007-4"></script>
+    <script src="/src/core/WordTetrisGame.js?v=20251007-4"></script>
+    <script src="/src/core/game-settings-integration.js?v=20251007-4"></script>
 </body>
 </html>
-
