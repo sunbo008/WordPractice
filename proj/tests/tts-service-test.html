@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TTS 服务测试</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 32px;
+        }
+
+        .status-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .status-value {
+            color: #666;
+            font-family: monospace;
+        }
+
+        .providers-section {
+            margin-bottom: 30px;
+        }
+
+        .providers-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .provider-list {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+        }
+
+        .provider-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            margin-bottom: 10px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .provider-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .provider-index {
+            width: 30px;
+            height: 30px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 15px;
+        }
+
+        .provider-info {
+            flex: 1;
+        }
+
+        .provider-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .provider-desc {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .test-section {
+            background: #f0f7ff;
+            border: 2px solid #667eea;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .test-word {
+            font-size: 48px;
+            font-weight: 700;
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .log-section {
+            background: #1e1e1e;
+            border-radius: 12px;
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .log-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .log-entry {
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            padding: 8px;
+            margin-bottom: 4px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .log-info {
+            color: #61dafb;
+        }
+
+        .log-success {
+            color: #98c379;
+        }
+
+        .log-warning {
+            color: #e5c07b;
+        }
+
+        .log-error {
+            color: #e06c75;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎤 TTS 服务测试</h1>
+
+        <!-- 状态信息 -->
+        <div class="status-section">
+            <div class="status-item">
+                <span class="status-label">初始化状态</span>
+                <span class="status-value" id="initStatus">
+                    <span class="loading"></span> 正在初始化...
+                </span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">可用提供商数量</span>
+                <span class="status-value" id="providerCount">-</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">当前使用提供商</span>
+                <span class="status-value" id="currentProvider">-</span>
+            </div>
+        </div>
+
+        <!-- 可用提供商列表 -->
+        <div class="providers-section">
+            <div class="providers-title">
+                📋 可用的 TTS 提供商
+            </div>
+            <div class="provider-list" id="providerList">
+                <div style="text-align: center; padding: 20px; color: #666;">
+                    正在检测可用的 TTS 服务...
+                </div>
+            </div>
+        </div>
+
+        <!-- 测试区域 -->
+        <div class="test-section">
+            <div class="test-word">see</div>
+            <div class="button-group">
+                <button class="btn-primary" onclick="testSpeak()" id="speakBtn">
+                    🔊 测试朗读
+                </button>
+                <button class="btn-secondary" onclick="stopSpeak()" id="stopBtn" disabled>
+                    ⏹️ 停止朗读
+                </button>
+                <button class="btn-success" onclick="testAllProviders()" id="testAllBtn">
+                    🔄 测试所有提供商
+                </button>
+            </div>
+        </div>
+
+        <!-- 日志输出 -->
+        <div>
+            <div class="log-title">
+                📝 日志输出
+                <button class="btn-secondary" onclick="clearLog()" style="margin-left: auto; padding: 5px 15px; font-size: 14px;">
+                    清空日志
+                </button>
+            </div>
+            <div class="log-section" id="logContainer"></div>
+        </div>
+    </div>
+
+    <!-- 引入 TTS 服务 -->
+    <script src="../src/utils/TTSService.js"></script>
+
+    <script>
+        let ttsService;
+        const testWord = 'see';
+
+        // 劫持 console 方法，显示在页面上
+        const originalConsole = {
+            log: console.log,
+            info: console.info,
+            warn: console.warn,
+            error: console.error
+        };
+
+        function addLog(message, type = 'info') {
+            const logContainer = document.getElementById('logContainer');
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            
+            const timestamp = new Date().toLocaleTimeString('zh-CN', { hour12: false });
+            entry.textContent = `[${timestamp}] ${message}`;
+            
+            logContainer.appendChild(entry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('logContainer').innerHTML = '';
+            addLog('日志已清空', 'info');
+        }
+
+        // 劫持 console 方法
+        console.log = function(...args) {
+            originalConsole.log.apply(console, args);
+            addLog(args.join(' '), 'info');
+        };
+
+        console.info = function(...args) {
+            originalConsole.info.apply(console, args);
+            addLog(args.join(' '), 'info');
+        };
+
+        console.warn = function(...args) {
+            originalConsole.warn.apply(console, args);
+            addLog(args.join(' '), 'warning');
+        };
+
+        console.error = function(...args) {
+            originalConsole.error.apply(console, args);
+            addLog(args.join(' '), 'error');
+        };
+
+        // 初始化 TTS 服务
+        async function initTTS() {
+            if (typeof TTSService === 'undefined') {
+                updateStatus('error', '❌ TTSService 未加载');
+                addLog('错误：TTSService 未加载', 'error');
+                return;
+            }
+
+            try {
+                ttsService = TTSService.getInstance();
+                addLog('开始初始化 TTS 服务...', 'info');
+                
+                await ttsService.initialize();
+                
+                const providers = ttsService.getAvailableProviders();
+                const current = ttsService.getCurrentProvider();
+
+                // 更新状态
+                updateStatus('success', `✅ 初始化完成`);
+                document.getElementById('providerCount').textContent = providers.length;
+                document.getElementById('currentProvider').textContent = current || '无';
+
+                // 显示提供商列表
+                displayProviders(providers);
+
+                // 启用按钮
+                document.getElementById('speakBtn').disabled = false;
+                document.getElementById('testAllBtn').disabled = false;
+
+                addLog(`初始化成功，找到 ${providers.length} 个可用提供商`, 'success');
+
+            } catch (error) {
+                updateStatus('error', '❌ 初始化失败');
+                addLog(`初始化失败: ${error.message}`, 'error');
+            }
+        }
+
+        function updateStatus(type, message) {
+            const statusEl = document.getElementById('initStatus');
+            let badge = '';
+            
+            if (type === 'success') {
+                badge = `<span class="badge badge-success">${message}</span>`;
+            } else if (type === 'error') {
+                badge = `<span class="badge badge-danger">${message}</span>`;
+            } else {
+                badge = `<span class="badge badge-warning">${message}</span>`;
+            }
+            
+            statusEl.innerHTML = badge;
+        }
+
+        function displayProviders(providers) {
+            const listContainer = document.getElementById('providerList');
+            
+            if (providers.length === 0) {
+                listContainer.innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: #e06c75;">
+                        ❌ 没有找到可用的 TTS 提供商
+                    </div>
+                `;
+                return;
+            }
+
+            listContainer.innerHTML = providers.map((name, index) => `
+                <div class="provider-item">
+                    <div class="provider-index">${index + 1}</div>
+                    <div class="provider-info">
+                        <div class="provider-name">${name}</div>
+                        <div class="provider-desc">提供商 #${index + 1}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function testSpeak() {
+            if (!ttsService) {
+                addLog('TTS 服务未初始化', 'error');
+                return;
+            }
+
+            const speakBtn = document.getElementById('speakBtn');
+            const stopBtn = document.getElementById('stopBtn');
+
+            speakBtn.disabled = true;
+            stopBtn.disabled = false;
+
+            addLog(`准备朗读单词: "${testWord}"`, 'info');
+
+            try {
+                await ttsService.speak(testWord, {
+                    showError: false,
+                    onSuccess: (providerName) => {
+                        addLog(`✅ 朗读成功，使用: ${providerName}`, 'success');
+                        updateCurrentProvider();
+                    },
+                    onError: (error) => {
+                        addLog(`❌ 朗读失败: ${error.message}`, 'error');
+                    }
+                });
+            } catch (error) {
+                addLog(`❌ 朗读异常: ${error.message}`, 'error');
+            } finally {
+                speakBtn.disabled = false;
+                stopBtn.disabled = true;
+            }
+        }
+
+        function stopSpeak() {
+            if (!ttsService) {
+                return;
+            }
+
+            ttsService.stop();
+            addLog('已停止朗读', 'warning');
+            
+            document.getElementById('speakBtn').disabled = false;
+            document.getElementById('stopBtn').disabled = true;
+        }
+
+        async function testAllProviders() {
+            if (!ttsService) {
+                addLog('TTS 服务未初始化', 'error');
+                return;
+            }
+
+            const providers = ttsService.getAvailableProviders();
+            
+            if (providers.length === 0) {
+                addLog('没有可用的提供商', 'error');
+                return;
+            }
+
+            addLog(`开始测试所有 ${providers.length} 个提供商...`, 'info');
+
+            const testAllBtn = document.getElementById('testAllBtn');
+            testAllBtn.disabled = true;
+
+            for (let i = 0; i < providers.length; i++) {
+                addLog(`\n测试提供商 ${i + 1}/${providers.length}: ${providers[i]}`, 'info');
+                
+                try {
+                    await ttsService.speak(testWord, {
+                        showError: false,
+                        onSuccess: (providerName) => {
+                            addLog(`  ✅ ${providerName} 测试成功`, 'success');
+                        },
+                        onError: (error) => {
+                            addLog(`  ❌ 测试失败: ${error.message}`, 'error');
+                        }
+                    });
+
+                    // 等待 1.5 秒再测试下一个
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+
+                } catch (error) {
+                    addLog(`  ❌ 测试异常: ${error.message}`, 'error');
+                }
+            }
+
+            addLog('\n✅ 所有提供商测试完成', 'success');
+            testAllBtn.disabled = false;
+        }
+
+        function updateCurrentProvider() {
+            const current = ttsService.getCurrentProvider();
+            document.getElementById('currentProvider').textContent = current || '无';
+        }
+
+        // 页面加载完成后初始化
+        window.addEventListener('load', () => {
+            addLog('页面加载完成', 'info');
+            initTTS();
+        });
+    </script>
+</body>
+</html>
+
