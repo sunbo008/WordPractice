@@ -83,40 +83,57 @@ class TTSService {
     /**
      * 初始化并测试 TTS 提供商（异步）
      * 在第一次使用前调用，找到所有可用的提供商
+     * 真正测试每个提供商是否能成功朗读
      */
     async initialize() {
         if (this.providerTested) {
             return; // 已经测试过了
         }
         
-        console.log('🔍 TTSService: 开始测试所有 TTS 提供商...');
+        console.log('🔍 TTSService: 开始严格测试所有 TTS 提供商（使用测试单词 "test"）...');
         
         // 测试每个提供商，收集所有可用的
         for (let i = 0; i < this.providers.length; i++) {
             const provider = this.providers[i];
             
             try {
-                // 测试提供商是否可用
+                // 第一步：基础测试
                 if (!provider.test()) {
-                    console.log(`⏭️ TTSService: ${provider.name} 不可用（测试失败）`);
+                    console.log(`⏭️ TTSService: ${provider.name} 不可用（基础测试失败）`);
                     continue;
                 }
+                
+                // 第二步：真实朗读测试（使用静音方式）
+                console.log(`🔬 TTSService: 测试 ${provider.name}...`);
                 
                 // 对于 Web Speech API，特殊处理
                 if (provider.name === 'Web Speech API') {
                     this._initWebSpeechAPI();
+                    // Web Speech API 的测试比较特殊，如果基础测试通过就认为可用
+                    this.availableProviders.push({
+                        ...provider,
+                        index: i
+                    });
+                    console.log(`✅ TTSService: ${provider.name} 可用`);
+                    continue;
                 }
                 
-                // 添加到可用列表
-                this.availableProviders.push({
-                    ...provider,
-                    index: i // 记录原始索引
-                });
+                // 对于基于 URL 的提供商，尝试真正加载音频
+                const testResult = await this._testAudioProvider(provider, 'test');
                 
-                console.log(`✅ TTSService: ${provider.name} 可用`);
+                if (testResult) {
+                    // 添加到可用列表
+                    this.availableProviders.push({
+                        ...provider,
+                        index: i
+                    });
+                    console.log(`✅ TTSService: ${provider.name} 可用`);
+                } else {
+                    console.log(`⏭️ TTSService: ${provider.name} 不可用（音频测试失败）`);
+                }
                 
             } catch (error) {
-                console.warn(`❌ TTSService: ${provider.name} 测试失败:`, error.message);
+                console.warn(`❌ TTSService: ${provider.name} 测试异常:`, error.message);
             }
         }
         
@@ -132,6 +149,55 @@ class TTSService {
         } else {
             console.error('❌ TTSService: 没有找到可用的 TTS 提供商');
         }
+    }
+    
+    /**
+     * 测试基于音频 URL 的提供商是否可用
+     * @param {Object} provider - 提供商对象
+     * @param {string} testWord - 测试单词
+     * @returns {Promise<boolean>} 是否可用
+     */
+    async _testAudioProvider(provider, testWord) {
+        return new Promise((resolve) => {
+            try {
+                // 提取 URL 生成逻辑
+                let url;
+                if (provider.name === '百度翻译 TTS') {
+                    url = `https://fanyi.baidu.com/gettts?lan=en&text=${encodeURIComponent(testWord)}&spd=5&source=web`;
+                } else if (provider.name === '有道智云 TTS') {
+                    url = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(testWord)}&type=1`;
+                } else if (provider.name === '微软 Bing TTS') {
+                    url = `https://www.bing.com/tts?text=${encodeURIComponent(testWord)}&lang=en-US&format=audio/mp3`;
+                } else {
+                    resolve(false);
+                    return;
+                }
+                
+                const audio = new Audio();
+                const timeout = setTimeout(() => {
+                    audio.src = '';
+                    resolve(false); // 超时认为失败
+                }, 3000); // 3秒超时
+                
+                audio.addEventListener('canplaythrough', () => {
+                    clearTimeout(timeout);
+                    audio.src = ''; // 清理
+                    resolve(true);
+                }, { once: true });
+                
+                audio.addEventListener('error', () => {
+                    clearTimeout(timeout);
+                    resolve(false);
+                }, { once: true });
+                
+                audio.volume = 0; // 静音测试
+                audio.src = url;
+                audio.load();
+                
+            } catch (error) {
+                resolve(false);
+            }
+        });
     }
     
     /**
