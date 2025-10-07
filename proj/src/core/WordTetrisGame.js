@@ -318,28 +318,28 @@ class WordTetrisGame {
     }
 
     setupSpeechSynthesis() {
-        console.log('初始化语音合成系统...');
+        debugLog.info('🎤 初始化语音合成系统...');
         
         // 检查浏览器是否支持语音合成
         if ('speechSynthesis' in window) {
             this.speechSynthesis = window.speechSynthesis;
-            console.log('✅ 浏览器支持 Web Speech API');
+            debugLog.success('✅ 浏览器支持 Web Speech API');
             
             // 等待语音列表加载
             const voices = this.speechSynthesis.getVoices();
-            console.log('当前可用语音数量:', voices.length);
+            debugLog.info(`📊 当前可用语音数量: ${voices.length}`);
             
             if (voices.length === 0) {
-                console.log('⏳ 语音列表未加载，等待 voiceschanged 事件...');
+                debugLog.warn('⏳ 语音列表未加载，等待 voiceschanged 事件...');
                 this.speechSynthesis.addEventListener('voiceschanged', () => {
-                    console.log('📢 voiceschanged 事件触发');
+                    debugLog.info('📢 voiceschanged 事件触发');
                     this.selectBritishVoice();
                 });
             } else {
                 this.selectBritishVoice();
             }
         } else {
-            console.error('❌ 浏览器不支持语音合成功能');
+            debugLog.error('❌ 浏览器不支持语音合成功能');
             this.speechEnabled = false;
         }
     }
@@ -347,11 +347,12 @@ class WordTetrisGame {
     selectBritishVoice() {
         // 获取所有可用的语音
         const voices = this.speechSynthesis.getVoices();
-        console.log('正在选择语音，可用数量:', voices.length);
+        debugLog.info(`🔍 正在选择语音，可用数量: ${voices.length}`);
         
         // 打印前几个语音供调试
         if (voices.length > 0) {
-            console.log('可用语音示例:', voices.slice(0, 5).map(v => `${v.name} (${v.lang})`));
+            const voiceList = voices.slice(0, 5).map(v => `${v.name} (${v.lang})`).join(', ');
+            debugLog.info(`📝 可用语音示例: ${voiceList}`);
         }
         
         // 尝试找到英式英语语音
@@ -371,21 +372,22 @@ class WordTetrisGame {
         }
         
         if (this.britishVoice) {
-            console.log('✅ 已选择语音:', this.britishVoice.name, '(', this.britishVoice.lang, ')');
+            debugLog.success(`✅ 已选择语音: ${this.britishVoice.name} (${this.britishVoice.lang})`);
         } else {
-            console.warn('⚠️ 未找到合适的英语语音，将使用默认语音');
+            debugLog.warn('⚠️ 未找到合适的英语语音，将使用默认语音');
         }
     }
 
     speakWord(word) {
         // 检查是否启用语音
         if (!this.speechEnabled || !this.speechSynthesis) {
-            console.log('语音未启用或不支持');
+            debugLog.warn('⚠️ 语音未启用或不支持');
             return;
         }
 
         // 如果没有语音，尝试重新获取
         if (!this.britishVoice) {
+            debugLog.info('🔄 重新选择语音...');
             this.selectBritishVoice();
         }
 
@@ -404,26 +406,27 @@ class WordTetrisGame {
 
         // 添加错误处理
         utterance.onerror = (event) => {
-            console.error('语音朗读错误:', event.error, event);
+            debugLog.error(`❌ 语音朗读错误: ${event.error}`, event);
         };
 
         utterance.onstart = () => {
-            console.log('开始朗读:', word);
+            debugLog.info(`🔊 开始朗读: "${word}"`);
         };
 
         utterance.onend = () => {
-            console.log('朗读完成:', word);
+            debugLog.success(`✅ 朗读完成: "${word}"`);
         };
 
         // 播放语音
         this.currentSpeech = utterance;
         this.speechSynthesis.speak(utterance);
 
-        console.log('已发送朗读请求:', word, '语音:', this.britishVoice ? this.britishVoice.name : '默认');
+        const voiceInfo = this.britishVoice ? `${this.britishVoice.name} (${this.britishVoice.lang})` : '默认';
+        debugLog.info(`📤 已发送朗读请求: "${word}" | 使用语音: ${voiceInfo}`);
     }
 
     startRepeatedSpeech(word) {
-        console.log('开始重复朗读:', word);
+        debugLog.info(`🔁 开始重复朗读: "${word}"`);
         
         // 先停止之前的朗读
         this.stopSpeaking();
@@ -433,7 +436,7 @@ class WordTetrisGame {
 
         // 设置定时器，每5秒重复播放
         this.speechTimer = setInterval(() => {
-            console.log('定时重复朗读:', word);
+            debugLog.info(`⏰ 定时重复朗读: "${word}"`);
             this.speakWord(word);
         }, 5000); // 5秒 = 5000毫秒
     }
@@ -443,11 +446,13 @@ class WordTetrisGame {
         if (this.speechTimer) {
             clearInterval(this.speechTimer);
             this.speechTimer = null;
+            debugLog.info('⏹️ 停止重复朗读定时器');
         }
 
         // 停止当前语音
         if (this.speechSynthesis) {
             this.speechSynthesis.cancel();
+            debugLog.info('🛑 取消当前语音播放');
         }
 
         this.currentSpeech = null;
@@ -460,18 +465,20 @@ class WordTetrisGame {
         if (this.speechEnabled) {
             btn.textContent = '🔊 语音开';
             btn.classList.remove('disabled');
+            debugLog.success('✅ 语音已开启');
             
             // 如果有单词在下降且游戏正在进行，重新开始朗读
             if (this.gameState === 'playing' && this.fallingWords.length > 0) {
-                this.startRepeatedSpeech(this.fallingWords[0].original);
+                const word = this.fallingWords[0].original;
+                debugLog.info(`🔄 恢复朗读当前单词: "${word}"`);
+                this.startRepeatedSpeech(word);
             }
         } else {
             btn.textContent = '🔇 语音关';
             btn.classList.add('disabled');
+            debugLog.warn('⚠️ 语音已关闭');
             this.stopSpeaking();
         }
-        
-        console.log('语音', this.speechEnabled ? '开启' : '关闭');
     }
 
     setupHighDPICanvas() {
@@ -2534,7 +2541,7 @@ class WordTetrisGame {
             if (Math.abs(newTargetAngle - this.cannon.targetAngle) > 0.01) {
                 const oldAngle = this.cannon.targetAngle;
                 this.cannon.targetAngle = newTargetAngle;
-                debugLog.info(`🎯 炮管目标角度更新: ${(oldAngle * 180 / Math.PI).toFixed(1)}° → ${(newTargetAngle * 180 / Math.PI).toFixed(1)}° (目标: ${targetWord.original} at x=${targetWord.x.toFixed(0)}, y=${targetWord.y.toFixed(0)})`);
+                // debugLog.info(`🎯 炮管目标角度更新: ${(oldAngle * 180 / Math.PI).toFixed(1)}° → ${(newTargetAngle * 180 / Math.PI).toFixed(1)}° (目标: ${targetWord.original} at x=${targetWord.x.toFixed(0)}, y=${targetWord.y.toFixed(0)})`);
             }
         } else {
             // debugLog.info(`⚠️ 无下落单词，炮管保持当前角度`);
@@ -2559,9 +2566,9 @@ class WordTetrisGame {
             // 每60帧（约1秒）输出一次调试信息
             if (!this._cannonLogCounter) this._cannonLogCounter = 0;
             this._cannonLogCounter++;
-            if (this._cannonLogCounter % 60 === 0) {
-                debugLog.info(`🔄 炮管旋转中: ${(oldAngle * 180 / Math.PI).toFixed(1)}° → ${(this.cannon.angle * 180 / Math.PI).toFixed(1)}° (差值: ${(normalizedDiff * 180 / Math.PI).toFixed(1)}°)`);
-            }
+            // if (this._cannonLogCounter % 60 === 0) {
+            //     debugLog.info(`🔄 炮管旋转中: ${(oldAngle * 180 / Math.PI).toFixed(1)}° → ${(this.cannon.angle * 180 / Math.PI).toFixed(1)}° (差值: ${(normalizedDiff * 180 / Math.PI).toFixed(1)}°)`);
+            // }
         }
     }
 
@@ -2855,11 +2862,11 @@ class WordTetrisGame {
         const test = new Image();
         // 不跨域读取像素，仅展示即可
         test.onload = () => {
-            debugLog.success(`✅ 图片加载成功 [${label}]: ${url}`);
+            // debugLog.success(`✅ 图片加载成功 [${label}]: ${url}`);
             img.src = url;
         };
         test.onerror = (ev) => {
-            debugLog.error(`❌ 图片加载失败 [${label}]: ${url}`);
+            // debugLog.error(`❌ 图片加载失败 [${label}]: ${url}`);
             if (onError) onError(ev);
         };
         test.src = url;
