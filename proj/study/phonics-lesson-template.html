@@ -545,37 +545,148 @@
         document.addEventListener('click', initSpeech, { once: true });
         document.addEventListener('keydown', initSpeech, { once: true });
         
-        // 朗读单词
-        function speakWord(word) {
-            if ('speechSynthesis' in window) {
-                // 如果还没初始化，先初始化
-                if (!speechInitialized) {
-                    initSpeech();
+        // TTS 服务提供商列表（按优先级排序）
+        const ttsProviders = [
+            {
+                name: 'Web Speech API',
+                test: () => 'speechSynthesis' in window && speechSynthesis.getVoices().length > 0,
+                speak: (word) => {
+                    return new Promise((resolve, reject) => {
+                        // 如果还没初始化，先初始化
+                        if (!speechInitialized) {
+                            initSpeech();
+                        }
+                        
+                        // 如果还没有选择语音，尝试选择
+                        if (!britishVoice) {
+                            selectBritishVoice();
+                        }
+                        
+                        // 停止之前的朗读
+                        speechSynthesis.cancel();
+                        
+                        const utterance = new SpeechSynthesisUtterance(word);
+                        
+                        // 优先使用选中的英式语音
+                        if (britishVoice) {
+                            utterance.voice = britishVoice;
+                        }
+                        
+                        // 设置语言为英式英语
+                        utterance.lang = 'en-GB';
+                        utterance.rate = 0.8;
+                        utterance.pitch = 1.0;
+                        utterance.volume = 1.0;
+                        
+                        utterance.onend = () => resolve();
+                        utterance.onerror = (e) => reject(e);
+                        
+                        speechSynthesis.speak(utterance);
+                    });
                 }
-                
-                // 如果还没有选择语音，尝试选择
-                if (!britishVoice) {
-                    selectBritishVoice();
+            },
+            {
+                name: '百度翻译 TTS',
+                test: () => true, // 百度 TTS 总是可用
+                speak: (word) => {
+                    return new Promise((resolve, reject) => {
+                        const audio = new Audio(
+                            `https://fanyi.baidu.com/gettts?lan=en&text=${encodeURIComponent(word)}&spd=5&source=web`
+                        );
+                        audio.onended = () => resolve();
+                        audio.onerror = (e) => reject(e);
+                        audio.play().catch(reject);
+                    });
                 }
-                
-                // 停止之前的朗读
-                speechSynthesis.cancel();
-                
-                const utterance = new SpeechSynthesisUtterance(word);
-                
-                // 优先使用选中的英式语音
-                if (britishVoice) {
-                    utterance.voice = britishVoice;
+            },
+            {
+                name: '有道智云 TTS',
+                test: () => true,
+                speak: (word) => {
+                    return new Promise((resolve, reject) => {
+                        // 有道 TTS API
+                        const audio = new Audio(
+                            `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(word)}&type=1`
+                        );
+                        audio.onended = () => resolve();
+                        audio.onerror = (e) => reject(e);
+                        audio.play().catch(reject);
+                    });
                 }
+            },
+            {
+                name: '微软 Edge TTS',
+                test: () => true,
+                speak: (word) => {
+                    return new Promise((resolve, reject) => {
+                        // 使用 Edge Read Aloud API (非官方，可能不稳定)
+                        const audio = new Audio(
+                            `https://www.bing.com/tts?text=${encodeURIComponent(word)}&lang=en-US&format=audio/mp3`
+                        );
+                        audio.onended = () => resolve();
+                        audio.onerror = (e) => reject(e);
+                        audio.play().catch(reject);
+                    });
+                }
+            }
+        ];
+        
+        // 当前使用的 TTS 提供商索引
+        let currentTTSProviderIndex = 0;
+        
+        // 朗读单词（带降级机制）
+        async function speakWord(word) {
+            // 从当前提供商开始尝试
+            for (let i = currentTTSProviderIndex; i < ttsProviders.length; i++) {
+                const provider = ttsProviders[i];
                 
-                // 设置语言为英式英语
-                utterance.lang = 'en-GB';
-                utterance.rate = 0.8;
-                utterance.pitch = 1.0;
-                utterance.volume = 1.0;
+                try {
+                    // 测试提供商是否可用
+                    if (!provider.test()) {
+                        console.log(`⏭️ ${provider.name} 不可用，尝试下一个`);
+                        continue;
+                    }
+                    
+                    // 尝试朗读
+                    await provider.speak(word);
+                    console.log(`✅ 使用 ${provider.name} 朗读: ${word}`);
+                    
+                    // 记住成功的提供商，下次优先使用
+                    currentTTSProviderIndex = i;
+                    return;
+                    
+                } catch (error) {
+                    console.warn(`❌ ${provider.name} 失败:`, error.message);
+                    // 继续尝试下一个提供商
+                }
+            }
+            
+            // 所有提供商都失败
+            console.error('❌ 所有 TTS 服务均不可用');
+            
+            // 显示友好提示（可选）
+            if (currentTTSProviderIndex === 0) {
+                // 只在第一次失败时显示提示，避免重复提示
+                const hint = document.createElement('div');
+                hint.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: rgba(231, 76, 60, 0.95);
+                    color: white;
+                    padding: 15px 25px;
+                    border-radius: 10px;
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+                    z-index: 10000;
+                    animation: slideIn 0.5s ease;
+                `;
+                hint.textContent = '⚠️ 语音朗读功能暂时不可用';
+                document.body.appendChild(hint);
                 
-                speechSynthesis.speak(utterance);
-                console.log('🔊 朗读单词:', word, '语音:', britishVoice ? britishVoice.name : '默认');
+                setTimeout(() => {
+                    hint.style.animation = 'fadeOut 0.5s ease';
+                    setTimeout(() => hint.remove(), 500);
+                }, 3000);
             }
         }
         
