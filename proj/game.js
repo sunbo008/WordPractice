@@ -784,6 +784,18 @@ class WordTetrisGame {
         this.hitWords = new Set(); // 重置命中单词集合（去重用）
         this.fallenWords = new Set(); // 重置下落单词集合（去重用）
         this.gameCompletionTriggered = false; // 【修复】重置完成标志
+        
+        // 【修复】重置炮管角度
+        this.cannon.angle = -Math.PI / 2;
+        this.cannon.targetAngle = -Math.PI / 2;
+        this._cannonLogCounter = 0; // 重置炮管日志计数器
+        
+        // 重置炮弹和爆炸效果
+        this.bullets = [];
+        this.explosions = [];
+        this.meaningExplosions = [];
+        this.errorMarks = [];
+        
         console.log('🔄 游戏重置，生词本已清空，统计数据已重置，单词池已重置');
         
         this.resetBufferLights();
@@ -1148,12 +1160,20 @@ class WordTetrisGame {
         
         debugLog.success(`📤 释放单词到游戏区域: ${this.nextWord.original}`);
         
+        // 计算单词宽度
+        const wordWidth = this.nextWord.display.length * 30;
+        
+        // 计算随机 x 位置（确保单词完全在画布内）
+        const minX = wordWidth / 2 + 20; // 左边界留20像素边距
+        const maxX = this.canvasWidth - wordWidth / 2 - 20; // 右边界留20像素边距
+        const randomX = minX + Math.random() * (maxX - minX);
+        
         // 创建下降单词
         const fallingWord = {
             ...this.nextWord,
-            x: this.canvasWidth / 2,
+            x: randomX,
             y: this.gameAreaTop,
-            width: this.nextWord.display.length * 30,
+            width: wordWidth,
             height: 40,
             spawnTime: Date.now() // 添加生成时间戳
         };
@@ -1626,7 +1646,11 @@ class WordTetrisGame {
         
         this.ctx.save();
         this.ctx.translate(this.cannon.x, this.cannon.y);
-        this.ctx.rotate(this.cannon.angle + Math.PI / 2);
+        
+        // 【修复】简化旋转逻辑
+        // cannon.angle 直接表示从Y轴负方向（向上）顺时针旋转的角度
+        // fillRect 绘制的炮管默认向上（y=-40），所以直接使用 angle 旋转即可
+        this.ctx.rotate(this.cannon.angle);
         
         // 绘制炮管底座
         this.ctx.fillStyle = '#555555';
@@ -1651,19 +1675,76 @@ class WordTetrisGame {
     
     // 更新炮管瞄准角度（在updateGame中调用）
     updateCannonAngle() {
-        if (this.gameState !== 'playing' && this.gameState !== 'review') return;
+        if (this.gameState !== 'playing' && this.gameState !== 'review') {
+            // debugLog.info(`⚠️ 炮管更新跳过: gameState=${this.gameState}`);
+            return;
+        }
         
         // 更新炮管瞄准角度
         if (this.fallingWords.length > 0) {
             const targetWord = this.fallingWords[0];
             const dx = targetWord.x - this.cannon.x;
             const dy = targetWord.y - this.cannon.y;
-            this.cannon.targetAngle = Math.atan2(dy, dx) - Math.PI / 2;
+            
+            // 【最终修复】正确计算目标角度
+            // Canvas 坐标系：Y轴向下为正，rotate() 逆时针为正
+            // 炮管默认指向上方（-Y方向），对应 rotate(0)
+            // 
+            // 目标：让炮管指向目标单词
+            // - 炮管在底部 (cannon.y 大，例如 700)
+            // - 目标在上方 (targetWord.y 小，例如 100)
+            // - dy = targetWord.y - cannon.y = 100 - 700 = -600（负数，向上）
+            // 
+            // Math.atan2(y, x) 返回从+X轴逆时针到(x,y)的角度
+            // 我们需要从-Y轴（向上）开始计算角度
+            // 
+            // 技巧：将坐标系旋转90度
+            // - 原来的(dx, dy)在新坐标系中变成(dy, -dx)
+            // - 但我们希望从-Y开始，所以使用(-dy, dx)
+            // 
+            // 正确公式：angle = atan2(dx, -dy)
+            // 验证：
+            // - 目标在正上方：dx=0, dy=-600, angle=atan2(0, 600)=0（向上）✓
+            // - 目标在左上方：dx=-100, dy=-600, angle=atan2(-100, 600)≈-0.17（逆时针偏右，应该是顺时针偏左）✗
+            // 
+            // 再次修正！atan2(y,x) 不是 atan2(x,y)
+            // 正确公式：angle = atan2(dx, -dy)
+            // 其中 atan2 的第一个参数是"新Y轴"，第二个是"新X轴"
+            const newTargetAngle = Math.atan2(dx, -dy);
+            
+            // 只在角度变化较大时更新（避免过度计算）
+            if (Math.abs(newTargetAngle - this.cannon.targetAngle) > 0.01) {
+                const oldAngle = this.cannon.targetAngle;
+                this.cannon.targetAngle = newTargetAngle;
+                debugLog.info(`🎯 炮管目标角度更新: ${(oldAngle * 180 / Math.PI).toFixed(1)}° → ${(newTargetAngle * 180 / Math.PI).toFixed(1)}° (目标: ${targetWord.original} at x=${targetWord.x.toFixed(0)}, y=${targetWord.y.toFixed(0)})`);
+            }
+        } else {
+            // debugLog.info(`⚠️ 无下落单词，炮管保持当前角度`);
         }
         
         // 平滑过渡炮管角度
         const angleDiff = this.cannon.targetAngle - this.cannon.angle;
-        this.cannon.angle += angleDiff * 0.1;
+        
+        // 只有当角度差异足够大时才更新
+        if (Math.abs(angleDiff) > 0.001) {
+            // 处理角度跨越 -PI/PI 边界的情况
+            let normalizedDiff = angleDiff;
+            if (angleDiff > Math.PI) {
+                normalizedDiff = angleDiff - 2 * Math.PI;
+            } else if (angleDiff < -Math.PI) {
+                normalizedDiff = angleDiff + 2 * Math.PI;
+            }
+            
+            const oldAngle = this.cannon.angle;
+            this.cannon.angle += normalizedDiff * 0.2; // 提高响应速度到0.2
+            
+            // 每60帧（约1秒）输出一次调试信息
+            if (!this._cannonLogCounter) this._cannonLogCounter = 0;
+            this._cannonLogCounter++;
+            if (this._cannonLogCounter % 60 === 0) {
+                debugLog.info(`🔄 炮管旋转中: ${(oldAngle * 180 / Math.PI).toFixed(1)}° → ${(this.cannon.angle * 180 / Math.PI).toFixed(1)}° (差值: ${(normalizedDiff * 180 / Math.PI).toFixed(1)}°)`);
+            }
+        }
     }
 
     drawBullets() {
