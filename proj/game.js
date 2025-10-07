@@ -205,7 +205,9 @@ class WordTetrisGame {
             width: 40,
             height: 60,
             angle: -Math.PI / 2, // 初始向上
-            targetAngle: -Math.PI / 2
+            targetAngle: -Math.PI / 2,
+            recoil: 0, // 后坐力偏移量
+            recoilDecay: 0.15 // 后坐力衰减速度
         };
         
         // 炮弹系统
@@ -1644,33 +1646,359 @@ class WordTetrisGame {
         // 炮管在游戏进行时始终显示
         if (this.gameState !== 'playing' && this.gameState !== 'review') return;
         
+        // 更新后坐力（逐渐衰减）
+        if (this.cannon.recoil > 0) {
+            this.cannon.recoil *= (1 - this.cannon.recoilDecay);
+            if (this.cannon.recoil < 0.1) {
+                this.cannon.recoil = 0;
+            }
+        }
+        
         this.ctx.save();
         this.ctx.translate(this.cannon.x, this.cannon.y);
         
-        // 【修复】简化旋转逻辑
-        // cannon.angle 直接表示从Y轴负方向（向上）顺时针旋转的角度
-        // fillRect 绘制的炮管默认向上（y=-40），所以直接使用 angle 旋转即可
-        this.ctx.rotate(this.cannon.angle);
+        // === 卡通风格木质大炮（堡垒基座设计） ===
         
-        // 绘制炮管底座
-        this.ctx.fillStyle = '#555555';
+        // 1. 绘制半圆形堡垒基座（保持水平，覆盖大炮1/3，不受后坐力影响）
+        this.ctx.save();
+        
+        // 基座阴影
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
         this.ctx.beginPath();
-        this.ctx.arc(0, 0, 20, 0, Math.PI * 2);
+        this.ctx.arc(0, 25, 62, Math.PI, 0);
+        this.ctx.closePath();
         this.ctx.fill();
         
-        // 绘制炮管
-        this.ctx.fillStyle = '#888888';
-        this.ctx.fillRect(-8, -40, 16, 40);
+        // 基座主体（真正的半圆形，石质渐变，半径60px）
+        const baseGradient = this.ctx.createRadialGradient(0, 25, 0, 0, 25, 60);
+        baseGradient.addColorStop(0, '#8B8D8F');
+        baseGradient.addColorStop(0.3, '#7F8C8D');
+        baseGradient.addColorStop(0.6, '#6C7A7E');
+        baseGradient.addColorStop(1, '#5D6D7E');
+        this.ctx.fillStyle = baseGradient;
+        this.ctx.beginPath();
+        this.ctx.arc(0, 25, 60, Math.PI, 0);
+        this.ctx.closePath();
+        this.ctx.fill();
         
-        // 炮管边缘高光
-        this.ctx.fillStyle = '#aaaaaa';
-        this.ctx.fillRect(-8, -40, 4, 40);
+        // 石头不规则质感 - 随机石块纹理
+        this.ctx.save();
+        this.ctx.globalAlpha = 0.3;
         
-        // 炮口
-        this.ctx.fillStyle = '#333333';
-        this.ctx.fillRect(-10, -42, 20, 4);
+        // 使用固定的随机种子模拟石块（调整到60px半径范围内）
+        const stonePatterns = [
+            { x: -40, y: 8, size: 12, darkness: 0.2 },
+            { x: -25, y: 5, size: 10, darkness: 0.15 },
+            { x: -10, y: 7, size: 14, darkness: 0.25 },
+            { x: 8, y: 10, size: 11, darkness: 0.18 },
+            { x: 28, y: 6, size: 13, darkness: 0.22 },
+            { x: 45, y: 12, size: 10, darkness: 0.2 },
+            { x: -30, y: 15, size: 8, darkness: 0.15 },
+            { x: 18, y: 17, size: 9, darkness: 0.17 },
+            { x: -48, y: 18, size: 10, darkness: 0.19 },
+            { x: 38, y: 20, size: 11, darkness: 0.21 }
+        ];
+        
+        stonePatterns.forEach(stone => {
+            // 只绘制在半圆范围内的石块（60px半径）
+            const distFromCenter = Math.sqrt(stone.x * stone.x + (stone.y - 25) * (stone.y - 25));
+            if (distFromCenter < 55 && stone.y < 25) {
+                // 深色石块
+                this.ctx.fillStyle = `rgba(0, 0, 0, ${stone.darkness})`;
+                this.ctx.beginPath();
+                this.ctx.arc(stone.x, stone.y, stone.size, 0, Math.PI * 2);
+                this.ctx.fill();
+                
+                // 石块边缘高光
+                this.ctx.fillStyle = `rgba(255, 255, 255, ${stone.darkness * 0.5})`;
+                this.ctx.beginPath();
+                this.ctx.arc(stone.x - stone.size * 0.3, stone.y - stone.size * 0.3, stone.size * 0.4, 0, Math.PI * 2);
+                this.ctx.fill();
+            }
+        });
         
         this.ctx.restore();
+        
+        // 石头裂纹纹理
+        this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.25)';
+        this.ctx.lineWidth = 1.5;
+        this.ctx.lineCap = 'round';
+        
+        // 不规则裂纹（调整到60px半径范围内）
+        const cracks = [
+            [{ x: -48, y: 12 }, { x: -35, y: 10 }, { x: -22, y: 11 }],
+            [{ x: -28, y: 6 }, { x: -18, y: 8 }, { x: -8, y: 7 }],
+            [{ x: 3, y: 8 }, { x: 15, y: 10 }, { x: 25, y: 9 }],
+            [{ x: 32, y: 13 }, { x: 42, y: 11 }, { x: 52, y: 15 }],
+            [{ x: -38, y: 18 }, { x: -28, y: 20 }, { x: -18, y: 19 }],
+            [{ x: 12, y: 16 }, { x: 22, y: 18 }, { x: 32, y: 20 }]
+        ];
+        
+        cracks.forEach(crack => {
+            this.ctx.beginPath();
+            this.ctx.moveTo(crack[0].x, crack[0].y);
+            for (let i = 1; i < crack.length; i++) {
+                this.ctx.lineTo(crack[i].x, crack[i].y);
+            }
+            this.ctx.stroke();
+        });
+        
+        // 基座底部平面（宽度120px）
+        this.ctx.fillStyle = '#4A5A5E';
+        this.ctx.fillRect(-60, 25, 120, 6);
+        
+        // 底部平面阴影
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+        this.ctx.fillRect(-60, 25, 120, 2);
+        
+        // 基座边缘高光（左侧）
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+        this.ctx.beginPath();
+        this.ctx.arc(-30, 13, 18, Math.PI * 0.7, Math.PI * 1.3);
+        this.ctx.fill();
+        
+        // 基座边缘阴影（右侧）
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+        this.ctx.beginPath();
+        this.ctx.arc(35, 16, 15, Math.PI * 1.7, Math.PI * 0.3);
+        this.ctx.fill();
+        
+        // 基座装饰边缘（深色轮廓）
+        this.ctx.strokeStyle = '#2C3E50';
+        this.ctx.lineWidth = 3;
+        this.ctx.beginPath();
+        this.ctx.arc(0, 25, 60, Math.PI, 0);
+        this.ctx.stroke();
+        
+        // 基座底部边缘线
+        this.ctx.strokeStyle = '#1A252F';
+        this.ctx.lineWidth = 2;
+        this.ctx.beginPath();
+        this.ctx.moveTo(-60, 25);
+        this.ctx.lineTo(60, 25);
+        this.ctx.stroke();
+        
+        this.ctx.restore();
+        
+        // 应用炮管旋转和后坐力（基座不受影响）
+        this.ctx.rotate(this.cannon.angle);
+        if (this.cannon.recoil > 0) {
+            this.ctx.translate(0, this.cannon.recoil);
+        }
+        
+        // 2. 绘制炮台基座（连接堡垒和炮管）
+        // 炮台底部（圆柱形）
+        const platformGradient = this.ctx.createLinearGradient(-25, 0, 25, 0);
+        platformGradient.addColorStop(0, '#5D6D7E');
+        platformGradient.addColorStop(0.5, '#7F8C8D');
+        platformGradient.addColorStop(1, '#5D6D7E');
+        this.ctx.fillStyle = platformGradient;
+        this.ctx.fillRect(-25, -8, 50, 12);
+        
+        // 炮台顶部椭圆
+        const topGradient = this.ctx.createRadialGradient(0, -8, 0, 0, -8, 25);
+        topGradient.addColorStop(0, '#95A5A6');
+        topGradient.addColorStop(1, '#7F8C8D');
+        this.ctx.fillStyle = topGradient;
+        this.ctx.beginPath();
+        this.ctx.ellipse(0, -8, 25, 8, 0, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // 炮台装饰环
+        this.ctx.strokeStyle = '#34495E';
+        this.ctx.lineWidth = 2;
+        this.ctx.beginPath();
+        this.ctx.ellipse(0, -8, 23, 7, 0, 0, Math.PI * 2);
+        this.ctx.stroke();
+        
+        // 炮台高光
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+        this.ctx.fillRect(-25, -8, 8, 12);
+        this.ctx.beginPath();
+        this.ctx.ellipse(-8, -8, 10, 4, 0, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // 3. 绘制木质支架（V形支撑）
+        this.ctx.fillStyle = '#A0522D';
+        // 左支架
+        this.ctx.beginPath();
+        this.ctx.moveTo(-20, -5);
+        this.ctx.lineTo(-15, -25);
+        this.ctx.lineTo(-10, -25);
+        this.ctx.lineTo(-15, -5);
+        this.ctx.closePath();
+        this.ctx.fill();
+        
+        // 右支架
+        this.ctx.beginPath();
+        this.ctx.moveTo(20, -5);
+        this.ctx.lineTo(15, -25);
+        this.ctx.lineTo(10, -25);
+        this.ctx.lineTo(15, -5);
+        this.ctx.closePath();
+        this.ctx.fill();
+        
+        // 支架高光
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+        this.ctx.beginPath();
+        this.ctx.moveTo(-20, -5);
+        this.ctx.lineTo(-17, -25);
+        this.ctx.lineTo(-15, -25);
+        this.ctx.lineTo(-18, -5);
+        this.ctx.closePath();
+        this.ctx.fill();
+        
+        // 4. 绘制金属炮管（深灰色，分段设计）
+        // 炮管后段（粗）
+        const barrelGradient1 = this.ctx.createLinearGradient(-15, 0, 15, 0);
+        barrelGradient1.addColorStop(0, '#2C3E50');
+        barrelGradient1.addColorStop(0.3, '#34495E');
+        barrelGradient1.addColorStop(0.5, '#4A5F7F');
+        barrelGradient1.addColorStop(0.7, '#34495E');
+        barrelGradient1.addColorStop(1, '#2C3E50');
+        this.ctx.fillStyle = barrelGradient1;
+        this.drawRoundedRect(-15, -50, 30, 30, 4);
+        this.ctx.fill();
+        
+        // 炮管中段（略细）
+        const barrelGradient2 = this.ctx.createLinearGradient(-13, 0, 13, 0);
+        barrelGradient2.addColorStop(0, '#34495E');
+        barrelGradient2.addColorStop(0.5, '#4A5F7F');
+        barrelGradient2.addColorStop(1, '#34495E');
+        this.ctx.fillStyle = barrelGradient2;
+        this.drawRoundedRect(-13, -75, 26, 30, 3);
+        this.ctx.fill();
+        
+        // 炮管前段（细长）
+        const barrelGradient3 = this.ctx.createLinearGradient(-11, 0, 11, 0);
+        barrelGradient3.addColorStop(0, '#2C3E50');
+        barrelGradient3.addColorStop(0.5, '#34495E');
+        barrelGradient3.addColorStop(1, '#2C3E50');
+        this.ctx.fillStyle = barrelGradient3;
+        this.drawRoundedRect(-11, -105, 22, 35, 3);
+        this.ctx.fill();
+        
+        // 炮管高光（左侧）
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
+        this.drawRoundedRect(-15, -50, 5, 30, 2);
+        this.ctx.fill();
+        this.drawRoundedRect(-13, -75, 5, 30, 2);
+        this.ctx.fill();
+        this.drawRoundedRect(-11, -105, 4, 35, 2);
+        this.ctx.fill();
+        
+        // 炮管阴影（右侧）
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+        this.drawRoundedRect(10, -50, 5, 30, 2);
+        this.ctx.fill();
+        this.drawRoundedRect(8, -75, 5, 30, 2);
+        this.ctx.fill();
+        this.drawRoundedRect(7, -105, 4, 35, 2);
+        this.ctx.fill();
+        
+        // 5. 绘制炮管分段装饰环
+        this.ctx.strokeStyle = '#1A252F';
+        this.ctx.lineWidth = 3;
+        [-48, -73, -98].forEach(y => {
+            this.ctx.beginPath();
+            this.ctx.moveTo(-15, y);
+            this.ctx.lineTo(15, y);
+            this.ctx.stroke();
+        });
+        
+        // 6. 绘制炮口（粗圆柱体设计）
+        // 炮口圆柱体（比炮身粗）
+        const muzzleCylinderGradient = this.ctx.createLinearGradient(-18, 0, 18, 0);
+        muzzleCylinderGradient.addColorStop(0, '#1A252F');
+        muzzleCylinderGradient.addColorStop(0.3, '#2C3E50');
+        muzzleCylinderGradient.addColorStop(0.5, '#4A5F7F');
+        muzzleCylinderGradient.addColorStop(0.7, '#2C3E50');
+        muzzleCylinderGradient.addColorStop(1, '#1A252F');
+        this.ctx.fillStyle = muzzleCylinderGradient;
+        this.drawRoundedRect(-18, -118, 36, 13, 2);
+        this.ctx.fill();
+        
+        // 炮口圆柱体边缘环（蓝色装饰）
+        this.ctx.strokeStyle = '#3498DB';
+        this.ctx.lineWidth = 2;
+        this.ctx.beginPath();
+        this.ctx.moveTo(-18, -106);
+        this.ctx.lineTo(18, -106);
+        this.ctx.stroke();
+        
+        // 炮口圆柱体高光
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+        this.drawRoundedRect(-18, -118, 6, 13, 2);
+        this.ctx.fill();
+        
+        // 7. 绘制金属铆钉装饰
+        this.ctx.fillStyle = '#1A252F';
+        [-45, -35, -70, -60, -95, -85].forEach(y => {
+            // 左侧铆钉
+            this.ctx.beginPath();
+            this.ctx.arc(-12, y, 2.5, 0, Math.PI * 2);
+            this.ctx.fill();
+            // 右侧铆钉
+            this.ctx.beginPath();
+            this.ctx.arc(12, y, 2.5, 0, Math.PI * 2);
+            this.ctx.fill();
+        });
+        
+        // 铆钉高光
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+        [-45, -35, -70, -60, -95, -85].forEach(y => {
+            this.ctx.beginPath();
+            this.ctx.arc(-13, y - 1, 1, 0, Math.PI * 2);
+            this.ctx.fill();
+            this.ctx.beginPath();
+            this.ctx.arc(11, y - 1, 1, 0, Math.PI * 2);
+            this.ctx.fill();
+        });
+        
+        // 8. 绘制底座装饰（金属扣件）
+        this.ctx.fillStyle = '#34495E';
+        this.ctx.fillRect(-8, -12, 16, 8);
+        this.ctx.strokeStyle = '#1A252F';
+        this.ctx.lineWidth = 2;
+        this.ctx.strokeRect(-8, -12, 16, 8);
+        
+        // 9. 发射准备指示灯
+        if (this.fallingWords.length > 0) {
+            // 绿色指示灯（在炮管侧面）
+            const glowGradient = this.ctx.createRadialGradient(18, -60, 0, 18, -60, 8);
+            glowGradient.addColorStop(0, '#2ECC71');
+            glowGradient.addColorStop(0.5, '#27AE60');
+            glowGradient.addColorStop(1, 'rgba(46, 204, 113, 0.2)');
+            this.ctx.fillStyle = glowGradient;
+            this.ctx.beginPath();
+            this.ctx.arc(18, -60, 5, 0, Math.PI * 2);
+            this.ctx.fill();
+            
+            // 指示灯闪烁
+            if (Math.floor(Date.now() / 300) % 2 === 0) {
+                this.ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                this.ctx.beginPath();
+                this.ctx.arc(18, -60, 2.5, 0, Math.PI * 2);
+                this.ctx.fill();
+            }
+        }
+        
+        this.ctx.restore();
+    }
+    
+    // 辅助方法：绘制圆角矩形
+    drawRoundedRect(x, y, width, height, radius) {
+        this.ctx.beginPath();
+        this.ctx.moveTo(x + radius, y);
+        this.ctx.lineTo(x + width - radius, y);
+        this.ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+        this.ctx.lineTo(x + width, y + height - radius);
+        this.ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+        this.ctx.lineTo(x + radius, y + height);
+        this.ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+        this.ctx.lineTo(x, y + radius);
+        this.ctx.quadraticCurveTo(x, y, x + radius, y);
+        this.ctx.closePath();
     }
     
     // 更新炮管瞄准角度（在updateGame中调用）
@@ -1749,36 +2077,81 @@ class WordTetrisGame {
 
     drawBullets() {
         this.bullets.forEach(bullet => {
-            // 绘制炮弹轨迹（橙色/黄色光束）
-            const gradient = this.ctx.createLinearGradient(
-                bullet.startX, bullet.startY,
-                bullet.x, bullet.y
-            );
-            gradient.addColorStop(0, 'rgba(255, 165, 0, 0.8)');
-            gradient.addColorStop(0.5, 'rgba(255, 215, 0, 1)');
-            gradient.addColorStop(1, 'rgba(255, 255, 0, 0.6)');
+            // 1. 绘制火焰尾迹
+            bullet.trail.forEach((point, index) => {
+                const size = (index / bullet.trail.length) * 12;
+                const alpha = point.alpha * 0.6;
+                
+                // 橙红色尾迹
+                const trailGradient = this.ctx.createRadialGradient(
+                    point.x, point.y, 0,
+                    point.x, point.y, size
+                );
+                trailGradient.addColorStop(0, `rgba(255, 200, 0, ${alpha})`);
+                trailGradient.addColorStop(0.5, `rgba(255, 100, 0, ${alpha * 0.7})`);
+                trailGradient.addColorStop(1, `rgba(255, 50, 0, 0)`);
+                
+                this.ctx.fillStyle = trailGradient;
+                this.ctx.beginPath();
+                this.ctx.arc(point.x, point.y, size, 0, Math.PI * 2);
+                this.ctx.fill();
+            });
             
-            this.ctx.strokeStyle = gradient;
-            this.ctx.lineWidth = 4;
-            this.ctx.lineCap = 'round';
+            // 2. 绘制火球主体
+            this.ctx.save();
+            this.ctx.translate(bullet.x, bullet.y);
+            this.ctx.rotate(bullet.rotation);
             
+            // 外层光晕（红色）
+            const outerGlow = this.ctx.createRadialGradient(0, 0, 0, 0, 0, 16);
+            outerGlow.addColorStop(0, 'rgba(255, 100, 0, 0.8)');
+            outerGlow.addColorStop(0.5, 'rgba(255, 50, 0, 0.4)');
+            outerGlow.addColorStop(1, 'rgba(255, 0, 0, 0)');
+            this.ctx.fillStyle = outerGlow;
             this.ctx.beginPath();
-            this.ctx.moveTo(bullet.startX, bullet.startY);
-            this.ctx.lineTo(bullet.x, bullet.y);
-            this.ctx.stroke();
-            
-            // 绘制炮弹头部（发光效果）
-            const glowGradient = this.ctx.createRadialGradient(
-                bullet.x, bullet.y, 0,
-                bullet.x, bullet.y, 8
-            );
-            glowGradient.addColorStop(0, 'rgba(255, 255, 0, 1)');
-            glowGradient.addColorStop(1, 'rgba(255, 165, 0, 0)');
-            
-            this.ctx.fillStyle = glowGradient;
-            this.ctx.beginPath();
-            this.ctx.arc(bullet.x, bullet.y, 8, 0, Math.PI * 2);
+            this.ctx.arc(0, 0, 16, 0, Math.PI * 2);
             this.ctx.fill();
+            
+            // 中层火球（橙色）
+            const middleGlow = this.ctx.createRadialGradient(0, 0, 0, 0, 0, 10);
+            middleGlow.addColorStop(0, 'rgba(255, 200, 0, 1)');
+            middleGlow.addColorStop(0.6, 'rgba(255, 150, 0, 1)');
+            middleGlow.addColorStop(1, 'rgba(255, 100, 0, 0.8)');
+            this.ctx.fillStyle = middleGlow;
+            this.ctx.beginPath();
+            this.ctx.arc(0, 0, 10, 0, Math.PI * 2);
+            this.ctx.fill();
+            
+            // 内核（亮黄色）
+            const core = this.ctx.createRadialGradient(0, 0, 0, 0, 0, 5);
+            core.addColorStop(0, 'rgba(255, 255, 200, 1)');
+            core.addColorStop(0.5, 'rgba(255, 255, 100, 1)');
+            core.addColorStop(1, 'rgba(255, 200, 0, 1)');
+            this.ctx.fillStyle = core;
+            this.ctx.beginPath();
+            this.ctx.arc(0, 0, 5, 0, Math.PI * 2);
+            this.ctx.fill();
+            
+            // 火焰纹理（旋转的火苗）
+            for (let i = 0; i < 6; i++) {
+                const angle = (Math.PI * 2 / 6) * i;
+                const flameX = Math.cos(angle) * 8;
+                const flameY = Math.sin(angle) * 8;
+                
+                const flameGradient = this.ctx.createRadialGradient(
+                    flameX, flameY, 0,
+                    flameX, flameY, 4
+                );
+                flameGradient.addColorStop(0, 'rgba(255, 255, 150, 0.6)');
+                flameGradient.addColorStop(1, 'rgba(255, 150, 0, 0)');
+                
+                this.ctx.fillStyle = flameGradient;
+                this.ctx.beginPath();
+                this.ctx.arc(flameX, flameY, 4, 0, Math.PI * 2);
+                this.ctx.fill();
+            }
+            
+            this.ctx.restore();
         });
     }
 
@@ -2176,16 +2549,24 @@ class WordTetrisGame {
     }
 
     shootBullet(targetWord) {
-        // 创建炮弹对象
+        // 触发后坐力效果（向后推10像素）
+        this.cannon.recoil = 10;
+        
+        // 计算炮口位置（炮管前端，考虑旋转角度）
+        const muzzleDistance = 118; // 炮口距离炮管中心的距离
+        const muzzleX = this.cannon.x + Math.sin(this.cannon.angle) * muzzleDistance;
+        const muzzleY = this.cannon.y - Math.cos(this.cannon.angle) * muzzleDistance;
+        
+        // 创建火球炮弹对象
         const bullet = {
-            startX: this.cannon.x,
-            startY: this.cannon.y - 40,
-            x: this.cannon.x,
-            y: this.cannon.y - 40,
+            x: muzzleX,
+            y: muzzleY,
             targetX: targetWord.x,
             targetY: targetWord.y + targetWord.height / 2,
             speed: 15,
-            targetWord: targetWord
+            targetWord: targetWord,
+            rotation: 0, // 火球旋转角度
+            trail: [] // 火焰尾迹
         };
         
         // 计算炮弹方向
@@ -2202,9 +2583,23 @@ class WordTetrisGame {
         for (let i = this.bullets.length - 1; i >= 0; i--) {
             const bullet = this.bullets[i];
             
+            // 保存当前位置作为尾迹
+            bullet.trail.push({ x: bullet.x, y: bullet.y, alpha: 1 });
+            if (bullet.trail.length > 10) {
+                bullet.trail.shift();
+            }
+            
+            // 更新尾迹透明度
+            bullet.trail.forEach((point, index) => {
+                point.alpha = index / bullet.trail.length;
+            });
+            
             // 更新炮弹位置
             bullet.x += bullet.vx;
             bullet.y += bullet.vy;
+            
+            // 更新火球旋转
+            bullet.rotation += 0.3;
             
             // 检查是否击中目标
             const dx = bullet.x - bullet.targetX;
