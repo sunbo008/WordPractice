@@ -327,7 +327,20 @@ class WordTetrisGame {
             
             // 异步初始化 TTS 服务（提前测试找到可用的提供商）
             this.ttsService.initialize().then(() => {
-                debugLog.success('✅ TTS 服务初始化完成');
+                // 获取可用的提供商列表
+                const availableProviders = this.ttsService.getAvailableProviders();
+                const currentProvider = this.ttsService.getCurrentProvider();
+                
+                if (availableProviders.length > 0) {
+                    debugLog.success(`✅ TTS 服务初始化完成，找到 ${availableProviders.length} 个可用提供商:`);
+                    availableProviders.forEach((name, index) => {
+                        const prefix = (name === currentProvider) ? '👉' : '  ';
+                        debugLog.info(`${prefix} ${index + 1}. ${name}`);
+                    });
+                } else {
+                    debugLog.warning('⚠️ TTS 服务初始化完成，但没有找到可用的提供商');
+                    this.speechEnabled = false;
+                }
             }).catch((error) => {
                 debugLog.error('❌ TTS 服务初始化失败:', error);
                 this.speechEnabled = false;
