@@ -21,6 +21,8 @@ class TTSService {
         this.britishVoice = null;
         this.currentProviderIndex = 0;
         this.isSpeaking = false;
+        this.providerTested = false; // 标记是否已测试过提供商
+        this.availableProvider = null; // 缓存可用的提供商
         
         // 定义 TTS 提供商列表（按优先级排序）
         this.providers = [
@@ -75,6 +77,51 @@ class TTSService {
             TTSService.instance = new TTSService();
         }
         return TTSService.instance;
+    }
+    
+    /**
+     * 初始化并测试 TTS 提供商（异步）
+     * 在第一次使用前调用，找到可用的提供商
+     */
+    async initialize() {
+        if (this.providerTested) {
+            return; // 已经测试过了
+        }
+        
+        console.log('🔍 TTSService: 开始测试 TTS 提供商...');
+        
+        // 测试每个提供商
+        for (let i = 0; i < this.providers.length; i++) {
+            const provider = this.providers[i];
+            
+            try {
+                // 测试提供商是否可用
+                if (!provider.test()) {
+                    console.log(`⏭️ TTSService: ${provider.name} 不可用（测试失败）`);
+                    continue;
+                }
+                
+                // 对于 Web Speech API，特殊处理
+                if (provider.name === 'Web Speech API') {
+                    this._initWebSpeechAPI();
+                }
+                
+                console.log(`✅ TTSService: ${provider.name} 可用`);
+                this.currentProviderIndex = i;
+                this.availableProvider = provider;
+                this.providerTested = true;
+                
+                console.log(`🎯 TTSService: 选定 ${provider.name} 作为默认 TTS 提供商`);
+                return;
+                
+            } catch (error) {
+                console.warn(`❌ TTSService: ${provider.name} 测试失败:`, error.message);
+            }
+        }
+        
+        // 如果没有找到可用的提供商
+        console.error('❌ TTSService: 没有找到可用的 TTS 提供商');
+        this.providerTested = true;
     }
     
     /**
@@ -210,61 +257,58 @@ class TTSService {
             onError = null
         } = options;
         
-        // 防止重复朗读
+        // 防止重复朗读 - 但允许强制停止旧的朗读
         if (this.isSpeaking) {
-            console.log('⏸️ TTSService: 正在朗读中，跳过');
-            return;
+            console.warn('⚠️ TTSService: 上一次朗读还未完成，先停止旧的朗读');
+            this.stop(); // 停止旧的朗读
         }
         
-        this.isSpeaking = true;
+        // 如果还没有测试过提供商，先初始化
+        if (!this.providerTested) {
+            await this.initialize();
+        }
         
-        try {
-            // 从当前提供商开始尝试
-            for (let i = this.currentProviderIndex; i < this.providers.length; i++) {
-                const provider = this.providers[i];
+        // 如果有可用的提供商，直接使用
+        if (this.availableProvider) {
+            this.isSpeaking = true;
+            
+            try {
+                await this.availableProvider.speak(word);
+                console.log(`✅ TTSService: 使用 ${this.availableProvider.name} 朗读: ${word}`);
                 
-                try {
-                    // 测试提供商是否可用
-                    if (!provider.test()) {
-                        console.log(`⏭️ TTSService: ${provider.name} 不可用，尝试下一个`);
-                        continue;
-                    }
-                    
-                    // 尝试朗读
-                    await provider.speak(word);
-                    console.log(`✅ TTSService: 使用 ${provider.name} 朗读: ${word}`);
-                    
-                    // 记住成功的提供商，下次优先使用
-                    this.currentProviderIndex = i;
-                    
-                    // 调用成功回调
-                    if (onSuccess) {
-                        onSuccess(provider.name);
-                    }
-                    
-                    return;
-                    
-                } catch (error) {
-                    console.warn(`❌ TTSService: ${provider.name} 失败:`, error.message);
-                    // 继续尝试下一个提供商
+                if (onSuccess) {
+                    onSuccess(this.availableProvider.name);
                 }
+                
+                return;
+                
+            } catch (error) {
+                console.warn(`❌ TTSService: ${this.availableProvider.name} 失败:`, error.message);
+                
+                // 当前提供商失败，尝试降级到下一个
+                console.log('🔄 TTSService: 尝试降级到其他提供商...');
+                this.availableProvider = null; // 清除缓存
+                this.providerTested = false; // 重新测试
+                
+                // 递归调用，重新初始化并尝试
+                this.isSpeaking = false;
+                return await this.speak(word, options);
+                
+            } finally {
+                this.isSpeaking = false;
             }
-            
-            // 所有提供商都失败
-            const errorMsg = '所有 TTS 服务均不可用';
-            console.error(`❌ TTSService: ${errorMsg}`);
-            
-            if (showError) {
-                this._showErrorNotification(errorMsg);
-            }
-            
-            // 调用失败回调
-            if (onError) {
-                onError(new Error(errorMsg));
-            }
-            
-        } finally {
-            this.isSpeaking = false;
+        }
+        
+        // 没有可用的提供商
+        const errorMsg = '所有 TTS 服务均不可用';
+        console.error(`❌ TTSService: ${errorMsg}`);
+        
+        if (showError) {
+            this._showErrorNotification(errorMsg);
+        }
+        
+        if (onError) {
+            onError(new Error(errorMsg));
         }
     }
     
@@ -359,11 +403,13 @@ class TTSService {
     }
 }
 
-// 导出单例实例
-export { TTSService };
-
-// 如果不使用 ES6 模块，也可以挂载到 window 对象
+// 导出到 window 对象，供全局使用
 if (typeof window !== 'undefined') {
     window.TTSService = TTSService;
+}
+
+// 如果使用 ES6 模块，也提供 export
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { TTSService };
 }
 

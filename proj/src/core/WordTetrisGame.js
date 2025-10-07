@@ -243,6 +243,7 @@ class WordTetrisGame {
         this.speechEnabled = true;
         this.currentSpeech = null;
         this.speechTimer = null;
+        this.ttsService = null; // TTS 服务实例
         this.setupSpeechSynthesis();
         
         // 炮塔基座纹理缓存（静态生成，避免每帧重新计算）
@@ -320,109 +321,44 @@ class WordTetrisGame {
     setupSpeechSynthesis() {
         debugLog.info('🎤 初始化语音合成系统...');
         
-        // 检查浏览器是否支持语音合成
-        if ('speechSynthesis' in window) {
-            this.speechSynthesis = window.speechSynthesis;
-            debugLog.success('✅ 浏览器支持 Web Speech API');
+        // 使用 TTSService
+        if (typeof TTSService !== 'undefined') {
+            this.ttsService = TTSService.getInstance();
             
-            // 等待语音列表加载
-            const voices = this.speechSynthesis.getVoices();
-            debugLog.info(`📊 当前可用语音数量: ${voices.length}`);
-            
-            if (voices.length === 0) {
-                debugLog.warn('⏳ 语音列表未加载，等待 voiceschanged 事件...');
-                this.speechSynthesis.addEventListener('voiceschanged', () => {
-                    debugLog.info('📢 voiceschanged 事件触发');
-                    this.selectBritishVoice();
-                });
-            } else {
-                this.selectBritishVoice();
-            }
+            // 异步初始化 TTS 服务（提前测试找到可用的提供商）
+            this.ttsService.initialize().then(() => {
+                debugLog.success('✅ TTS 服务初始化完成');
+            }).catch((error) => {
+                debugLog.error('❌ TTS 服务初始化失败:', error);
+                this.speechEnabled = false;
+            });
         } else {
-            debugLog.error('❌ 浏览器不支持语音合成功能');
+            debugLog.error('❌ TTSService 未加载');
             this.speechEnabled = false;
         }
     }
 
-    selectBritishVoice() {
-        // 获取所有可用的语音
-        const voices = this.speechSynthesis.getVoices();
-        debugLog.info(`🔍 正在选择语音，可用数量: ${voices.length}`);
-        
-        // 打印前几个语音供调试
-        if (voices.length > 0) {
-            const voiceList = voices.slice(0, 5).map(v => `${v.name} (${v.lang})`).join(', ');
-            debugLog.info(`📝 可用语音示例: ${voiceList}`);
-        }
-        
-        // 尝试找到英式英语语音
-        this.britishVoice = voices.find(voice => 
-            voice.lang === 'en-GB' || 
-            voice.name.includes('British') || 
-            voice.name.includes('UK') ||
-            voice.name.includes('Daniel') ||
-            voice.name.includes('Kate')
-        );
-        
-        // 如果没有英式语音，使用任何英语语音
-        if (!this.britishVoice) {
-            this.britishVoice = voices.find(voice => 
-                voice.lang.startsWith('en-')
-            );
-        }
-        
-        if (this.britishVoice) {
-            debugLog.success(`✅ 已选择语音: ${this.britishVoice.name} (${this.britishVoice.lang})`);
-        } else {
-            debugLog.warn('⚠️ 未找到合适的英语语音，将使用默认语音');
-        }
-    }
-
-    speakWord(word) {
+    async speakWord(word) {
         // 检查是否启用语音
-        if (!this.speechEnabled || !this.speechSynthesis) {
-            debugLog.warn('⚠️ 语音未启用或不支持');
+        if (!this.speechEnabled || !this.ttsService) {
+            debugLog.warning('⚠️ 语音未启用或 TTS 服务未加载');
             return;
         }
 
-        // 如果没有语音，尝试重新获取
-        if (!this.britishVoice) {
-            debugLog.info('🔄 重新选择语音...');
-            this.selectBritishVoice();
+        // 使用 TTSService 朗读
+        try {
+            await this.ttsService.speak(word, {
+                showError: false, // 不显示错误通知，避免干扰游戏
+                onSuccess: (providerName) => {
+                    debugLog.info(`🔊 朗读成功: "${word}" (${providerName})`);
+                },
+                onError: (error) => {
+                    debugLog.error(`❌ 朗读失败: "${word}"`, error);
+                }
+            });
+        } catch (error) {
+            debugLog.error(`❌ 朗读异常: "${word}"`, error);
         }
-
-        // 创建新的语音合成实例
-        const utterance = new SpeechSynthesisUtterance(word);
-        
-        // 设置语音（如果有的话）
-        if (this.britishVoice) {
-            utterance.voice = this.britishVoice;
-        }
-        
-        utterance.lang = 'en-GB';
-        utterance.rate = 0.9; // 稍微慢一点，便于听清
-        utterance.pitch = 1.0;
-        utterance.volume = 1.0;
-
-        // 添加错误处理
-        utterance.onerror = (event) => {
-            debugLog.error(`❌ 语音朗读错误: ${event.error}`, event);
-        };
-
-        utterance.onstart = () => {
-            debugLog.info(`🔊 开始朗读: "${word}"`);
-        };
-
-        utterance.onend = () => {
-            debugLog.success(`✅ 朗读完成: "${word}"`);
-        };
-
-        // 播放语音
-        this.currentSpeech = utterance;
-        this.speechSynthesis.speak(utterance);
-
-        const voiceInfo = this.britishVoice ? `${this.britishVoice.name} (${this.britishVoice.lang})` : '默认';
-        debugLog.info(`📤 已发送朗读请求: "${word}" | 使用语音: ${voiceInfo}`);
     }
 
     startRepeatedSpeech(word) {
@@ -449,10 +385,9 @@ class WordTetrisGame {
             debugLog.info('⏹️ 停止重复朗读定时器');
         }
 
-        // 停止当前语音
-        if (this.speechSynthesis) {
-            this.speechSynthesis.cancel();
-            debugLog.info('🛑 取消当前语音播放');
+        // 停止当前语音（使用 TTSService）
+        if (this.ttsService) {
+            this.ttsService.stop();
         }
 
         this.currentSpeech = null;
@@ -476,7 +411,7 @@ class WordTetrisGame {
         } else {
             btn.textContent = '🔇 语音关';
             btn.classList.add('disabled');
-            debugLog.warn('⚠️ 语音已关闭');
+            debugLog.warning('⚠️ 语音已关闭');
             this.stopSpeaking();
         }
     }

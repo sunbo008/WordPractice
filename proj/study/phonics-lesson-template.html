@@ -357,8 +357,19 @@
     <script src="/src/utils/TTSService.js"></script>
     
     <script>
-        // 初始化 TTS 服务
-        const ttsService = TTSService.getInstance();
+        // 等待 TTSService 加载完成后初始化
+        let ttsService;
+        if (typeof TTSService !== 'undefined') {
+            ttsService = TTSService.getInstance();
+            // 异步初始化 TTS 提供商（提前测试找到可用的服务）
+            ttsService.initialize().then(() => {
+                console.log('✅ TTS 服务初始化完成');
+            }).catch((error) => {
+                console.error('❌ TTS 服务初始化失败:', error);
+            });
+        } else {
+            console.error('TTSService 未加载');
+        }
         
         // 从URL参数获取课程ID
         const urlParams = new URLSearchParams(window.location.search);
@@ -492,18 +503,26 @@
         
         // 页面点击时激活语音（绕过浏览器限制）
         document.addEventListener('click', () => {
-            ttsService.activateWebSpeechAPI();
+            if (ttsService) {
+                ttsService.activateWebSpeechAPI();
+            }
             hideSpeechHint();
         }, { once: true });
         
         document.addEventListener('keydown', () => {
-            ttsService.activateWebSpeechAPI();
+            if (ttsService) {
+                ttsService.activateWebSpeechAPI();
+            }
             hideSpeechHint();
         }, { once: true });
         
         // 朗读单词（使用 TTS 服务）
         async function speakWord(word) {
-            await ttsService.speak(word);
+            if (ttsService) {
+                await ttsService.speak(word);
+            } else {
+                console.warn('TTS 服务未初始化');
+            }
         }
         
         // 返回设置页面
