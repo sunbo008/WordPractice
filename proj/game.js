@@ -2583,9 +2583,9 @@ class WordTetrisGame {
         for (let i = this.bullets.length - 1; i >= 0; i--) {
             const bullet = this.bullets[i];
             
-            // 保存当前位置作为尾迹
+            // 保存当前位置作为尾迹（加大一倍长度：10 → 20）
             bullet.trail.push({ x: bullet.x, y: bullet.y, alpha: 1 });
-            if (bullet.trail.length > 10) {
+            if (bullet.trail.length > 20) {
                 bullet.trail.shift();
             }
             
