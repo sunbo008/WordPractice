@@ -55,6 +55,7 @@
 
     <button onclick="runTests()">运行所有测试</button>
     <button onclick="window.location.href='index.html'">进入游戏</button>
+    <button onclick="window.location.href='tests/tts-service-test.html'" style="background: #9C27B0;">🎤 TTS 服务测试</button>
 
     <div id="results"></div>
 
@@ -74,6 +75,7 @@
 
             // 测试3: 工具类
             addResult('测试 DebugLogger.js', await testFile('../src/utils/DebugLogger.js'));
+            addResult('测试 TTSService.js', await testFile('../src/utils/TTSService.js'));
             addResult('测试 SpeechSystem.js', await testFile('../src/systems/SpeechSystem.js'));
             addResult('测试 CanvasHelper.js', await testFile('../src/utils/CanvasHelper.js'));
 
@@ -83,6 +85,9 @@
 
             // 测试5: 图片目录
             addResult('测试 images 目录访问', await testDirectory('images/cache/'));
+
+            // 测试6: 测试页面
+            addResult('测试 TTS 测试页面', await testFile('tests/tts-service-test.html'));
 
             // 最终总结
             const allTests = document.querySelectorAll('.test-result');
