@@ -1,48 +1,44 @@
 {
   "version": 2,
   "name": "word-tetris-game",
-  "builds": [
-    {
-      "src": "proj/**",
-      "use": "@vercel/static"
-    }
-  ],
+  "buildCommand": "echo 'No build needed'",
+  "outputDirectory": "proj",
   "routes": [
     {
       "src": "/",
-      "dest": "/proj/public/index.html"
+      "dest": "/public/index.html"
     },
     {
       "src": "/settings.html",
-      "dest": "/proj/public/settings.html"
+      "dest": "/public/settings.html"
     },
     {
       "src": "/test-structure.html",
-      "dest": "/proj/public/test-structure.html"
+      "dest": "/public/test-structure.html"
     },
     {
       "src": "/css/(.*)",
-      "dest": "/proj/public/css/$1"
+      "dest": "/public/css/$1"
     },
     {
       "src": "/js/(.*)",
-      "dest": "/proj/public/js/$1"
+      "dest": "/public/js/$1"
     },
     {
       "src": "/images/(.*)",
-      "dest": "/proj/public/images/$1"
+      "dest": "/public/images/$1"
     },
     {
       "src": "/words/(.*)",
-      "dest": "/proj/public/words/$1"
+      "dest": "/public/words/$1"
     },
     {
       "src": "/src/(.*)",
-      "dest": "/proj/src/$1"
+      "dest": "/src/$1"
     },
     {
       "src": "/(.*)",
-      "dest": "/proj/public/$1"
+      "dest": "/public/$1"
     }
   ]
 }
