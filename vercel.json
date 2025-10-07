@@ -3,7 +3,7 @@
   "name": "word-tetris-game",
   "builds": [
     {
-      "src": "proj/public/**",
+      "src": "proj/**",
       "use": "@vercel/static"
     }
   ],
@@ -11,6 +11,34 @@
     {
       "src": "/",
       "dest": "/proj/public/index.html"
+    },
+    {
+      "src": "/settings.html",
+      "dest": "/proj/public/settings.html"
+    },
+    {
+      "src": "/test-structure.html",
+      "dest": "/proj/public/test-structure.html"
+    },
+    {
+      "src": "/css/(.*)",
+      "dest": "/proj/public/css/$1"
+    },
+    {
+      "src": "/js/(.*)",
+      "dest": "/proj/public/js/$1"
+    },
+    {
+      "src": "/images/(.*)",
+      "dest": "/proj/public/images/$1"
+    },
+    {
+      "src": "/words/(.*)",
+      "dest": "/proj/public/words/$1"
+    },
+    {
+      "src": "/src/(.*)",
+      "dest": "/proj/src/$1"
     },
     {
       "src": "/(.*)",
