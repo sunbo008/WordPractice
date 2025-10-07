@@ -54,13 +54,13 @@
     <div class="container">
         <h1>小写单词显示测试</h1>
         
-        <div id="status" class="status">正在加载单词库...</div>
+        <div id="status" class="status">正在加载单词�?..</div>
         
         <div class="word-display" id="wordDisplay">等待加载...</div>
         
         <div style="text-align: center;">
-            <button onclick="generateNewWord()">生成新单词</button>
-            <button onclick="showRandomWords()">显示5个随机单词</button>
+            <button onclick="generateNewWord()">生成新单�?/button>
+            <button onclick="showRandomWords()">显示5个随机单�?/button>
         </div>
         
         <div id="results"></div>
@@ -70,7 +70,7 @@
     <script>
         let vocabularyManager;
         
-        // 初始化
+        // 初始�?
         document.addEventListener('DOMContentLoaded', () => {
             vocabularyManager = new VocabularyManager();
             
@@ -79,16 +79,16 @@
                 if (vocabularyManager.isLoaded) {
                     clearInterval(checkLoading);
                     document.getElementById('status').innerHTML = 
-                        `<span class="success">✅ 单词库加载成功！所有单词已转换为小写</span>`;
+                        `<span class="success">�?单词库加载成功！所有单词已转换为小�?/span>`;
                     generateNewWord();
                 }
             }, 100);
             
-            // 超时检查
+            // 超时检�?
             setTimeout(() => {
                 if (!vocabularyManager.isLoaded) {
                     document.getElementById('status').innerHTML = 
-                        '<span class="error">❌ 单词库加载超时</span>';
+                        '<span class="error">�?单词库加载超�?/span>';
                 }
             }, 5000);
         });
@@ -100,7 +100,7 @@
             if (word) {
                 document.getElementById('wordDisplay').innerHTML = `
                     <strong>${word.display}</strong><br>
-                    <small>原词: ${word.original} | 意思: ${word.meaning}</small>
+                    <small>原词: ${word.original} | 意�? ${word.meaning}</small>
                 `;
             }
         }
@@ -115,7 +115,7 @@
                 const word = vocabularyManager.getRandomWord(Math.floor(Math.random() * 3) + 1);
                 if (word) {
                     const isLowercase = word.original === word.original.toLowerCase();
-                    const statusIcon = isLowercase ? '✅' : '❌';
+                    const statusIcon = isLowercase ? '�? : '�?;
                     const statusText = isLowercase ? '小写正确' : '仍为大写';
                     
                     results.innerHTML += `
@@ -130,3 +130,4 @@
     </script>
 </body>
 </html>
+

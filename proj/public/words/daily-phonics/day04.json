@@ -1,0 +1,95 @@
+{
+  "metadata": {
+    "id": "day04",
+    "name": "Day 4 - 长元音 /eɪ/",
+    "phoneme": "/eɪ/",
+    "description": "学习/eɪ/的发音和拼读规则",
+    "day": 4,
+    "category": "daily-phonics",
+    "difficulty": "beginner",
+    "wordCount": 10,
+    "lastUpdated": "2025-10-06"
+  },
+  "words": [
+    {
+      "word": "name",
+      "phonetic": "[neɪm]",
+      "meaning": "名字",
+      "difficulty": 1
+    },
+    {
+      "word": "make",
+      "phonetic": "[meɪk]",
+      "meaning": "制作",
+      "difficulty": 1
+    },
+    {
+      "word": "take",
+      "phonetic": "[teɪk]",
+      "meaning": "拿",
+      "difficulty": 1
+    },
+    {
+      "word": "cake",
+      "phonetic": "[keɪk]",
+      "meaning": "蛋糕",
+      "difficulty": 1
+    },
+    {
+      "word": "game",
+      "phonetic": "[ɡeɪm]",
+      "meaning": "游戏",
+      "difficulty": 1
+    },
+    {
+      "word": "same",
+      "phonetic": "[seɪm]",
+      "meaning": "相同的",
+      "difficulty": 1
+    },
+    {
+      "word": "face",
+      "phonetic": "[feɪs]",
+      "meaning": "脸",
+      "difficulty": 1
+    },
+    {
+      "word": "place",
+      "phonetic": "[pleɪs]",
+      "meaning": "地方",
+      "difficulty": 1
+    },
+    {
+      "word": "table",
+      "phonetic": "[ˈteɪbl]",
+      "meaning": "桌子",
+      "difficulty": 1
+    },
+    {
+      "word": "today",
+      "phonetic": "[təˈdeɪ]",
+      "meaning": "今天",
+      "difficulty": 1
+    }
+  ],
+  "lesson": {
+    "pronunciationTips": [
+      "舌位：从中前位置向高前位置滑动，有明显的移动过程",
+      "唇形：从半开到接近闭合，嘴角向两侧展开",
+      "气流：声带振动，发音时要体现从/e/向/ɪ/滑动",
+      "音长：这是一个双元音，要完整发出滑动过程"
+    ],
+    "phonicsPatterns": [
+      "a + 辅音 + e 结构发 /eɪ/ 音（name, make, cake）",
+      "ace 组合发 /eɪs/ 音（face, place, space）",
+      "ame 组合发 /eɪm/ 音（game, same, name）",
+      "ay 在词尾发 /eɪ/ 音（day, today, play）"
+    ],
+    "practiceSteps": [
+      "准备动作：嘴巴半开",
+      "舌位调整：舌尖轻触下齿",
+      "发音：从\"诶\"滑向\"衣\"，体现滑动过程",
+      "检查：感受舌位的移动"
+    ]
+  }
+}

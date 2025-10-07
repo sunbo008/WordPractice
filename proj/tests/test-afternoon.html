@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>测试 afternoon</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            background: #1e3c72;
+            color: white;
+        }
+        .word {
+            font-size: 64px;
+            margin: 20px 0;
+        }
+        .stress { color: #ff4444; }
+        .normal { color: #ffffff; }
+        .info {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>测试 afternoon 重音识别</h1>
+    
+    <div class="info">
+        <h3>单词信息</h3>
+        <p><strong>单词:</strong> afternoon</p>
+        <p><strong>音标:</strong> <span id="phonetic"></span></p>
+        <p><strong>重音应该�?</strong> noon (后半部分)</p>
+    </div>
+    
+    <div class="word" id="result"></div>
+    
+    <div class="info">
+        <h3>识别结果</h3>
+        <p><strong>识别的重音位�?</strong> <span id="positions"></span></p>
+        <p><strong>对应字母:</strong> <span id="letters"></span></p>
+    </div>
+    
+    <script>
+        function getWholeSyllable(word, vowelIndex) {
+            const vowels = 'aeiou';
+            const result = [];
+            
+            let centerVowel = vowelIndex;
+            if (!vowels.includes(word[centerVowel])) {
+                for (let i = centerVowel; i < word.length; i++) {
+                    if (vowels.includes(word[i])) {
+                        centerVowel = i;
+                        break;
+                    }
+                }
+                if (!vowels.includes(word[centerVowel])) {
+                    return Array.from({length: word.length}, (_, i) => i);
+                }
+            }
+            
+            let left = centerVowel;
+            while (left > 0 && !vowels.includes(word[left - 1])) {
+                left--;
+            }
+            
+            let right = centerVowel;
+            while (right < word.length - 1 && vowels.includes(word[right + 1])) {
+                right++;
+            }
+            
+            let consonantCount = 0;
+            let tempRight = right;
+            while (tempRight < word.length - 1 && !vowels.includes(word[tempRight + 1])) {
+                consonantCount++;
+                tempRight++;
+            }
+            
+            if (tempRight < word.length - 1) {
+                right += Math.ceil(consonantCount / 2);
+            } else {
+                right = tempRight;
+            }
+            
+            for (let i = left; i <= right && i < word.length; i++) {
+                result.push(i);
+            }
+            
+            return result;
+        }
+        
+        function getStressPositions(word, phonetic) {
+            if (!word || !phonetic) {
+                return [];
+            }
+            
+            const lowerWord = word.toLowerCase();
+            console.log('单词:', lowerWord);
+            console.log('音标:', phonetic);
+            
+            const stressPattern = /[ˈˌ]([əæɑɒɔɪiːɜɛeʊuːʌɔːɪəeɪaɪɔɪəʊeəɪəʊəaʊ]+)/g;
+            const matches = [];
+            let match;
+            
+            while ((match = stressPattern.exec(phonetic)) !== null) {
+                matches.push({
+                    index: match.index,
+                    vowelSound: match[1],
+                    type: phonetic[match.index],
+                    fullMatch: match[0]
+                });
+                console.log('找到重音:', match[0], '位置:', match.index, '类型:', phonetic[match.index]);
+            }
+            
+            if (matches.length === 0) {
+                const vowels = 'aeiou';
+                for (let i = 0; i < lowerWord.length; i++) {
+                    if (vowels.includes(lowerWord[i])) {
+                        return getWholeSyllable(lowerWord, i);
+                    }
+                }
+                return Array.from({length: lowerWord.length}, (_, i) => i);
+            }
+            
+            const result = [];
+            const vowels = 'aeiou';
+            
+            matches.forEach((stressMatch, idx) => {
+                const beforeStress = phonetic.substring(0, stressMatch.index);
+                const syllablesBefore = (beforeStress.match(/[əæɑɒɔɪiːɜɛeʊuːʌɔːaʊ]+/g) || []).length;
+                
+                console.log(`重音 ${idx + 1}:`, stressMatch.type, stressMatch.fullMatch);
+                console.log('  前面的音�?', beforeStress);
+                console.log('  前面的音节数:', syllablesBefore);
+                
+                let vowelCount = 0;
+                for (let i = 0; i < lowerWord.length; i++) {
+                    if (vowels.includes(lowerWord[i])) {
+                        console.log(`  元音 ${vowelCount}: ${lowerWord[i]} at ${i}`);
+                        if (vowelCount === syllablesBefore) {
+                            console.log(`  �?匹配！找到第 ${syllablesBefore} 个元音`);
+                            const syllablePositions = getWholeSyllable(lowerWord, i);
+                            console.log('  音节范围:', syllablePositions);
+                            syllablePositions.forEach(pos => {
+                                if (!result.includes(pos)) {
+                                    result.push(pos);
+                                }
+                            });
+                            break;
+                        }
+                        vowelCount++;
+                    }
+                }
+            });
+            
+            if (result.length === 0) {
+                const vowels = 'aeiou';
+                for (let i = 0; i < lowerWord.length; i++) {
+                    if (vowels.includes(lowerWord[i])) {
+                        return getWholeSyllable(lowerWord, i);
+                    }
+                }
+            }
+            
+            return result.sort((a, b) => a - b);
+        }
+        
+        // 测试不同的音标格�?
+        const testCases = [
+            { phonetic: '[ˌɑːftəˈnuːn]', description: '标准音标（英式）' },
+            { phonetic: '[ˌæftərˈnuːn]', description: '美式音标' },
+            { phonetic: '[ɑːftəˈnuːn]', description: '只有主重�? },
+            { phonetic: '[ˈɑːftənuːn]', description: '重音在前（错误示例）' }
+        ];
+        
+        const word = 'afternoon';
+        let html = '<h2>测试不同音标格式</h2>';
+        
+        testCases.forEach((testCase, idx) => {
+            console.log(`\n=== 测试 ${idx + 1}: ${testCase.description} ===`);
+            const positions = getStressPositions(word, testCase.phonetic);
+            const letters = positions.map(i => word[i]).join('');
+            
+            html += `<div class="info">`;
+            html += `<h4>${testCase.description}</h4>`;
+            html += `<p>音标: ${testCase.phonetic}</p>`;
+            html += `<p>识别位置: [${positions.join(', ')}] �?"${letters}"</p>`;
+            html += `<div style="font-size: 48px;">`;
+            for (let i = 0; i < word.length; i++) {
+                if (positions.includes(i)) {
+                    html += `<span class="stress">${word[i]}</span>`;
+                } else {
+                    html += `<span class="normal">${word[i]}</span>`;
+                }
+            }
+            html += `</div>`;
+            html += `</div>`;
+        });
+        
+        document.getElementById('result').innerHTML = html;
+    </script>
+</body>
+</html>
+

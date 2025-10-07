@@ -1,0 +1,55 @@
+{
+  "metadata": {
+    "id": "day05",
+    "name": "Day 5 - 第1周测试",
+    "phoneme": "Review",
+    "description": "复习第1-4天学习的音标和词汇",
+    "day": 5,
+    "category": "daily-phonics",
+    "difficulty": "beginner",
+    "wordCount": 20,
+    "lastUpdated": "2025-10-06"
+  },
+  "lesson": {
+    "pronunciationTips": [
+      "复习第1周学习的4个音标：/i:/, /ʊ/, /u:/, /ɑ:/",
+      "注意区分长元音和短元音的发音差异",
+      "重点掌握每个音标的发音要领",
+      "通过单词练习巩固音标记忆"
+    ],
+    "phonicsPatterns": [
+      "/i:/ - ee组合：see, tree, green, sleep, sweet",
+      "/ʊ/ - oo+k/d组合：book, look, good",
+      "/u:/ - oo组合：moon, cool, school, blue, zoo",
+      "/ɑ:/ - ar组合：car, star, park, arm, heart"
+    ],
+    "practiceSteps": [
+      "第一步：逐个复习4个音标的发音",
+      "第二步：跟读每个音标的5个核心单词",
+      "第三步：完成听音辨音练习",
+      "第四步：进行单词拼读测试"
+    ]
+  },
+  "words": [
+    {"word": "see", "phonetic": "[siː]", "meaning": "看见", "difficulty": 1},
+    {"word": "tree", "phonetic": "[triː]", "meaning": "树", "difficulty": 1},
+    {"word": "green", "phonetic": "[ɡriːn]", "meaning": "绿色", "difficulty": 1},
+    {"word": "sleep", "phonetic": "[sliːp]", "meaning": "睡觉", "difficulty": 1},
+    {"word": "sweet", "phonetic": "[swiːt]", "meaning": "甜的", "difficulty": 1},
+    {"word": "book", "phonetic": "[bʊk]", "meaning": "书", "difficulty": 1},
+    {"word": "look", "phonetic": "[lʊk]", "meaning": "看", "difficulty": 1},
+    {"word": "good", "phonetic": "[ɡʊd]", "meaning": "好的", "difficulty": 1},
+    {"word": "put", "phonetic": "[pʊt]", "meaning": "放", "difficulty": 1},
+    {"word": "pull", "phonetic": "[pʊl]", "meaning": "拉", "difficulty": 1},
+    {"word": "moon", "phonetic": "[muːn]", "meaning": "月亮", "difficulty": 1},
+    {"word": "cool", "phonetic": "[kuːl]", "meaning": "凉爽的", "difficulty": 1},
+    {"word": "school", "phonetic": "[skuːl]", "meaning": "学校", "difficulty": 1},
+    {"word": "blue", "phonetic": "[bluː]", "meaning": "蓝色的", "difficulty": 1},
+    {"word": "zoo", "phonetic": "[zuː]", "meaning": "动物园", "difficulty": 1},
+    {"word": "car", "phonetic": "[kɑː]", "meaning": "汽车", "difficulty": 1},
+    {"word": "star", "phonetic": "[stɑː]", "meaning": "星星", "difficulty": 1},
+    {"word": "park", "phonetic": "[pɑːk]", "meaning": "公园", "difficulty": 1},
+    {"word": "arm", "phonetic": "[ɑːm]", "meaning": "手臂", "difficulty": 1},
+    {"word": "heart", "phonetic": "[hɑːt]", "meaning": "心脏", "difficulty": 2}
+  ]
+}

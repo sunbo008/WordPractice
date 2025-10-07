@@ -64,7 +64,7 @@
     <h1>🔊 语音朗读功能测试</h1>
     
     <div class="test-section">
-        <h2>1. 浏览器支持检测</h2>
+        <h2>1. 浏览器支持检�?/h2>
         <div id="supportInfo"></div>
     </div>
 
@@ -75,11 +75,11 @@
 
     <div class="test-section">
         <h2>3. 测试朗读</h2>
-        <button onclick="testSimpleSpeech()">测试简单朗读</button>
+        <button onclick="testSimpleSpeech()">测试简单朗�?/button>
         <button onclick="testEnglishWord()">测试英文单词 (HOUSE)</button>
         <button onclick="testBritishVoice()">测试英式发音</button>
-        <button onclick="testRepeated()">测试重复朗读（5秒间隔）</button>
-        <button onclick="stopAll()">停止所有朗读</button>
+        <button onclick="testRepeated()">测试重复朗读�?秒间隔）</button>
+        <button onclick="stopAll()">停止所有朗�?/button>
         <div id="testResult"></div>
     </div>
 
@@ -97,17 +97,17 @@
             const supportDiv = document.getElementById('supportInfo');
             
             if ('speechSynthesis' in window) {
-                supportDiv.innerHTML = '<div class="success">✅ 浏览器支持 Web Speech API</div>';
+                supportDiv.innerHTML = '<div class="success">�?浏览器支�?Web Speech API</div>';
                 
                 // 等待语音列表加载
                 if (window.speechSynthesis.getVoices().length === 0) {
-                    supportDiv.innerHTML += '<div class="info">⏳ 正在加载语音列表...</div>';
+                    supportDiv.innerHTML += '<div class="info">�?正在加载语音列表...</div>';
                     window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
                 } else {
                     loadVoices();
                 }
             } else {
-                supportDiv.innerHTML = '<div class="error">❌ 浏览器不支持 Web Speech API</div>';
+                supportDiv.innerHTML = '<div class="error">�?浏览器不支持 Web Speech API</div>';
             }
         }
 
@@ -117,18 +117,18 @@
             const voicesDiv = document.getElementById('voicesList');
             
             if (voices.length === 0) {
-                voicesDiv.innerHTML = '<div class="error">❌ 没有可用的语音</div>';
+                voicesDiv.innerHTML = '<div class="error">�?没有可用的语�?/div>';
                 return;
             }
 
-            let html = '<div class="success">✅ 找到 ' + voices.length + ' 个可用语音</div>';
+            let html = '<div class="success">�?找到 ' + voices.length + ' 个可用语�?/div>';
             html += '<pre>';
             
             voices.forEach((voice, index) => {
                 html += `${index + 1}. ${voice.name} (${voice.lang})`;
                 if (voice.default) html += ' [默认]';
                 if (voice.lang === 'en-GB' || voice.name.includes('British') || voice.name.includes('UK')) {
-                    html += ' ⭐ [英式]';
+                    html += ' �?[英式]';
                     if (!britishVoice) britishVoice = voice;
                 }
                 html += '\n';
@@ -137,22 +137,20 @@
             html += '</pre>';
             voicesDiv.innerHTML = html;
 
-            // 显示选择的英式语音
-            if (britishVoice) {
-                voicesDiv.innerHTML += `<div class="success">✅ 已选择英式语音: ${britishVoice.name}</div>`;
+            // 显示选择的英式语�?            if (britishVoice) {
+                voicesDiv.innerHTML += `<div class="success">�?已选择英式语音: ${britishVoice.name}</div>`;
             } else {
                 const anyEnglish = voices.find(v => v.lang.startsWith('en-'));
                 if (anyEnglish) {
                     britishVoice = anyEnglish;
                     voicesDiv.innerHTML += `<div class="info">ℹ️ 使用英语语音: ${anyEnglish.name}</div>`;
                 } else {
-                    voicesDiv.innerHTML += `<div class="error">❌ 没有找到英语语音</div>`;
+                    voicesDiv.innerHTML += `<div class="error">�?没有找到英语语音</div>`;
                 }
             }
         }
 
-        // 3. 测试简单朗读
-        function testSimpleSpeech() {
+        // 3. 测试简单朗�?        function testSimpleSpeech() {
             const resultDiv = document.getElementById('testResult');
             resultDiv.innerHTML = '<div class="info">🔊 正在朗读: "Hello"</div>';
             
@@ -160,11 +158,11 @@
             window.speechSynthesis.speak(utterance);
             
             utterance.onend = () => {
-                resultDiv.innerHTML += '<div class="success">✅ 朗读完成</div>';
+                resultDiv.innerHTML += '<div class="success">�?朗读完成</div>';
             };
             
             utterance.onerror = (event) => {
-                resultDiv.innerHTML += '<div class="error">❌ 朗读失败: ' + event.error + '</div>';
+                resultDiv.innerHTML += '<div class="error">�?朗读失败: ' + event.error + '</div>';
             };
         }
 
@@ -180,11 +178,11 @@
             window.speechSynthesis.speak(utterance);
             
             utterance.onend = () => {
-                resultDiv.innerHTML += '<div class="success">✅ 朗读完成</div>';
+                resultDiv.innerHTML += '<div class="success">�?朗读完成</div>';
             };
             
             utterance.onerror = (event) => {
-                resultDiv.innerHTML += '<div class="error">❌ 朗读失败: ' + event.error + '</div>';
+                resultDiv.innerHTML += '<div class="error">�?朗读失败: ' + event.error + '</div>';
             };
         }
 
@@ -193,7 +191,7 @@
             const resultDiv = document.getElementById('testResult');
             
             if (!britishVoice) {
-                resultDiv.innerHTML = '<div class="error">❌ 没有可用的英式语音</div>';
+                resultDiv.innerHTML = '<div class="error">�?没有可用的英式语�?/div>';
                 return;
             }
             
@@ -207,11 +205,11 @@
             window.speechSynthesis.speak(utterance);
             
             utterance.onend = () => {
-                resultDiv.innerHTML += '<div class="success">✅ 朗读完成</div>';
+                resultDiv.innerHTML += '<div class="success">�?朗读完成</div>';
             };
             
             utterance.onerror = (event) => {
-                resultDiv.innerHTML += '<div class="error">❌ 朗读失败: ' + event.error + '</div>';
+                resultDiv.innerHTML += '<div class="error">�?朗读失败: ' + event.error + '</div>';
             };
         }
 
@@ -221,7 +219,7 @@
             stopAll(); // 先停止之前的
             
             let count = 1;
-            resultDiv.innerHTML = `<div class="info">🔊 开始重复朗读 "HOUSE"（每5秒一次）</div>`;
+            resultDiv.innerHTML = `<div class="info">🔊 开始重复朗�?"HOUSE"（每5秒一次）</div>`;
             
             function speak() {
                 const utterance = new SpeechSynthesisUtterance('HOUSE');
@@ -232,25 +230,22 @@
                 utterance.rate = 0.9;
                 
                 window.speechSynthesis.speak(utterance);
-                resultDiv.innerHTML += `<div class="info">🔊 第 ${count} 次朗读</div>`;
+                resultDiv.innerHTML += `<div class="info">🔊 �?${count} 次朗�?/div>`;
                 count++;
             }
             
-            speak(); // 立即播放第一次
-            testTimer = setInterval(speak, 5000); // 每5秒重复
-            
-            resultDiv.innerHTML += '<div class="success">✅ 已启动重复朗读（点击"停止所有朗读"停止）</div>';
+            speak(); // 立即播放第一�?            testTimer = setInterval(speak, 5000); // �?秒重�?            
+            resultDiv.innerHTML += '<div class="success">�?已启动重复朗读（点击"停止所有朗�?停止�?/div>';
         }
 
-        // 7. 停止所有朗读
-        function stopAll() {
+        // 7. 停止所有朗�?        function stopAll() {
             window.speechSynthesis.cancel();
             if (testTimer) {
                 clearInterval(testTimer);
                 testTimer = null;
             }
             const resultDiv = document.getElementById('testResult');
-            resultDiv.innerHTML += '<div class="info">⏹️ 已停止所有朗读</div>';
+            resultDiv.innerHTML += '<div class="info">⏹️ 已停止所有朗�?/div>';
         }
 
         // 8. 显示调试信息
@@ -258,7 +253,7 @@
             const debugDiv = document.getElementById('debugInfo');
             const info = {
                 'User Agent': navigator.userAgent,
-                '语音合成支持': 'speechSynthesis' in window ? '是' : '否',
+                '语音合成支持': 'speechSynthesis' in window ? '�? : '�?,
                 '可用语音数量': window.speechSynthesis ? window.speechSynthesis.getVoices().length : 0,
                 '浏览器语言': navigator.language,
                 '平台': navigator.platform
@@ -273,11 +268,11 @@
             debugDiv.innerHTML = html;
         }
 
-        // 页面加载时执行检测
-        window.addEventListener('load', () => {
+        // 页面加载时执行检�?        window.addEventListener('load', () => {
             checkSupport();
             showDebugInfo();
         });
     </script>
 </body>
 </html>
+

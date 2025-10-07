@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>单词大小和小写输入测试</title>
+    <title>单词大小和小写输入测�?/title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -113,20 +113,20 @@
 </head>
 <body>
     <div class="container">
-        <h1>🎯 单词大小和小写输入测试</h1>
-        <p>测试单词显示大小增加和输入字母小写化的效果</p>
+        <h1>🎯 单词大小和小写输入测�?/h1>
+        <p>测试单词显示大小增加和输入字母小写化的效�?/p>
         
         <div class="test-section">
             <h3>字体大小对比</h3>
             <div class="comparison">
                 <div class="comparison-item old-size">
-                    <h4>修改前 (20px)</h4>
+                    <h4>修改�?(20px)</h4>
                     <div class="font-demo font-20">H[e]LL_</div>
                     <div class="font-demo font-20">W[o]R_D</div>
                     <div class="font-demo font-20">SCH[o]OL</div>
                 </div>
                 <div class="comparison-item new-size">
-                    <h4>修改后 (32px)</h4>
+                    <h4>修改�?(32px)</h4>
                     <div class="font-demo font-32">H[e]LL_</div>
                     <div class="font-demo font-32">W[o]R_D</div>
                     <div class="font-demo font-32">SCH[o]OL</div>
@@ -137,7 +137,7 @@
         <div class="test-section">
             <h3>小写输入测试</h3>
             <div class="input-test">
-                <label><strong>输入测试（应该显示小写）：</strong></label><br><br>
+                <label><strong>输入测试（应该显示小写）�?/strong></label><br><br>
                 <input type="text" id="test-input" maxlength="3" placeholder="输入字母">
                 <div id="input-display" style="margin-top: 15px; font-size: 1.2em; color: #2c3e50;">
                     输入内容将显示在这里...
@@ -168,10 +168,10 @@
             <h3>测试结果</h3>
             <div id="test-results">
                 <div class="status info">
-                    <strong>预期效果：</strong><br>
-                    1. 单词显示更大更醒目 (32px vs 20px)<br>
+                    <strong>预期效果�?/strong><br>
+                    1. 单词显示更大更醒�?(32px vs 20px)<br>
                     2. 输入的字母显示为小写<br>
-                    3. 但答案验证仍然正确工作
+                    3. 但答案验证仍然正确工�?
                 </div>
             </div>
         </div>
@@ -241,7 +241,7 @@
         
         // 监听输入变化
         document.getElementById('test-input').addEventListener('input', function(e) {
-            // 模拟游戏中的处理：只允许字母，转为小写
+            // 模拟游戏中的处理：只允许字母，转为小�?
             let value = e.target.value.replace(/[^a-zA-Z]/g, '').toLowerCase();
             e.target.value = value;
             
@@ -261,14 +261,15 @@
             const resultsDiv = document.getElementById('test-results');
             resultsDiv.innerHTML += `
                 <div class="status success">
-                    <strong>✅ 修改完成：</strong><br>
-                    1. 主要单词字体从 20px 增加到 32px<br>
-                    2. 缓冲区单词字体从 24px 增加到 28px<br>
-                    3. 输入字母自动转换为小写显示<br>
-                    4. 答案验证时自动转为大写比较
+                    <strong>�?修改完成�?/strong><br>
+                    1. 主要单词字体�?20px 增加�?32px<br>
+                    2. 缓冲区单词字体从 24px 增加�?28px<br>
+                    3. 输入字母自动转换为小写显�?br>
+                    4. 答案验证时自动转为大写比�?
                 </div>
             `;
         });
     </script>
 </body>
 </html>
+

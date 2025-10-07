@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>运行时配置加载测试</title>
+    <title>运行时配置加载测�?/title>
     <style>
         * {
             margin: 0;
@@ -191,11 +191,11 @@
 </head>
 <body>
     <div class="container">
-        <h1>🧪 运行时配置加载测试</h1>
+        <h1>🧪 运行时配置加载测�?/h1>
         <p class="subtitle">测试 JavaScript 动态扫描和生成词库配置</p>
         
         <div id="status" class="status loading">
-            ⏳ 正在加载配置...
+            �?正在加载配置...
         </div>
         
         <div class="stats-grid">
@@ -226,7 +226,7 @@
         <div class="section">
             <h2>📋 配置详情</h2>
             <div class="category-list" id="category-list">
-                <!-- 动态生成 -->
+                <!-- 动态生�?-->
             </div>
         </div>
         
@@ -236,14 +236,14 @@
         </div>
     </div>
     
-    <script src="../vocabulary-config-loader.js"></script>
+    <script src="../src/core/vocabulary-config-loader.js"></script>
     <script>
         let config = null;
         
         async function testLoad() {
             const statusEl = document.getElementById('status');
             statusEl.className = 'status loading';
-            statusEl.textContent = '⏳ 正在加载配置...';
+            statusEl.textContent = '�?正在加载配置...';
             
             try {
                 const startTime = performance.now();
@@ -255,14 +255,14 @@
                 const loadTime = (endTime - startTime).toFixed(2);
                 
                 statusEl.className = 'status success';
-                statusEl.textContent = `✅ 配置加载成功！耗时 ${loadTime}ms`;
+                statusEl.textContent = `�?配置加载成功！耗时 ${loadTime}ms`;
                 
                 displayStats(config);
                 displayCategories(config);
                 
             } catch (error) {
                 statusEl.className = 'status error';
-                statusEl.textContent = `❌ 配置加载失败: ${error.message}`;
+                statusEl.textContent = `�?配置加载失败: ${error.message}`;
                 console.error(error);
             }
         }
@@ -299,21 +299,21 @@
                     itemCount = category.subcategories.reduce((sum, sub) => sum + sub.items.length, 0);
                     const samples = [];
                     category.subcategories.forEach(sub => {
-                        samples.push(...sub.items.slice(0, 2).map(item => `${item.name} (${item.wordCount}词)`));
+                        samples.push(...sub.items.slice(0, 2).map(item => `${item.name} (${item.wordCount}�?`));
                     });
-                    itemsHTML = samples.slice(0, 5).map(item => `<div class="item">• ${item}</div>`).join('');
+                    itemsHTML = samples.slice(0, 5).map(item => `<div class="item">�?${item}</div>`).join('');
                     if (itemCount > 5) {
-                        itemsHTML += `<div class="item">... 还有 ${itemCount - 5} 个学期</div>`;
+                        itemsHTML += `<div class="item">... 还有 ${itemCount - 5} 个学�?/div>`;
                     }
                 } else {
-                    // 普通分类
+                    // 普通分�?
                     itemCount = category.subcategories?.length || 0;
                     const items = category.subcategories || [];
                     itemsHTML = items.slice(0, 5).map(item => 
-                        `<div class="item">• ${item.name} (${item.wordCount}词)</div>`
+                        `<div class="item">�?${item.name} (${item.wordCount}�?</div>`
                     ).join('');
                     if (itemCount > 5) {
-                        itemsHTML += `<div class="item">... 还有 ${itemCount - 5} 个课程</div>`;
+                        itemsHTML += `<div class="item">... 还有 ${itemCount - 5} 个课�?/div>`;
                     }
                 }
                 
@@ -322,7 +322,7 @@
                         <span class="category-icon">${category.icon}</span>
                         <div>
                             <div class="category-name">${category.name}</div>
-                            <div class="category-count">${itemCount} 个课程/学期</div>
+                            <div class="category-count">${itemCount} 个课�?学期</div>
                         </div>
                     </div>
                     <div class="item-list">${itemsHTML}</div>
@@ -346,8 +346,9 @@
             }
         }
         
-        // 页面加载时自动测试
+        // 页面加载时自动测�?
         document.addEventListener('DOMContentLoaded', testLoad);
     </script>
 </body>
 </html>
+

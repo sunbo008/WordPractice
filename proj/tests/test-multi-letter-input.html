@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>多字母输入显示测试</title>
+    <title>多字母输入显示测�?/title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -118,14 +118,14 @@
 </head>
 <body>
     <div class="container">
-        <h1>🔤 多字母输入显示测试</h1>
+        <h1>🔤 多字母输入显示测�?/h1>
         <p>测试当单词有多个缺失字母时，输入显示是否正确</p>
         
         <div class="test-section">
             <h3>当前测试单词</h3>
             <div class="test-word" id="current-word">H_LL_</div>
             <div class="input-section">
-                <label>输入缺失字母：</label>
+                <label>输入缺失字母�?/label>
                 <input type="text" id="test-input" maxlength="3" placeholder="输入字母">
             </div>
             <div class="test-word" id="display-result">H_LL_</div>
@@ -141,7 +141,7 @@
         
         <div class="test-section">
             <h3>自动测试用例</h3>
-            <button class="button" onclick="runAllTests()">运行所有测试</button>
+            <button class="button" onclick="runAllTests()">运行所有测�?/button>
             <div id="test-results" class="test-cases"></div>
         </div>
         
@@ -150,12 +150,12 @@
             <ul>
                 <li><strong>正确行为</strong>：输入第一个字母时，只显示第一个缺失位置的字母，其他位置保持下划线</li>
                 <li><strong>错误行为</strong>：输入第一个字母时，所有缺失位置都显示字母</li>
-                <li><strong>示例</strong>：HELLO缺失E,O → 输入E → 应显示H[E]LL_，而不是H[E]LL[O]</li>
+                <li><strong>示例</strong>：HELLO缺失E,O �?输入E �?应显示H[E]LL_，而不是H[E]LL[O]</li>
             </ul>
         </div>
     </div>
 
-    <script src="../vocabulary.js"></script>
+    <script src="../src/core/vocabulary-manager-v2.js"></script>
     <script>
         let currentTestWord = null;
         
@@ -183,19 +183,19 @@
             
             const expectedLetters = word.missingLetters.toUpperCase();
             
-            // 使用字符数组来避免索引问题
+            // 使用字符数组来避免索引问�?
             let displayChars = word.original.split('');
             let inputIndex = 0;
             
-            // 只替换已输入字母对应的缺失位置
+            // 只替换已输入字母对应的缺失位�?
             for (let i = 0; i < word.missing.length && inputIndex < currentInput.length; i++) {
                 const missingIndex = word.missing[i];
-                // 替换为带括号的输入字母
+                // 替换为带括号的输入字�?
                 displayChars[missingIndex] = `[${currentInput[inputIndex]}]`;
                 inputIndex++;
             }
             
-            // 将字符数组重新组合成字符串
+            // 将字符数组重新组合成字符�?
             return displayChars.join('');
         }
         
@@ -288,7 +288,7 @@
                             <div class="expected">期望: ${test.expected}</div>
                             <div class="actual">实际: ${actual}</div>
                             <div class="result ${passed ? 'pass' : 'fail'}">
-                                ${passed ? '✅ 通过' : '❌ 失败'}
+                                ${passed ? '�?通过' : '�?失败'}
                             </div>
                         </div>
                     `;
@@ -310,3 +310,4 @@
     </script>
 </body>
 </html>
+

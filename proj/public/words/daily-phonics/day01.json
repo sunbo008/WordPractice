@@ -1,0 +1,94 @@
+{
+  "metadata": {
+    "id": "day01",
+    "name": "Day 1 - 长元音 /i:/",
+    "phoneme": "/i:/",
+    "description": "学习/i:/的发音和拼读规则",
+    "day": 1,
+    "category": "daily-phonics",
+    "difficulty": "beginner",
+    "wordCount": 10,
+    "lastUpdated": "2025-10-06"
+  },
+  "lesson": {
+    "pronunciationTips": [
+      "舌位：舌前部抬高，接近硬腭前部，但不接触",
+      "唇形：嘴唇微微张开，呈扁平状，嘴角稍微向两侧拉开",
+      "气流：气流从舌面和硬腭之间通过，声带振动",
+      "音长：这是一个长元音，发音时间要拉长"
+    ],
+    "phonicsPatterns": [
+      "ee 组合通常发 /i:/ 长音",
+      "ee 可以在词中（green）或词尾（see, tree）",
+      "记住：看到 ee，就读长音'衣——'"
+    ],
+    "practiceSteps": [
+      "准备动作：微笑，嘴角向上",
+      "舌位调整：舌尖轻触下齿，舌前部抬高",
+      "发音：发'衣'音，但要拉长，类似'衣——'",
+      "检查：用手感受声带振动"
+    ]
+  },
+  "words": [
+    {
+      "word": "see",
+      "phonetic": "[siː]",
+      "meaning": "看见",
+      "difficulty": 1
+    },
+    {
+      "word": "tree",
+      "phonetic": "[triː]",
+      "meaning": "树",
+      "difficulty": 1
+    },
+    {
+      "word": "three",
+      "phonetic": "[θriː]",
+      "meaning": "三",
+      "difficulty": 1
+    },
+    {
+      "word": "free",
+      "phonetic": "[friː]",
+      "meaning": "自由的",
+      "difficulty": 1
+    },
+    {
+      "word": "green",
+      "phonetic": "[ɡriːn]",
+      "meaning": "绿色",
+      "difficulty": 1
+    },
+    {
+      "word": "sleep",
+      "phonetic": "[sliːp]",
+      "meaning": "睡觉",
+      "difficulty": 1
+    },
+    {
+      "word": "sweet",
+      "phonetic": "[swiːt]",
+      "meaning": "甜的",
+      "difficulty": 1
+    },
+    {
+      "word": "meet",
+      "phonetic": "[miːt]",
+      "meaning": "遇见",
+      "difficulty": 1
+    },
+    {
+      "word": "feet",
+      "phonetic": "[fiːt]",
+      "meaning": "脚",
+      "difficulty": 1
+    },
+    {
+      "word": "keep",
+      "phonetic": "[kiːp]",
+      "meaning": "保持",
+      "difficulty": 1
+    }
+  ]
+}

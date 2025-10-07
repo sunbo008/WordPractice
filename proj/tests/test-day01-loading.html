@@ -45,19 +45,19 @@
         <div id="test3-result"></div>
     </div>
 
-    <script src="../vocabulary-config-loader.js"></script>
+    <script src="../src/core/vocabulary-config-loader.js"></script>
     <script>
         async function test1() {
             try {
                 const response = await fetch('../words/daily-phonics/day01.json');
                 const data = await response.json();
                 document.getElementById('test1-result').innerHTML = `
-                    <p class="success">✅ 成功加载 day01.json</p>
+                    <p class="success">�?成功加载 day01.json</p>
                     <pre>${JSON.stringify(data.metadata, null, 2)}</pre>
                 `;
             } catch (error) {
                 document.getElementById('test1-result').innerHTML = `
-                    <p class="error">❌ 加载失败: ${error.message}</p>
+                    <p class="error">�?加载失败: ${error.message}</p>
                 `;
             }
         }
@@ -72,18 +72,18 @@
                 
                 if (day01) {
                     document.getElementById('test2-result').innerHTML = `
-                        <p class="success">✅ 在配置中找到 day01</p>
+                        <p class="success">�?在配置中找到 day01</p>
                         <pre>${JSON.stringify(day01, null, 2)}</pre>
                     `;
                 } else {
                     document.getElementById('test2-result').innerHTML = `
-                        <p class="error">❌ 在配置中未找到 day01</p>
-                        <p>共加载了 ${dailyPhonics.subcategories.length} 个课程</p>
+                        <p class="error">�?在配置中未找�?day01</p>
+                        <p>共加载了 ${dailyPhonics.subcategories.length} 个课�?/p>
                     `;
                 }
             } catch (error) {
                 document.getElementById('test2-result').innerHTML = `
-                    <p class="error">❌ 配置加载失败: ${error.message}</p>
+                    <p class="error">�?配置加载失败: ${error.message}</p>
                 `;
             }
         }
@@ -100,21 +100,22 @@
                 ).join('\n');
                 
                 document.getElementById('test3-result').innerHTML = `
-                    <p class="success">✅ 共加载 ${dailyPhonics.subcategories.length} 个课程</p>
+                    <p class="success">�?共加�?${dailyPhonics.subcategories.length} 个课�?/p>
                     <pre>${list}</pre>
                 `;
             } catch (error) {
                 document.getElementById('test3-result').innerHTML = `
-                    <p class="error">❌ 测试失败: ${error.message}</p>
+                    <p class="error">�?测试失败: ${error.message}</p>
                 `;
             }
         }
 
-        // 运行所有测试
+        // 运行所有测�?
         test1();
         test2();
         test3();
     </script>
 </body>
 </html>
+
 

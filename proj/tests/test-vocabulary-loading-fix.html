@@ -74,13 +74,13 @@
     <div class="container">
         <h1>🧪 词库加载修复测试</h1>
         
-        <!-- 测试1: LocalStorage检查 -->
+        <!-- 测试1: LocalStorage检�?-->
         <div class="test-section">
-            <h2>1️⃣ LocalStorage 用户选择检查</h2>
-            <div id="storage-status" class="status info">准备检查...</div>
-            <button class="btn" onclick="checkLocalStorage()">检查存储</button>
+            <h2>1️⃣ LocalStorage 用户选择检�?/h2>
+            <div id="storage-status" class="status info">准备检�?..</div>
+            <button class="btn" onclick="checkLocalStorage()">检查存�?/button>
             <button class="btn" onclick="clearLocalStorage()">清空存储</button>
-            <button class="btn" onclick="setTestSelection()">设置测试选择（只选Day1）</button>
+            <button class="btn" onclick="setTestSelection()">设置测试选择（只选Day1�?/button>
             <div id="storage-result"></div>
         </div>
         
@@ -92,16 +92,16 @@
             <div id="vocab-result"></div>
         </div>
         
-        <!-- 测试3: 单词数统计 -->
+        <!-- 测试3: 单词数统�?-->
         <div class="test-section">
-            <h2>3️⃣ 单词数统计验证</h2>
+            <h2>3️⃣ 单词数统计验�?/h2>
             <div id="count-status" class="status info">准备统计...</div>
-            <button class="btn" onclick="testWordCount()">验证单词数</button>
+            <button class="btn" onclick="testWordCount()">验证单词�?/button>
             <div id="count-result"></div>
         </div>
     </div>
 
-    <script src="../vocabulary-manager-v2.js"></script>
+    <script src="../src/core/vocabulary-manager-v2.js"></script>
     <script>
         let vocabularyManager = null;
         
@@ -118,7 +118,7 @@
             if (savedLibraries) {
                 try {
                     const libraries = JSON.parse(savedLibraries);
-                    updateStatus('storage-status', `✅ 找到用户选择: ${libraries.length}个词库`, 'success');
+                    updateStatus('storage-status', `�?找到用户选择: ${libraries.length}个词库`, 'success');
                     
                     resultDiv.innerHTML = `
                         <div class="result-box">
@@ -127,7 +127,7 @@
                         </div>
                     `;
                 } catch (error) {
-                    updateStatus('storage-status', '❌ 数据格式错误', 'error');
+                    updateStatus('storage-status', '�?数据格式错误', 'error');
                     resultDiv.innerHTML = `<div class="result-box">错误: ${error.message}</div>`;
                 }
             } else {
@@ -138,7 +138,7 @@
         
         function clearLocalStorage() {
             localStorage.removeItem('wordTetris_selectedLibraries');
-            updateStatus('storage-status', '🗑️ 已清空存储', 'info');
+            updateStatus('storage-status', '🗑�?已清空存�?, 'info');
             document.getElementById('storage-result').innerHTML = '';
         }
         
@@ -146,7 +146,7 @@
             // 只选择Day 1
             const testSelection = ['day01'];
             localStorage.setItem('wordTetris_selectedLibraries', JSON.stringify(testSelection));
-            updateStatus('storage-status', '✅ 已设置测试选择（只选Day1 - 10个单词）', 'success');
+            updateStatus('storage-status', '�?已设置测试选择（只选Day1 - 10个单词）', 'success');
             checkLocalStorage();
         }
         
@@ -167,9 +167,9 @@
                     throw new Error('加载超时');
                 }
                 
-                updateStatus('vocab-status', '✅ VocabularyManagerV2加载成功！', 'success');
+                updateStatus('vocab-status', '�?VocabularyManagerV2加载成功�?, 'success');
                 
-                // 显示加载的词库信息
+                // 显示加载的词库信�?
                 const stats = vocabularyManager.getLibraryStats();
                 const config = vocabularyManager.getCurrentConfig();
                 
@@ -181,29 +181,29 @@
                         总单词数: <span class="highlight">${stats.totalWords}</span><br>
                         <br>
                         <strong>当前配置:</strong><br>
-                        启用的词库: ${config.enabledLibraries.map(id => `<span class="highlight">${id}</span>`).join(', ')}<br>
+                        启用的词�? ${config.enabledLibraries.map(id => `<span class="highlight">${id}</span>`).join(', ')}<br>
                         <br>
-                        <strong>各词库详情:</strong><br>
+                        <strong>各词库详�?</strong><br>
                         ${stats.libraries.map(lib => 
-                            `- ${lib.name}: ${lib.wordCount}个单词 (难度: ${lib.difficulty})`
+                            `- ${lib.name}: ${lib.wordCount}个单�?(难度: ${lib.difficulty})`
                         ).join('<br>')}
                     </div>
                 `;
                 
             } catch (error) {
-                updateStatus('vocab-status', `❌ 加载失败: ${error.message}`, 'error');
+                updateStatus('vocab-status', `�?加载失败: ${error.message}`, 'error');
                 console.error('加载失败:', error);
             }
         }
         
         async function testWordCount() {
             if (!vocabularyManager) {
-                updateStatus('count-status', '❌ 请先加载VocabularyManager', 'error');
+                updateStatus('count-status', '�?请先加载VocabularyManager', 'error');
                 return;
             }
             
             try {
-                updateStatus('count-status', '正在统计单词数...', 'info');
+                updateStatus('count-status', '正在统计单词�?..', 'info');
                 
                 const stats = vocabularyManager.getVocabularyStats();
                 const config = vocabularyManager.getCurrentConfig();
@@ -217,7 +217,7 @@
                     selectedIds = JSON.parse(savedLibraries);
                 }
                 
-                // 从config-v2.json读取期望值
+                // 从config-v2.json读取期望�?
                 const configResponse = await fetch('../words/config-v2.json');
                 const configData = await configResponse.json();
                 
@@ -242,7 +242,7 @@
                 const isCorrect = stats.totalWords === expectedWords;
                 
                 updateStatus('count-status', 
-                    isCorrect ? '✅ 单词数统计正确！' : '❌ 单词数统计不匹配！', 
+                    isCorrect ? '�?单词数统计正确！' : '�?单词数统计不匹配�?, 
                     isCorrect ? 'success' : 'error'
                 );
                 
@@ -250,17 +250,17 @@
                 resultDiv.innerHTML = `
                     <div class="result-box">
                         <strong>统计结果:</strong><br>
-                        实际加载单词数: <span class="highlight">${stats.totalWords}</span><br>
-                        期望单词数: <span class="highlight">${expectedWords}</span><br>
-                        匹配状态: <span class="highlight ${isCorrect ? 'success' : 'error'}">${isCorrect ? '✓ 正确' : '✗ 不匹配'}</span><br>
+                        实际加载单词�? <span class="highlight">${stats.totalWords}</span><br>
+                        期望单词�? <span class="highlight">${expectedWords}</span><br>
+                        匹配状�? <span class="highlight ${isCorrect ? 'success' : 'error'}">${isCorrect ? '�?正确' : '�?不匹�?}</span><br>
                         <br>
-                        <strong>已选词库:</strong><br>
+                        <strong>已选词�?</strong><br>
                         ${selectedIds.map(id => `<span class="highlight">${id}</span>`).join(', ')}
                     </div>
                 `;
                 
             } catch (error) {
-                updateStatus('count-status', `❌ 统计失败: ${error.message}`, 'error');
+                updateStatus('count-status', `�?统计失败: ${error.message}`, 'error');
                 console.error('统计失败:', error);
             }
         }
@@ -272,3 +272,4 @@
     </script>
 </body>
 </html>
+

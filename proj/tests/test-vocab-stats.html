@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>生词本统计测试</title>
+    <title>生词本统计测�?/title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -126,22 +126,22 @@
 </head>
 <body>
     <div class="container">
-        <h1>📊 生词本统计测试</h1>
+        <h1>📊 生词本统计测�?/h1>
         <p>测试生词本总数显示和命中率计算修正</p>
         
         <div class="test-section">
             <h3>修改对比</h3>
             <div class="comparison">
                 <div class="comparison-item old-logic">
-                    <h4>修改前</h4>
-                    <p><strong>生词本标题：</strong>生词本</p>
-                    <p><strong>命中率计算：</strong>命中单词数 ÷ 总单词库数量</p>
+                    <h4>修改�?/h4>
+                    <p><strong>生词本标题：</strong>生词�?/p>
+                    <p><strong>命中率计算：</strong>命中单词�?÷ 总单词库数量</p>
                     <p>例：5÷135 = 3.7%</p>
                 </div>
                 <div class="comparison-item new-logic">
-                    <h4>修改后</h4>
-                    <p><strong>生词本标题：</strong>生词本 (5)</p>
-                    <p><strong>命中率计算：</strong>命中单词数 ÷ 下落单词数（去重）</p>
+                    <h4>修改�?/h4>
+                    <p><strong>生词本标题：</strong>生词�?(5)</p>
+                    <p><strong>命中率计算：</strong>命中单词�?÷ 下落单词数（去重�?/p>
                     <p>例：5÷8 = 62.5%</p>
                 </div>
             </div>
@@ -152,11 +152,11 @@
             <div class="stats-display">
                 <div class="stat-item">
                     <div class="stat-value" id="total-words">135</div>
-                    <div class="stat-label">考试总词量</div>
+                    <div class="stat-label">考试总词�?/div>
                 </div>
                 <div class="stat-item highlight">
                     <div class="stat-value" id="fallen-words">0</div>
-                    <div class="stat-label">下落单词数（去重）</div>
+                    <div class="stat-label">下落单词数（去重�?/div>
                 </div>
                 <div class="stat-item highlight">
                     <div class="stat-value" id="hit-words">0</div>
@@ -164,7 +164,7 @@
                 </div>
                 <div class="stat-item">
                     <div class="stat-value" id="vocab-count">0</div>
-                    <div class="stat-label">生词本数量</div>
+                    <div class="stat-label">生词本数�?/div>
                 </div>
             </div>
             
@@ -175,7 +175,7 @@
                 </div>
                 <div class="stat-item">
                     <div class="stat-value" id="coverage-percentage">0%</div>
-                    <div class="stat-label">覆盖率</div>
+                    <div class="stat-label">覆盖�?/div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-value" id="old-hit-percentage">0%</div>
@@ -193,7 +193,7 @@
         </div>
         
         <div class="test-section">
-            <h3>生词本 (<span id="vocab-total-display">0</span>)</h3>
+            <h3>生词�?(<span id="vocab-total-display">0</span>)</h3>
             <div class="vocab-list" id="vocab-list">
                 <p>暂无生词</p>
             </div>
@@ -203,10 +203,10 @@
             <h3>测试结果</h3>
             <div id="test-results">
                 <div class="status info">
-                    <strong>测试说明：</strong><br>
+                    <strong>测试说明�?/strong><br>
                     1. 生词本标题现在显示总数：生词本 (数量)<br>
                     2. 命中率现在基于下落单词数计算，更准确反映玩家表现<br>
-                    3. 覆盖率仍然基于总单词库数量，反映学习进度
+                    3. 覆盖率仍然基于总单词库数量，反映学习进�?
                 </div>
             </div>
         </div>
@@ -228,13 +228,13 @@
             const hitCount = gameStats.hitWords.size;
             const vocabCount = gameStats.vocabWords.size;
             
-            // 新算法：命中率 = 命中单词数 / 下落单词数
+            // 新算法：命中�?= 命中单词�?/ 下落单词�?
             const newHitPercentage = fallenCount > 0 ? Math.round((hitCount / fallenCount) * 100) : 0;
             
-            // 旧算法：命中率 = 命中单词数 / 总单词数
+            // 旧算法：命中�?= 命中单词�?/ 总单词数
             const oldHitPercentage = Math.round((hitCount / gameStats.totalWords) * 100);
             
-            // 覆盖率 = 命中单词数 / 总单词数
+            // 覆盖�?= 命中单词�?/ 总单词数
             const coveragePercentage = Math.round((hitCount / gameStats.totalWords) * 100);
             
             // 更新显示
@@ -248,7 +248,7 @@
             document.getElementById('coverage-percentage').textContent = `${coveragePercentage}%`;
             document.getElementById('old-hit-percentage').textContent = `${oldHitPercentage}%`;
             
-            // 更新生词本显示
+            // 更新生词本显�?
             updateVocabList();
             
             console.log(`统计更新: 下落=${fallenCount}, 命中=${hitCount}, 生词=${vocabCount}, 新命中率=${newHitPercentage}%, 旧命中率=${oldHitPercentage}%`);
@@ -275,14 +275,14 @@
             gameStats.fallenWords.add(randomWord);
             updateDisplay();
             
-            showResult(`✅ 模拟单词下落: ${randomWord}`, 'success');
+            showResult(`�?模拟单词下落: ${randomWord}`, 'success');
         }
         
         function simulateHitWord() {
-            // 从已下落的单词中随机选择一个命中
+            // 从已下落的单词中随机选择一个命�?
             const fallenArray = Array.from(gameStats.fallenWords);
             if (fallenArray.length === 0) {
-                showResult('❌ 没有下落的单词可以命中，请先模拟单词下落', 'info');
+                showResult('�?没有下落的单词可以命中，请先模拟单词下落', 'info');
                 return;
             }
             
@@ -299,7 +299,7 @@
             const missedWords = fallenArray.filter(word => !gameStats.hitWords.has(word));
             
             if (missedWords.length === 0) {
-                showResult('❌ 没有错过的单词，请先模拟单词下落', 'info');
+                showResult('�?没有错过的单词，请先模拟单词下落', 'info');
                 return;
             }
             
@@ -328,7 +328,7 @@
             gameStats.vocabWords.clear();
             updateDisplay();
             
-            showResult('🔄 统计数据已重置', 'success');
+            showResult('🔄 统计数据已重�?, 'success');
         }
         
         function showResult(message, type) {
@@ -345,9 +345,9 @@
         window.addEventListener('load', () => {
             updateDisplay();
             
-            showResult('页面已加载，可以开始测试', 'info');
+            showResult('页面已加载，可以开始测�?, 'info');
             
-            // 自动添加一些示例数据
+            // 自动添加一些示例数�?
             setTimeout(() => {
                 simulateFallenWord();
                 setTimeout(() => simulateFallenWord(), 500);
@@ -359,3 +359,4 @@
     </script>
 </body>
 </html>
+

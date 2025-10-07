@@ -1,0 +1,150 @@
+{
+  "metadata": {
+    "id": "basic-phonics",
+    "name": "基础音标课程",
+    "description": "15天音标学习计划 - 基础元音和辅音",
+    "version": "1.0",
+    "category": "phonics",
+    "difficulty": "beginner",
+    "totalWords": 80,
+    "lessons": 12,
+    "source": "phonics_methods 15天学习计划",
+    "tags": ["音标", "基础", "元音", "辅音"],
+    "recommended": true,
+    "lastUpdated": "2025-10-05"
+  },
+  "phonicsLessons": {
+    "day1": {
+      "phoneme": "/i:/",
+      "description": "长元音i",
+      "words": [
+        {
+          "word": "see",
+          "phonetic": "[siː]",
+          "meaning": "看见",
+          "difficulty": 1
+        },
+        {
+          "word": "tree",
+          "phonetic": "[triː]",
+          "meaning": "树",
+          "difficulty": 1
+        },
+        {
+          "word": "three",
+          "phonetic": "[θriː]",
+          "meaning": "三",
+          "difficulty": 1
+        },
+        {
+          "word": "free",
+          "phonetic": "[friː]",
+          "meaning": "自由的",
+          "difficulty": 1
+        },
+        {
+          "word": "green",
+          "phonetic": "[ɡriːn]",
+          "meaning": "绿色",
+          "difficulty": 1
+        },
+        {
+          "word": "sleep",
+          "phonetic": "[sliːp]",
+          "meaning": "睡觉",
+          "difficulty": 1
+        },
+        {
+          "word": "sweet",
+          "phonetic": "[swiːt]",
+          "meaning": "甜的",
+          "difficulty": 1
+        },
+        {
+          "word": "meet",
+          "phonetic": "[miːt]",
+          "meaning": "遇见",
+          "difficulty": 1
+        },
+        {
+          "word": "feet",
+          "phonetic": "[fiːt]",
+          "meaning": "脚",
+          "difficulty": 1
+        },
+        {
+          "word": "keep",
+          "phonetic": "[kiːp]",
+          "meaning": "保持",
+          "difficulty": 1
+        }
+      ]
+    },
+    "day2": {
+      "phoneme": "/ʊ/",
+      "description": "短元音u",
+      "words": [
+        {
+          "word": "book",
+          "phonetic": "[bʊk]",
+          "meaning": "书",
+          "difficulty": 1
+        },
+        {
+          "word": "look",
+          "phonetic": "[lʊk]",
+          "meaning": "看",
+          "difficulty": 1
+        },
+        {
+          "word": "good",
+          "phonetic": "[ɡʊd]",
+          "meaning": "好的",
+          "difficulty": 1
+        },
+        {
+          "word": "foot",
+          "phonetic": "[fʊt]",
+          "meaning": "脚",
+          "difficulty": 1
+        },
+        {
+          "word": "took",
+          "phonetic": "[tʊk]",
+          "meaning": "拿（过去式）",
+          "difficulty": 1
+        },
+        {
+          "word": "cook",
+          "phonetic": "[kʊk]",
+          "meaning": "烹饪",
+          "difficulty": 1
+        },
+        {
+          "word": "wood",
+          "phonetic": "[wʊd]",
+          "meaning": "木头",
+          "difficulty": 1
+        },
+        {
+          "word": "stood",
+          "phonetic": "[stʊd]",
+          "meaning": "站立（过去式）",
+          "difficulty": 2
+        },
+        {
+          "word": "could",
+          "phonetic": "[kʊd]",
+          "meaning": "能够",
+          "difficulty": 2
+        },
+        {
+          "word": "would",
+          "phonetic": "[wʊd]",
+          "meaning": "将要",
+          "difficulty": 2
+        }
+      ]
+    }
+  }
+}

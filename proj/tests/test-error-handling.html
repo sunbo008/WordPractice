@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>单词库错误处理测试</title>
+    <title>单词库错误处理测�?/title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -71,7 +71,7 @@
             border-bottom: 1px solid #eee;
         }
         .feature-list li:before {
-            content: "✅ ";
+            content: "�?";
             color: #27ae60;
             font-weight: bold;
         }
@@ -80,7 +80,7 @@
             padding: 0;
         }
         .removed-feature li:before {
-            content: "❌ ";
+            content: "�?";
             color: #e74c3c;
             font-weight: bold;
         }
@@ -88,24 +88,24 @@
 </head>
 <body>
     <div class="container">
-        <h1>🧪 单词库错误处理测试</h1>
-        <p>测试移除备用单词库后的错误处理机制</p>
+        <h1>🧪 单词库错误处理测�?/h1>
+        <p>测试移除备用单词库后的错误处理机�?/p>
         
         <div class="test-section">
             <h3>📋 功能变更说明</h3>
-            <h4>✅ 新增功能：</h4>
+            <h4>�?新增功能�?/h4>
             <ul class="feature-list">
-                <li>JSON加载失败时显示全屏错误弹窗</li>
-                <li>详细的错误信息显示（HTTP状态码、错误消息等）</li>
+                <li>JSON加载失败时显示全屏错误弹�?/li>
+                <li>详细的错误信息显示（HTTP状态码、错误消息等�?/li>
                 <li>用户友好的错误提示和解决建议</li>
                 <li>重新加载页面按钮</li>
-                <li>控制台详细错误日志</li>
+                <li>控制台详细错误日�?/li>
                 <li>停止无限重试机制</li>
             </ul>
             
-            <h4>❌ 移除功能：</h4>
+            <h4>�?移除功能�?/h4>
             <ul class="removed-feature">
-                <li>备用单词库（15个硬编码单词）</li>
+                <li>备用单词库（15个硬编码单词�?/li>
                 <li>加载失败时的自动降级机制</li>
                 <li>loadFallbackWords() 函数</li>
             </ul>
@@ -116,7 +116,7 @@
             <div id="testStatus" class="status warning">准备测试...</div>
             
             <button class="test-button" onclick="testNormalLoad()">测试正常加载</button>
-            <button class="test-button danger" onclick="testFileNotFound()">模拟文件不存在</button>
+            <button class="test-button danger" onclick="testFileNotFound()">模拟文件不存�?/button>
             <button class="test-button danger" onclick="testNetworkError()">模拟网络错误</button>
             <button class="test-button danger" onclick="testInvalidJSON()">模拟JSON格式错误</button>
             <button class="test-button" onclick="location.reload()">重新加载页面</button>
@@ -124,19 +124,19 @@
         
         <div class="test-section">
             <h3>📝 测试说明</h3>
-            <p><strong>正常情况：</strong></p>
+            <p><strong>正常情况�?/strong></p>
             <ol>
-                <li>单词库正常加载，游戏可以正常开始</li>
-                <li>控制台显示"✅ 单词库加载成功"</li>
+                <li>单词库正常加载，游戏可以正常开�?/li>
+                <li>控制台显�?�?单词库加载成�?</li>
             </ol>
             
-            <p><strong>错误情况：</strong></p>
+            <p><strong>错误情况�?/strong></p>
             <ol>
-                <li>显示全屏错误弹窗，阻止游戏继续</li>
+                <li>显示全屏错误弹窗，阻止游戏继�?/li>
                 <li>显示具体的错误信息和解决建议</li>
                 <li>提供重新加载按钮</li>
-                <li>控制台输出详细错误日志</li>
-                <li>不再使用备用单词库</li>
+                <li>控制台输出详细错误日�?/li>
+                <li>不再使用备用单词�?/li>
             </ol>
         </div>
         
@@ -144,8 +144,8 @@
             <h3>🎮 实际游戏测试</h3>
             <p>要测试实际游戏中的错误处理：</p>
             <ol>
-                <li>重命名 words.json 文件（模拟文件不存在）</li>
-                <li>打开游戏页面：<a href="index.html" target="_blank">Word Tetris 游戏</a></li>
+                <li>重命�?words.json 文件（模拟文件不存在�?/li>
+                <li>打开游戏页面�?a href="index.html" target="_blank">Word Tetris 游戏</a></li>
                 <li>观察是否显示错误弹窗而不是使用备用单词库</li>
                 <li>恢复 words.json 文件名并重新加载页面</li>
             </ol>
@@ -156,8 +156,8 @@
             <div style="background: #f8f9fa; padding: 15px; border-radius: 5px;">
                 <strong>可能的错误类型：</strong>
                 <ul>
-                    <li><code>HTTP 404: Not Found</code> - words.json 文件不存在</li>
-                    <li><code>HTTP 500: Internal Server Error</code> - 服务器错误</li>
+                    <li><code>HTTP 404: Not Found</code> - words.json 文件不存�?/li>
+                    <li><code>HTTP 500: Internal Server Error</code> - 服务器错�?/li>
                     <li><code>NetworkError</code> - 网络连接问题</li>
                     <li><code>SyntaxError</code> - JSON 格式错误</li>
                     <li><code>TypeError</code> - 数据结构错误</li>
@@ -186,24 +186,24 @@
             const checkLoading = setInterval(() => {
                 if (testVocabularyManager.isLoaded) {
                     clearInterval(checkLoading);
-                    updateStatus(`✅ 正常加载成功！共 ${testVocabularyManager.allWords.length} 个单词`, 'success');
+                    updateStatus(`�?正常加载成功！共 ${testVocabularyManager.allWords.length} 个单词`, 'success');
                 } else if (testVocabularyManager.loadError) {
                     clearInterval(checkLoading);
-                    updateStatus(`❌ 加载失败：${testVocabularyManager.loadError.message}`, 'error');
+                    updateStatus(`�?加载失败�?{testVocabularyManager.loadError.message}`, 'error');
                 }
             }, 100);
             
-            // 超时检查
+            // 超时检�?
             setTimeout(() => {
                 if (!testVocabularyManager.isLoaded && !testVocabularyManager.loadError) {
-                    updateStatus('⏰ 加载超时', 'error');
+                    updateStatus('�?加载超时', 'error');
                 }
             }, 5000);
         }
         
         function testFileNotFound() {
-            updateStatus('模拟文件不存在错误...', 'warning');
-            alert('要测试文件不存在错误：\n1. 重命名 words.json 为 words.json.bak\n2. 刷新页面\n3. 观察错误弹窗\n4. 恢复文件名');
+            updateStatus('模拟文件不存在错�?..', 'warning');
+            alert('要测试文件不存在错误：\n1. 重命�?words.json �?words.json.bak\n2. 刷新页面\n3. 观察错误弹窗\n4. 恢复文件�?);
         }
         
         function testNetworkError() {
@@ -216,10 +216,11 @@
             alert('要测试JSON格式错误：\n1. 编辑 words.json，删除一些括号或逗号\n2. 刷新页面\n3. 观察错误弹窗\n4. 恢复正确的JSON格式');
         }
         
-        // 页面加载时自动测试正常加载
+        // 页面加载时自动测试正常加�?
         window.addEventListener('load', () => {
             setTimeout(testNormalLoad, 1000);
         });
     </script>
 </body>
 </html>
+

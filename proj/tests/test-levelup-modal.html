@@ -45,7 +45,7 @@
             border-bottom: 1px solid #eee;
         }
         .feature-list li:before {
-            content: "✅ ";
+            content: "�?";
             color: #27ae60;
             font-weight: bold;
         }
@@ -96,15 +96,15 @@
 <body>
     <div class="container">
         <h1>🎯 等级提升弹窗优化测试</h1>
-        <p>测试等级提升弹窗的用户体验优化功能</p>
+        <p>测试等级提升弹窗的用户体验优化功�?/p>
         
         <div class="test-section">
             <h3>📋 优化功能列表</h3>
             <ul class="feature-list">
-                <li>游戏暂停：等级提升时游戏状态变为 'levelup'，暂停单词生成</li>
-                <li>自动关闭：5秒后自动关闭弹窗并继续游戏</li>
+                <li>游戏暂停：等级提升时游戏状态变�?'levelup'，暂停单词生�?/li>
+                <li>自动关闭�?秒后自动关闭弹窗并继续游�?/li>
                 <li>倒计时显示：实时显示剩余秒数</li>
-                <li>键盘快捷键：支持 Enter 和 Space 键快速继续</li>
+                <li>键盘快捷键：支持 Enter �?Space 键快速继�?/li>
                 <li>定时器清理：手动关闭时清除所有定时器</li>
             </ul>
         </div>
@@ -112,18 +112,18 @@
         <div class="test-section">
             <h3>🧪 功能测试</h3>
             <button class="test-button" onclick="showTestModal()">模拟等级提升弹窗</button>
-            <button class="test-button" onclick="testKeyboardShortcuts()">测试键盘快捷键</button>
+            <button class="test-button" onclick="testKeyboardShortcuts()">测试键盘快捷�?/button>
             <button class="test-button" onclick="testAutoClose()">测试自动关闭</button>
         </div>
         
         <div class="test-section">
             <h3>📝 使用说明</h3>
-            <p><strong>游戏中的体验：</strong></p>
+            <p><strong>游戏中的体验�?/strong></p>
             <ol>
-                <li>当达到目标分数时，游戏会自动暂停并显示等级提升弹窗</li>
-                <li>弹窗显示新等级和本级收集的生词数量</li>
-                <li>可以点击"继续游戏"按钮或按 Enter/Space 键继续</li>
-                <li>如果5秒内没有操作，弹窗会自动关闭并继续游戏</li>
+                <li>当达到目标分数时，游戏会自动暂停并显示等级提升弹�?/li>
+                <li>弹窗显示新等级和本级收集的生词数�?/li>
+                <li>可以点击"继续游戏"按钮或按 Enter/Space 键继�?/li>
+                <li>如果5秒内没有操作，弹窗会自动关闭并继续游�?/li>
                 <li>倒计时会实时显示剩余时间</li>
             </ol>
         </div>
@@ -132,7 +132,7 @@
             <h3>🎮 实际游戏测试</h3>
             <p>要测试实际游戏中的效果，请：</p>
             <ol>
-                <li>打开游戏页面：<a href="index.html" target="_blank">Word Tetris 游戏</a></li>
+                <li>打开游戏页面�?a href="index.html" target="_blank">Word Tetris 游戏</a></li>
                 <li>开始游戏并达到100分（第一次升级）</li>
                 <li>观察等级提升弹窗的新功能</li>
             </ol>
@@ -142,10 +142,10 @@
     <!-- 测试弹窗 -->
     <div id="testModal" class="modal">
         <div class="modal-content">
-            <h2>🎉 等级提升！</h2>
-            <p>恭喜升到第 <span id="testLevel">2</span> 级！</p>
-            <p>本级收集生词: <span id="testVocabulary">3</span> 个</p>
-            <p class="keyboard-hint" id="testHint">按 Enter 或 Space 继续游戏 (5秒后自动继续)</p>
+            <h2>🎉 等级提升�?/h2>
+            <p>恭喜升到�?<span id="testLevel">2</span> 级！</p>
+            <p>本级收集生词: <span id="testVocabulary">3</span> �?/p>
+            <p class="keyboard-hint" id="testHint">�?Enter �?Space 继续游戏 (5秒后自动继续)</p>
             <div class="modal-buttons">
                 <button onclick="closeTestModal()">继续游戏</button>
                 <button onclick="alert('查看生词功能')">查看生词</button>
@@ -163,10 +163,10 @@
             // 模拟自动关闭
             testTimer = setTimeout(() => {
                 closeTestModal();
-                alert('自动关闭！');
+                alert('自动关闭�?);
             }, 5000);
             
-            // 模拟倒计时
+            // 模拟倒计�?
             startTestCountdown();
             
             // 添加键盘事件监听
@@ -176,7 +176,7 @@
         function closeTestModal() {
             document.getElementById('testModal').style.display = 'none';
             
-            // 清除定时器
+            // 清除定时�?
             if (testTimer) {
                 clearTimeout(testTimer);
                 testTimer = null;
@@ -197,7 +197,7 @@
             testCountdownTimer = setInterval(() => {
                 countdown--;
                 if (countdown > 0) {
-                    hintElement.textContent = `按 Enter 或 Space 继续游戏 (${countdown}秒后自动继续)`;
+                    hintElement.textContent = `�?Enter �?Space 继续游戏 (${countdown}秒后自动继续)`;
                 } else {
                     hintElement.textContent = '自动继续游戏...';
                     clearInterval(testCountdownTimer);
@@ -215,7 +215,7 @@
         }
         
         function testKeyboardShortcuts() {
-            alert('测试键盘快捷键：\n1. 点击"模拟等级提升弹窗"\n2. 按 Enter 或 Space 键\n3. 观察弹窗是否立即关闭');
+            alert('测试键盘快捷键：\n1. 点击"模拟等级提升弹窗"\n2. �?Enter �?Space 键\n3. 观察弹窗是否立即关闭');
         }
         
         function testAutoClose() {
@@ -224,3 +224,4 @@
     </script>
 </body>
 </html>
+

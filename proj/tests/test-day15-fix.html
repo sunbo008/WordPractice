@@ -76,23 +76,22 @@
     <div class="test-section">
         <h2>问题分析</h2>
         <div class="info status">
-            <strong>问题原因：</strong> 默认配置只加载前4天课程 (day01-day04)，day15没有被包含在内
-        </div>
+            <strong>问题原因�?/strong> 默认配置只加载前4天课�?(day01-day04)，day15没有被包含在�?        </div>
         <div class="success status">
-            <strong>修复方案：</strong> 修改配置加载器，默认加载所有15天的daily-phonics课程
+            <strong>修复方案�?/strong> 修改配置加载器，默认加载所�?5天的daily-phonics课程
         </div>
     </div>
 
     <div class="test-section">
         <h2>1. 配置加载测试</h2>
-        <button onclick="testConfigLoader()">测试配置加载器</button>
+        <button onclick="testConfigLoader()">测试配置加载�?/button>
         <div id="configStatus"></div>
         <pre id="configInfo"></pre>
     </div>
 
     <div class="test-section">
-        <h2>2. 词汇管理器测试</h2>
-        <button onclick="testVocabManager()">测试词汇管理器</button>
+        <h2>2. 词汇管理器测�?/h2>
+        <button onclick="testVocabManager()">测试词汇管理�?/button>
         <div id="vocabStatus"></div>
         <pre id="loadedLibraries"></pre>
     </div>
@@ -106,14 +105,14 @@
 
     <div class="test-section">
         <h2>4. 随机单词生成测试</h2>
-        <button onclick="testRandomWords()">生成10个随机单词</button>
+        <button onclick="testRandomWords()">生成10个随机单�?/button>
         <div id="randomStatus"></div>
         <div id="randomWords"></div>
     </div>
 
-    <!-- 添加时间戳避免缓存 -->
-    <script src="../vocabulary-config-loader.js?v=20251006-fix2"></script>
-    <script src="../vocabulary-manager-v2.js?v=20251006-fix2"></script>
+    <!-- 添加时间戳避免缓�?-->
+    <script src="../src/core/vocabulary-config-loader.js?v=20251006-fix2"></script>
+    <script src="../src/core/vocabulary-manager-v2.js?v=20251006-fix2"></script>
     
     <script>
         let configLoader;
@@ -124,32 +123,31 @@
             const infoDiv = document.getElementById('configInfo');
             
             try {
-                statusDiv.innerHTML = '<div class="info status">⏳ 正在加载配置...</div>';
+                statusDiv.innerHTML = '<div class="info status">�?正在加载配置...</div>';
                 
                 configLoader = new VocabularyConfigLoader();
                 const config = await configLoader.loadConfig();
                 
-                statusDiv.innerHTML = '<div class="success status">✅ 配置加载成功！</div>';
+                statusDiv.innerHTML = '<div class="success status">�?配置加载成功�?/div>';
                 
                 const dailyPhonics = config.categories.find(c => c.id === 'daily-phonics');
                 const enabledLibs = config.defaultConfig.enabledLibraries;
                 const hasDay15 = enabledLibs.includes('day15');
                 
-                infoDiv.textContent = `配置信息：
-- Daily Phonics课程数: ${dailyPhonics.subcategories.length}
-- 默认启用课程数: ${enabledLibs.length}
-- 是否包含Day15: ${hasDay15 ? '✅ 是' : '❌ 否'}
-- 启用的课程: ${enabledLibs.join(', ')}
+                infoDiv.textContent = `配置信息�?- Daily Phonics课程�? ${dailyPhonics.subcategories.length}
+- 默认启用课程�? ${enabledLibs.length}
+- 是否包含Day15: ${hasDay15 ? '�?�? : '�?�?}
+- 启用的课�? ${enabledLibs.join(', ')}
 
 Day15配置:
 ${JSON.stringify(dailyPhonics.subcategories.find(s => s.id === 'day15'), null, 2)}`;
                 
                 if (!hasDay15) {
-                    statusDiv.innerHTML += '<div class="error status">❌ 警告：Day15未包含在默认配置中！</div>';
+                    statusDiv.innerHTML += '<div class="error status">�?警告：Day15未包含在默认配置中！</div>';
                 }
                 
             } catch (error) {
-                statusDiv.innerHTML = '<div class="error status">❌ 配置加载失败: ' + error.message + '</div>';
+                statusDiv.innerHTML = '<div class="error status">�?配置加载失败: ' + error.message + '</div>';
                 console.error(error);
             }
         }
@@ -159,7 +157,7 @@ ${JSON.stringify(dailyPhonics.subcategories.find(s => s.id === 'day15'), null, 2
             const libDiv = document.getElementById('loadedLibraries');
             
             try {
-                statusDiv.innerHTML = '<div class="info status">⏳ 正在初始化词汇管理器...</div>';
+                statusDiv.innerHTML = '<div class="info status">�?正在初始化词汇管理器...</div>';
                 
                 vocabManager = new VocabularyManagerV2();
                 
@@ -173,7 +171,7 @@ ${JSON.stringify(dailyPhonics.subcategories.find(s => s.id === 'day15'), null, 2
                     }, 100);
                 });
                 
-                statusDiv.innerHTML = '<div class="success status">✅ 词汇管理器初始化成功！</div>';
+                statusDiv.innerHTML = '<div class="success status">�?词汇管理器初始化成功�?/div>';
                 
                 const stats = vocabManager.getLibraryStats();
                 const config = vocabManager.getCurrentConfig();
@@ -182,18 +180,18 @@ ${JSON.stringify(dailyPhonics.subcategories.find(s => s.id === 'day15'), null, 2
                 libDiv.textContent = `词汇管理器状态：
 - 已加载词库数: ${stats.totalLibraries}
 - 总单词数: ${stats.totalWords}
-- 是否加载Day15: ${hasDay15 ? '✅ 是' : '❌ 否'}
-- 启用的词库: ${config.enabledLibraries.join(', ')}
+- 是否加载Day15: ${hasDay15 ? '�?�? : '�?�?}
+- 启用的词�? ${config.enabledLibraries.join(', ')}
 
 已加载的词库:
-${stats.libraries.map(lib => `  - ${lib.id}: ${lib.name} (${lib.wordCount}词)`).join('\n')}`;
+${stats.libraries.map(lib => `  - ${lib.id}: ${lib.name} (${lib.wordCount}�?`).join('\n')}`;
                 
                 if (!hasDay15) {
-                    statusDiv.innerHTML += '<div class="error status">❌ 警告：Day15未加载！</div>';
+                    statusDiv.innerHTML += '<div class="error status">�?警告：Day15未加载！</div>';
                 }
                 
             } catch (error) {
-                statusDiv.innerHTML = '<div class="error status">❌ 词汇管理器初始化失败: ' + error.message + '</div>';
+                statusDiv.innerHTML = '<div class="error status">�?词汇管理器初始化失败: ' + error.message + '</div>';
                 console.error(error);
             }
         }
@@ -203,7 +201,7 @@ ${stats.libraries.map(lib => `  - ${lib.id}: ${lib.name} (${lib.wordCount}词)`)
             const wordsDiv = document.getElementById('words');
             
             try {
-                statusDiv.innerHTML = '<div class="info status">⏳ 正在加载Day15单词...</div>';
+                statusDiv.innerHTML = '<div class="info status">�?正在加载Day15单词...</div>';
                 
                 const response = await fetch('../words/daily-phonics/day15.json');
                 if (!response.ok) {
@@ -212,11 +210,11 @@ ${stats.libraries.map(lib => `  - ${lib.id}: ${lib.name} (${lib.wordCount}词)`)
                 
                 const data = await response.json();
                 
-                statusDiv.innerHTML = '<div class="success status">✅ Day15单词加载成功！</div>';
+                statusDiv.innerHTML = '<div class="success status">�?Day15单词加载成功�?/div>';
                 
                 wordsDiv.innerHTML = `
 <strong>Day15 - ${data.metadata.name}</strong>
-<p>音标: ${data.metadata.phoneme} | 难度: ${data.metadata.difficulty} | 单词数: ${data.metadata.wordCount}</p>
+<p>音标: ${data.metadata.phoneme} | 难度: ${data.metadata.difficulty} | 单词�? ${data.metadata.wordCount}</p>
 <div>
     ${data.words.map((w, i) => `
         <div class="word-item">
@@ -230,7 +228,7 @@ ${stats.libraries.map(lib => `  - ${lib.id}: ${lib.name} (${lib.wordCount}词)`)
                 `;
                 
             } catch (error) {
-                statusDiv.innerHTML = '<div class="error status">❌ Day15单词加载失败: ' + error.message + '</div>';
+                statusDiv.innerHTML = '<div class="error status">�?Day15单词加载失败: ' + error.message + '</div>';
                 console.error(error);
             }
         }
@@ -240,12 +238,12 @@ ${stats.libraries.map(lib => `  - ${lib.id}: ${lib.name} (${lib.wordCount}词)`)
             const wordsDiv = document.getElementById('randomWords');
             
             if (!vocabManager || !vocabManager.isLoaded) {
-                statusDiv.innerHTML = '<div class="error status">❌ 请先运行"测试词汇管理器"</div>';
+                statusDiv.innerHTML = '<div class="error status">�?请先运行"测试词汇管理�?</div>';
                 return;
             }
             
             try {
-                statusDiv.innerHTML = '<div class="info status">⏳ 正在生成随机单词...</div>';
+                statusDiv.innerHTML = '<div class="info status">�?正在生成随机单词...</div>';
                 
                 const randomWords = [];
                 for (let i = 0; i < 10; i++) {
@@ -260,7 +258,7 @@ ${stats.libraries.map(lib => `  - ${lib.id}: ${lib.name} (${lib.wordCount}词)`)
                     throw new Error('无法生成随机单词');
                 }
                 
-                statusDiv.innerHTML = '<div class="success status">✅ 随机单词生成成功！</div>';
+                statusDiv.innerHTML = '<div class="success status">�?随机单词生成成功�?/div>';
                 
                 wordsDiv.innerHTML = randomWords.map((w, i) => `
                     <div class="word-item">
@@ -273,13 +271,12 @@ ${stats.libraries.map(lib => `  - ${lib.id}: ${lib.name} (${lib.wordCount}词)`)
                 `).join('');
                 
             } catch (error) {
-                statusDiv.innerHTML = '<div class="error status">❌ 随机单词生成失败: ' + error.message + '</div>';
+                statusDiv.innerHTML = '<div class="error status">�?随机单词生成失败: ' + error.message + '</div>';
                 console.error(error);
             }
         }
 
-        // 页面加载时自动运行基本测试
-        window.addEventListener('load', () => {
+        // 页面加载时自动运行基本测�?        window.addEventListener('load', () => {
             console.log('=== Day15 词汇加载问题修复测试 ===');
             setTimeout(() => {
                 testConfigLoader();
@@ -291,4 +288,5 @@ ${stats.libraries.map(lib => `  - ${lib.id}: ${lib.name} (${lib.wordCount}词)`)
     </script>
 </body>
 </html>
+
 

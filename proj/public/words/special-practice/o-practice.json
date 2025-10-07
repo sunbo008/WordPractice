@@ -1,0 +1,57 @@
+{
+  "metadata": {
+    "id": "special-o",
+    "name": "音标 /ɒ/ 专项练习",
+    "phoneme": "/ɒ/",
+    "description": "针对音标/ɒ/的20个重点单词强化练习",
+    "category": "special-practice",
+    "difficulty": "intermediate",
+    "wordCount": 20,
+    "lastUpdated": "2025-10-06"
+  },
+  "lesson": {
+    "pronunciationTips": [
+      "口型：嘴巴张大，呈圆形，但不向前突",
+      "舌位：舌后部稍抬起，舌尖离开下齿",
+      "发音：类似汉语'哦'，但更短促",
+      "要点：这是一个短元音，发音时间要短",
+      "对比：/ɒ/ (hot) 比 /ɔ:/ (port) 音更短，嘴不突出"
+    ],
+    "phonicsPatterns": [
+      "最常见拼写：单个字母 o",
+      "在闭音节中：hot, not, pot, got",
+      "CVC结构：辅音+o+辅音（dog, box, top）",
+      "双辅音结尾：stop, clock, shop",
+      "多音节词：orange, doctor, problem"
+    ],
+    "practiceSteps": [
+      "第一步：嘴巴张大呈圆形，但不前突",
+      "第二步：舌后部稍抬起",
+      "第三步：发短促的'哦'音",
+      "第四步：对比练习：/ɔ:/ (for) vs /ɒ/ (fox)",
+      "第五步：快速连读：hot-not-pot-got"
+    ]
+  },
+  "words": [
+    {"word": "hot", "phonetic": "[hɒt]", "meaning": "热的", "difficulty": 1},
+    {"word": "not", "phonetic": "[nɒt]", "meaning": "不", "difficulty": 1},
+    {"word": "pot", "phonetic": "[pɒt]", "meaning": "锅", "difficulty": 1},
+    {"word": "got", "phonetic": "[ɡɒt]", "meaning": "得到", "difficulty": 1},
+    {"word": "lot", "phonetic": "[lɒt]", "meaning": "很多", "difficulty": 1},
+    {"word": "dog", "phonetic": "[dɒɡ]", "meaning": "狗", "difficulty": 1},
+    {"word": "frog", "phonetic": "[frɒɡ]", "meaning": "青蛙", "difficulty": 1},
+    {"word": "log", "phonetic": "[lɒɡ]", "meaning": "木头", "difficulty": 1},
+    {"word": "box", "phonetic": "[bɒks]", "meaning": "盒子", "difficulty": 1},
+    {"word": "fox", "phonetic": "[fɒks]", "meaning": "狐狸", "difficulty": 1},
+    {"word": "stop", "phonetic": "[stɒp]", "meaning": "停止", "difficulty": 1},
+    {"word": "top", "phonetic": "[tɒp]", "meaning": "顶部", "difficulty": 1},
+    {"word": "job", "phonetic": "[dʒɒb]", "meaning": "工作", "difficulty": 1},
+    {"word": "rob", "phonetic": "[rɒb]", "meaning": "抢劫", "difficulty": 2},
+    {"word": "mop", "phonetic": "[mɒp]", "meaning": "拖把", "difficulty": 1},
+    {"word": "orange", "phonetic": "[ˈɒrɪndʒ]", "meaning": "橙子", "difficulty": 1},
+    {"word": "doctor", "phonetic": "[ˈdɒktə]", "meaning": "医生", "difficulty": 1},
+    {"word": "problem", "phonetic": "[ˈprɒbləm]", "meaning": "问题", "difficulty": 2},
+    {"word": "bottle", "phonetic": "[ˈbɒtl]", "meaning": "瓶子", "difficulty": 2},
+    {"word": "coffee", "phonetic": "[ˈkɒfi]", "meaning": "咖啡", "difficulty": 1}
+  ]
+}

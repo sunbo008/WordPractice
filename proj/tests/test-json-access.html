@@ -70,7 +70,7 @@
         
         <button class="test-button" onclick="testJsonAccess()">测试JSON访问</button>
         <button class="test-button" onclick="testWithFullPath()">测试完整路径</button>
-        <button class="test-button" onclick="testServerInfo()">显示服务器信息</button>
+        <button class="test-button" onclick="testServerInfo()">显示服务器信�?/button>
         
         <div id="results"></div>
         
@@ -103,7 +103,7 @@
             updateInfo();
             
             try {
-                console.log('开始测试 words.json 访问...');
+                console.log('开始测�?words.json 访问...');
                 
                 const response = await fetch('./words.json');
                 console.log('Response status:', response.status);
@@ -116,11 +116,11 @@
                 const data = await response.json();
                 console.log('JSON数据加载成功:', data.metadata);
                 
-                updateStatus(`✅ JSON访问成功！版本: ${data.metadata.version}`, 'success');
+                updateStatus(`�?JSON访问成功！版�? ${data.metadata.version}`, 'success');
                 updateResults(`
                     <div class="code-block">
-<strong>✅ 测试结果：成功</strong>
-HTTP状态: ${response.status} ${response.statusText}
+<strong>�?测试结果：成�?/strong>
+HTTP状�? ${response.status} ${response.statusText}
 Content-Type: ${response.headers.get('content-type')}
 文件大小: ${response.headers.get('content-length')} bytes
 单词总数: ${data.metadata.totalWords}
@@ -130,10 +130,10 @@ Content-Type: ${response.headers.get('content-type')}
                 
             } catch (error) {
                 console.error('JSON访问失败:', error);
-                updateStatus(`❌ JSON访问失败: ${error.message}`, 'error');
+                updateStatus(`�?JSON访问失败: ${error.message}`, 'error');
                 updateResults(`
                     <div class="code-block">
-<strong>❌ 测试结果：失败</strong>
+<strong>�?测试结果：失�?/strong>
 错误类型: ${error.constructor.name}
 错误消息: ${error.message}
 错误堆栈: ${error.stack}
@@ -154,21 +154,21 @@ Content-Type: ${response.headers.get('content-type')}
                 }
                 
                 const data = await response.json();
-                updateStatus(`✅ 完整路径访问成功！`, 'success');
+                updateStatus(`�?完整路径访问成功！`, 'success');
                 updateResults(`
                     <div class="code-block">
-<strong>✅ 完整路径测试：成功</strong>
+<strong>�?完整路径测试：成�?/strong>
 访问路径: ${fullPath}
-HTTP状态: ${response.status}
+HTTP状�? ${response.status}
 单词总数: ${data.metadata.totalWords}
                     </div>
                 `);
                 
             } catch (error) {
-                updateStatus(`❌ 完整路径访问失败: ${error.message}`, 'error');
+                updateStatus(`�?完整路径访问失败: ${error.message}`, 'error');
                 updateResults(`
                     <div class="code-block">
-<strong>❌ 完整路径测试：失败</strong>
+<strong>�?完整路径测试：失�?/strong>
 访问路径: ${fullPath}
 错误: ${error.message}
                     </div>
@@ -180,7 +180,7 @@ HTTP状态: ${response.status}
             updateInfo();
             updateResults(`
                 <div class="code-block">
-<strong>🔍 服务器信息诊断</strong>
+<strong>🔍 服务器信息诊�?/strong>
 
 当前页面协议: ${window.location.protocol}
 当前页面主机: ${window.location.host}
@@ -190,14 +190,14 @@ HTTP状态: ${response.status}
 预期JSON文件URL: ${new URL('./words.json', window.location.href).href}
 
 <strong>常见问题诊断:</strong>
-1. 如果协议是 file:// - 需要通过HTTP服务器访问
-2. 如果端口不是预期的 - 检查服务器是否在正确端口运行
-3. 如果路径不包含 /proj/ - 可能需要访问 http://localhost:8006/
+1. 如果协议�?file:// - 需要通过HTTP服务器访�?
+2. 如果端口不是预期�?- 检查服务器是否在正确端口运�?
+3. 如果路径不包�?/proj/ - 可能需要访�?http://localhost:8006/
                 </div>
             `);
         }
         
-        // 页面加载时自动更新信息
+        // 页面加载时自动更新信�?
         window.addEventListener('load', () => {
             updateInfo();
             // 自动测试
@@ -206,3 +206,4 @@ HTTP状态: ${response.status}
     </script>
 </body>
 </html>
+

@@ -1,0 +1,95 @@
+{
+  "metadata": {
+    "id": "day03",
+    "name": "Day 3 - 长元音 /u:/",
+    "phoneme": "/u:/",
+    "description": "学习/u:/的发音和拼读规则",
+    "day": 3,
+    "category": "daily-phonics",
+    "difficulty": "beginner",
+    "wordCount": 10,
+    "lastUpdated": "2025-10-06"
+  },
+  "words": [
+    {
+      "word": "too",
+      "phonetic": "[tuː]",
+      "meaning": "也",
+      "difficulty": 1
+    },
+    {
+      "word": "zoo",
+      "phonetic": "[zuː]",
+      "meaning": "动物园",
+      "difficulty": 1
+    },
+    {
+      "word": "food",
+      "phonetic": "[fuːd]",
+      "meaning": "食物",
+      "difficulty": 1
+    },
+    {
+      "word": "room",
+      "phonetic": "[ruːm]",
+      "meaning": "房间",
+      "difficulty": 1
+    },
+    {
+      "word": "moon",
+      "phonetic": "[muːn]",
+      "meaning": "月亮",
+      "difficulty": 1
+    },
+    {
+      "word": "soon",
+      "phonetic": "[suːn]",
+      "meaning": "很快",
+      "difficulty": 1
+    },
+    {
+      "word": "cool",
+      "phonetic": "[kuːl]",
+      "meaning": "凉爽的",
+      "difficulty": 1
+    },
+    {
+      "word": "pool",
+      "phonetic": "[puːl]",
+      "meaning": "游泳池",
+      "difficulty": 1
+    },
+    {
+      "word": "school",
+      "phonetic": "[skuːl]",
+      "meaning": "学校",
+      "difficulty": 1
+    },
+    {
+      "word": "afternoon",
+      "phonetic": "[ˌɑːftəˈnuːn]",
+      "meaning": "下午",
+      "difficulty": 2
+    }
+  ],
+  "lesson": {
+    "pronunciationTips": [
+      "舌位：舌后部高高抬起，接近软腭",
+      "唇形：嘴唇收圆突出，形成圆形",
+      "气流：声带振动，气流从圆唇中间通过",
+      "音长：这是一个长元音，发音时间要拉长，类似\"乌——\""
+    ],
+    "phonicsPatterns": [
+      "oo 组合通常发 /u:/ 长音（zoo, too, food）",
+      "oo + n 组合发 /u:/ 音（moon, soon, noon）",
+      "oo + l 组合发 /u:/ 音（cool, pool, school）",
+      "oo + m 组合发 /u:/ 音（room, boom, zoom）"
+    ],
+    "practiceSteps": [
+      "准备动作：嘴唇收圆突出",
+      "舌位调整：舌后部高高抬起",
+      "发音：发拉长的\"乌——\"音",
+      "检查：确保嘴唇保持圆形"
+    ]
+  }
+}

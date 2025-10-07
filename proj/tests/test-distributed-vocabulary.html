@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>分布式词库系统测试</title>
+    <title>分布式词库系统测�?/title>
     <style>
         body {
             font-family: 'Microsoft YaHei', sans-serif;
@@ -110,14 +110,14 @@
 </head>
 <body>
     <div class="container">
-        <h1>🧪 分布式词库系统测试</h1>
+        <h1>🧪 分布式词库系统测�?/h1>
         
-        <!-- 系统状态 -->
+        <!-- 系统状�?-->
         <div class="test-section">
-            <h2>📊 系统状态</h2>
-            <div id="system-status" class="status info">正在初始化词库系统...</div>
+            <h2>📊 系统状�?/h2>
+            <div id="system-status" class="status info">正在初始化词库系�?..</div>
             <div class="stats-grid" id="stats-grid">
-                <!-- 动态生成统计卡片 -->
+                <!-- 动态生成统计卡�?-->
             </div>
         </div>
         
@@ -126,17 +126,17 @@
             <h2>📚 可用词库</h2>
             <div id="libraries-status" class="status info">正在加载词库列表...</div>
             <div class="library-list" id="library-list">
-                <!-- 动态生成词库列表 -->
+                <!-- 动态生成词库列�?-->
             </div>
         </div>
         
         <!-- 配置测试 -->
         <div class="test-section">
             <h2>⚙️ 配置测试</h2>
-            <div id="config-status" class="status info">当前配置加载中...</div>
+            <div id="config-status" class="status info">当前配置加载�?..</div>
             <div id="config-details"></div>
             <button class="btn" onclick="testConfigUpdate()">测试配置更新</button>
-            <button class="btn" onclick="testResetConfig()">重置为默认配置</button>
+            <button class="btn" onclick="testResetConfig()">重置为默认配�?/button>
         </div>
         
         <!-- 单词生成测试 -->
@@ -150,7 +150,7 @@
         
         <!-- 性能测试 -->
         <div class="test-section">
-            <h2>⚡ 性能测试</h2>
+            <h2>�?性能测试</h2>
             <div id="performance-status" class="status info">准备性能测试...</div>
             <button class="btn" onclick="testLoadingPerformance()">测试加载性能</button>
             <button class="btn" onclick="testWordGenerationSpeed()">测试生成速度</button>
@@ -158,21 +158,21 @@
         </div>
     </div>
 
-    <script src="../vocabulary-manager-v2.js"></script>
+    <script src="../src/core/vocabulary-manager-v2.js"></script>
     <script>
         let vocabularyManager = null;
         
-        // 初始化测试
+        // 初始化测�?
         async function initTest() {
             try {
-                updateStatus('system-status', '正在初始化词库系统...', 'info');
+                updateStatus('system-status', '正在初始化词库系�?..', 'info');
                 
                 vocabularyManager = new VocabularyManagerV2();
                 
                 // 等待加载完成
                 await waitForLoad();
                 
-                updateStatus('system-status', '✅ 词库系统初始化成功！', 'success');
+                updateStatus('system-status', '�?词库系统初始化成功！', 'success');
                 
                 // 显示统计信息
                 displayStats();
@@ -184,8 +184,8 @@
                 displayConfig();
                 
             } catch (error) {
-                updateStatus('system-status', `❌ 初始化失败: ${error.message}`, 'error');
-                console.error('初始化失败:', error);
+                updateStatus('system-status', `�?初始化失�? ${error.message}`, 'error');
+                console.error('初始化失�?', error);
             }
         }
         
@@ -214,7 +214,7 @@
             statsGrid.innerHTML = `
                 <div class="stat-card">
                     <div class="stat-value">${stats.totalLibraries}</div>
-                    <div class="stat-label">已加载词库</div>
+                    <div class="stat-label">已加载词�?/div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-value">${stats.totalWords}</div>
@@ -235,15 +235,15 @@
             const libraries = vocabularyManager.getAvailableLibraries();
             const libraryList = document.getElementById('library-list');
             
-            updateStatus('libraries-status', `✅ 找到 ${libraries.length} 个可用词库`, 'success');
+            updateStatus('libraries-status', `�?找到 ${libraries.length} 个可用词库`, 'success');
             
             libraryList.innerHTML = libraries.map(lib => {
                 const isEnabled = vocabularyManager.currentConfig.enabledLibraries.includes(lib.id);
                 return `
                     <div class="library-item">
-                        <h3>${lib.icon} ${lib.name} ${isEnabled ? '✅' : '❌'}</h3>
+                        <h3>${lib.icon} ${lib.name} ${isEnabled ? '�? : '�?}</h3>
                         <div class="meta">分类: ${lib.category} | 难度: ${lib.difficulty}</div>
-                        <div class="meta">单词数: ${lib.totalWords} | 推荐: ${lib.recommended ? '是' : '否'}</div>
+                        <div class="meta">单词�? ${lib.totalWords} | 推荐: ${lib.recommended ? '�? : '�?}</div>
                         <div class="meta">标签: ${lib.tags.join(', ')}</div>
                         <div style="margin-top: 10px; font-size: 0.9em; color: #7f8c8d;">
                             ${lib.description}
@@ -257,7 +257,7 @@
             const config = vocabularyManager.getCurrentConfig();
             const configDetails = document.getElementById('config-details');
             
-            updateStatus('config-status', '✅ 当前配置加载成功', 'success');
+            updateStatus('config-status', '�?当前配置加载成功', 'success');
             
             configDetails.innerHTML = `
                 <div class="word-sample">
@@ -281,12 +281,12 @@
                 
                 await vocabularyManager.updateConfig(newConfig);
                 
-                updateStatus('config-status', '✅ 配置更新测试成功', 'success');
+                updateStatus('config-status', '�?配置更新测试成功', 'success');
                 displayConfig();
                 displayStats();
                 
             } catch (error) {
-                updateStatus('config-status', `❌ 配置更新失败: ${error.message}`, 'error');
+                updateStatus('config-status', `�?配置更新失败: ${error.message}`, 'error');
             }
         }
         
@@ -302,13 +302,13 @@
                 
                 await vocabularyManager.updateConfig(defaultConfig);
                 
-                updateStatus('config-status', '✅ 配置重置成功', 'success');
+                updateStatus('config-status', '�?配置重置成功', 'success');
                 displayConfig();
                 displayStats();
                 displayLibraries();
                 
             } catch (error) {
-                updateStatus('config-status', `❌ 配置重置失败: ${error.message}`, 'error');
+                updateStatus('config-status', `�?配置重置失败: ${error.message}`, 'error');
             }
         }
         
@@ -325,18 +325,18 @@
                 }
                 
                 if (samples.length > 0) {
-                    updateStatus('word-generation-status', `✅ 成功生成 ${samples.length} 个测试单词`, 'success');
+                    updateStatus('word-generation-status', `�?成功生成 ${samples.length} 个测试单词`, 'success');
                     document.getElementById('word-samples').innerHTML = `
                         <div class="word-sample">
                             ${samples.join('<br>')}
                         </div>
                     `;
                 } else {
-                    updateStatus('word-generation-status', '❌ 未能生成测试单词', 'error');
+                    updateStatus('word-generation-status', '�?未能生成测试单词', 'error');
                 }
                 
             } catch (error) {
-                updateStatus('word-generation-status', `❌ 单词生成失败: ${error.message}`, 'error');
+                updateStatus('word-generation-status', `�?单词生成失败: ${error.message}`, 'error');
             }
         }
         
@@ -361,7 +361,7 @@
                     `难度${level}: ${words.size}个不同单词`
                 ).join('<br>');
                 
-                updateStatus('word-generation-status', '✅ 难度级别测试完成', 'success');
+                updateStatus('word-generation-status', '�?难度级别测试完成', 'success');
                 document.getElementById('word-samples').innerHTML = `
                     <div class="word-sample">
                         <strong>难度分布测试结果:</strong><br>
@@ -370,7 +370,7 @@
                 `;
                 
             } catch (error) {
-                updateStatus('word-generation-status', `❌ 难度测试失败: ${error.message}`, 'error');
+                updateStatus('word-generation-status', `�?难度测试失败: ${error.message}`, 'error');
             }
         }
         
@@ -380,7 +380,7 @@
                 
                 const startTime = performance.now();
                 
-                // 重新创建管理器测试加载时间
+                // 重新创建管理器测试加载时�?
                 const testManager = new VocabularyManagerV2();
                 
                 // 等待加载完成
@@ -392,18 +392,18 @@
                 
                 const loadTime = performance.now() - startTime;
                 
-                updateStatus('performance-status', `✅ 加载性能测试完成`, 'success');
+                updateStatus('performance-status', `�?加载性能测试完成`, 'success');
                 document.getElementById('performance-results').innerHTML = `
                     <div class="word-sample">
                         <strong>加载性能结果:</strong><br>
-                        总加载时间: ${loadTime.toFixed(2)}ms<br>
+                        总加载时�? ${loadTime.toFixed(2)}ms<br>
                         加载尝试次数: ${attempts}<br>
                         平均每次: ${(loadTime/attempts).toFixed(2)}ms
                     </div>
                 `;
                 
             } catch (error) {
-                updateStatus('performance-status', `❌ 性能测试失败: ${error.message}`, 'error');
+                updateStatus('performance-status', `�?性能测试失败: ${error.message}`, 'error');
             }
         }
         
@@ -424,7 +424,7 @@
                 const endTime = performance.now();
                 const totalTime = endTime - startTime;
                 
-                updateStatus('performance-status', `✅ 单词生成速度测试完成`, 'success');
+                updateStatus('performance-status', `�?单词生成速度测试完成`, 'success');
                 document.getElementById('performance-results').innerHTML = `
                     <div class="word-sample">
                         <strong>生成速度结果:</strong><br>
@@ -432,17 +432,18 @@
                         成功次数: ${successCount}<br>
                         总耗时: ${totalTime.toFixed(2)}ms<br>
                         平均每次: ${(totalTime/iterations).toFixed(3)}ms<br>
-                        成功率: ${((successCount/iterations)*100).toFixed(1)}%
+                        成功�? ${((successCount/iterations)*100).toFixed(1)}%
                     </div>
                 `;
                 
             } catch (error) {
-                updateStatus('performance-status', `❌ 生成速度测试失败: ${error.message}`, 'error');
+                updateStatus('performance-status', `�?生成速度测试失败: ${error.message}`, 'error');
             }
         }
         
-        // 页面加载时开始测试
+        // 页面加载时开始测�?
         document.addEventListener('DOMContentLoaded', initTest);
     </script>
 </body>
 </html>
+

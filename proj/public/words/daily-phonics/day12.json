@@ -1,0 +1,95 @@
+{
+  "metadata": {
+    "id": "day12",
+    "name": "Day 12 - 长元音 /əʊ/",
+    "phoneme": "/əʊ/",
+    "description": "学习/əʊ/的发音和拼读规则",
+    "day": 12,
+    "category": "daily-phonics",
+    "difficulty": "intermediate",
+    "wordCount": 10,
+    "lastUpdated": "2025-10-06"
+  },
+  "words": [
+    {
+      "word": "go",
+      "phonetic": "[ɡəʊ]",
+      "meaning": "去",
+      "difficulty": 1
+    },
+    {
+      "word": "no",
+      "phonetic": "[nəʊ]",
+      "meaning": "不",
+      "difficulty": 1
+    },
+    {
+      "word": "so",
+      "phonetic": "[səʊ]",
+      "meaning": "所以",
+      "difficulty": 1
+    },
+    {
+      "word": "old",
+      "phonetic": "[əʊld]",
+      "meaning": "老的",
+      "difficulty": 1
+    },
+    {
+      "word": "cold",
+      "phonetic": "[kəʊld]",
+      "meaning": "冷的",
+      "difficulty": 1
+    },
+    {
+      "word": "home",
+      "phonetic": "[həʊm]",
+      "meaning": "家",
+      "difficulty": 1
+    },
+    {
+      "word": "open",
+      "phonetic": "[ˈəʊpən]",
+      "meaning": "打开",
+      "difficulty": 1
+    },
+    {
+      "word": "nose",
+      "phonetic": "[nəʊz]",
+      "meaning": "鼻子",
+      "difficulty": 1
+    },
+    {
+      "word": "close",
+      "phonetic": "[kləʊz]",
+      "meaning": "关闭",
+      "difficulty": 1
+    },
+    {
+      "word": "yellow",
+      "phonetic": "[ˈjeləʊ]",
+      "meaning": "黄色",
+      "difficulty": 1
+    }
+  ],
+  "lesson": {
+    "pronunciationTips": [
+      "舌位：从中央位置向后上方滑动",
+      "唇形：从自然到收圆，逐渐突出",
+      "气流：声带振动，体现从/ə/向/ʊ/的滑动",
+      "音长：这是一个双元音，要完整发出滑动过程"
+    ],
+    "phonicsPatterns": [
+      "o 在开音节中通常发 /əʊ/ 音（go, no, so）",
+      "o + 辅音 + e 结构发 /əʊ/ 音（home, nose, close）",
+      "old 组合发 /əʊld/ 音（old, cold, gold）",
+      "ow 在词尾发 /əʊ/ 音（yellow, window, follow）"
+    ],
+    "practiceSteps": [
+      "准备动作：嘴巴自然状态",
+      "舌位调整：舌头从中央向后移动",
+      "发音：从\"呃\"滑向\"屋\"",
+      "检查：感受嘴唇的逐渐收圆"
+    ]
+  }
+}

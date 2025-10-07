@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>堆叠区测试</title>
+    <title>堆叠区测�?/title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -141,13 +141,13 @@
     </style>
 </head>
 <body>
-    <h1>🔍 堆叠区功能测试</h1>
+    <h1>🔍 堆叠区功能测�?/h1>
     
     <div class="test-section">
         <h2>测试说明</h2>
         <div class="test-info">
-            <p><strong>目的：</strong>验证单词失败后是否正确加入堆叠区和错词本</p>
-            <p><strong>步骤：</strong></p>
+            <p><strong>目的�?/strong>验证单词失败后是否正确加入堆叠区和错词本</p>
+            <p><strong>步骤�?/strong></p>
             <ol>
                 <li>点击"模拟单词失败"按钮</li>
                 <li>观察控制台输出，查看是否有完整的日志序列</li>
@@ -157,19 +157,19 @@
     </div>
     
     <div class="test-section">
-        <h2>快速测试</h2>
+        <h2>快速测�?/h2>
         <button onclick="runSimpleTest()">模拟单词失败</button>
-        <button onclick="runMultipleFailures()">模拟5个单词失败</button>
+        <button onclick="runMultipleFailures()">模拟5个单词失�?/button>
         <button onclick="clearResults()">清空结果</button>
         <div id="test-results"></div>
     </div>
     
     <div class="test-section">
-        <h2>当前状态</h2>
+        <h2>当前状�?/h2>
         <table class="log-table">
             <tr>
                 <th>项目</th>
-                <th>数值</th>
+                <th>数�?/th>
             </tr>
             <tr>
                 <td>堆叠区单词数</td>
@@ -180,19 +180,19 @@
                 <td id="missed-count">0</td>
             </tr>
             <tr>
-                <td>堆叠区单词列表</td>
+                <td>堆叠区单词列�?/td>
                 <td id="stacked-words">-</td>
             </tr>
             <tr>
-                <td>错词本单词列表</td>
+                <td>错词本单词列�?/td>
                 <td id="missed-words">-</td>
             </tr>
         </table>
     </div>
     
     <div class="test-section">
-        <h2>控制台输出</h2>
-        <button onclick="clearConsole()">清空控制台</button>
+        <h2>控制台输�?/h2>
+        <button onclick="clearConsole()">清空控制�?/button>
         <div id="console-output"></div>
     </div>
     
@@ -220,24 +220,24 @@
                 return stackTopY;
             }
             
-            // 模拟addToStack方法（带调试日志）
+            // 模拟addToStack方法（带调试日志�?
             addToStack(word) {
-                logConsole('📦 addToStack 被调用:', 'info');
+                logConsole('📦 addToStack 被调�?', 'info');
                 logConsole(JSON.stringify({
                     original: word?.original,
                     meaning: word?.meaning,
                     giveUp: word?.giveUp,
-                    当前堆叠数: this.stackedWords.length
+                    当前堆叠�? this.stackedWords.length
                 }, null, 2), 'info');
                 
                 // 验证单词对象
                 if (!word) {
-                    logConsole('❌ 单词对象为空或undefined', 'error');
+                    logConsole('�?单词对象为空或undefined', 'error');
                     return;
                 }
                 
                 if (!word.original) {
-                    logConsole('❌ 单词对象缺少original属性', 'error');
+                    logConsole('�?单词对象缺少original属�?, 'error');
                     logConsole('完整对象: ' + JSON.stringify(word, null, 2), 'error');
                     return;
                 }
@@ -245,7 +245,7 @@
                 // 添加到错词本
                 logConsole('📚 准备添加到错词本: ' + word.original, 'info');
                 this.addMissedWord(word);
-                logConsole('✅ 已添加到错词本', 'success');
+                logConsole('�?已添加到错词�?, 'success');
                 
                 // 计算堆叠位置
                 const wordsPerRow = 5;
@@ -255,12 +255,12 @@
                 word.stackRow = row;
                 word.stackCol = col;
                 
-                // 添加到堆叠数组
-                logConsole('📦 准备添加到堆叠数组...', 'info');
+                // 添加到堆叠数�?
+                logConsole('📦 准备添加到堆叠数�?..', 'info');
                 this.stackedWords.push(word);
-                logConsole('✅ 已添加到堆叠数组', 'success');
+                logConsole('�?已添加到堆叠数组', 'success');
                 
-                logConsole('✅ 添加完成，堆叠区信息:', 'success');
+                logConsole('�?添加完成，堆叠区信息:', 'success');
                 logConsole(JSON.stringify({
                     单词: word.original,
                     位置: `row:${row}, col:${col}`,
@@ -270,9 +270,9 @@
                 
                 // 验证添加是否成功
                 if (this.stackedWords.includes(word)) {
-                    logConsole('✅ 验证成功：单词已在堆叠数组中', 'success');
+                    logConsole('�?验证成功：单词已在堆叠数组中', 'success');
                 } else {
-                    logConsole('❌ 验证失败：单词未在堆叠数组中！', 'error');
+                    logConsole('�?验证失败：单词未在堆叠数组中�?, 'error');
                 }
             }
             
@@ -321,10 +321,10 @@
                 logConsole('单词底部Y: ' + (word.y + word.height) + ', 堆叠区顶部Y: ' + stackTopY, 'info');
                 
                 if (word.y + word.height >= stackTopY) {
-                    logConsole('✅ 失败判定触发', 'success');
+                    logConsole('�?失败判定触发', 'success');
                     this.addToStack(word);
                 } else {
-                    logConsole('❌ 失败判定未触发（不应该出现）', 'error');
+                    logConsole('�?失败判定未触发（不应该出现）', 'error');
                 }
                 
                 updateStatus();
@@ -333,7 +333,7 @@
         
         const game = new MockGame();
         
-        // 日志输出到页面
+        // 日志输出到页�?
         function logConsole(message, type = 'info') {
             const consoleDiv = document.getElementById('console-output');
             const line = document.createElement('div');
@@ -342,7 +342,7 @@
             consoleDiv.appendChild(line);
             consoleDiv.scrollTop = consoleDiv.scrollHeight;
             
-            // 同时输出到浏览器控制台
+            // 同时输出到浏览器控制�?
             if (type === 'error') {
                 console.error(message);
             } else if (type === 'success') {
@@ -367,25 +367,25 @@
         
         function runSimpleTest() {
             const words = [
-                { text: 'tree', meaning: '树' },
+                { text: 'tree', meaning: '�? },
                 { text: 'house', meaning: '房子' },
-                { text: 'water', meaning: '水' },
-                { text: 'fire', meaning: '火' },
+                { text: 'water', meaning: '�? },
+                { text: 'fire', meaning: '�? },
                 { text: 'earth', meaning: '土地' }
             ];
             
             const word = words[Math.floor(Math.random() * words.length)];
             game.simulateWordFailure(word.text, word.meaning);
             
-            showTestResult('已模拟1个单词失败，请查看控制台输出', 'success');
+            showTestResult('已模�?个单词失败，请查看控制台输出', 'success');
         }
         
         function runMultipleFailures() {
             const words = [
-                { text: 'tree', meaning: '树' },
+                { text: 'tree', meaning: '�? },
                 { text: 'house', meaning: '房子' },
-                { text: 'water', meaning: '水' },
-                { text: 'fire', meaning: '火' },
+                { text: 'water', meaning: '�? },
+                { text: 'fire', meaning: '�? },
                 { text: 'earth', meaning: '土地' }
             ];
             
@@ -395,7 +395,7 @@
                 }, i * 500);
             }
             
-            showTestResult('已开始模拟5个单词失败（间隔0.5秒），请查看控制台输出', 'success');
+            showTestResult('已开始模�?个单词失败（间隔0.5秒），请查看控制台输�?, 'success');
         }
         
         function showTestResult(message, type) {
@@ -412,13 +412,14 @@
             game.missedWords.clear();
             updateStatus();
             clearConsole();
-            showTestResult('已清空所有测试结果', 'info');
+            showTestResult('已清空所有测试结�?, 'info');
         }
         
-        // 初始化
+        // 初始�?
         updateStatus();
-        logConsole('测试环境已准备就绪', 'success');
-        logConsole('点击"模拟单词失败"按钮开始测试', 'info');
+        logConsole('测试环境已准备就�?, 'success');
+        logConsole('点击"模拟单词失败"按钮开始测�?, 'info');
     </script>
 </body>
 </html>
+

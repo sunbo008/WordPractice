@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>重置自动开始测试</title>
+    <title>重置自动开始测�?/title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -149,7 +149,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>🔄 重置自动开始测试</h1>
+        <h1>🔄 重置自动开始测�?/h1>
         <p>测试点击重置按钮后自动开始游戏的功能</p>
         
         <div class="test-section">
@@ -157,25 +157,25 @@
             <div class="comparison">
                 <div class="comparison-item manual-reset">
                     <h4>点击重置按钮</h4>
-                    <p><strong>行为：</strong>重置 + 自动开始</p>
-                    <p>游戏状态：stopped → playing</p>
-                    <p>用户体验：一键重新开始</p>
+                    <p><strong>行为�?/strong>重置 + 自动开�?/p>
+                    <p>游戏状态：stopped �?playing</p>
+                    <p>用户体验：一键重新开�?/p>
                 </div>
                 <div class="comparison-item refresh-reset">
                     <h4>页面刷新重置</h4>
-                    <p><strong>行为：</strong>仅重置</p>
+                    <p><strong>行为�?/strong>仅重�?/p>
                     <p>游戏状态：stopped</p>
-                    <p>用户体验：需手动开始</p>
+                    <p>用户体验：需手动开�?/p>
                 </div>
             </div>
         </div>
         
         <div class="test-section">
-            <h3>模拟游戏状态</h3>
+            <h3>模拟游戏状�?/h3>
             <div class="game-state">
                 <div class="state-item" id="game-state-indicator">
                     <div class="state-value" id="game-state">stopped</div>
-                    <div class="state-label">游戏状态</div>
+                    <div class="state-label">游戏状�?/div>
                 </div>
                 <div class="state-item">
                     <div class="state-value" id="game-score">0</div>
@@ -194,7 +194,7 @@
         
         <div class="test-section">
             <h3>测试操作</h3>
-            <button class="button" onclick="simulateStart()">模拟开始游戏</button>
+            <button class="button" onclick="simulateStart()">模拟开始游�?/button>
             <button class="button" onclick="simulateProgress()">模拟游戏进度</button>
             <button class="button reset" onclick="simulateManualReset()">模拟点击重置</button>
             <button class="button refresh" onclick="simulateRefreshReset()">模拟刷新重置</button>
@@ -203,11 +203,11 @@
         <div class="test-section">
             <h3>测试说明</h3>
             <div class="status info">
-                <strong>测试步骤：</strong><br>
-                1. 点击"模拟游戏进度"来改变游戏状态<br>
-                2. 点击"模拟点击重置"观察是否自动开始游戏<br>
-                3. 点击"模拟刷新重置"观察是否只重置不开始<br>
-                4. 检查操作日志确认行为正确
+                <strong>测试步骤�?/strong><br>
+                1. 点击"模拟游戏进度"来改变游戏状�?br>
+                2. 点击"模拟点击重置"观察是否自动开始游�?br>
+                3. 点击"模拟刷新重置"观察是否只重置不开�?br>
+                4. 检查操作日志确认行为正�?
             </div>
         </div>
         
@@ -215,7 +215,7 @@
             <h3>操作日志</h3>
             <div class="log-container" id="log-container">
                 <div class="log-entry">
-                    <span class="timestamp">[页面加载]</span> 测试页面已加载
+                    <span class="timestamp">[页面加载]</span> 测试页面已加�?
                 </div>
             </div>
         </div>
@@ -223,8 +223,8 @@
         <div class="test-section">
             <h3>预期行为</h3>
             <div class="status success">
-                <strong>✅ 正确行为：</strong><br>
-                - 点击重置按钮：游戏重置后自动开始（stopped → playing）<br>
+                <strong>�?正确行为�?/strong><br>
+                - 点击重置按钮：游戏重置后自动开始（stopped �?playing�?br>
                 - 页面刷新重置：游戏重置但不自动开始（保持stopped状态）<br>
                 - 控制台显示相应的日志信息
             </div>
@@ -232,7 +232,7 @@
     </div>
 
     <script>
-        // 模拟游戏状态
+        // 模拟游戏状�?
         let gameState = {
             state: 'stopped',
             score: 0,
@@ -283,12 +283,12 @@
             }, 1000);
             
             updateDisplay();
-            addLog('🎮 游戏开始', 'start');
+            addLog('🎮 游戏开�?, 'start');
         }
         
         function simulateProgress() {
             if (gameState.state !== 'playing') {
-                addLog('❌ 游戏未开始，无法模拟进度', 'info');
+                addLog('�?游戏未开始，无法模拟进度', 'info');
                 return;
             }
             
@@ -296,30 +296,30 @@
             gameState.level = Math.floor(gameState.score / 100) + 1;
             
             updateDisplay();
-            addLog(`📈 游戏进度：分数=${gameState.score}, 等级=${gameState.level}`, 'info');
+            addLog(`📈 游戏进度：分�?${gameState.score}, 等级=${gameState.level}`, 'info');
         }
         
         function simulateManualReset() {
             addLog('🔄 模拟点击重置按钮...', 'reset');
             
-            // 停止计时器
+            // 停止计时�?
             if (gameState.timer) {
                 clearInterval(gameState.timer);
                 gameState.timer = null;
             }
             
-            // 重置状态
+            // 重置状�?
             gameState.state = 'stopped';
             gameState.score = 0;
             gameState.level = 1;
             gameState.time = 0;
             
             updateDisplay();
-            addLog('✅ 游戏已重置', 'reset');
+            addLog('�?游戏已重�?, 'reset');
             
-            // 模拟自动开始（延迟200ms）
+            // 模拟自动开始（延迟200ms�?
             setTimeout(() => {
-                addLog('🎮 重置完成，自动开始游戏', 'start');
+                addLog('🎮 重置完成，自动开始游�?, 'start');
                 simulateStart();
             }, 200);
         }
@@ -327,7 +327,7 @@
         function simulateRefreshReset() {
             addLog('🔄 模拟页面刷新重置...', 'reset');
             
-            // 停止计时器
+            // 停止计时�?
             if (gameState.timer) {
                 clearInterval(gameState.timer);
                 gameState.timer = null;
@@ -340,15 +340,15 @@
             gameState.time = 0;
             
             updateDisplay();
-            addLog('✅ 页面刷新，游戏已重置（未自动开始）', 'reset');
+            addLog('�?页面刷新，游戏已重置（未自动开始）', 'reset');
         }
         
         // 页面加载时初始化
         window.addEventListener('load', () => {
             updateDisplay();
-            addLog('📋 测试页面已加载，可以开始测试', 'info');
+            addLog('📋 测试页面已加载，可以开始测�?, 'info');
             
-            // 添加键盘快捷键
+            // 添加键盘快捷�?
             document.addEventListener('keydown', (e) => {
                 switch(e.key) {
                     case 's':
@@ -371,8 +371,9 @@
                 }
             });
             
-            addLog('💡 快捷键：S=开始, R=重置, Ctrl+R=刷新重置, P=进度', 'info');
+            addLog('💡 快捷键：S=开�? R=重置, Ctrl+R=刷新重置, P=进度', 'info');
         });
     </script>
 </body>
 </html>
+

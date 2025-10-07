@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>单词重复检查工具</title>
+    <title>单词重复检查工�?/title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -86,14 +86,14 @@
 </head>
 <body>
     <div class="container">
-        <h1>🔍 单词重复检查工具</h1>
+        <h1>🔍 单词重复检查工�?/h1>
         <p>检查单词库中是否存在重复单词，确保每个单词只出现在一个难度级别中</p>
         
-        <div id="status" class="status warning">准备检查...</div>
+        <div id="status" class="status warning">准备检�?..</div>
         
-        <button class="test-button" onclick="checkDuplicates()">开始检查重复</button>
+        <button class="test-button" onclick="checkDuplicates()">开始检查重�?/button>
         <button class="test-button" onclick="showDifficultyStats()">显示难度统计</button>
-        <button class="test-button" onclick="generateFixedWords()">生成修复后的单词库</button>
+        <button class="test-button" onclick="generateFixedWords()">生成修复后的单词�?/button>
         
         <div id="results"></div>
         
@@ -123,7 +123,7 @@
                 
                 return true;
             } catch (error) {
-                console.error('加载单词库失败:', error);
+                console.error('加载单词库失�?', error);
                 return false;
             }
         }
@@ -135,17 +135,17 @@
         }
         
         async function checkDuplicates() {
-            updateStatus('正在加载单词库...', 'warning');
+            updateStatus('正在加载单词�?..', 'warning');
             
             const loaded = await loadWordsData();
             if (!loaded) {
-                updateStatus('❌ 单词库加载失败', 'error');
+                updateStatus('�?单词库加载失�?, 'error');
                 return;
             }
             
-            updateStatus('正在检查重复单词...', 'warning');
+            updateStatus('正在检查重复单�?..', 'warning');
             
-            // 检查重复单词
+            // 检查重复单�?
             const wordMap = new Map();
             const duplicates = [];
             
@@ -172,15 +172,15 @@
             const resultsDiv = document.getElementById('results');
             
             if (duplicates.length === 0) {
-                updateStatus('✅ 检查完成：没有发现重复单词', 'success');
+                updateStatus('�?检查完成：没有发现重复单词', 'success');
                 resultsDiv.innerHTML = `
                     <div class="status success">
-                        <h3>🎉 检查结果：无重复</h3>
-                        <p>单词库中的 ${allWords.length} 个单词都是唯一的，没有重复。</p>
+                        <h3>🎉 检查结果：无重�?/h3>
+                        <p>单词库中�?${allWords.length} 个单词都是唯一的，没有重复�?/p>
                     </div>
                 `;
             } else {
-                updateStatus(`❌ 发现 ${duplicates.length} 个重复单词`, 'error');
+                updateStatus(`�?发现 ${duplicates.length} 个重复单词`, 'error');
                 
                 let duplicateHtml = `
                     <div class="status error">
@@ -223,7 +223,7 @@
                 if (!loaded) return;
             }
             
-            // 按难度统计
+            // 按难度统�?
             const difficultyStats = {
                 1: { words: [], count: 0 },
                 2: { words: [], count: 0 },
@@ -275,7 +275,7 @@
             updateStatus('正在生成修复建议...', 'warning');
             
             // 这里可以实现自动修复逻辑
-            // 例如：将重复单词分配到不同难度级别
+            // 例如：将重复单词分配到不同难度级�?
             
             const resultsDiv = document.getElementById('results');
             resultsDiv.innerHTML = `
@@ -283,12 +283,12 @@
                     <h3>🔧 修复建议</h3>
                     <p>基于单词互斥原则的修复建议：</p>
                     <ol>
-                        <li><strong>保持难度1单词纯净</strong>：只包含最基础的3-4字母单词</li>
-                        <li><strong>难度2单词独立</strong>：4-6字母单词，不与难度1重复</li>
-                        <li><strong>难度3单词高级</strong>：5-8字母复杂单词，完全独立</li>
-                        <li><strong>重复处理策略</strong>：
+                        <li><strong>保持难度1单词纯净</strong>：只包含最基础�?-4字母单词</li>
+                        <li><strong>难度2单词独立</strong>�?-6字母单词，不与难�?重复</li>
+                        <li><strong>难度3单词高级</strong>�?-8字母复杂单词，完全独�?/li>
+                        <li><strong>重复处理策略</strong>�?
                             <ul>
-                                <li>保留在最适合的难度级别</li>
+                                <li>保留在最适合的难度级�?/li>
                                 <li>从其他级别中移除</li>
                                 <li>确保每个级别有足够的单词数量</li>
                             </ul>
@@ -298,10 +298,11 @@
             `;
         }
         
-        // 页面加载时自动检查
+        // 页面加载时自动检�?
         window.addEventListener('load', () => {
             setTimeout(checkDuplicates, 1000);
         });
     </script>
 </body>
 </html>
+

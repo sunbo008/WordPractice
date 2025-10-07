@@ -77,10 +77,10 @@
 <body>
     <div class="container">
         <h1>🎯 音标专项练习单词测试</h1>
-        <p>测试新增的四个重点音标专项练习单词是否正确加载</p>
+        <p>测试新增的四个重点音标专项练习单词是否正确加�?/p>
         
         <div id="stats" class="stats">
-            <div class="stat-item">📚 加载状态: <span id="loadStatus">加载中...</span></div>
+            <div class="stat-item">📚 加载状�? <span id="loadStatus">加载�?..</span></div>
             <div class="stat-item">🔢 总单词数: <span id="totalWords">-</span></div>
             <div class="stat-item">📖 专项课程: <span id="specialLessons">-</span></div>
         </div>
@@ -97,10 +97,10 @@
                 const data = await response.json();
                 
                 // 更新统计信息
-                document.getElementById('loadStatus').textContent = '✅ 加载成功';
+                document.getElementById('loadStatus').textContent = '�?加载成功';
                 document.getElementById('totalWords').textContent = data.metadata.totalWords;
                 
-                // 筛选专项练习课程
+                // 筛选专项练习课�?
                 const specialPhonicsLessons = Object.entries(data.phonicsLessons)
                     .filter(([key, value]) => key.includes('special_') && key.includes('phonics'));
                 
@@ -136,18 +136,19 @@
                     container.appendChild(section);
                 });
                 
-                console.log('✅ 音标专项练习单词加载成功:', specialPhonicsLessons.length, '个课程');
+                console.log('�?音标专项练习单词加载成功:', specialPhonicsLessons.length, '个课�?);
                 
             } catch (error) {
-                console.error('❌ 加载失败:', error);
-                document.getElementById('loadStatus').textContent = '❌ 加载失败';
+                console.error('�?加载失败:', error);
+                document.getElementById('loadStatus').textContent = '�?加载失败';
                 document.getElementById('errorMsg').style.display = 'block';
                 document.getElementById('errorMsg').textContent = '错误: ' + error.message;
             }
         }
         
-        // 页面加载时执行测试
+        // 页面加载时执行测�?
         window.addEventListener('load', loadAndTestWords);
     </script>
 </body>
 </html>
+

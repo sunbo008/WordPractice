@@ -1,0 +1,96 @@
+{
+  "metadata": {
+    "id": "day13",
+    "name": "Day 13 - 长元音 /ɜː/",
+    "phoneme": "/ɜː/",
+    "description": "学习/ɜː/的发音和拼读规则",
+    "day": 13,
+    "category": "daily-phonics",
+    "difficulty": "intermediate",
+    "wordCount": 10,
+    "lastUpdated": "2025-10-06"
+  },
+  "words": [
+    {
+      "word": "her",
+      "phonetic": "[hɜː(r)]",
+      "meaning": "她的",
+      "difficulty": 1
+    },
+    {
+      "word": "bird",
+      "phonetic": "[bɜːd]",
+      "meaning": "鸟",
+      "difficulty": 1
+    },
+    {
+      "word": "girl",
+      "phonetic": "[ɡɜːl]",
+      "meaning": "女孩",
+      "difficulty": 1
+    },
+    {
+      "word": "turn",
+      "phonetic": "[tɜːn]",
+      "meaning": "转动",
+      "difficulty": 1
+    },
+    {
+      "word": "work",
+      "phonetic": "[wɜːk]",
+      "meaning": "工作",
+      "difficulty": 1
+    },
+    {
+      "word": "word",
+      "phonetic": "[wɜːd]",
+      "meaning": "单词",
+      "difficulty": 1
+    },
+    {
+      "word": "first",
+      "phonetic": "[fɜːst]",
+      "meaning": "第一",
+      "difficulty": 1
+    },
+    {
+      "word": "thirsty",
+      "phonetic": "[ˈθɜːsti]",
+      "meaning": "口渴的",
+      "difficulty": 2
+    },
+    {
+      "word": "early",
+      "phonetic": "[ˈɜːli]",
+      "meaning": "早的",
+      "difficulty": 1
+    },
+    {
+      "word": "learn",
+      "phonetic": "[lɜːn]",
+      "meaning": "学习",
+      "difficulty": 1
+    }
+  ],
+  "lesson": {
+    "pronunciationTips": [
+      "舌位：舌中部抬高，舌尖向下卷或不卷",
+      "唇形：嘴唇自然微开，扁平状",
+      "气流：声带振动，气流从口腔中部通过",
+      "音长：这是一个长元音，发音时间要拉长"
+    ],
+    "phonicsPatterns": [
+      "er 组合通常发 /ɜː/ 音（her, term, serve）",
+      "ir 组合通常发 /ɜː/ 音（bird, girl, first）",
+      "ur 组合通常发 /ɜː/ 音（turn, burn, hurt）",
+      "or 在 w 后面发 /ɜː/ 音（work, word, world）",
+      "ear 在特定单词中发 /ɜː/ 音（learn, earn, earth）"
+    ],
+    "practiceSteps": [
+      "准备动作：嘴唇扁平，自然微开",
+      "舌位调整：舌中部抬高",
+      "发音：发拉长的\"呃——\"音",
+      "检查：不要卷舌过度"
+    ]
+  }
+}

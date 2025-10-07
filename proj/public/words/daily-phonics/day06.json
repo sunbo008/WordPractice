@@ -1,0 +1,95 @@
+{
+  "metadata": {
+    "id": "day06",
+    "name": "Day 6 - 短元音 /ɪ/",
+    "phoneme": "/ɪ/",
+    "description": "学习/ɪ/的发音和拼读规则",
+    "day": 6,
+    "category": "daily-phonics",
+    "difficulty": "beginner",
+    "wordCount": 10,
+    "lastUpdated": "2025-10-06"
+  },
+  "words": [
+    {
+      "word": "big",
+      "phonetic": "[bɪɡ]",
+      "meaning": "大的",
+      "difficulty": 1
+    },
+    {
+      "word": "pig",
+      "phonetic": "[pɪɡ]",
+      "meaning": "猪",
+      "difficulty": 1
+    },
+    {
+      "word": "sit",
+      "phonetic": "[sɪt]",
+      "meaning": "坐",
+      "difficulty": 1
+    },
+    {
+      "word": "six",
+      "phonetic": "[sɪks]",
+      "meaning": "六",
+      "difficulty": 1
+    },
+    {
+      "word": "fish",
+      "phonetic": "[fɪʃ]",
+      "meaning": "鱼",
+      "difficulty": 1
+    },
+    {
+      "word": "milk",
+      "phonetic": "[mɪlk]",
+      "meaning": "牛奶",
+      "difficulty": 1
+    },
+    {
+      "word": "swim",
+      "phonetic": "[swɪm]",
+      "meaning": "游泳",
+      "difficulty": 1
+    },
+    {
+      "word": "quick",
+      "phonetic": "[kwɪk]",
+      "meaning": "快的",
+      "difficulty": 1
+    },
+    {
+      "word": "chicken",
+      "phonetic": "[ˈtʃɪkɪn]",
+      "meaning": "鸡肉",
+      "difficulty": 1
+    },
+    {
+      "word": "little",
+      "phonetic": "[ˈlɪtl]",
+      "meaning": "小的",
+      "difficulty": 1
+    }
+  ],
+  "lesson": {
+    "pronunciationTips": [
+      "舌位：舌前部抬起，但低于/i:/，较放松",
+      "唇形：嘴唇微微张开，比/i:/开口大，扁平状",
+      "气流：声带振动，气流从口腔自然通过",
+      "音长：这是一个短元音，发音短促清晰，不拉长"
+    ],
+    "phonicsPatterns": [
+      "i 在闭音节中通常发 /ɪ/ 短音（big, sit, six）",
+      "i + 辅音字母结尾发 /ɪ/ 音（pig, fish, milk）",
+      "i 在双音节词中发 /ɪ/ 音（chicken, little, visit）",
+      "闭音节规则：辅音+i+辅音 = /ɪ/"
+    ],
+    "practiceSteps": [
+      "准备动作：嘴唇微微张开",
+      "舌位调整：舌前部抬起但保持放松",
+      "发音：发短促的\"衣\"音",
+      "检查：不要发成长音/i:/"
+    ]
+  }
+}

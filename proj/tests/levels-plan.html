@@ -29,21 +29,21 @@
 </head>
 <body>
     <h1>等级词表规划测试</h1>
-    <div class="desc">验证“同一单词只出现于一个等级”，并展示各等级词表与重复来源。</div>
+    <div class="desc">验证“同一单词只出现于一个等级”，并展示各等级词表与重复来源�?/div>
 
     <div id="summary" class="summary"></div>
 
     <div class="panel" style="margin-bottom:16px;">
         <h3>重复词来源（被过滤）</h3>
         <div class="body" id="duplicates">
-            <div class="muted">加载中...</div>
+            <div class="muted">加载�?..</div>
         </div>
     </div>
 
     <div class="grid" id="levels"></div>
 
-    <script src="../vocabulary-config-loader.js?v=20251007-levels"></script>
-    <script src="../vocabulary-manager-v2.js?v=20251007-levels"></script>
+    <script src="../src/core/vocabulary-config-loader.js?v=20251007-levels"></script>
+    <script src="../src/core/vocabulary-manager-v2.js?v=20251007-levels"></script>
     <script>
     (async function() {
         const vm = new VocabularyManagerV2();
@@ -70,7 +70,7 @@
             return;
         }
 
-        // 获取分组与统计
+        // 获取分组与统�?
         const grouped = vm.getWordsGroupedByDifficulty();
         const planSummary = vm.getLevelPlanSummary();
         const duplicates = vm.getFilteredDuplicateWords();
@@ -97,11 +97,11 @@
         summaryEl.innerHTML = `
             <div class="card"><div>总单词数</div><div><strong>${totalWords}</strong></div></div>
             <div class="card"><div>等级数量</div><div><strong>${diffCount}</strong></div></div>
-            <div class="card ${conflictCount === 0 ? 'ok' : 'error'}"><div>跨等级重复</div><div><strong>${conflictCount}</strong></div></div>
-            <div class="card ${dupCount === 0 ? 'ok' : 'warn'}"><div>跨库重复（已过滤）</div><div><strong>${dupCount}</strong></div></div>
+            <div class="card ${conflictCount === 0 ? 'ok' : 'error'}"><div>跨等级重�?/div><div><strong>${conflictCount}</strong></div></div>
+            <div class="card ${dupCount === 0 ? 'ok' : 'warn'}"><div>跨库重复（已过滤�?/div><div><strong>${dupCount}</strong></div></div>
         `;
 
-        // 重复来源表
+        // 重复来源�?
         if (dupCount === 0) {
             dupEl.innerHTML = '<div class="ok">未发现跨库重复词</div>';
         } else {
@@ -114,7 +114,7 @@
             }).join('');
             dupEl.innerHTML = `
                 <details open>
-                    <summary>重复 ${dupCount} 项（显示前200）</summary>
+                    <summary>重复 ${dupCount} 项（显示�?00�?/summary>
                     <div style="margin-top:8px;">
                         <table>
                             <thead><tr><th>单词</th><th>来源1</th><th>来源2</th></tr></thead>
@@ -125,13 +125,13 @@
             `;
         }
 
-        // 各等级面板
+        // 各等级面�?
         levelsEl.innerHTML = planSummary.map(s => {
             const list = grouped[s.difficulty] || [];
             const items = list.map(w => `<li title="${w.meaning}">${w.word}</li>`).join('');
             return `
                 <div class="panel">
-                    <h3>难度 ${s.difficulty}（${s.count}）</h3>
+                    <h3>难度 ${s.difficulty}�?{s.count}�?/h3>
                     <div class="body">
                         <ul class="words">${items}</ul>
                     </div>
@@ -142,6 +142,7 @@
     </script>
 </body>
 </html>
+
 
 
 

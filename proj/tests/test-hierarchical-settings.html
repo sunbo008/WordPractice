@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>层级化设置系统测试</title>
+    <title>层级化设置系统测�?/title>
     <style>
         body {
             font-family: 'Microsoft YaHei', sans-serif;
@@ -104,24 +104,24 @@
 </head>
 <body>
     <div class="container">
-        <h1>🧪 层级化设置系统测试</h1>
+        <h1>🧪 层级化设置系统测�?/h1>
         
         <!-- 配置文件测试 -->
         <div class="test-section">
             <h2>📋 配置文件结构测试</h2>
             <div id="config-status" class="status info">正在加载配置文件...</div>
             <div class="stats-grid" id="config-stats">
-                <!-- 动态生成统计卡片 -->
+                <!-- 动态生成统计卡�?-->
             </div>
             <button class="btn" onclick="testConfigLoading()">重新加载配置</button>
             <button class="btn" onclick="testConfigStructure()">验证配置结构</button>
         </div>
         
-        <!-- 分类树展示 -->
+        <!-- 分类树展�?-->
         <div class="test-section">
-            <h2>🌳 三级分类树结构</h2>
-            <div id="tree-status" class="status info">准备显示分类树...</div>
-            <button class="btn" onclick="displayCategoryTree()">显示完整分类树</button>
+            <h2>🌳 三级分类树结�?/h2>
+            <div id="tree-status" class="status info">准备显示分类�?..</div>
+            <button class="btn" onclick="displayCategoryTree()">显示完整分类�?/button>
             <div id="category-tree" class="category-tree"></div>
         </div>
         
@@ -137,7 +137,7 @@
         <div class="test-section">
             <h2>🔍 文件路径验证</h2>
             <div id="path-status" class="status info">准备验证文件路径...</div>
-            <button class="btn" onclick="validateFilePaths()">验证所有文件路径</button>
+            <button class="btn" onclick="validateFilePaths()">验证所有文件路�?/button>
             <div id="path-results"></div>
         </div>
     </div>
@@ -156,13 +156,13 @@
                 
                 configData = await response.json();
                 
-                updateStatus('config-status', '✅ 配置文件加载成功！', 'success');
+                updateStatus('config-status', '�?配置文件加载成功�?, 'success');
                 
                 // 显示配置统计
                 displayConfigStats();
                 
             } catch (error) {
-                updateStatus('config-status', `❌ 加载失败: ${error.message}`, 'error');
+                updateStatus('config-status', `�?加载失败: ${error.message}`, 'error');
                 console.error('配置加载失败:', error);
             }
         }
@@ -196,11 +196,11 @@
             statsGrid.innerHTML = `
                 <div class="stat-card">
                     <div class="stat-value">${totalCategories}</div>
-                    <div class="stat-label">主分类</div>
+                    <div class="stat-label">主分�?/div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-value">${totalSubcategories}</div>
-                    <div class="stat-label">子分类</div>
+                    <div class="stat-label">子分�?/div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-value">${totalItems}</div>
@@ -215,7 +215,7 @@
         
         function testConfigStructure() {
             if (!configData) {
-                updateStatus('config-status', '请先加载配置文件！', 'error');
+                updateStatus('config-status', '请先加载配置文件�?, 'error');
                 return;
             }
             
@@ -240,16 +240,16 @@
                     throw new Error(errors.join('; '));
                 }
                 
-                updateStatus('config-status', '✅ 配置结构验证通过！', 'success');
+                updateStatus('config-status', '�?配置结构验证通过�?, 'success');
                 
             } catch (error) {
-                updateStatus('config-status', `❌ 结构验证失败: ${error.message}`, 'error');
+                updateStatus('config-status', `�?结构验证失败: ${error.message}`, 'error');
             }
         }
         
         function displayCategoryTree() {
             if (!configData) {
-                updateStatus('tree-status', '请先加载配置文件！', 'error');
+                updateStatus('tree-status', '请先加载配置文件�?, 'error');
                 return;
             }
             
@@ -265,23 +265,23 @@
                             // 三级结构（年级分类）
                             treeHTML += `<div class="level2">  📁 ${sub.name} (${sub.id})</div>`;
                             sub.items.forEach(item => {
-                                treeHTML += `<div class="level3">    📄 ${item.name} - ${item.wordCount}个单词</div>`;
+                                treeHTML += `<div class="level3">    📄 ${item.name} - ${item.wordCount}个单�?/div>`;
                             });
                         } else {
                             // 二级结构（按天学习、专项练习）
-                            treeHTML += `<div class="level2">  📄 ${sub.name} (${sub.id}) - ${sub.wordCount}个单词</div>`;
+                            treeHTML += `<div class="level2">  📄 ${sub.name} (${sub.id}) - ${sub.wordCount}个单�?/div>`;
                         }
                     });
                 }
             });
             
             treeContainer.innerHTML = treeHTML;
-            updateStatus('tree-status', '✅ 分类树显示完成！', 'success');
+            updateStatus('tree-status', '�?分类树显示完成！', 'success');
         }
         
         function analyzeVocabularyStats() {
             if (!configData) {
-                updateStatus('stats-status', '请先加载配置文件！', 'error');
+                updateStatus('stats-status', '请先加载配置文件�?, 'error');
                 return;
             }
             
@@ -322,12 +322,12 @@
             statsHTML += '</div>';
             
             statsContainer.innerHTML = statsHTML;
-            updateStatus('stats-status', '✅ 词库统计分析完成！', 'success');
+            updateStatus('stats-status', '�?词库统计分析完成�?, 'success');
         }
         
         async function validateFilePaths() {
             if (!configData) {
-                updateStatus('path-status', '请先加载配置文件！', 'error');
+                updateStatus('path-status', '请先加载配置文件�?, 'error');
                 return;
             }
             
@@ -353,13 +353,13 @@
                                 try {
                                     const response = await fetch(path, { method: 'HEAD' });
                                     if (response.ok) {
-                                        results += `<div class="level3" style="color: #27ae60;">✓ ${path}</div>`;
+                                        results += `<div class="level3" style="color: #27ae60;">�?${path}</div>`;
                                         validCount++;
                                     } else {
-                                        results += `<div class="level3" style="color: #e74c3c;">✗ ${path} (${response.status})</div>`;
+                                        results += `<div class="level3" style="color: #e74c3c;">�?${path} (${response.status})</div>`;
                                     }
                                 } catch (error) {
-                                    results += `<div class="level3" style="color: #e74c3c;">✗ ${path} (错误)</div>`;
+                                    results += `<div class="level3" style="color: #e74c3c;">�?${path} (错误)</div>`;
                                 }
                             }
                         }
@@ -371,12 +371,13 @@
             resultsContainer.innerHTML = results;
             
             const message = `验证完成: ${validCount}/${totalCount} 个文件可访问`;
-            updateStatus('path-status', validCount === totalCount ? `✅ ${message}` : `⚠️ ${message}`, 
+            updateStatus('path-status', validCount === totalCount ? `�?${message}` : `⚠️ ${message}`, 
                          validCount === totalCount ? 'success' : 'error');
         }
         
-        // 页面加载时自动测试配置加载
+        // 页面加载时自动测试配置加�?
         document.addEventListener('DOMContentLoaded', testConfigLoading);
     </script>
 </body>
 </html>
+

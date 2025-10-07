@@ -120,7 +120,7 @@
         <p>测试页面刷新时自动重置游戏的功能</p>
         
         <div class="test-section">
-            <h3>当前游戏状态</h3>
+            <h3>当前游戏状�?/h3>
             <div class="game-state">
                 <div class="state-item">
                     <div class="state-value" id="game-score">0</div>
@@ -132,11 +132,11 @@
                 </div>
                 <div class="state-item">
                     <div class="state-value" id="vocab-count">0</div>
-                    <div class="state-label">生词本数量</div>
+                    <div class="state-label">生词本数�?/div>
                 </div>
                 <div class="state-item">
                     <div class="state-value" id="hit-count">0</div>
-                    <div class="state-label">命中单词数</div>
+                    <div class="state-label">命中单词�?/div>
                 </div>
             </div>
         </div>
@@ -152,11 +152,11 @@
         <div class="test-section">
             <h3>测试说明</h3>
             <div class="status info">
-                <strong>测试步骤：</strong><br>
-                1. 点击"模拟游戏进度"和"添加生词"来改变游戏状态<br>
+                <strong>测试步骤�?/strong><br>
+                1. 点击"模拟游戏进度"�?添加生词"来改变游戏状�?br>
                 2. 点击"刷新页面测试"或按F5刷新页面<br>
-                3. 观察页面重新加载后，游戏状态是否自动重置为初始状态<br>
-                4. 检查控制台日志确认重置操作被执行
+                3. 观察页面重新加载后，游戏状态是否自动重置为初始状�?br>
+                4. 检查控制台日志确认重置操作被执�?
             </div>
         </div>
         
@@ -172,17 +172,17 @@
         <div class="test-section">
             <h3>预期行为</h3>
             <div class="status success">
-                <strong>✅ 正确行为：</strong><br>
-                - 页面刷新后，所有游戏数据自动重置为初始状态<br>
-                - 分数重置为0，等级重置为1<br>
+                <strong>�?正确行为�?/strong><br>
+                - 页面刷新后，所有游戏数据自动重置为初始状�?br>
+                - 分数重置�?，等级重置为1<br>
                 - 生词本清空，命中统计清零<br>
-                - 控制台显示"🔄 页面刷新，自动重置游戏"日志
+                - 控制台显�?🔄 页面刷新，自动重置游�?日志
             </div>
         </div>
     </div>
 
     <script>
-        // 模拟游戏状态
+        // 模拟游戏状�?
         let gameState = {
             score: 0,
             level: 1,
@@ -217,7 +217,7 @@
             gameState.hitCount += Math.floor(Math.random() * 5) + 1;
             
             updateDisplay();
-            addLog(`模拟游戏进度：分数=${gameState.score}, 等级=${gameState.level}, 命中=${gameState.hitCount}`, 'info');
+            addLog(`模拟游戏进度：分�?${gameState.score}, 等级=${gameState.level}, 命中=${gameState.hitCount}`, 'info');
         }
         
         function addVocabWords() {
@@ -236,13 +236,13 @@
             };
             
             updateDisplay();
-            addLog('手动重置游戏状态', 'reset');
+            addLog('手动重置游戏状�?, 'reset');
         }
         
         function refreshPage() {
             addLog('即将刷新页面...', 'refresh');
             
-            // 保存当前状态到sessionStorage，用于验证重置
+            // 保存当前状态到sessionStorage，用于验证重�?
             sessionStorage.setItem('preRefreshState', JSON.stringify({
                 ...gameState,
                 timestamp: Date.now()
@@ -253,7 +253,7 @@
             }, 1000);
         }
         
-        // 页面加载时检查
+        // 页面加载时检�?
         function checkRefreshReset() {
             const preRefreshState = sessionStorage.getItem('preRefreshState');
             
@@ -261,30 +261,30 @@
                 const prevState = JSON.parse(preRefreshState);
                 const timeDiff = Date.now() - prevState.timestamp;
                 
-                if (timeDiff < 10000) { // 10秒内的刷新
+                if (timeDiff < 10000) { // 10秒内的刷�?
                     addLog('🔄 检测到页面刷新', 'refresh');
                     addLog(`刷新前状态：分数=${prevState.score}, 等级=${prevState.level}, 生词=${prevState.vocabCount}, 命中=${prevState.hitCount}`, 'info');
                     
                     // 检查当前状态是否已重置
                     if (gameState.score === 0 && gameState.level === 1 && gameState.vocabCount === 0 && gameState.hitCount === 0) {
-                        addLog('✅ 游戏状态已正确重置！', 'reset');
+                        addLog('�?游戏状态已正确重置�?, 'reset');
                     } else {
-                        addLog('❌ 游戏状态未正确重置', 'reset');
+                        addLog('�?游戏状态未正确重置', 'reset');
                     }
                     
-                    // 清除保存的状态
+                    // 清除保存的状�?
                     sessionStorage.removeItem('preRefreshState');
                 }
             }
         }
         
-        // 监听控制台日志（模拟）
+        // 监听控制台日志（模拟�?
         function checkConsoleLog() {
-            // 由于无法直接监听console.log，这里模拟检查
+            // 由于无法直接监听console.log，这里模拟检�?
             // 在实际游戏中，重置日志会在控制台显示
             setTimeout(() => {
                 if (isRefresh) {
-                    addLog('📋 请检查浏览器控制台是否显示："🔄 页面刷新，自动重置游戏"', 'info');
+                    addLog('📋 请检查浏览器控制台是否显示："🔄 页面刷新，自动重置游�?', 'info');
                 }
             }, 500);
         }
@@ -294,7 +294,7 @@
             updateDisplay();
             
             if (isRefresh) {
-                addLog('🔄 页面已刷新重新加载', 'refresh');
+                addLog('🔄 页面已刷新重新加�?, 'refresh');
             } else {
                 addLog('🆕 首次加载页面', 'info');
             }
@@ -302,7 +302,7 @@
             checkRefreshReset();
             checkConsoleLog();
             
-            // 添加键盘快捷键
+            // 添加键盘快捷�?
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'F5' || (e.ctrlKey && e.key === 'r')) {
                     e.preventDefault();
@@ -311,7 +311,7 @@
             });
         });
         
-        // 页面卸载前保存状态
+        // 页面卸载前保存状�?
         window.addEventListener('beforeunload', () => {
             sessionStorage.setItem('preRefreshState', JSON.stringify({
                 ...gameState,
@@ -321,3 +321,4 @@
     </script>
 </body>
 </html>
+

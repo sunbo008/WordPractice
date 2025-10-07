@@ -95,18 +95,18 @@
         <p>测试生词导出为文本文件的功能</p>
         
         <div class="test-section">
-            <h3>当前生词本</h3>
+            <h3>当前生词�?/h3>
             <div id="vocabulary-display" class="vocabulary-list">
                 <p>暂无生词</p>
             </div>
-            <p><strong>生词数量：</strong><span id="vocab-count">0</span></p>
+            <p><strong>生词数量�?/strong><span id="vocab-count">0</span></p>
         </div>
         
         <div class="test-section">
             <h3>测试操作</h3>
-            <button class="button" onclick="loadVocabularyManager()">加载单词库</button>
+            <button class="button" onclick="loadVocabularyManager()">加载单词�?/button>
             <button class="button" onclick="addTestWords()">添加测试生词</button>
-            <button class="button" onclick="clearVocabulary()">清空生词本</button>
+            <button class="button" onclick="clearVocabulary()">清空生词�?/button>
             <button class="button" id="exportBtn" onclick="exportVocabulary()" disabled>导出生词</button>
         </div>
         
@@ -121,7 +121,7 @@
         </div>
     </div>
 
-    <script src="../vocabulary.js"></script>
+    <script src="../src/core/vocabulary-manager-v2.js"></script>
     <script>
         let vocabularyManager = null;
         
@@ -176,23 +176,23 @@
                 }
                 
                 if (vocabularyManager.isLoaded) {
-                    updateStatus('✅ 单词库管理器加载成功！', 'success');
+                    updateStatus('�?单词库管理器加载成功�?, 'success');
                     updateVocabularyDisplay();
                 } else {
-                    updateStatus('❌ 单词库管理器加载失败或超时', 'error');
+                    updateStatus('�?单词库管理器加载失败或超�?, 'error');
                 }
             } catch (error) {
-                updateStatus(`❌ 加载失败: ${error.message}`, 'error');
+                updateStatus(`�?加载失败: ${error.message}`, 'error');
             }
         }
         
         function addTestWords() {
             if (!vocabularyManager) {
-                updateStatus('❌ 请先加载单词库管理器', 'error');
+                updateStatus('�?请先加载单词库管理器', 'error');
                 return;
             }
             
-            // 添加一些测试生词（包含音标）
+            // 添加一些测试生词（包含音标�?
             const testWords = [
                 { original: 'problem', meaning: '问题', phonetic: '[ˈprɒbləm]', giveUp: true },
                 { original: 'father', meaning: '父亲', phonetic: '[ˈfɑːðə(r)]', giveUp: false },
@@ -205,30 +205,30 @@
                 vocabularyManager.addMissedWord(word);
             });
             
-            updateStatus(`✅ 已添加 ${testWords.length} 个测试生词`, 'success');
+            updateStatus(`�?已添�?${testWords.length} 个测试生词`, 'success');
             updateVocabularyDisplay();
         }
         
         function clearVocabulary() {
             if (!vocabularyManager) {
-                updateStatus('❌ 请先加载单词库管理器', 'error');
+                updateStatus('�?请先加载单词库管理器', 'error');
                 return;
             }
             
             vocabularyManager.clearCurrentLevelVocabulary();
-            updateStatus('✅ 生词本已清空', 'success');
+            updateStatus('�?生词本已清空', 'success');
             updateVocabularyDisplay();
         }
         
         function exportVocabulary() {
             if (!vocabularyManager) {
-                updateStatus('❌ 请先加载单词库管理器', 'error');
+                updateStatus('�?请先加载单词库管理器', 'error');
                 return;
             }
             
             const vocabularyBook = vocabularyManager.getVocabularyBook();
             if (vocabularyBook.length === 0) {
-                updateStatus('❌ 生词本为空，无法导出！', 'error');
+                updateStatus('�?生词本为空，无法导出�?, 'error');
                 return;
             }
             
@@ -255,13 +255,14 @@
             link.click();
             document.body.removeChild(link);
             
-            updateStatus(`✅ 成功导出 ${vocabularyBook.length} 个生词到文本文件！`, 'success');
+            updateStatus(`�?成功导出 ${vocabularyBook.length} 个生词到文本文件！`, 'success');
         }
         
         // 页面加载时自动加载单词库
         window.addEventListener('load', () => {
-            updateStatus('页面已加载，点击"加载单词库"开始测试', 'info');
+            updateStatus('页面已加载，点击"加载单词�?开始测�?, 'info');
         });
     </script>
 </body>
 </html>
+

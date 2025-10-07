@@ -98,7 +98,7 @@
             <h3>当前考试统计</h3>
             <div class="exam-stats">
                 <div class="stats-item">
-                    <span class="label">考试总词量:</span>
+                    <span class="label">考试总词�?</span>
                     <span id="total-words">0</span>
                 </div>
                 <div class="stats-item">
@@ -107,7 +107,7 @@
                     <span class="percentage">(<span id="hit-percentage">0%</span>)</span>
                 </div>
                 <div class="stats-item">
-                    <span class="label">覆盖率:</span>
+                    <span class="label">覆盖�?</span>
                     <span id="coverage-percentage">0%</span>
                 </div>
             </div>
@@ -132,7 +132,7 @@
         </div>
     </div>
 
-    <script src="../vocabulary.js"></script>
+    <script src="../src/core/vocabulary-manager-v2.js"></script>
     <script>
         let vocabularyManager = null;
         let testHitWords = new Set();
@@ -174,24 +174,24 @@
                 if (vocabularyManager.isLoaded) {
                     const stats = vocabularyManager.getVocabularyStats();
                     
-                    updateStatus(`✅ 单词库加载成功！总单词数: ${stats.totalWords}`, 'success');
+                    updateStatus(`�?单词库加载成功！总单词数: ${stats.totalWords}`, 'success');
                     updateExamStats(stats.totalWords, testHitWords.size);
                     
-                    updateDebugInfo(`单词库统计:
+                    updateDebugInfo(`单词库统�?
 总单词数: ${stats.totalWords}
-生词本数量: ${stats.missedWords}
-所有单词数组长度: ${vocabularyManager.allWords ? vocabularyManager.allWords.length : 'null'}
-加载状态: ${vocabularyManager.isLoaded}
+生词本数�? ${stats.missedWords}
+所有单词数组长�? ${vocabularyManager.allWords ? vocabularyManager.allWords.length : 'null'}
+加载状�? ${vocabularyManager.isLoaded}
 加载错误: ${vocabularyManager.loadError || 'none'}`);
                 } else {
-                    updateStatus('❌ 单词库加载失败或超时', 'error');
+                    updateStatus('�?单词库加载失败或超时', 'error');
                     updateDebugInfo(`加载失败信息:
-加载状态: ${vocabularyManager.isLoaded}
+加载状�? ${vocabularyManager.isLoaded}
 加载错误: ${vocabularyManager.loadError || 'none'}
 等待次数: ${waitCount}`);
                 }
             } catch (error) {
-                updateStatus(`❌ 测试失败: ${error.message}`, 'error');
+                updateStatus(`�?测试失败: ${error.message}`, 'error');
                 updateDebugInfo(`错误详情: ${error.stack}`);
             }
         }
@@ -200,7 +200,7 @@
             updateStatus('正在测试游戏统计逻辑...', 'info');
             
             if (!vocabularyManager || !vocabularyManager.isLoaded) {
-                updateStatus('❌ 请先测试单词库管理器', 'error');
+                updateStatus('�?请先测试单词库管理器', 'error');
                 return;
             }
             
@@ -211,20 +211,20 @@
                 const hitWordsCount = testHitWords.size;
                 
                 updateExamStats(totalWords, hitWordsCount);
-                updateStatus(`✅ 游戏统计测试成功！总词量: ${totalWords}, 命中: ${hitWordsCount}`, 'success');
+                updateStatus(`�?游戏统计测试成功！总词�? ${totalWords}, 命中: ${hitWordsCount}`, 'success');
                 
                 updateDebugInfo(`游戏统计:
 总单词数: ${totalWords}
-命中单词数: ${hitWordsCount}
-命中率: ${totalWords > 0 ? Math.round((hitWordsCount / totalWords) * 100) : 0}%
+命中单词�? ${hitWordsCount}
+命中�? ${totalWords > 0 ? Math.round((hitWordsCount / totalWords) * 100) : 0}%
 测试命中单词: [${Array.from(testHitWords).join(', ')}]`);
             } catch (error) {
-                updateStatus(`❌ 游戏统计测试失败: ${error.message}`, 'error');
+                updateStatus(`�?游戏统计测试失败: ${error.message}`, 'error');
             }
         }
         
         function simulateHitWords() {
-            // 模拟命中一些单词
+            // 模拟命中一些单�?
             const sampleWords = ['cat', 'dog', 'book', 'tree', 'house'];
             const randomWord = sampleWords[Math.floor(Math.random() * sampleWords.length)];
             
@@ -233,23 +233,24 @@
             if (vocabularyManager && vocabularyManager.isLoaded) {
                 const stats = vocabularyManager.getVocabularyStats();
                 updateExamStats(stats.totalWords, testHitWords.size);
-                updateStatus(`✅ 模拟命中单词: ${randomWord}`, 'success');
+                updateStatus(`�?模拟命中单词: ${randomWord}`, 'success');
             } else {
-                updateStatus('❌ 请先测试单词库管理器', 'error');
+                updateStatus('�?请先测试单词库管理器', 'error');
             }
         }
         
         function resetStats() {
             testHitWords.clear();
             updateExamStats(0, 0);
-            updateStatus('✅ 统计已重置', 'success');
-            updateDebugInfo('统计数据已清空');
+            updateStatus('�?统计已重�?, 'success');
+            updateDebugInfo('统计数据已清�?);
         }
         
-        // 页面加载时自动测试
+        // 页面加载时自动测�?
         window.addEventListener('load', () => {
-            updateStatus('页面已加载，点击"测试单词库管理器"开始测试', 'info');
+            updateStatus('页面已加载，点击"测试单词库管理器"开始测�?, 'info');
         });
     </script>
 </body>
 </html>
+

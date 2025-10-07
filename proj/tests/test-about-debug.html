@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>调试 about</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            padding: 40px;
+            background: #1e3c72;
+            color: white;
+            line-height: 1.8;
+        }
+        .word {
+            font-size: 64px;
+            margin: 20px 0;
+        }
+        .stress { color: #ff4444; font-weight: bold; }
+        .normal { color: #ffffff; }
+        .debug {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+        .step {
+            background: rgba(100,150,255,0.2);
+            padding: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #4CAF50;
+        }
+        .error {
+            background: rgba(255,100,100,0.2);
+            border-left: 4px solid #ff4444;
+        }
+        .success {
+            background: rgba(100,255,100,0.2);
+            border-left: 4px solid #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <h1>🐛 调试 about 重音识别</h1>
+    
+    <div class="debug">
+        <h3>单词信息</h3>
+        <p><strong>单词:</strong> about</p>
+        <p><strong>音标:</strong> [əˈbaʊt]</p>
+        <p><strong>预期重音:</strong> bout (索引 1,2,3,4)</p>
+    </div>
+    
+    <div id="steps"></div>
+    
+    <div class="word" id="result"></div>
+    
+    <script>
+        const logs = [];
+        
+        function log(message, type = 'info') {
+            logs.push({ message, type });
+            console.log(message);
+        }
+        
+        function getWholeSyllable(word, vowelIndex) {
+            log(`\n=== getWholeSyllable(${word}, ${vowelIndex}) ===`);
+            const vowels = 'aeiou';
+            const result = [];
+            
+            let centerVowel = vowelIndex;
+            if (!vowels.includes(word[centerVowel])) {
+                log(`⚠️ 索引 ${centerVowel} 不是元音: '${word[centerVowel]}'`, 'warning');
+                for (let i = centerVowel; i < word.length; i++) {
+                    if (vowels.includes(word[i])) {
+                        centerVowel = i;
+                        log(`�?找到元音在索�?${i}: '${word[i]}'`, 'success');
+                        break;
+                    }
+                }
+            } else {
+                log(`�?索引 ${centerVowel} 是元�? '${word[centerVowel]}'`, 'success');
+            }
+            
+            // 向左扩展
+            let left = centerVowel;
+            log(`\n向左扩展，从索引 ${left} 开始`);
+            while (left > 0 && !vowels.includes(word[left - 1])) {
+                left--;
+                log(`  向左到索�?${left}: '${word[left]}'`);
+            }
+            log(`�?左边�? ${left}`);
+            
+            // 向右扩展
+            let right = centerVowel;
+            log(`\n向右扩展，从索引 ${right} 开始`);
+            
+            // 包含连续元音
+            while (right < word.length - 1 && vowels.includes(word[right + 1])) {
+                right++;
+                log(`  包含连续元音 ${right}: '${word[right]}'`);
+            }
+            
+            // 包含后面的辅�?
+            let consonantCount = 0;
+            let tempRight = right;
+            log(`\n计算后面的辅音数量`);
+            while (tempRight < word.length - 1 && !vowels.includes(word[tempRight + 1])) {
+                consonantCount++;
+                tempRight++;
+                log(`  辅音 ${tempRight}: '${word[tempRight]}'`);
+            }
+            log(`�?后面�?${consonantCount} 个辅音`);
+            
+            if (tempRight < word.length - 1) {
+                const half = Math.ceil(consonantCount / 2);
+                right += half;
+                log(`⚠️ 后面还有元音，取一半辅�? ${half}`, 'warning');
+            } else {
+                right = tempRight;
+                log(`�?后面没有元音了，取所有辅音`, 'success');
+            }
+            log(`�?右边�? ${right}`);
+            
+            for (let i = left; i <= right && i < word.length; i++) {
+                result.push(i);
+            }
+            
+            log(`\n�?音节范围: [${result.join(', ')}] �?"${result.map(i => word[i]).join('')}"`, 'success');
+            return result;
+        }
+        
+        function getStressPositions(word, phonetic) {
+            log(`\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`, 'info');
+            log(`开始处理单�? ${word}`, 'info');
+            log(`音标: ${phonetic}`, 'info');
+            log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`, 'info');
+            
+            if (!word || !phonetic) {
+                return [];
+            }
+            
+            const lowerWord = word.toLowerCase();
+            
+            // 1. 查找重音符号
+            log(`\n【步�?】查找重音符号`);
+            const stressPattern = /[ˈˌ]([əæɑɒɔɪiːɜɛeʊuːʌɔːɪəeɪaɪɔɪəʊeəɪəʊəaʊ]+)/g;
+            const matches = [];
+            let match;
+            
+            let searchPhonetic = phonetic;
+            stressPattern.lastIndex = 0; // 重置正则
+            
+            while ((match = stressPattern.exec(searchPhonetic)) !== null) {
+                const info = {
+                    index: match.index,
+                    vowelSound: match[1],
+                    type: searchPhonetic[match.index],
+                    fullMatch: match[0]
+                };
+                matches.push(info);
+                log(`  找到重音: ${info.type}${info.vowelSound} (索引 ${info.index})`, 'success');
+            }
+            
+            if (matches.length === 0) {
+                log(`⚠️ 没有找到重音符号，使用默认规则`, 'warning');
+                const vowels = 'aeiou';
+                for (let i = 0; i < lowerWord.length; i++) {
+                    if (vowels.includes(lowerWord[i])) {
+                        return getWholeSyllable(lowerWord, i);
+                    }
+                }
+                return Array.from({length: lowerWord.length}, (_, i) => i);
+            }
+            
+            // 2. 优先处理主重�?
+            log(`\n【步�?】筛选重音类型`);
+            const primaryStress = matches.filter(m => m.type === 'ˈ');
+            const stressesToProcess = primaryStress.length > 0 ? primaryStress : matches;
+            
+            if (primaryStress.length > 0) {
+                log(`�?找到 ${primaryStress.length} 个主重音，忽略次重音`, 'success');
+            } else {
+                log(`⚠️ 没有主重音，使用 ${matches.length} 个次重音`, 'warning');
+            }
+            
+            const result = [];
+            const vowels = 'aeiou';
+            
+            // 3. 计算音节位置
+            stressesToProcess.forEach((stressMatch, idx) => {
+                log(`\n【步�?.${idx + 1}】处理重�? ${stressMatch.type}${stressMatch.vowelSound}`);
+                
+                const beforeStress = phonetic.substring(0, stressMatch.index);
+                log(`  重音前的音标: "${beforeStress}"`);
+                
+                const syllablesBefore = (beforeStress.match(/[əæɑɒɔɪiːɜɛeʊuːʌɔːaʊ]+/g) || []).length;
+                log(`  重音前的音节�? ${syllablesBefore}`);
+                
+                log(`\n【步�?】在单词中查找第 ${syllablesBefore} 个元音`);
+                let vowelCount = 0;
+                for (let i = 0; i < lowerWord.length; i++) {
+                    if (vowels.includes(lowerWord[i])) {
+                        log(`  元音#${vowelCount}: 索引${i} = '${lowerWord[i]}'`);
+                        if (vowelCount === syllablesBefore) {
+                            log(`\n✓✓�?匹配！找到重音元音在索引 ${i}`, 'success');
+                            const syllablePositions = getWholeSyllable(lowerWord, i);
+                            syllablePositions.forEach(pos => {
+                                if (!result.includes(pos)) {
+                                    result.push(pos);
+                                }
+                            });
+                            break;
+                        }
+                        vowelCount++;
+                    }
+                }
+            });
+            
+            if (result.length === 0) {
+                log(`\n⚠️ 未找到匹配，使用默认规则`, 'error');
+                const vowels = 'aeiou';
+                for (let i = 0; i < lowerWord.length; i++) {
+                    if (vowels.includes(lowerWord[i])) {
+                        return getWholeSyllable(lowerWord, i);
+                    }
+                }
+            }
+            
+            log(`\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`, 'success');
+            log(`✓✓�?最终结�? [${result.sort((a, b) => a - b).join(', ')}]`, 'success');
+            log(`✓✓�?对应字母: "${result.sort((a, b) => a - b).map(i => lowerWord[i]).join('')}"`, 'success');
+            log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`, 'success');
+            
+            return result.sort((a, b) => a - b);
+        }
+        
+        // 测试
+        const word = 'about';
+        const phonetic = '[əˈbaʊt]';
+        const positions = getStressPositions(word, phonetic);
+        
+        // 显示步骤
+        let stepsHtml = '';
+        logs.forEach(log => {
+            const className = log.type === 'error' ? 'step error' : 
+                             log.type === 'warning' ? 'step' : 
+                             log.type === 'success' ? 'step success' : 'step';
+            stepsHtml += `<div class="${className}">${log.message}</div>`;
+        });
+        document.getElementById('steps').innerHTML = stepsHtml;
+        
+        // 显示结果
+        let resultHtml = '<div>';
+        for (let i = 0; i < word.length; i++) {
+            if (positions.includes(i)) {
+                resultHtml += `<span class="stress">${word[i]}</span>`;
+            } else {
+                resultHtml += `<span class="normal">${word[i]}</span>`;
+            }
+        }
+        resultHtml += '</div>';
+        resultHtml += `<p style="font-size: 20px;">识别位置: [${positions.join(', ')}] �?"${positions.map(i => word[i]).join('')}"</p>`;
+        resultHtml += `<p style="font-size: 20px;">预期位置: [1, 2, 3, 4] �?"bout"</p>`;
+        
+        document.getElementById('result').innerHTML = resultHtml;
+    </script>
+</body>
+</html>
+

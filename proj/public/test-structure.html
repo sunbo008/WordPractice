@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>结构测试 - Word Tetris</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+        }
+        .test-result {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #ffd700;
+        }
+        .test-result.success {
+            border-left-color: #4CAF50;
+        }
+        .test-result.error {
+            border-left-color: #f44336;
+        }
+        .test-result h3 {
+            margin: 0 0 10px 0;
+            color: #ffd700;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Word Tetris 结构测试</h1>
+    
+    <div class="test-result">
+        <h3>测试说明</h3>
+        <p>此页面用于验证新的目录结构是否正确配置</p>
+    </div>
+
+    <button onclick="runTests()">运行所有测试</button>
+    <button onclick="window.location.href='index.html'">进入游戏</button>
+
+    <div id="results"></div>
+
+    <script>
+        async function runTests() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<h2>测试结果：</h2>';
+
+            // 测试1: CSS文件
+            addResult('测试 CSS 文件加载', await testFile('css/styles.css'));
+            addResult('测试设置 CSS 文件加载', await testFile('css/settings.css'));
+
+            // 测试2: 核心JS文件
+            addResult('测试 WordTetrisGame.js', await testFile('../src/core/WordTetrisGame.js'));
+            addResult('测试 vocabulary-manager-v2.js', await testFile('../src/core/vocabulary-manager-v2.js'));
+            addResult('测试 vocabulary-config-loader.js', await testFile('../src/core/vocabulary-config-loader.js'));
+
+            // 测试3: 工具类
+            addResult('测试 DebugLogger.js', await testFile('../src/utils/DebugLogger.js'));
+            addResult('测试 SpeechSystem.js', await testFile('../src/systems/SpeechSystem.js'));
+            addResult('测试 CanvasHelper.js', await testFile('../src/utils/CanvasHelper.js'));
+
+            // 测试4: 词库文件
+            addResult('测试 words 目录访问', await testFile('words/config.json'));
+            addResult('测试 day01.json', await testFile('words/daily-phonics/day01.json'));
+
+            // 测试5: 图片目录
+            addResult('测试 images 目录访问', await testDirectory('images/cache/'));
+
+            // 最终总结
+            const allTests = document.querySelectorAll('.test-result');
+            const successCount = document.querySelectorAll('.test-result.success').length;
+            const totalCount = allTests.length - 1; // 减去说明
+            
+            const summary = document.createElement('div');
+            summary.className = successCount === totalCount ? 'test-result success' : 'test-result error';
+            summary.innerHTML = `
+                <h3>测试总结</h3>
+                <p>通过: ${successCount} / ${totalCount}</p>
+                ${successCount === totalCount ? 
+                    '<p>✅ 所有测试通过！新目录结构配置正确。</p>' : 
+                    '<p>❌ 部分测试失败，请检查文件路径和Junction链接。</p>'
+                }
+            `;
+            results.appendChild(summary);
+        }
+
+        async function testFile(path) {
+            try {
+                const response = await fetch(path);
+                return response.ok;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        async function testDirectory(path) {
+            // 简单测试：尝试访问目录（虽然可能403，但不是404就说明存在）
+            try {
+                const response = await fetch(path);
+                return response.status !== 404;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function addResult(name, success) {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `test-result ${success ? 'success' : 'error'}`;
+            div.innerHTML = `
+                <h3>${success ? '✅' : '❌'} ${name}</h3>
+                <p>${success ? '成功' : '失败'}</p>
+            `;
+            results.appendChild(div);
+        }
+    </script>
+</body>
+</html>
+

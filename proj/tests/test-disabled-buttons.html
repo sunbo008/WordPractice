@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>禁用按钮测试 - 词库状态</title>
+    <title>禁用按钮测试 - 词库状�?/title>
     <style>
         body {
             font-family: 'Microsoft YaHei', sans-serif;
@@ -101,54 +101,54 @@
         
         <!-- 按天学习音标 -->
         <div class="test-section">
-            <h2>📅 按天学习音标（12个课程）</h2>
+            <h2>📅 按天学习音标�?2个课程）</h2>
             <table>
                 <thead>
                     <tr>
                         <th>课程</th>
                         <th>音标</th>
-                        <th>文件状态</th>
+                        <th>文件状�?/th>
                         <th>按钮预览</th>
                     </tr>
                 </thead>
                 <tbody id="daily-phonics-table">
-                    <!-- 动态生成 -->
+                    <!-- 动态生�?-->
                 </tbody>
             </table>
         </div>
         
         <!-- 专项强化练习 -->
         <div class="test-section">
-            <h2>🎯 专项强化练习（4个专项）</h2>
+            <h2>🎯 专项强化练习�?个专项）</h2>
             <table>
                 <thead>
                     <tr>
                         <th>课程</th>
                         <th>音标</th>
-                        <th>文件状态</th>
+                        <th>文件状�?/th>
                         <th>按钮预览</th>
                     </tr>
                 </thead>
                 <tbody id="special-practice-table">
-                    <!-- 动态生成 -->
+                    <!-- 动态生�?-->
                 </tbody>
             </table>
         </div>
         
-        <!-- 按年级分类 -->
+        <!-- 按年级分�?-->
         <div class="test-section">
-            <h2>🎓 按年级分类（20个学期，抽样显示）</h2>
+            <h2>🎓 按年级分类（20个学期，抽样显示�?/h2>
             <table>
                 <thead>
                     <tr>
                         <th>课程</th>
-                        <th>单词数</th>
-                        <th>文件状态</th>
+                        <th>单词�?/th>
+                        <th>文件状�?/th>
                         <th>按钮预览</th>
                     </tr>
                 </thead>
                 <tbody id="grade-based-table">
-                    <!-- 动态生成 -->
+                    <!-- 动态生�?-->
                 </tbody>
             </table>
         </div>
@@ -157,7 +157,7 @@
         <div class="test-section">
             <h2>📊 统计摘要</h2>
             <div id="summary" style="font-size: 1.1em; line-height: 2;">
-                <!-- 动态生成 -->
+                <!-- 动态生�?-->
             </div>
         </div>
     </div>
@@ -201,7 +201,7 @@
                     <td>${course.name}</td>
                     <td><strong>${course.phoneme}</strong></td>
                     <td><span class="status-badge ${exists ? 'status-exists' : 'status-missing'}">
-                        ${exists ? '✓ 已实现' : '❌ 未实现'}
+                        ${exists ? '�?已实�? : '�?未实�?}
                     </span></td>
                     <td>
                         <div class="button-preview">
@@ -237,7 +237,7 @@
                     <td>${course.name}</td>
                     <td><strong>${course.phoneme}</strong></td>
                     <td><span class="status-badge ${exists ? 'status-exists' : 'status-missing'}">
-                        ${exists ? '✓ 已实现' : '❌ 未实现'}
+                        ${exists ? '�?已实�? : '�?未实�?}
                     </span></td>
                     <td>
                         <div class="button-preview">
@@ -259,7 +259,7 @@
                 { name: '三年级下学期', words: 50, file: 'grade-based/primary/grade3-term2.json' },
                 { name: '四年级上学期', words: 60, file: 'grade-based/primary/grade4-term1.json' },
                 { name: '七年级上学期', words: 100, file: 'grade-based/middle/grade7-term1.json' },
-                { name: '高一上学期', words: 200, file: 'grade-based/high/grade10-term1.json' }
+                { name: '高一上学�?, words: 200, file: 'grade-based/high/grade10-term1.json' }
             ];
             
             let existsCount = 0;
@@ -272,9 +272,9 @@
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${course.name}</td>
-                    <td>${course.words} 个单词</td>
+                    <td>${course.words} 个单�?/td>
                     <td><span class="status-badge ${exists ? 'status-exists' : 'status-missing'}">
-                        ${exists ? '✓ 已实现' : '❌ 未实现'}
+                        ${exists ? '�?已实�? : '�?未实�?}
                     </span></td>
                     <td>
                         <div class="button-preview">
@@ -300,14 +300,14 @@
             
             const summary = document.getElementById('summary');
             summary.innerHTML = `
-                <p><strong>📚 按天学习音标：</strong> ${daily.exists}/${daily.total} 已实现 (${Math.round(daily.exists/daily.total*100)}%)</p>
-                <p><strong>🎯 专项强化练习：</strong> ${special.exists}/${special.total} 已实现 (${Math.round(special.exists/special.total*100)}%)</p>
-                <p><strong>🎓 按年级分类（抽样）：</strong> ${grade.exists}/${grade.total} 已实现 (${Math.round(grade.exists/grade.total*100)}%)</p>
+                <p><strong>📚 按天学习音标�?/strong> ${daily.exists}/${daily.total} 已实�?(${Math.round(daily.exists/daily.total*100)}%)</p>
+                <p><strong>🎯 专项强化练习�?/strong> ${special.exists}/${special.total} 已实�?(${Math.round(special.exists/special.total*100)}%)</p>
+                <p><strong>🎓 按年级分类（抽样）：</strong> ${grade.exists}/${grade.total} 已实�?(${Math.round(grade.exists/grade.total*100)}%)</p>
                 <hr style="margin: 15px 0;">
-                <p style="font-size: 1.2em; color: #2c3e50;"><strong>总计：</strong> ${totalExists}/${totalCourses} 已实现，${totalMissing}/${totalCourses} 未实现</p>
+                <p style="font-size: 1.2em; color: #2c3e50;"><strong>总计�?/strong> ${totalExists}/${totalCourses} 已实现，${totalMissing}/${totalCourses} 未实�?/p>
                 <p style="color: #7f8c8d; font-size: 0.95em;">
-                    ✅ 已实现的课程：学习和选择按钮可用<br>
-                    ❌ 未实现的课程：学习和选择按钮灰色禁用
+                    �?已实现的课程：学习和选择按钮可用<br>
+                    �?未实现的课程：学习和选择按钮灰色禁用
                 </p>
             `;
         }
@@ -316,3 +316,4 @@
     </script>
 </body>
 </html>
+
