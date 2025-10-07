@@ -15,6 +15,10 @@ class VocabularyManagerV2 {
         
         // 已使用单词跟踪（用于确保所有单词都被使用）
         this.usedWords = new Set();
+		
+		// 去重与分级视图
+		this.duplicateWords = [];
+		this.wordsByDifficulty = new Map();
         
         // 当前配置 (初始占位，会从配置加载器获取实际默认值)
         this.currentConfig = {
@@ -182,10 +186,22 @@ class VocabularyManagerV2 {
         if (duplicates.length > 0) {
             console.warn(`⚠️ 发现 ${duplicates.length} 个重复单词:`, duplicates);
         }
+		// 持久化重复项（用于测试与可视化）
+		this.duplicateWords = duplicates;
         
         // 验证难度分布
         this.validateDifficultyDistribution();
         
+		// 构建按难度分组的快速视图（全局已按单词去重）
+		this.wordsByDifficulty.clear();
+		this.allWords.forEach(item => {
+			const diff = item.difficulty || 1;
+			if (!this.wordsByDifficulty.has(diff)) {
+				this.wordsByDifficulty.set(diff, []);
+			}
+			this.wordsByDifficulty.get(diff).push(item);
+		});
+		
         console.log(`📊 单词处理完成: 总计 ${this.allWords.length} 个单词`);
     }
     
@@ -374,8 +390,9 @@ class VocabularyManagerV2 {
         this.usedWords.add(selectedWord.word);
         this.addToRecentWords(selectedWord.word);
         
-        // 随机选择1-2个字母作为缺失字母
-        const missingCount = Math.random() < 0.5 ? 1 : 2;
+        // 模式控制：挑战模式去掉全部字母，否则随机1-2个
+        const mode = (localStorage.getItem('wordTetris_gameMode') === 'challenge') ? 'challenge' : 'casual';
+        const missingCount = mode === 'challenge' ? selectedWord.word.length : (Math.random() < 0.5 ? 1 : 2);
         let missingIndices = this.generateMissingIndices(selectedWord.word, missingCount);
         
         return {
@@ -433,8 +450,9 @@ class VocabularyManagerV2 {
         this.usedWords.add(selectedWord.word);
         this.addToRecentWords(selectedWord.word);
         
-        // 随机选择1-2个字母作为缺失字母
-        const missingCount = Math.random() < 0.5 ? 1 : 2;
+        // 模式控制：挑战模式去掉全部字母，否则随机1-2个
+        const mode = (localStorage.getItem('wordTetris_gameMode') === 'challenge') ? 'challenge' : 'casual';
+        const missingCount = mode === 'challenge' ? selectedWord.word.length : (Math.random() < 0.5 ? 1 : 2);
         let missingIndices = this.generateMissingIndices(selectedWord.word, missingCount);
         
         return {
@@ -579,4 +597,44 @@ class VocabularyManagerV2 {
             recentWords: [...this.recentWords]
         };
     }
+
+	// ====== 新增：分级视图与去重校验辅助 API ======
+	/**
+	 * 获取按难度分组后的词表（已全局去重）
+	 * 返回对象：{ [difficulty: number]: Array<{word, meaning, ...}> }
+	 */
+	getWordsGroupedByDifficulty() {
+		const result = {};
+		for (const [diff, list] of this.wordsByDifficulty.entries()) {
+			result[diff] = list.map(w => ({
+				word: w.word,
+				meaning: w.meaning,
+				phonetic: w.phonetic || '',
+				libraryId: w.libraryId,
+				lessonKey: w.lessonKey,
+				difficulty: w.difficulty || 1
+			}));
+		}
+		return result;
+	}
+
+	/**
+	 * 返回等级规划摘要（按难度排序）
+	 */
+	getLevelPlanSummary() {
+		const entries = Array.from(this.wordsByDifficulty.entries())
+			.sort((a, b) => (a[0] - b[0]));
+		return entries.map(([diff, list]) => ({
+			difficulty: diff,
+			count: list.length,
+			examples: list.slice(0, 10).map(w => w.word)
+		}));
+	}
+
+	/**
+	 * 获取被判定为重复且被过滤掉的词（来源与位置）
+	 */
+	getFilteredDuplicateWords() {
+		return [...this.duplicateWords];
+	}
 }

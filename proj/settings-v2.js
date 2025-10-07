@@ -3,6 +3,9 @@ class SettingsManagerV2 {
     constructor() {
         this.config = null;
         this.selectedLibraries = new Set();
+        // 新增：难度模式（休闲/挑战）
+        this.gameMode = 'casual';
+        this._modeBound = false;
         this.init();
     }
     
@@ -48,9 +51,13 @@ class SettingsManagerV2 {
                 this.selectedLibraries = new Set(this.config.defaultConfig.enabledLibraries);
                 console.log('⚙️ 使用默认配置:', Array.from(this.selectedLibraries));
             }
+            // 新增：加载难度模式
+            const savedMode = localStorage.getItem('wordTetris_gameMode');
+            this.gameMode = savedMode === 'challenge' ? 'challenge' : 'casual';
         } catch (error) {
             console.warn('⚠️ 用户设置加载失败，使用默认配置:', error);
             this.selectedLibraries = new Set(this.config.defaultConfig.enabledLibraries);
+            this.gameMode = 'casual';
         }
     }
     
@@ -58,6 +65,8 @@ class SettingsManagerV2 {
         try {
             localStorage.setItem('wordTetris_selectedLibraries', 
                 JSON.stringify(Array.from(this.selectedLibraries)));
+            // 新增：保存难度模式
+            localStorage.setItem('wordTetris_gameMode', this.gameMode);
             console.log('💾 用户设置已保存');
         } catch (error) {
             console.error('❌ 用户设置保存失败:', error);
@@ -67,6 +76,8 @@ class SettingsManagerV2 {
     renderInterface() {
         this.renderOverview();
         this.renderCategories();
+        // 新增：渲染模式开关
+        this.renderMode();
     }
     
     renderOverview() {
@@ -96,6 +107,42 @@ class SettingsManagerV2 {
         });
         
         document.getElementById('total-words-count').textContent = totalWords;
+    }
+    
+    // 新增：模式渲染与绑定
+    renderMode() {
+        const casual = document.getElementById('mode-casual');
+        const challenge = document.getElementById('mode-challenge');
+        
+        // 设置初始状态
+        if (casual && challenge) {
+            if (this.gameMode === 'challenge') {
+                challenge.checked = true;
+            } else {
+                casual.checked = true;
+            }
+            
+            // 绑定事件监听器
+            if (!this._modeBound) {
+                casual.addEventListener('change', () => {
+                    if (casual.checked) {
+                        this.gameMode = 'casual';
+                        this.saveUserSettings();
+                        this.showStatus('😊 已切换为休闲模式', 'success');
+                    }
+                });
+                
+                challenge.addEventListener('change', () => {
+                    if (challenge.checked) {
+                        this.gameMode = 'challenge';
+                        this.saveUserSettings();
+                        this.showStatus('🔥 已切换为挑战模式', 'success');
+                    }
+                });
+                
+                this._modeBound = true;
+            }
+        }
     }
     
     renderCategories() {
@@ -353,6 +400,7 @@ class SettingsManagerV2 {
     
     resetToDefault() {
         this.selectedLibraries = new Set(this.config.defaultConfig.enabledLibraries);
+        this.gameMode = 'casual';
         this.renderInterface();
         this.showStatus('已恢复默认设置！', 'success');
     }

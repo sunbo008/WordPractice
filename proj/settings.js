@@ -4,6 +4,8 @@ class SettingsManager {
         this.vocabularyManager = null;
         this.currentConfig = null;
         this.availableLibraries = [];
+        // 新增：难度模式
+        this.gameMode = localStorage.getItem('wordTetris_gameMode') === 'challenge' ? 'challenge' : 'casual';
         
         this.init();
     }
@@ -53,6 +55,7 @@ class SettingsManager {
         this.renderOverview();
         this.renderLibraryGrid();
         this.renderAdvancedSettings();
+        this.renderMode();
     }
     
     renderOverview() {
@@ -129,6 +132,32 @@ class SettingsManager {
         
         document.getElementById('min-difficulty').value = this.currentConfig.difficultyRange[0];
         document.getElementById('max-difficulty').value = this.currentConfig.difficultyRange[1];
+    }
+
+    // 新增：渲染休闲/挑战模式（若页面存在对应控件）
+    renderMode() {
+        const casual = document.getElementById('mode-casual');
+        const challenge = document.getElementById('mode-challenge');
+        if (!casual || !challenge) return;
+        if (this.gameMode === 'challenge') {
+            challenge.checked = true;
+        } else {
+            casual.checked = true;
+        }
+        casual.addEventListener('change', () => {
+            if (casual.checked) {
+                this.gameMode = 'casual';
+                localStorage.setItem('wordTetris_gameMode', this.gameMode);
+                this.showStatus('已切换为休闲模式', 'info');
+            }
+        });
+        challenge.addEventListener('change', () => {
+            if (challenge.checked) {
+                this.gameMode = 'challenge';
+                localStorage.setItem('wordTetris_gameMode', this.gameMode);
+                this.showStatus('已切换为挑战模式（全部字母隐藏）', 'info');
+            }
+        });
     }
     
     bindEvents() {

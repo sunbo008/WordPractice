@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>等级词表规划测试 - Word Tetris</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif; margin: 20px; color: #2c3e50; }
+        h1 { margin: 0 0 10px; }
+        .desc { color: #7f8c8d; margin-bottom: 20px; }
+        .summary { display: flex; flex-wrap: wrap; gap: 12px; margin: 10px 0 20px; }
+        .card { background:#f8f9fa; border:1px solid #e9ecef; border-radius:8px; padding:12px 16px; min-width: 180px; }
+        .ok { color:#27ae60; }
+        .warn { color:#e67e22; }
+        .error { color:#c0392b; }
+        .grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap:16px; }
+        .panel { border:1px solid #e9ecef; border-radius:10px; }
+        .panel h3 { margin:0; padding:10px 12px; background:#f4f6f8; border-bottom:1px solid #e9ecef; }
+        .panel .body { padding:12px; }
+        details > summary { cursor: pointer; user-select: none; }
+        ul.words { list-style: none; padding: 0; margin:0; display:flex; flex-wrap:wrap; gap:6px; }
+        ul.words li { background:#fff; border:1px solid #e9ecef; border-radius:6px; padding:6px 8px; }
+        table { width:100%; border-collapse: collapse; }
+        th, td { border:1px solid #e9ecef; padding:8px; text-align:left; }
+        th { background:#f8f9fa; }
+        .muted { color:#95a5a6; }
+        .badge { display:inline-block; padding:2px 6px; font-size:12px; border-radius:4px; background:#ecf0f1; color:#34495e; }
+    </style>
+</head>
+<body>
+    <h1>等级词表规划测试</h1>
+    <div class="desc">验证“同一单词只出现于一个等级”，并展示各等级词表与重复来源。</div>
+
+    <div id="summary" class="summary"></div>
+
+    <div class="panel" style="margin-bottom:16px;">
+        <h3>重复词来源（被过滤）</h3>
+        <div class="body" id="duplicates">
+            <div class="muted">加载中...</div>
+        </div>
+    </div>
+
+    <div class="grid" id="levels"></div>
+
+    <script src="../vocabulary-config-loader.js?v=20251007-levels"></script>
+    <script src="../vocabulary-manager-v2.js?v=20251007-levels"></script>
+    <script>
+    (async function() {
+        const vm = new VocabularyManagerV2();
+
+        // 等待异步加载完成
+        function waitLoaded() {
+            return new Promise(resolve => {
+                const timer = setInterval(() => {
+                    if (vm.isLoaded || vm.loadError) {
+                        clearInterval(timer);
+                        resolve();
+                    }
+                }, 50);
+            });
+        }
+        await waitLoaded();
+
+        const summaryEl = document.getElementById('summary');
+        const levelsEl = document.getElementById('levels');
+        const dupEl = document.getElementById('duplicates');
+
+        if (vm.loadError) {
+            summaryEl.innerHTML = '<div class="card error">词库加载失败</div>';
+            return;
+        }
+
+        // 获取分组与统计
+        const grouped = vm.getWordsGroupedByDifficulty();
+        const planSummary = vm.getLevelPlanSummary();
+        const duplicates = vm.getFilteredDuplicateWords();
+
+        // 去重校验：同一个单词是否出现在多个等级
+        const wordToDiffs = new Map();
+        Object.entries(grouped).forEach(([diff, list]) => {
+            list.forEach(item => {
+                if (!wordToDiffs.has(item.word)) wordToDiffs.set(item.word, new Set());
+                wordToDiffs.get(item.word).add(Number(diff));
+            });
+        });
+        const crossLevelConflicts = [];
+        for (const [w, diffs] of wordToDiffs.entries()) {
+            if (diffs.size > 1) crossLevelConflicts.push({ word: w, diffs: Array.from(diffs).sort() });
+        }
+
+        // 概览
+        const totalWords = Object.values(grouped).reduce((s, arr) => s + arr.length, 0);
+        const diffCount = Object.keys(grouped).length;
+        const dupCount = duplicates.length;
+        const conflictCount = crossLevelConflicts.length;
+
+        summaryEl.innerHTML = `
+            <div class="card"><div>总单词数</div><div><strong>${totalWords}</strong></div></div>
+            <div class="card"><div>等级数量</div><div><strong>${diffCount}</strong></div></div>
+            <div class="card ${conflictCount === 0 ? 'ok' : 'error'}"><div>跨等级重复</div><div><strong>${conflictCount}</strong></div></div>
+            <div class="card ${dupCount === 0 ? 'ok' : 'warn'}"><div>跨库重复（已过滤）</div><div><strong>${dupCount}</strong></div></div>
+        `;
+
+        // 重复来源表
+        if (dupCount === 0) {
+            dupEl.innerHTML = '<div class="ok">未发现跨库重复词</div>';
+        } else {
+            const rows = duplicates.slice(0, 200).map(d => {
+                const libA = (d.libraries && d.libraries[0]) || '';
+                const libB = (d.libraries && d.libraries[1]) || '';
+                const lesA = (d.lessons && d.lessons[0]) || '';
+                const lesB = (d.lessons && d.lessons[1]) || '';
+                return `<tr><td>${d.word}</td><td><span class="badge">${libA}</span> / <span class="badge">${lesA}</span></td><td><span class="badge">${libB}</span> / <span class="badge">${lesB}</span></td></tr>`;
+            }).join('');
+            dupEl.innerHTML = `
+                <details open>
+                    <summary>重复 ${dupCount} 项（显示前200）</summary>
+                    <div style="margin-top:8px;">
+                        <table>
+                            <thead><tr><th>单词</th><th>来源1</th><th>来源2</th></tr></thead>
+                            <tbody>${rows}</tbody>
+                        </table>
+                    </div>
+                </details>
+            `;
+        }
+
+        // 各等级面板
+        levelsEl.innerHTML = planSummary.map(s => {
+            const list = grouped[s.difficulty] || [];
+            const items = list.map(w => `<li title="${w.meaning}">${w.word}</li>`).join('');
+            return `
+                <div class="panel">
+                    <h3>难度 ${s.difficulty}（${s.count}）</h3>
+                    <div class="body">
+                        <ul class="words">${items}</ul>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    })();
+    </script>
+</body>
+</html>
+
+
+

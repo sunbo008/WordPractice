@@ -620,8 +620,12 @@ class WordTetrisGame {
         const letterInput = document.getElementById('letterInput');
         const currentValue = letterInput.value;
         
-        // 限制最大长度
-        if (currentValue.length < 3) {
+        // 动态限制：按当前单词缺失字母数限制输入长度
+        let maxLen = 3;
+        if (this.fallingWords.length > 0 && this.fallingWords[0].missingLetters) {
+            maxLen = this.fallingWords[0].missingLetters.length;
+        }
+        if (currentValue.length < maxLen) {
             letterInput.value = currentValue + letter;
             this.updateRealTimeDisplay();
         }
