@@ -51,4 +51,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+    
+    // 添加单测按钮事件监听器
+    const testBtn = document.getElementById('testBtn');
+    if (testBtn) {
+        testBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            // 跳转到测试页面
+            window.location.href = './test-structure.html';
+        });
+        console.log('✅ 单测按钮事件已绑定');
+    }
 });

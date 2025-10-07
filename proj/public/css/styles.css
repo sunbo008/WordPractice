@@ -331,6 +331,16 @@ button {
     background: #8e44ad;
 }
 
+.test-btn {
+    background: #204455;
+    color: white;
+    font-size: 0.9em;
+}
+
+.test-btn:hover {
+    background: #214b5e;
+}
+
 #pauseBtn {
     background: #ff9800;
     color: white;
