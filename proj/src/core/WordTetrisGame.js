@@ -207,7 +207,7 @@ class WordTetrisGame {
             angle: -Math.PI / 2, // 初始向上
             targetAngle: -Math.PI / 2,
             recoil: 0, // 后坐力偏移量
-            recoilDecay: 0.15 // 后坐力衰减速度
+            recoilDecay: 0.12 // 后坐力衰减速度（降低以延长后坐力效果）
         };
         
         // 炮弹系统
@@ -3073,8 +3073,8 @@ class WordTetrisGame {
     }
 
     shootBullet(targetWord) {
-        // 触发后坐力效果（向后推10像素）
-        this.cannon.recoil = 10;
+        // 触发后坐力效果（向后推20像素，增强视觉冲击）
+        this.cannon.recoil = 30;
         
         // 计算炮口位置（炮管前端，考虑旋转角度）
         const muzzleDistance = 118; // 炮口距离炮管中心的距离
