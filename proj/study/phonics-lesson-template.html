@@ -354,7 +354,7 @@
     </div>
     
     <!-- 引入 TTS 服务 -->
-    <script src="../src/utils/TTSService.js"></script>
+    <script src="/src/utils/TTSService.js"></script>
     
     <script>
         // 初始化 TTS 服务
@@ -372,10 +372,10 @@
                 if (lessonId.startsWith('special-')) {
                     // 专项练习：special-ae, special-e, special-or, special-o
                     const practiceType = lessonId.replace('special-', '');
-                    filePath = `../words/special-practice/${practiceType}-practice.json`;
+                    filePath = `/words/special-practice/${practiceType}-practice.json`;
                 } else {
                     // 按天学习：day01, day02, ...
-                    filePath = `../words/daily-phonics/${lessonId}.json`;
+                    filePath = `/words/daily-phonics/${lessonId}.json`;
                 }
                 
                 // 加载对应的JSON文件
@@ -508,7 +508,7 @@
         
         // 返回设置页面
         function goBack() {
-            window.location.href = '../settings.html';
+            window.location.href = '/settings.html';
         }
         
         // 开始游戏练习
@@ -516,7 +516,7 @@
             // 保存当前选择的课程到localStorage
             localStorage.setItem('wordTetris_selectedLibraries', JSON.stringify([lessonId]));
             // 跳转到游戏页面
-            window.location.href = '../index.html';
+            window.location.href = '/index.html';
         }
         
         // 页面加载时初始化
