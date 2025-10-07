@@ -330,7 +330,8 @@ class TTSService {
         const {
             showError = true,
             onSuccess = null,
-            onError = null
+            onError = null,
+            _isRetry = false // 内部参数：是否是重试调用
         } = options;
         
         // 防止重复朗读 - 但允许强制停止旧的朗读
@@ -383,9 +384,35 @@ class TTSService {
                 }
             }
             
-            // 所有可用提供商都失败了
+            // 所有可用提供商都失败了，尝试重新初始化（仅第一次失败时）
             this.isSpeaking = false;
-            const errorMsg = '所有可用的 TTS 服务均失败';
+            
+            if (!_isRetry) {
+                console.warn('⚠️ TTSService: 所有可用提供商都失败，尝试重新初始化...');
+                
+                // 清空当前的可用提供商列表
+                this.availableProviders = [];
+                this.providerTested = false;
+                this.currentAvailableIndex = 0;
+                
+                // 重新初始化
+                await this.initialize();
+                
+                // 如果重新初始化后找到了可用的提供商，再次尝试朗读
+                if (this.availableProviders.length > 0) {
+                    console.log('🔄 TTSService: 重新初始化成功，再次尝试朗读...');
+                    // 标记为重试，避免无限递归
+                    return await this.speak(word, {
+                        ...options,
+                        _isRetry: true
+                    });
+                }
+            } else {
+                console.error('❌ TTSService: 重新初始化后仍然失败');
+            }
+            
+            // 重新初始化后仍然没有可用的提供商
+            const errorMsg = '所有 TTS 服务均不可用';
             console.error(`❌ TTSService: ${errorMsg}`);
             
             if (showError) {
