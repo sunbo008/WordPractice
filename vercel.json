@@ -3,18 +3,18 @@
   "name": "word-tetris-game",
   "builds": [
     {
-      "src": "proj/**",
+      "src": "proj/public/**",
       "use": "@vercel/static"
     }
   ],
   "routes": [
     {
-      "src": "/(.*)",
-      "dest": "/proj/$1"
+      "src": "/",
+      "dest": "/proj/public/index.html"
     },
     {
-      "src": "/",
-      "dest": "/proj/index.html"
+      "src": "/(.*)",
+      "dest": "/proj/public/$1"
     }
   ]
 }
