@@ -201,7 +201,7 @@ class WordTetrisGame {
         // 炮管系统
         this.cannon = {
             x: this.canvasWidth / 2,
-            y: this.canvasHeight - 30,
+            y: this.canvasHeight - 20, // 从-30调整到-20，下降10像素
             width: 40,
             height: 60,
             angle: -Math.PI / 2, // 初始向上
@@ -1487,35 +1487,39 @@ class WordTetrisGame {
         this.ctx.font = '32px Arial';  // 从20px增加到32px，更醒目
         this.ctx.textAlign = 'center';
         
+        // 获取重音音节位置
+        const stressPositions = word.stressPositions || [];
+        
         // 如果有实时显示，需要特殊处理高亮
         if (word.realTimeDisplay) {
             // 解析带有[]的文本
             const parts = text.split(/(\[[^\]]*\])/);
             let currentX = x - (this.ctx.measureText(text.replace(/[\[\]]/g, '')).width / 2);
+            let charIndex = 0; // 跟踪原始单词中的字符位置
             
             parts.forEach(part => {
                 if (part.startsWith('[') && part.endsWith(']')) {
-                    // 输入的字母，绿色高亮
+                    // 输入的字母，绿色或红色高亮
                     const letter = part.slice(1, -1);
                     this.ctx.fillStyle = word.inputCorrect ? '#44ff44' : '#ff4444';
                     this.ctx.fillText(letter, currentX + this.ctx.measureText(letter).width/2, y);
                     currentX += this.ctx.measureText(letter).width;
+                    charIndex++;
                 } else {
-                    // 普通字母或下划线
-                    this.drawTextWithCustomUnderlines(part, currentX, y);
+                    // 普通字母或下划线 - 需要考虑重音音节
+                    this.drawTextWithStress(part, currentX, y, charIndex, stressPositions, false);
                     currentX += this.ctx.measureText(part).width;
+                    charIndex += part.length;
                 }
             });
         } else {
-            // 普通显示 - 处理下划线
-            this.drawTextWithCustomUnderlines(text, x, y, true);
+            // 普通显示 - 处理下划线和重音
+            this.drawTextWithStress(text, x, y, 0, stressPositions, true);
         }
     }
     
-    // 绘制带有自定义下划线的文本
-    drawTextWithCustomUnderlines(text, x, y, centered = false) {
-        this.ctx.fillStyle = '#ffffff';
-        
+    // 绘制带有重音高亮和自定义下划线的文本
+    drawTextWithStress(text, x, y, startCharIndex, stressPositions, centered = false) {
         if (centered) {
             // 居中显示
             const totalWidth = this.measureTextWithCustomUnderlines(text);
@@ -1523,10 +1527,18 @@ class WordTetrisGame {
             
             for (let i = 0; i < text.length; i++) {
                 const char = text[i];
+                const charIndex = startCharIndex + i;
+                
                 if (char === '_') {
                     this.drawCustomUnderscore(currentX, y);
                     currentX += this.getCustomUnderscoreWidth();
                 } else {
+                    // 检查是否是重音音节的字母
+                    if (stressPositions.includes(charIndex)) {
+                        this.ctx.fillStyle = '#ff4444'; // 重音音节用红色
+                    } else {
+                        this.ctx.fillStyle = '#ffffff'; // 普通字母用白色
+                    }
                     this.ctx.fillText(char, currentX + this.ctx.measureText(char).width/2, y);
                     currentX += this.ctx.measureText(char).width;
                 }
@@ -1537,15 +1549,29 @@ class WordTetrisGame {
             
             for (let i = 0; i < text.length; i++) {
                 const char = text[i];
+                const charIndex = startCharIndex + i;
+                
                 if (char === '_') {
                     this.drawCustomUnderscore(currentX, y);
                     currentX += this.getCustomUnderscoreWidth();
                 } else {
+                    // 检查是否是重音音节的字母
+                    if (stressPositions.includes(charIndex)) {
+                        this.ctx.fillStyle = '#ff4444'; // 重音音节用红色
+                    } else {
+                        this.ctx.fillStyle = '#ffffff'; // 普通字母用白色
+                    }
                     this.ctx.fillText(char, currentX + this.ctx.measureText(char).width/2, y);
                     currentX += this.ctx.measureText(char).width;
                 }
             }
         }
+    }
+    
+    // 绘制带有自定义下划线的文本（保留向后兼容）
+    drawTextWithCustomUnderlines(text, x, y, centered = false) {
+        // 调用新的带重音的方法，但不传递重音位置
+        this.drawTextWithStress(text, x, y, 0, [], centered);
     }
     
     // 绘制自定义下划线（缩短4像素）

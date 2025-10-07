@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>音节划分测试</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            padding: 40px;
+            background: #1e3c72;
+            color: white;
+        }
+        .test {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+        }
+        .word { font-size: 48px; margin: 10px 0; }
+        .stress { color: #ff4444; }
+        .normal { color: #ffffff; }
+    </style>
+</head>
+<body>
+    <h1>音节划分规则测试</h1>
+    
+    <div id="results"></div>
+    
+    <script>
+        const testWords = [
+            { word: 'father', vowelIdx: 1, expected: [0, 1], syllable: 'fa' },
+            { word: 'mother', vowelIdx: 1, expected: [0, 1], syllable: 'mo' },
+            { word: 'teacher', vowelIdx: 1, expected: [0, 1, 2, 3, 4], syllable: 'teach' },
+            { word: 'about', vowelIdx: 1, expected: [1, 2, 3, 4], syllable: 'bout' },
+            { word: 'banana', vowelIdx: 2, expected: [2, 3], syllable: 'na' },
+        ];
+        
+        function getWholeSyllable(word, vowelIndex) {
+            const vowels = 'aeiou';
+            const result = [];
+            
+            let centerVowel = vowelIndex;
+            
+            // 向左扩展
+            let left = centerVowel;
+            let consonantsBeforeCount = 0;
+            let tempLeft = left - 1;
+            while (tempLeft >= 0 && !vowels.includes(word[tempLeft])) {
+                consonantsBeforeCount++;
+                tempLeft--;
+            }
+            
+            console.log(`${word}: 元音='${word[centerVowel]}' at ${vowelIndex}`);
+            console.log(`  前面有 ${consonantsBeforeCount} 个辅音`);
+            
+            if (tempLeft >= 0) {
+                if (consonantsBeforeCount === 1) {
+                    left = left - 1;
+                    console.log(`  单个辅音，包含: ${word[left]}`);
+                } else if (consonantsBeforeCount >= 2) {
+                    left = left - Math.ceil(consonantsBeforeCount / 2);
+                    console.log(`  ${consonantsBeforeCount}个辅音，取后${Math.ceil(consonantsBeforeCount / 2)}个`);
+                }
+            } else {
+                left = 0;
+                console.log(`  单词开头，从0开始`);
+            }
+            
+            // 向右扩展
+            let right = centerVowel;
+            while (right < word.length - 1 && vowels.includes(word[right + 1])) {
+                right++;
+            }
+            
+            let consonantsAfterCount = 0;
+            let tempRight = right;
+            while (tempRight < word.length - 1 && !vowels.includes(word[tempRight + 1])) {
+                consonantsAfterCount++;
+                tempRight++;
+            }
+            
+            console.log(`  后面有 ${consonantsAfterCount} 个辅音: ${word.substring(right + 1, tempRight + 1)}`);
+            
+            if (tempRight < word.length - 1) {
+                if (consonantsAfterCount === 1) {
+                    console.log(`  单个辅音，不包含（留给下一个音节）`);
+                } else if (consonantsAfterCount >= 2) {
+                    const take = Math.floor(consonantsAfterCount / 2);
+                    right += take;
+                    console.log(`  ${consonantsAfterCount}个辅音，取前${take}个`);
+                }
+            } else {
+                right = tempRight;
+                console.log(`  单词结尾，取所有辅音`);
+            }
+            
+            console.log(`  结果: left=${left}, right=${right}`);
+            
+            for (let i = left; i <= right && i < word.length; i++) {
+                result.push(i);
+            }
+            
+            return result;
+        }
+        
+        let html = '';
+        testWords.forEach(test => {
+            console.log(`\n=== 测试: ${test.word} ===`);
+            const result = getWholeSyllable(test.word, test.vowelIdx);
+            const resultStr = result.map(i => test.word[i]).join('');
+            const isCorrect = JSON.stringify(result) === JSON.stringify(test.expected);
+            
+            html += `<div class="test" style="border-left: 4px solid ${isCorrect ? '#4CAF50' : '#ff4444'}">`;
+            html += `<h3>${test.word} ${isCorrect ? '✅' : '❌'}</h3>`;
+            html += `<p><strong>分析元音:</strong> ${test.word[test.vowelIdx]} (索引${test.vowelIdx})</p>`;
+            html += `<p><strong>预期音节:</strong> ${test.syllable} = [${test.expected.join(', ')}]</p>`;
+            html += `<p><strong>实际结果:</strong> ${resultStr} = [${result.join(', ')}]</p>`;
+            html += `<div class="word">`;
+            for (let i = 0; i < test.word.length; i++) {
+                if (result.includes(i)) {
+                    html += `<span class="stress">${test.word[i]}</span>`;
+                } else {
+                    html += `<span class="normal">${test.word[i]}</span>`;
+                }
+            }
+            html += `</div>`;
+            html += `</div>`;
+        });
+        
+        document.getElementById('results').innerHTML = html;
+    </script>
+</body>
+</html>

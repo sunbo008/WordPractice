@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>重音音节测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #1e3c72;
+            color: white;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .word-display {
+            font-size: 48px;
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+        }
+        .stress {
+            color: #ff4444;
+        }
+        .normal {
+            color: #ffffff;
+        }
+        .info {
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 5px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background: #4CAF50;
+            color: white;
+        }
+        button:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>重音音节显示测试</h1>
+        <p>此页面用于测试单词重音音节的红色高亮功能</p>
+        
+        <div id="wordDisplay" class="word-display"></div>
+        <div id="wordInfo" class="info"></div>
+        
+        <button onclick="loadNextWord()">下一个单词</button>
+        <button onclick="loadAllWords()">显示所有单词</button>
+        
+        <div id="allWordsDisplay"></div>
+    </div>
+
+    <script type="module">
+        import { VocabularyManagerV2 } from './vocabulary-manager-v2.js';
+        
+        const vocabManager = new VocabularyManagerV2();
+        let currentWordIndex = 0;
+        let testWords = [];
+        
+        async function init() {
+            await vocabManager.loadVocabulary();
+            console.log('词汇库加载完成');
+            
+            // 获取一些测试单词
+            testWords = vocabManager.allWords.slice(0, 20);
+            loadNextWord();
+        }
+        
+        window.loadNextWord = function() {
+            if (testWords.length === 0) return;
+            
+            const wordData = testWords[currentWordIndex % testWords.length];
+            const stressPositions = vocabManager.getStressPositions(wordData.word, wordData.phonetic);
+            
+            displayWord(wordData.word, stressPositions, wordData.phonetic, wordData.meaning);
+            
+            currentWordIndex++;
+        }
+        
+        function displayWord(word, stressPositions, phonetic, meaning) {
+            const displayDiv = document.getElementById('wordDisplay');
+            const infoDiv = document.getElementById('wordInfo');
+            
+            // 显示单词，重音字母用红色
+            let html = '';
+            for (let i = 0; i < word.length; i++) {
+                const char = word[i];
+                if (stressPositions.includes(i)) {
+                    html += `<span class="stress">${char}</span>`;
+                } else {
+                    html += `<span class="normal">${char}</span>`;
+                }
+            }
+            
+            displayDiv.innerHTML = html;
+            
+            // 显示详细信息
+            infoDiv.innerHTML = `
+                <strong>单词:</strong> ${word}<br>
+                <strong>音标:</strong> ${phonetic}<br>
+                <strong>中文:</strong> ${meaning}<br>
+                <strong>重音位置:</strong> [${stressPositions.join(', ')}]<br>
+                <strong>重音字母:</strong> ${stressPositions.map(i => word[i]).join(', ')}
+            `;
+        }
+        
+        window.loadAllWords = function() {
+            const allWordsDiv = document.getElementById('allWordsDisplay');
+            let html = '<h2>所有测试单词</h2>';
+            
+            testWords.forEach(wordData => {
+                const stressPositions = vocabManager.getStressPositions(wordData.word, wordData.phonetic);
+                
+                html += '<div class="info">';
+                html += '<div style="font-size: 32px; margin-bottom: 10px;">';
+                for (let i = 0; i < wordData.word.length; i++) {
+                    const char = wordData.word[i];
+                    if (stressPositions.includes(i)) {
+                        html += `<span class="stress">${char}</span>`;
+                    } else {
+                        html += `<span class="normal">${char}</span>`;
+                    }
+                }
+                html += '</div>';
+                html += `音标: ${wordData.phonetic} | 中文: ${wordData.meaning} | 重音位置: [${stressPositions.join(', ')}]`;
+                html += '</div>';
+            });
+            
+            allWordsDiv.innerHTML = html;
+        }
+        
+        init();
+    </script>
+</body>
+</html>
+

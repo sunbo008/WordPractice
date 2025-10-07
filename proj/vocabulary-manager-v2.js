@@ -441,7 +441,8 @@ class VocabularyManagerV2 {
             display: this.createDisplayWord(selectedWord.word, missingIndices),
             missingLetters: this.getMissingLetters(selectedWord.word, missingIndices),
             level: selectedWord.difficulty,
-            difficulty: selectedWord.difficulty
+            difficulty: selectedWord.difficulty,
+            stressPositions: this.getStressPositions(selectedWord.word, selectedWord.phonetic || '')
         };
     }
     
@@ -501,7 +502,8 @@ class VocabularyManagerV2 {
             display: this.createDisplayWord(selectedWord.word, missingIndices),
             missingLetters: this.getMissingLetters(selectedWord.word, missingIndices),
             level: targetDifficulty,
-            difficulty: selectedWord.difficulty
+            difficulty: selectedWord.difficulty,
+            stressPositions: this.getStressPositions(selectedWord.word, selectedWord.phonetic || '')
         };
     }
     
@@ -624,6 +626,197 @@ class VocabularyManagerV2 {
         const correctAnswer = wordData.missingLetters.toUpperCase();
         const userAnswer = userInput.toUpperCase().trim();
         return correctAnswer === userAnswer;
+    }
+    
+    /**
+     * 获取单词中重音音节的字母位置（整个音节）
+     * @param {string} word - 英文单词
+     * @param {string} phonetic - 音标 (如 "[ˈhæpi]", "[bəˈnɑːnə]")
+     * @returns {Array<number>} - 重音音节所有字母的索引数组
+     */
+    getStressPositions(word, phonetic) {
+        if (!word || !phonetic) {
+            return [];
+        }
+        
+        const lowerWord = word.toLowerCase();
+        
+        // 从音标中提取重音位置
+        // 音标格式如: [ˈhæpi] 或 [həˈləʊ] 
+        // ˈ 表示主重音，ˌ 表示次重音
+        
+        // 1. 找到音标中的重音符号位置
+        // 注意：重音符号后可能跟辅音，不一定紧跟元音
+        const stressIndices = [];
+        for (let i = 0; i < phonetic.length; i++) {
+            if (phonetic[i] === 'ˈ' || phonetic[i] === 'ˌ') {
+                stressIndices.push({
+                    index: i,
+                    type: phonetic[i]
+                });
+            }
+        }
+        
+        const matches = stressIndices;
+        
+        if (matches.length === 0) {
+            // 如果没有重音符号，不高亮任何字母（单音节词通常没有重音标记）
+            return [];
+        }
+        
+        // 2. 根据重音音标映射到单词中的元音位置，然后扩展为整个音节
+        const result = [];
+        const vowels = 'aeiou';
+        
+        // 优先处理主重音（ˈ），如果没有主重音才处理次重音（ˌ）
+        const primaryStress = matches.filter(m => m.type === 'ˈ');
+        const stressesToProcess = primaryStress.length > 0 ? primaryStress : matches;
+        
+        stressesToProcess.forEach(stressMatch => {
+            // 计算这个重音在音标中是第几个音节
+            const beforeStress = phonetic.substring(0, stressMatch.index);
+            const syllablesBefore = (beforeStress.match(/[əæɑɒɔɪiːɜɛeʊuːʌɔːaʊ]+/g) || []).length;
+            
+            // 找到单词中对应的第N个元音字母
+            let vowelCount = 0;
+            for (let i = 0; i < lowerWord.length; i++) {
+                if (vowels.includes(lowerWord[i])) {
+                    if (vowelCount === syllablesBefore) {
+                        // 找到了对应的重音元音，扩展为整个音节
+                        const syllablePositions = this.getWholeSyllable(lowerWord, i);
+                        syllablePositions.forEach(pos => {
+                            if (!result.includes(pos)) {
+                                result.push(pos);
+                            }
+                        });
+                        break;
+                    }
+                    vowelCount++;
+                }
+            }
+        });
+        
+        // 如果还是没找到，返回空数组（不高亮）
+        if (result.length === 0) {
+            return [];
+        }
+        
+        return result.sort((a, b) => a - b);
+    }
+    
+    /**
+     * 获取包含指定元音的整个音节的字母位置
+     * @param {string} word - 单词
+     * @param {number} vowelIndex - 元音字母的索引
+     * @returns {Array<number>} - 音节所有字母的索引数组
+     */
+    getWholeSyllable(word, vowelIndex) {
+        const vowels = 'aeiou';
+        const result = [];
+        
+        // 如果vowelIndex不是元音，先找到最近的元音
+        let centerVowel = vowelIndex;
+        if (!vowels.includes(word[centerVowel])) {
+            centerVowel = this.findNearestVowel(word, centerVowel);
+            if (centerVowel === -1) {
+                // 没有元音，返回整个单词
+                return Array.from({length: word.length}, (_, i) => i);
+            }
+        }
+        
+        // 向左扩展：包含前面的辅音
+        let left = centerVowel;
+        
+        // 计算前面有多少个连续辅音
+        let consonantsBeforeCount = 0;
+        let tempLeft = left - 1;
+        while (tempLeft >= 0 && !vowels.includes(word[tempLeft])) {
+            consonantsBeforeCount++;
+            tempLeft--;
+        }
+        
+        // 辅音分配策略（向左）：
+        if (tempLeft >= 0) {
+            // 前面还有元音
+            if (consonantsBeforeCount === 1) {
+                // 单个辅音：归属于当前音节（如 about 的 b 归 bout）
+                left = left - 1;
+            } else if (consonantsBeforeCount >= 2) {
+                // 多个辅音：取后一半归当前音节
+                left = left - Math.ceil(consonantsBeforeCount / 2);
+            }
+            // consonantsBeforeCount === 0 时，left 保持不变
+        } else {
+            // 前面没有元音了（单词开头），取所有辅音
+            left = 0;
+        }
+        
+        // 向右扩展
+        let right = centerVowel;
+        
+        // 1. 先包含连续的元音（如 ea, oo, ou 等）
+        while (right < word.length - 1 && vowels.includes(word[right + 1])) {
+            right++;
+        }
+        
+        // 2. 然后包含后面的辅音
+        let consonantsAfterCount = 0;
+        let tempRight = right;
+        while (tempRight < word.length - 1 && !vowels.includes(word[tempRight + 1])) {
+            consonantsAfterCount++;
+            tempRight++;
+        }
+        
+        // 辅音分配策略（向右）：
+        if (tempRight < word.length - 1) {
+            // 后面还有元音，需要分配辅音
+            // 规则：所有辅音都归属于下一个音节（更符合英语发音）
+            // father = fa-ther (不是 fat-her)
+            // about = a-bout (不是 ab-out)
+            // right 保持不变（不包含后面的辅音）
+        } else {
+            // 后面没有元音了（单词结尾），取所有辅音
+            right = tempRight;
+        }
+        
+        // 收集范围内的所有索引
+        for (let i = left; i <= right && i < word.length; i++) {
+            result.push(i);
+        }
+        
+        return result;
+    }
+    
+    /**
+     * 找到距离指定位置最近的元音字母
+     */
+    findNearestVowel(word, startPos) {
+        const vowels = 'aeiouAEIOU';
+        
+        // 先向右找
+        for (let i = startPos; i < word.length; i++) {
+            if (vowels.includes(word[i])) {
+                return i;
+            }
+        }
+        
+        // 再向左找
+        for (let i = startPos - 1; i >= 0; i--) {
+            if (vowels.includes(word[i])) {
+                return i;
+            }
+        }
+        
+        return -1;
+    }
+    
+    /**
+     * 找到单词中第一个音节的所有字母位置（默认重音规则）
+     * 注意：此方法已废弃，现在没有重音符号的单词不高亮
+     */
+    findFirstVowelPositions(word) {
+        // 没有重音符号的单词（通常是单音节词）不需要高亮
+        return [];
     }
     
     getRepetitionStats() {
