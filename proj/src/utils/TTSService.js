@@ -22,7 +22,8 @@ class TTSService {
         this.currentProviderIndex = 0;
         this.isSpeaking = false;
         this.providerTested = false; // 标记是否已测试过提供商
-        this.availableProvider = null; // 缓存可用的提供商
+        this.availableProviders = []; // 缓存所有可用的提供商（数组）
+        this.currentAvailableIndex = 0; // 当前使用的可用提供商索引（用于轮换）
         
         // 定义 TTS 提供商列表（按优先级排序）
         this.providers = [
@@ -81,16 +82,16 @@ class TTSService {
     
     /**
      * 初始化并测试 TTS 提供商（异步）
-     * 在第一次使用前调用，找到可用的提供商
+     * 在第一次使用前调用，找到所有可用的提供商
      */
     async initialize() {
         if (this.providerTested) {
             return; // 已经测试过了
         }
         
-        console.log('🔍 TTSService: 开始测试 TTS 提供商...');
+        console.log('🔍 TTSService: 开始测试所有 TTS 提供商...');
         
-        // 测试每个提供商
+        // 测试每个提供商，收集所有可用的
         for (let i = 0; i < this.providers.length; i++) {
             const provider = this.providers[i];
             
@@ -106,22 +107,31 @@ class TTSService {
                     this._initWebSpeechAPI();
                 }
                 
-                console.log(`✅ TTSService: ${provider.name} 可用`);
-                this.currentProviderIndex = i;
-                this.availableProvider = provider;
-                this.providerTested = true;
+                // 添加到可用列表
+                this.availableProviders.push({
+                    ...provider,
+                    index: i // 记录原始索引
+                });
                 
-                console.log(`🎯 TTSService: 选定 ${provider.name} 作为默认 TTS 提供商`);
-                return;
+                console.log(`✅ TTSService: ${provider.name} 可用`);
                 
             } catch (error) {
                 console.warn(`❌ TTSService: ${provider.name} 测试失败:`, error.message);
             }
         }
         
-        // 如果没有找到可用的提供商
-        console.error('❌ TTSService: 没有找到可用的 TTS 提供商');
         this.providerTested = true;
+        
+        // 输出测试结果
+        if (this.availableProviders.length > 0) {
+            console.log(`🎯 TTSService: 找到 ${this.availableProviders.length} 个可用的 TTS 提供商:`);
+            this.availableProviders.forEach((provider, idx) => {
+                console.log(`   ${idx + 1}. ${provider.name} (${provider.description})`);
+            });
+            console.log(`📌 TTSService: 将在这些提供商之间轮换使用，提高稳定性`);
+        } else {
+            console.error('❌ TTSService: 没有找到可用的 TTS 提供商');
+        }
     }
     
     /**
@@ -268,35 +278,59 @@ class TTSService {
             await this.initialize();
         }
         
-        // 如果有可用的提供商，直接使用
-        if (this.availableProvider) {
+        // 如果有可用的提供商，轮换使用
+        if (this.availableProviders.length > 0) {
             this.isSpeaking = true;
             
-            try {
-                await this.availableProvider.speak(word);
-                console.log(`✅ TTSService: 使用 ${this.availableProvider.name} 朗读: ${word}`);
+            // 尝试当前提供商和后续的所有提供商
+            const startIndex = this.currentAvailableIndex;
+            let attemptCount = 0;
+            
+            while (attemptCount < this.availableProviders.length) {
+                const provider = this.availableProviders[this.currentAvailableIndex];
                 
-                if (onSuccess) {
-                    onSuccess(this.availableProvider.name);
+                try {
+                    await provider.speak(word);
+                    console.log(`✅ TTSService: 使用 ${provider.name} 朗读: ${word} [${this.currentAvailableIndex + 1}/${this.availableProviders.length}]`);
+                    
+                    if (onSuccess) {
+                        onSuccess(provider.name);
+                    }
+                    
+                    // 成功后，轮换到下一个提供商（为下次调用准备）
+                    this.currentAvailableIndex = (this.currentAvailableIndex + 1) % this.availableProviders.length;
+                    
+                    this.isSpeaking = false;
+                    return;
+                    
+                } catch (error) {
+                    console.warn(`❌ TTSService: ${provider.name} 失败 [${this.currentAvailableIndex + 1}/${this.availableProviders.length}]:`, error.message);
+                    
+                    // 尝试下一个提供商
+                    this.currentAvailableIndex = (this.currentAvailableIndex + 1) % this.availableProviders.length;
+                    attemptCount++;
+                    
+                    // 如果还有其他提供商可尝试
+                    if (attemptCount < this.availableProviders.length) {
+                        console.log(`🔄 TTSService: 切换到下一个提供商: ${this.availableProviders[this.currentAvailableIndex].name}`);
+                    }
                 }
-                
-                return;
-                
-            } catch (error) {
-                console.warn(`❌ TTSService: ${this.availableProvider.name} 失败:`, error.message);
-                
-                // 当前提供商失败，尝试降级到下一个
-                console.log('🔄 TTSService: 尝试降级到其他提供商...');
-                this.availableProvider = null; // 清除缓存
-                this.providerTested = false; // 重新测试
-                
-                // 递归调用，重新初始化并尝试
-                this.isSpeaking = false;
-                return await this.speak(word, options);
-                
-            } finally {
-                this.isSpeaking = false;
             }
+            
+            // 所有可用提供商都失败了
+            this.isSpeaking = false;
+            const errorMsg = '所有可用的 TTS 服务均失败';
+            console.error(`❌ TTSService: ${errorMsg}`);
+            
+            if (showError) {
+                this._showErrorNotification(errorMsg);
+            }
+            
+            if (onError) {
+                onError(new Error(errorMsg));
+            }
+            
+            return;
         }
         
         // 没有可用的提供商
@@ -365,6 +399,25 @@ class TTSService {
                 }
             }, 500);
         }, 3000);
+    }
+    
+    /**
+     * 获取可用的 TTS 提供商列表
+     * @returns {Array} 可用提供商的名称数组
+     */
+    getAvailableProviders() {
+        return this.availableProviders.map(p => p.name);
+    }
+    
+    /**
+     * 获取当前使用的 TTS 提供商
+     * @returns {string|null} 当前提供商名称
+     */
+    getCurrentProvider() {
+        if (this.availableProviders.length > 0) {
+            return this.availableProviders[this.currentAvailableIndex].name;
+        }
+        return null;
     }
     
     /**
