@@ -1,0 +1,369 @@
+/**
+ * TTS (Text-to-Speech) 服务
+ * 多提供商降级机制，确保在各种网络环境下都能正常使用
+ * 
+ * 使用示例：
+ * import { TTSService } from './TTSService.js';
+ * const tts = TTSService.getInstance();
+ * await tts.speak('hello');
+ */
+
+class TTSService {
+    constructor() {
+        // 单例模式
+        if (TTSService.instance) {
+            return TTSService.instance;
+        }
+        TTSService.instance = this;
+        
+        // 初始化状态
+        this.speechInitialized = false;
+        this.britishVoice = null;
+        this.currentProviderIndex = 0;
+        this.isSpeaking = false;
+        
+        // 定义 TTS 提供商列表（按优先级排序）
+        this.providers = [
+            {
+                name: 'Web Speech API',
+                description: '浏览器原生语音合成（需要 Google 服务）',
+                test: () => {
+                    if (!('speechSynthesis' in window)) return false;
+                    const voices = speechSynthesis.getVoices();
+                    return voices.length > 0;
+                },
+                speak: (word) => this._speakWithWebSpeechAPI(word)
+            },
+            {
+                name: '百度翻译 TTS',
+                description: '百度翻译语音合成（国内稳定可用）',
+                test: () => true,
+                speak: (word) => this._speakWithAudioURL(
+                    `https://fanyi.baidu.com/gettts?lan=en&text=${encodeURIComponent(word)}&spd=5&source=web`,
+                    '百度翻译 TTS'
+                )
+            },
+            {
+                name: '有道智云 TTS',
+                description: '有道词典语音合成（国内稳定可用）',
+                test: () => true,
+                speak: (word) => this._speakWithAudioURL(
+                    `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(word)}&type=1`,
+                    '有道智云 TTS'
+                )
+            },
+            {
+                name: '微软 Bing TTS',
+                description: '微软 Bing 语音合成（备用方案）',
+                test: () => true,
+                speak: (word) => this._speakWithAudioURL(
+                    `https://www.bing.com/tts?text=${encodeURIComponent(word)}&lang=en-US&format=audio/mp3`,
+                    '微软 Bing TTS'
+                )
+            }
+        ];
+        
+        // 初始化 Web Speech API
+        this._initWebSpeechAPI();
+    }
+    
+    /**
+     * 获取单例实例
+     */
+    static getInstance() {
+        if (!TTSService.instance) {
+            TTSService.instance = new TTSService();
+        }
+        return TTSService.instance;
+    }
+    
+    /**
+     * 初始化 Web Speech API
+     */
+    _initWebSpeechAPI() {
+        if ('speechSynthesis' in window) {
+            // 监听语音列表加载完成
+            speechSynthesis.onvoiceschanged = () => {
+                this._selectBritishVoice();
+            };
+            
+            // 尝试立即选择语音
+            this._selectBritishVoice();
+        }
+    }
+    
+    /**
+     * 选择英式发音
+     */
+    _selectBritishVoice() {
+        if (!('speechSynthesis' in window)) return;
+        
+        const voices = speechSynthesis.getVoices();
+        
+        // 优先级：英国英语 > 英式英语相关
+        this.britishVoice = voices.find(voice => 
+            voice.lang === 'en-GB' && voice.name.includes('UK')
+        ) || voices.find(voice => 
+            voice.lang === 'en-GB' && voice.name.includes('British')
+        ) || voices.find(voice => 
+            voice.lang === 'en-GB'
+        ) || voices.find(voice => 
+            voice.lang.startsWith('en-') && voice.name.includes('UK')
+        ) || voices.find(voice => 
+            voice.lang.startsWith('en-') && voice.name.includes('British')
+        );
+        
+        if (this.britishVoice) {
+            console.log('✅ TTSService: 已选择英式语音:', this.britishVoice.name, this.britishVoice.lang);
+        }
+    }
+    
+    /**
+     * 激活 Web Speech API（需要用户交互）
+     */
+    activateWebSpeechAPI() {
+        if (!this.speechInitialized && 'speechSynthesis' in window) {
+            // 选择英式语音
+            this._selectBritishVoice();
+            
+            // 创建一个静音的 utterance 来激活语音合成
+            const utterance = new SpeechSynthesisUtterance('');
+            utterance.volume = 0;
+            speechSynthesis.speak(utterance);
+            this.speechInitialized = true;
+            console.log('✅ TTSService: Web Speech API 已激活');
+        }
+    }
+    
+    /**
+     * 使用 Web Speech API 朗读
+     */
+    _speakWithWebSpeechAPI(word) {
+        return new Promise((resolve, reject) => {
+            if (!('speechSynthesis' in window)) {
+                reject(new Error('浏览器不支持 Web Speech API'));
+                return;
+            }
+            
+            // 如果还没初始化，先激活
+            if (!this.speechInitialized) {
+                this.activateWebSpeechAPI();
+            }
+            
+            // 如果还没有选择语音，尝试选择
+            if (!this.britishVoice) {
+                this._selectBritishVoice();
+            }
+            
+            // 停止之前的朗读
+            speechSynthesis.cancel();
+            
+            const utterance = new SpeechSynthesisUtterance(word);
+            
+            // 优先使用选中的英式语音
+            if (this.britishVoice) {
+                utterance.voice = this.britishVoice;
+            }
+            
+            // 设置语言为英式英语
+            utterance.lang = 'en-GB';
+            utterance.rate = 0.8;  // 语速
+            utterance.pitch = 1.0; // 音调
+            utterance.volume = 1.0; // 音量
+            
+            utterance.onend = () => resolve();
+            utterance.onerror = (e) => reject(e);
+            
+            speechSynthesis.speak(utterance);
+        });
+    }
+    
+    /**
+     * 使用音频 URL 朗读
+     */
+    _speakWithAudioURL(url, providerName) {
+        return new Promise((resolve, reject) => {
+            const audio = new Audio(url);
+            
+            audio.onended = () => resolve();
+            audio.onerror = (e) => {
+                reject(new Error(`${providerName} 音频加载失败`));
+            };
+            
+            audio.play().catch(reject);
+        });
+    }
+    
+    /**
+     * 朗读单词（带自动降级）
+     * @param {string} word - 要朗读的单词
+     * @param {Object} options - 配置选项
+     * @param {boolean} options.showError - 是否显示错误提示（默认 true）
+     * @param {Function} options.onSuccess - 成功回调
+     * @param {Function} options.onError - 失败回调
+     * @returns {Promise<void>}
+     */
+    async speak(word, options = {}) {
+        const {
+            showError = true,
+            onSuccess = null,
+            onError = null
+        } = options;
+        
+        // 防止重复朗读
+        if (this.isSpeaking) {
+            console.log('⏸️ TTSService: 正在朗读中，跳过');
+            return;
+        }
+        
+        this.isSpeaking = true;
+        
+        try {
+            // 从当前提供商开始尝试
+            for (let i = this.currentProviderIndex; i < this.providers.length; i++) {
+                const provider = this.providers[i];
+                
+                try {
+                    // 测试提供商是否可用
+                    if (!provider.test()) {
+                        console.log(`⏭️ TTSService: ${provider.name} 不可用，尝试下一个`);
+                        continue;
+                    }
+                    
+                    // 尝试朗读
+                    await provider.speak(word);
+                    console.log(`✅ TTSService: 使用 ${provider.name} 朗读: ${word}`);
+                    
+                    // 记住成功的提供商，下次优先使用
+                    this.currentProviderIndex = i;
+                    
+                    // 调用成功回调
+                    if (onSuccess) {
+                        onSuccess(provider.name);
+                    }
+                    
+                    return;
+                    
+                } catch (error) {
+                    console.warn(`❌ TTSService: ${provider.name} 失败:`, error.message);
+                    // 继续尝试下一个提供商
+                }
+            }
+            
+            // 所有提供商都失败
+            const errorMsg = '所有 TTS 服务均不可用';
+            console.error(`❌ TTSService: ${errorMsg}`);
+            
+            if (showError) {
+                this._showErrorNotification(errorMsg);
+            }
+            
+            // 调用失败回调
+            if (onError) {
+                onError(new Error(errorMsg));
+            }
+            
+        } finally {
+            this.isSpeaking = false;
+        }
+    }
+    
+    /**
+     * 显示错误通知
+     */
+    _showErrorNotification(message) {
+        // 避免重复显示
+        if (document.getElementById('tts-error-notification')) {
+            return;
+        }
+        
+        const notification = document.createElement('div');
+        notification.id = 'tts-error-notification';
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(231, 76, 60, 0.95);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            z-index: 10000;
+            animation: tts-slideIn 0.5s ease;
+            font-size: 14px;
+        `;
+        notification.textContent = `⚠️ ${message}`;
+        
+        // 添加动画
+        if (!document.querySelector('style#tts-animations')) {
+            const style = document.createElement('style');
+            style.id = 'tts-animations';
+            style.textContent = `
+                @keyframes tts-slideIn {
+                    from { transform: translateX(400px); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                @keyframes tts-fadeOut {
+                    to { opacity: 0; transform: translateX(400px); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        document.body.appendChild(notification);
+        
+        // 3秒后自动消失
+        setTimeout(() => {
+            notification.style.animation = 'tts-fadeOut 0.5s ease';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 500);
+        }, 3000);
+    }
+    
+    /**
+     * 停止当前朗读
+     */
+    stop() {
+        if ('speechSynthesis' in window) {
+            speechSynthesis.cancel();
+        }
+        this.isSpeaking = false;
+        console.log('⏹️ TTSService: 已停止朗读');
+    }
+    
+    /**
+     * 获取可用的 TTS 提供商列表
+     */
+    getAvailableProviders() {
+        return this.providers.filter(provider => provider.test());
+    }
+    
+    /**
+     * 获取当前使用的提供商
+     */
+    getCurrentProvider() {
+        return this.providers[this.currentProviderIndex];
+    }
+    
+    /**
+     * 手动切换到指定的提供商
+     */
+    switchProvider(providerIndex) {
+        if (providerIndex >= 0 && providerIndex < this.providers.length) {
+            this.currentProviderIndex = providerIndex;
+            console.log(`🔄 TTSService: 切换到 ${this.providers[providerIndex].name}`);
+        }
+    }
+}
+
+// 导出单例实例
+export { TTSService };
+
+// 如果不使用 ES6 模块，也可以挂载到 window 对象
+if (typeof window !== 'undefined') {
+    window.TTSService = TTSService;
+}
+
