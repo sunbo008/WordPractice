@@ -2,8 +2,9 @@
 class DebugLogger {
     constructor() {
         this.console = null;
-        this.maxLines = 200;
+        this.maxLines = 500; // 增加最大行数
         this.enabled = true;
+        this.logHistory = []; // 完整日志历史
     }
     
     init() {
@@ -12,6 +13,7 @@ class DebugLogger {
         // 绑定控制按钮
         const toggleBtn = document.getElementById('toggleDebugBtn');
         const clearBtn = document.getElementById('clearDebugBtn');
+        const exportBtn = document.getElementById('exportDebugBtn');
         const panel = document.getElementById('debugPanel');
         
         if (toggleBtn) {
@@ -23,6 +25,10 @@ class DebugLogger {
         
         if (clearBtn) {
             clearBtn.addEventListener('click', () => this.clear());
+        }
+        
+        if (exportBtn) {
+            exportBtn.addEventListener('click', () => this.export());
         }
         
         // 捕获全局错误
@@ -40,21 +46,35 @@ class DebugLogger {
     }
     
     log(message, type = 'info') {
-        if (!this.enabled || !this.console) return;
+        if (!this.enabled) return;
         
-        const line = document.createElement('div');
-        line.className = `debug-line ${type}`;
-        line.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+        const timestamp = new Date().toLocaleTimeString('zh-CN', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit', fractionalSecondDigits: 3 });
+        const logEntry = {
+            timestamp,
+            message,
+            type,
+            fullMessage: `[${timestamp}] ${message}`
+        };
         
-        this.console.appendChild(line);
+        // 保存到历史记录
+        this.logHistory.push(logEntry);
         
-        // 限制行数
-        while (this.console.children.length > this.maxLines) {
-            this.console.removeChild(this.console.firstChild);
+        // 显示到调试面板
+        if (this.console) {
+            const line = document.createElement('div');
+            line.className = `debug-line ${type}`;
+            line.textContent = logEntry.fullMessage;
+            
+            this.console.appendChild(line);
+            
+            // 限制行数（只限制显示，不限制历史记录）
+            while (this.console.children.length > this.maxLines) {
+                this.console.removeChild(this.console.firstChild);
+            }
+            
+            // 自动滚动到底部
+            this.console.scrollTop = this.console.scrollHeight;
         }
-        
-        // 自动滚动到底部
-        this.console.scrollTop = this.console.scrollHeight;
         
         // 同时输出到浏览器控制台
         const consoleMethod = type === 'error' ? 'error' : type === 'warning' ? 'warn' : 'log';
@@ -80,8 +100,40 @@ class DebugLogger {
     clear() {
         if (this.console) {
             this.console.innerHTML = '';
-            this.info('📝 日志已清空');
         }
+        this.logHistory = [];
+        this.info('📝 日志已清空');
+    }
+    
+    export() {
+        if (this.logHistory.length === 0) {
+            alert('没有日志可以导出');
+            return;
+        }
+        
+        // 生成日志文本
+        const logText = this.logHistory.map(entry => entry.fullMessage).join('\n');
+        
+        // 创建下载链接
+        const blob = new Blob([logText], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        
+        // 文件名包含时间戳
+        const now = new Date();
+        const dateStr = now.toISOString().replace(/[:.]/g, '-').slice(0, 19);
+        link.download = `word-tetris-debug-${dateStr}.txt`;
+        
+        // 触发下载
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // 释放URL对象
+        URL.revokeObjectURL(url);
+        
+        this.success(`✅ 日志已导出 (${this.logHistory.length} 条记录)`);
     }
 }
 
@@ -125,6 +177,7 @@ class WordTetrisGame {
         this.hitWords = new Set(); // 正确命中的单词集合（去重）
         this.fallenWords = new Set(); // 下落的单词集合（去重，包括命中和未命中）
         this.totalWords = 135; // 考试总单词量（从单词库获取）
+        this.gameCompletionTriggered = false; // 【修复】防止重复触发游戏完成
         
         // 缓冲区状态
         this.bufferState = 'idle'; // idle, countdown, ready
@@ -192,11 +245,12 @@ class WordTetrisGame {
         }
         
         if (this.vocabularyManager.isLoaded) {
-            // 获取总单词数
+            // 使用去重后的实际单词数
+            this.totalWords = this.vocabularyManager.allWords.length;
             const stats = this.vocabularyManager.getVocabularyStats();
-            this.totalWords = stats.totalWords;
             
-            console.log(`📊 单词库统计: 总单词数 = ${this.totalWords}`);
+            console.log(`📊 单词库统计: 总单词数 = ${this.totalWords} (去重后)`);
+            console.log(`📊 单词池大小: ${this.vocabularyManager.wordPool.length}`);
             console.log(`📊 生词本数量: ${stats.missedWords}`);
             
             // 更新显示
@@ -213,20 +267,29 @@ class WordTetrisGame {
         const hitWordsCount = this.hitWords.size;
         const fallenWordsCount = this.fallenWords.size;
         
+        // 剩余待测单词数 = 总单词数 - 已经下落的单词数（去重）
+        // 注意：已下落的单词包括命中的、放弃的、失败的，都在 fallenWords 集合中
+        const remainingWords = this.totalWords > fallenWordsCount ? this.totalWords - fallenWordsCount : 0;
+        
         // 命中率：命中单词数 / 下落单词数（去重）
         const hitPercentage = fallenWordsCount > 0 ? Math.round((hitWordsCount / fallenWordsCount) * 100) : 0;
         
         // 覆盖率：命中单词数 / 总单词库数量
         const coveragePercentage = this.totalWords > 0 ? Math.round((hitWordsCount / this.totalWords) * 100) : 0;
         
-        console.log(`📊 更新考试统计: 总词量=${this.totalWords}, 下落=${fallenWordsCount}, 命中=${hitWordsCount}, 命中率=${hitPercentage}%, 覆盖率=${coveragePercentage}%`);
+        // 只在统计数据变化时输出日志（避免每帧都输出）
+        const statsKey = `${remainingWords}-${fallenWordsCount}-${hitWordsCount}`;
+        if (this._lastStatsKey !== statsKey) {
+            debugLog.info(`📊 更新考试统计: 剩余=${remainingWords}, 下落=${fallenWordsCount}, 命中=${hitWordsCount}, 命中率=${hitPercentage}%, 覆盖率=${coveragePercentage}%`);
+            this._lastStatsKey = statsKey;
+        }
         
         const totalWordsElement = document.getElementById('total-words');
         const hitWordsElement = document.getElementById('hit-words');
         const hitPercentageElement = document.getElementById('hit-percentage');
         const coveragePercentageElement = document.getElementById('coverage-percentage');
         
-        if (totalWordsElement) totalWordsElement.textContent = this.totalWords;
+        if (totalWordsElement) totalWordsElement.textContent = remainingWords;
         if (hitWordsElement) hitWordsElement.textContent = hitWordsCount;
         if (hitPercentageElement) hitPercentageElement.textContent = `${hitPercentage}%`;
         if (coveragePercentageElement) coveragePercentageElement.textContent = `${coveragePercentage}%`;
@@ -481,7 +544,8 @@ class WordTetrisGame {
         this.loadGameData();
         this.bindEvents();
         this.updateUI();
-        this.generateNextWord();
+        // 【修复】不在 init 中生成单词，让 startGame() 统一处理
+        // this.generateNextWord(); 
         this.initExamStats(); // 初始化考试统计
         this.gameLoop();
         
@@ -665,6 +729,9 @@ class WordTetrisGame {
         this.gameState = 'playing';
         this.startTime = Date.now();
         this.updateButtons();
+        
+        // 【修复】先生成第一个单词，再启动缓冲区
+        this.generateNextWord();
         this.startBufferCountdown();
         
         // 确保输入框可以接收键盘输入（但不需要焦点）
@@ -698,6 +765,7 @@ class WordTetrisGame {
         this.fallingWords = [];
         this.stackedWords = [];
         this.currentWord = null;
+        this.nextWord = null; // 【修复】重置时清空 nextWord
         this.bufferState = 'idle';
         this.bufferTimer = 0;
         this.spawnTimer = 0;
@@ -707,6 +775,7 @@ class WordTetrisGame {
         
         // 重置游戏时清空生词本和统计数据
         this.vocabularyManager.clearCurrentLevelVocabulary();
+        this.vocabularyManager.resetWordPool(); // 重置单词池
         this.totalWordsHit = 0;
         this.totalWordsGivenUp = 0;
         this.totalWordsFailed = 0;
@@ -714,10 +783,11 @@ class WordTetrisGame {
         this.perfectLevels = 0;
         this.hitWords = new Set(); // 重置命中单词集合（去重用）
         this.fallenWords = new Set(); // 重置下落单词集合（去重用）
-        console.log('🔄 游戏重置，生词本已清空，统计数据已重置');
+        this.gameCompletionTriggered = false; // 【修复】重置完成标志
+        console.log('🔄 游戏重置，生词本已清空，统计数据已重置，单词池已重置');
         
         this.resetBufferLights();
-        this.generateNextWord();
+        // 【修复】不在这里生成 nextWord，让 startGame() 来生成
         this.updateUI();
         this.updateButtons();
         this.clearInput();
@@ -790,6 +860,9 @@ class WordTetrisGame {
             this.combo++;
             this.lastHitTime = Date.now();
             
+            // 更新命中统计（去重）
+            this.hitWords.add(hitWord.original.toLowerCase());
+            
             this.showHitEffect(hitWord, points);
             this.clearInput();
             
@@ -797,6 +870,9 @@ class WordTetrisGame {
             if (this.score >= this.targetScore) {
                 this.levelUp();
             }
+            
+            // 检查游戏是否完成
+            this.checkGameCompletion();
         } else {
             // 击落失败
             this.combo = 0;
@@ -862,6 +938,9 @@ class WordTetrisGame {
         this.combo = 0;
         this.levelWordCount = 0;
         
+        // 通知单词管理器升级（不重置单词池）
+        this.vocabularyManager.onLevelUp();
+        
         // 暂停游戏并显示升级弹窗
         this.gameState = 'levelup';
         this.showLevelUpModal(vocabularyStats.totalWords);
@@ -887,6 +966,9 @@ class WordTetrisGame {
             return;
         }
         
+        // 【调试】输出单词池当前状态
+        debugLog.info(`📝 生成新单词前，单词池剩余: ${this.vocabularyManager.wordPool.length} 个`);
+        
         // 检查是否为等级末尾挑战（最后10个单词）
         const wordsUntilNextLevel = Math.ceil((this.targetScore - this.score) / 2); // 假设平均2分/单词
         const isEndChallenge = wordsUntilNextLevel <= 10;
@@ -907,6 +989,7 @@ class WordTetrisGame {
             return;
         }
         
+        debugLog.info(`✅ 生成新单词: ${this.nextWord.original}，单词池剩余: ${this.vocabularyManager.wordPool.length} 个`);
         this.levelWordCount++;
         this.updateNextWordDisplay();
     }
@@ -917,15 +1000,14 @@ class WordTetrisGame {
             return false;
         }
         
-        // 获取总单词数
-        const totalWords = this.vocabularyManager.allWords.length;
+        // 【修复】单词池为空 + nextWord也为空 才表示所有单词都已生成并处理完毕
+        // 因为最后一个单词从单词池抽取后，单词池变空，但这个单词还在 nextWord 中等待释放
+        const wordPoolEmpty = this.vocabularyManager.wordPool.length === 0;
+        const noNextWord = this.nextWord === null;
         
-        // 获取已下落的单词数（去重）
-        const fallenWordsCount = this.fallenWords.size;
-        
-        // 如果所有单词都已下落过，游戏结束
-        if (totalWords > 0 && fallenWordsCount >= totalWords) {
-            console.log(`📊 游戏完成统计: 总单词=${totalWords}, 已下落=${fallenWordsCount}`);
+        if (wordPoolEmpty && noNextWord) {
+            console.log(`📊 单词池已空且无待释放单词，游戏即将完成`);
+            console.log(`📊 统计: 总单词=${this.totalWords}, 已下落=${this.fallenWords.size}, 命中=${this.hitWords.size}`);
             return true;
         }
         
@@ -934,25 +1016,92 @@ class WordTetrisGame {
     
     // 检查游戏是否完成（所有单词已下落且没有正在下落的单词）
     checkGameCompletion() {
-        // 检查是否所有单词都已下落
-        if (!this.checkAllWordsCompleted()) {
+        // 【修复】防止重复触发
+        if (this.gameCompletionTriggered) {
             return;
         }
         
-        // 检查是否还有单词在处理中
-        const hasWordsInProgress = this.fallingWords.length > 0 || this.bufferState !== 'idle';
+        // 检查是否所有单词都已下落
+        const allCompleted = this.checkAllWordsCompleted();
+        
+        if (!allCompleted) {
+            return; // 单词池还有单词，继续游戏
+        }
+        
+        // ===== 已修复：此逻辑不再需要 =====
+        // checkAllWordsCompleted() 现在会正确判断单词池为空 + nextWord为空
+        // 所以不会在还有 nextWord 时错误地认为游戏完成
+        // 保留此注释以便理解逻辑
+        
+        // 检查是否还有单词在处理中（包括缓冲区和下落中的单词）
+        const hasWordsInProgress = this.fallingWords.length > 0 || 
+                                   this.bufferState !== 'idle' || 
+                                   this.nextWord !== null;
         
         if (!hasWordsInProgress) {
-            console.log('🎉 所有单词已处理完毕，游戏结束！');
-            console.log(`📊 最终统计: 总单词=${this.vocabularyManager.allWords.length}, 已下落=${this.fallenWords.size}, 命中=${this.hitWords.size}`);
+            // 【修复】设置标志，防止重复触发
+            this.gameCompletionTriggered = true;
             
-            // 延迟500ms让动画完成
+            debugLog.success('🎉 所有单词已处理完毕，游戏完成！');
+            debugLog.info(`📊 最终统计: 总单词=${this.totalWords}, 已下落=${this.fallenWords.size}, 命中=${this.hitWords.size}`);
+            
+            // 延迟500ms让动画完成后显示完成弹窗
             setTimeout(() => {
                 if (this.gameState === 'playing') {
-                    this.gameOver();
+                    this.showGameCompletionModal();
                 }
             }, 500);
         }
+    }
+    
+    // 显示游戏完成弹窗
+    showGameCompletionModal() {
+        this.gameState = 'gameOver';
+        
+        // 计算最终统计
+        const hitWordsCount = this.hitWords.size;
+        const fallenWordsCount = this.fallenWords.size;
+        const hitPercentage = fallenWordsCount > 0 ? Math.round((hitWordsCount / fallenWordsCount) * 100) : 0;
+        const coveragePercentage = this.totalWords > 0 ? Math.round((hitWordsCount / this.totalWords) * 100) : 0;
+        
+        // 【修复】使用HTML中实际存在的ID（没有中划线）
+        const finalScoreEl = document.getElementById('finalScore');
+        const finalLevelEl = document.getElementById('finalLevel');
+        const finalVocabularyEl = document.getElementById('finalVocabulary');
+        
+        if (finalScoreEl) finalScoreEl.textContent = this.score;
+        if (finalLevelEl) finalLevelEl.textContent = this.level;
+        if (finalVocabularyEl) finalVocabularyEl.textContent = this.vocabularyManager.getVocabularyStats().totalWords;
+        
+        // 显示完成统计
+        const gameOverModal = document.getElementById('gameOverModal');
+        const modalTitle = gameOverModal.querySelector('h2');
+        if (modalTitle) {
+            modalTitle.textContent = '🎉 恭喜完成！';
+        }
+        
+        // 添加完成信息
+        const modalContent = gameOverModal.querySelector('.modal-content');
+        let completionInfo = modalContent.querySelector('.completion-info');
+        if (!completionInfo) {
+            completionInfo = document.createElement('div');
+            completionInfo.className = 'completion-info';
+            completionInfo.style.cssText = 'background: #e8f5e9; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #4caf50;';
+            const modalBody = modalContent.querySelector('.modal-body');
+            if (modalBody && modalBody.firstChild) {
+                modalBody.insertBefore(completionInfo, modalBody.firstChild.nextSibling);
+            }
+        }
+        completionInfo.innerHTML = `
+            <p style="margin: 0; font-size: 1.1em; color: #2e7d32;">
+                ✅ 已完成所有 ${this.totalWords} 个单词的测试！<br>
+                📊 命中率: ${hitPercentage}% (${hitWordsCount}/${fallenWordsCount})<br>
+                🎯 覆盖率: ${coveragePercentage}% (${hitWordsCount}/${this.totalWords})
+            </p>
+        `;
+        
+        gameOverModal.style.display = 'flex';
+        debugLog.success('📊 游戏完成弹窗已显示');
     }
 
     startBufferCountdown() {
@@ -972,15 +1121,19 @@ class WordTetrisGame {
             this.bufferLights.red = true;
             this.bufferLights.yellow = false;
             this.bufferLights.green = false;
+            debugLog.info(`⏱️ 缓冲区倒计时: 红灯 (1秒)`);
         } else if (this.bufferTimer === 120) { // 2秒 - 只亮黄灯
             this.bufferLights.red = false;
             this.bufferLights.yellow = true;
             this.bufferLights.green = false;
+            debugLog.info(`⏱️ 缓冲区倒计时: 黄灯 (2秒)`);
         } else if (this.bufferTimer === 180) { // 3秒 - 只亮绿灯
             this.bufferLights.red = false;
             this.bufferLights.yellow = false;
             this.bufferLights.green = true;
+            debugLog.info(`⏱️ 缓冲区倒计时: 绿灯 (3秒)`);
         } else if (this.bufferTimer === 240) { // 4秒 - 绿灯亮满1秒后释放单词
+            debugLog.success(`🚀 缓冲区倒计时完成，准备释放单词`);
             this.releaseWord();
         }
         
@@ -988,7 +1141,12 @@ class WordTetrisGame {
     }
 
     releaseWord() {
-        if (!this.nextWord) return;
+        if (!this.nextWord) {
+            debugLog.warning('⚠️ releaseWord: nextWord 为空，无法释放');
+            return;
+        }
+        
+        debugLog.success(`📤 释放单词到游戏区域: ${this.nextWord.original}`);
         
         // 创建下降单词
         const fallingWord = {
@@ -1001,6 +1159,8 @@ class WordTetrisGame {
         };
         
         this.fallingWords.push(fallingWord);
+        debugLog.info(`✅ 单词已添加到 fallingWords，当前下落单词数: ${this.fallingWords.length}`);
+        
         // 同步展示当前单词的图片，确保与下落单词一致
         this.updateImageShowcase(fallingWord.original);
         
@@ -1016,8 +1176,15 @@ class WordTetrisGame {
         this.resetBufferLights();
         this.updateBufferLights();
         
-        // 生成下一个单词
-        this.generateNextWord();
+        // 清空 nextWord（因为已经释放到 fallingWords）
+        this.nextWord = null;
+        
+        // 只有当单词池不为空时才生成下一个单词
+        if (!this.checkAllWordsCompleted()) {
+            this.generateNextWord();
+        } else {
+            debugLog.warning('🎯 单词池已空，不再生成新单词，等待最后一个单词完成');
+        }
         
         // 检查是否所有单词都已下落（在生成下一个单词后检查）
         this.checkGameCompletion();
@@ -1034,9 +1201,12 @@ class WordTetrisGame {
         // 更新缓冲区倒计时
         this.updateBufferCountdown();
         
-        // 更新生成计时器 - 只有当没有下降单词时才生成新单词
+        // 更新生成计时器 - 只有当没有下降单词且单词池不为空时才生成新单词
         this.spawnTimer++;
-        if (this.spawnTimer >= this.spawnRate && this.bufferState === 'idle' && this.fallingWords.length === 0) {
+        if (this.spawnTimer >= this.spawnRate && 
+            this.bufferState === 'idle' && 
+            this.fallingWords.length === 0 &&
+            !this.checkAllWordsCompleted()) { // 新增：检查单词池是否还有单词
             this.startBufferCountdown();
             this.spawnTimer = 0;
         }
@@ -1633,6 +1803,7 @@ class WordTetrisGame {
         document.getElementById('combo').textContent = this.combo;
         
         this.updateVocabularyList();
+        this.updateExamStats(); // 更新考试统计
     }
 
     updateButtons() {

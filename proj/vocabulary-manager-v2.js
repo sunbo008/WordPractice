@@ -13,6 +13,11 @@ class VocabularyManagerV2 {
         this.recentWords = [];
         this.maxRecentWords = 15;
         
+        // 单词池系统（新）
+        this.wordPool = []; // 当前可用的单词池
+        this.usedWordsInGame = new Set(); // 本次游戏中已使用的单词
+        this.levelWordsCount = 0; // 当前等级已使用的单词数
+        
         // 已使用单词跟踪（用于确保所有单词都被使用）
         this.usedWords = new Set();
 		
@@ -203,6 +208,42 @@ class VocabularyManagerV2 {
 		});
 		
         console.log(`📊 单词处理完成: 总计 ${this.allWords.length} 个单词`);
+        
+        // 初始化单词池
+        this.initializeWordPool();
+    }
+    
+    // 初始化单词池
+    initializeWordPool() {
+        // 将所有单词复制到单词池中（去重后的）
+        this.wordPool = [...this.allWords];
+        this.usedWordsInGame.clear();
+        this.levelWordsCount = 0;
+        
+        // 打乱单词池顺序
+        this.shuffleWordPool();
+        
+        console.log(`🎲 单词池已初始化: ${this.wordPool.length} 个单词`);
+    }
+    
+    // 打乱单词池
+    shuffleWordPool() {
+        for (let i = this.wordPool.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [this.wordPool[i], this.wordPool[j]] = [this.wordPool[j], this.wordPool[i]];
+        }
+    }
+    
+    // 重置单词池（游戏重置时调用）
+    resetWordPool() {
+        this.initializeWordPool();
+        console.log('🔄 单词池已重置');
+    }
+    
+    // 升级时的处理（不重置单词池，继续使用）
+    onLevelUp() {
+        this.levelWordsCount = 0;
+        console.log(`📈 升级！剩余单词池: ${this.wordPool.length} 个`);
     }
     
     // 处理音标课程格式
@@ -361,34 +402,29 @@ class VocabularyManagerV2 {
         return this.getVocabularyForLevel(level, isEndChallenge);
     }
     
-    // 从所有难度中随机选择单词（取消难度限制）
+    // 从单词池中抽取单词（新的抽取式逻辑）
     getRandomWordFromAll(isEndChallenge = false) {
         if (!this.isLoaded || this.allWords.length === 0) {
             return null;
         }
         
-        // 优先选择未使用过的单词
-        const unusedWords = this.allWords.filter(word => !this.usedWords.has(word.word));
-        
-        // 如果所有单词都用过了，重置已使用列表（开始新一轮）
-        if (unusedWords.length === 0) {
-            console.log('🔄 所有单词已使用完毕，开始新一轮');
-            this.usedWords.clear();
-            var availableWords = this.allWords;
-        } else {
-            var availableWords = unusedWords;
+        // 检查单词池是否为空
+        if (this.wordPool.length === 0) {
+            console.log('🎉 单词池已空，所有单词已完成！');
+            return null;
         }
         
-        // 在可用单词中，优先选择非最近使用的单词
-        const nonRecentWords = availableWords.filter(word => !this.isWordRecent(word.word));
-        const finalWords = nonRecentWords.length > 0 ? nonRecentWords : availableWords;
+        // 从单词池中抽取第一个单词（已打乱顺序）
+        const selectedWord = this.wordPool.shift();
         
-        // 随机选择单词
-        const selectedWord = finalWords[Math.floor(Math.random() * finalWords.length)];
+        // 添加到本次游戏已使用列表
+        this.usedWordsInGame.add(selectedWord.word);
+        this.levelWordsCount++;
         
-        // 添加到已使用列表和最近使用列表
-        this.usedWords.add(selectedWord.word);
+        // 添加到最近使用列表（用于避免连续重复）
         this.addToRecentWords(selectedWord.word);
+        
+        console.log(`📝 抽取单词: ${selectedWord.word} (剩余: ${this.wordPool.length})`);
         
         // 模式控制：挑战模式去掉全部字母，否则随机1-2个
         const mode = (localStorage.getItem('wordTetris_gameMode') === 'challenge') ? 'challenge' : 'casual';
