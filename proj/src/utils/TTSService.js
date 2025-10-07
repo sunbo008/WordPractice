@@ -31,9 +31,9 @@ class TTSService {
                 name: 'Web Speech API',
                 description: '浏览器原生语音合成（需要 Google 服务）',
                 test: () => {
-                    if (!('speechSynthesis' in window)) return false;
-                    const voices = speechSynthesis.getVoices();
-                    return voices.length > 0;
+                    // 只检查浏览器是否支持，不检查语音列表
+                    // 因为语音列表可能异步加载，初始为空是正常的
+                    return ('speechSynthesis' in window);
                 },
                 speak: (word) => this._speakWithWebSpeechAPI(word)
             },
@@ -109,12 +109,19 @@ class TTSService {
                 // 对于 Web Speech API，特殊处理
                 if (provider.name === 'Web Speech API') {
                     this._initWebSpeechAPI();
-                    // Web Speech API 的测试比较特殊，如果基础测试通过就认为可用
-                    this.availableProviders.push({
-                        ...provider,
-                        index: i
-                    });
-                    console.log(`✅ TTSService: ${provider.name} 可用`);
+                    
+                    // 等待语音列表加载（最多等待 2 秒）
+                    const voices = await this._waitForVoices(2000);
+                    
+                    if (voices.length > 0) {
+                        this.availableProviders.push({
+                            ...provider,
+                            index: i
+                        });
+                        console.log(`✅ TTSService: ${provider.name} 可用（找到 ${voices.length} 个语音）`);
+                    } else {
+                        console.log(`⏭️ TTSService: ${provider.name} 不可用（未找到语音）`);
+                    }
                     continue;
                 }
                 
@@ -196,6 +203,38 @@ class TTSService {
                 
             } catch (error) {
                 resolve(false);
+            }
+        });
+    }
+    
+    /**
+     * 等待 Web Speech API 语音列表加载完成
+     * @param {number} timeout - 超时时间（毫秒）
+     * @returns {Promise<Array>} 语音列表
+     */
+    _waitForVoices(timeout = 2000) {
+        return new Promise((resolve) => {
+            if ('speechSynthesis' in window) {
+                const voices = speechSynthesis.getVoices();
+                
+                // 如果已经有语音列表，直接返回
+                if (voices.length > 0) {
+                    resolve(voices);
+                    return;
+                }
+                
+                // 设置超时
+                const timer = setTimeout(() => {
+                    resolve(speechSynthesis.getVoices());
+                }, timeout);
+                
+                // 监听语音列表加载完成
+                speechSynthesis.onvoiceschanged = () => {
+                    clearTimeout(timer);
+                    resolve(speechSynthesis.getVoices());
+                };
+            } else {
+                resolve([]);
             }
         });
     }
