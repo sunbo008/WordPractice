@@ -1425,6 +1425,9 @@ class WordTetrisGame {
         
         // 绘制UI元素
         this.drawGameInfo();
+
+        // 最顶层：半圆形基座覆盖层（确保遮挡炮管与基座相交处）
+        this.drawBaseOverlay();
     }
 
     drawBackground() {
@@ -1685,7 +1688,7 @@ class WordTetrisGame {
         
         // === 卡通风格木质大炮（堡垒基座设计） ===
         
-        // 1. 绘制半圆形堡垒基座（保持水平，覆盖大炮1/3，不受后坐力影响）
+        // 1. 绘制半圆形堡垒基座（保持水平，不受后坐力影响）
         this.ctx.save();
         
         // 基座阴影
@@ -1695,7 +1698,7 @@ class WordTetrisGame {
         this.ctx.closePath();
         this.ctx.fill();
         
-        // 基座主体（真正的半圆形，石质渐变，半径60px）
+        // 半圆主体（石质渐变）
         const baseGradient = this.ctx.createRadialGradient(0, 25, 0, 0, 25, 60);
         baseGradient.addColorStop(0, '#8B8D8F');
         baseGradient.addColorStop(0.3, '#7F8C8D');
@@ -1707,11 +1710,9 @@ class WordTetrisGame {
         this.ctx.closePath();
         this.ctx.fill();
         
-        // 石头不规则质感 - 随机石块纹理
+        // 石头不规则质感
         this.ctx.save();
         this.ctx.globalAlpha = 0.3;
-        
-        // 使用固定的随机种子模拟石块（调整到60px半径范围内）
         const stonePatterns = [
             { x: -40, y: 8, size: 12, darkness: 0.2 },
             { x: -25, y: 5, size: 10, darkness: 0.15 },
@@ -1724,33 +1725,101 @@ class WordTetrisGame {
             { x: -48, y: 18, size: 10, darkness: 0.19 },
             { x: 38, y: 20, size: 11, darkness: 0.21 }
         ];
-        
-        stonePatterns.forEach(stone => {
-            // 只绘制在半圆范围内的石块（60px半径）
-            const distFromCenter = Math.sqrt(stone.x * stone.x + (stone.y - 25) * (stone.y - 25));
-            if (distFromCenter < 55 && stone.y < 25) {
-                // 深色石块
-                this.ctx.fillStyle = `rgba(0, 0, 0, ${stone.darkness})`;
+        stonePatterns.forEach(s => {
+            const d = Math.sqrt(s.x * s.x + (s.y - 25) * (s.y - 25));
+            if (d < 55 && s.y < 25) {
+                this.ctx.fillStyle = `rgba(0,0,0,${s.darkness})`;
                 this.ctx.beginPath();
-                this.ctx.arc(stone.x, stone.y, stone.size, 0, Math.PI * 2);
+                this.ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
                 this.ctx.fill();
-                
-                // 石块边缘高光
-                this.ctx.fillStyle = `rgba(255, 255, 255, ${stone.darkness * 0.5})`;
+                this.ctx.fillStyle = `rgba(255,255,255,${s.darkness * 0.5})`;
                 this.ctx.beginPath();
-                this.ctx.arc(stone.x - stone.size * 0.3, stone.y - stone.size * 0.3, stone.size * 0.4, 0, Math.PI * 2);
+                this.ctx.arc(s.x - s.size * 0.3, s.y - s.size * 0.3, s.size * 0.4, 0, Math.PI * 2);
                 this.ctx.fill();
             }
         });
-        
         this.ctx.restore();
-        
-        // 石头裂纹纹理
+
+        // 12. 顶层基座覆盖层（使用半圆剪裁 + 实心重绘，强制覆盖相交处）
+        this.ctx.save();
+        this.ctx.translate(this.cannon.x, this.cannon.y);
+        // 12.1 半圆剪裁区域
+        this.ctx.beginPath();
+        this.ctx.arc(0, 23, 61, Math.PI, 0);
+        this.ctx.lineTo(61, 23);
+        this.ctx.lineTo(-61, 23);
+        this.ctx.closePath();
+        this.ctx.clip();
+        // 12.2 在剪裁内进行完全不透明的重绘（确保覆盖）
+        this.ctx.globalAlpha = 1;
+        // 阴影
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+        this.ctx.beginPath();
+        this.ctx.arc(0, 23, 63, Math.PI, 0);
+        this.ctx.closePath();
+        this.ctx.fill();
+        // 主体
+        const coverGrad = this.ctx.createRadialGradient(0, 23, 0, 0, 23, 61);
+        coverGrad.addColorStop(0, '#8B8D8F');
+        coverGrad.addColorStop(0.3, '#7F8C8D');
+        coverGrad.addColorStop(0.6, '#6C7A7E');
+        coverGrad.addColorStop(1, '#5D6D7E');
+        this.ctx.fillStyle = coverGrad;
+        this.ctx.beginPath();
+        this.ctx.arc(0, 23, 61, Math.PI, 0);
+        this.ctx.closePath();
+        this.ctx.fill();
+        // 石块纹理
+        this.ctx.save();
+        this.ctx.globalAlpha = 0.3;
+        const stonesTop = [
+            { x: -40, y: 8, size: 12, darkness: 0.2 },
+            { x: -25, y: 5, size: 10, darkness: 0.15 },
+            { x: -10, y: 7, size: 14, darkness: 0.25 },
+            { x: 8, y: 10, size: 11, darkness: 0.18 },
+            { x: 28, y: 6, size: 13, darkness: 0.22 },
+            { x: 45, y: 12, size: 10, darkness: 0.2 }
+        ];
+        stonesTop.forEach(s => {
+            const d = Math.sqrt(s.x * s.x + (s.y - 23) * (s.y - 23));
+            if (d < 56 && s.y < 23) {
+                this.ctx.fillStyle = `rgba(0,0,0,${s.darkness})`;
+                this.ctx.beginPath();
+                this.ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+                this.ctx.fill();
+                this.ctx.fillStyle = `rgba(255,255,255,${s.darkness * 0.5})`;
+                this.ctx.beginPath();
+                this.ctx.arc(s.x - s.size * 0.3, s.y - s.size * 0.3, s.size * 0.4, 0, Math.PI * 2);
+                this.ctx.fill();
+            }
+        });
+        this.ctx.restore();
+        // 裂纹
         this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.25)';
         this.ctx.lineWidth = 1.5;
         this.ctx.lineCap = 'round';
+        const cracksTop = [
+            [{ x: -48, y: 10 }, { x: -35, y: 8 }, { x: -22, y: 9 }],
+            [{ x: 3, y: 6 }, { x: 15, y: 8 }, { x: 25, y: 7 }]
+        ];
+        cracksTop.forEach(c => {
+            this.ctx.beginPath();
+            this.ctx.moveTo(c[0].x, c[0].y);
+            for (let i = 1; i < c.length; i++) this.ctx.lineTo(c[i].x, c[i].y);
+            this.ctx.stroke();
+        });
+        // 顶缘描边（在剪裁内绘制）
+        this.ctx.strokeStyle = '#2C3E50';
+        this.ctx.lineWidth = 3;
+        this.ctx.beginPath();
+        this.ctx.arc(0, 23, 61, Math.PI, 0);
+        this.ctx.stroke();
+        this.ctx.restore();
         
-        // 不规则裂纹（调整到60px半径范围内）
+        // 裂纹
+        this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.25)';
+        this.ctx.lineWidth = 1.5;
+        this.ctx.lineCap = 'round';
         const cracks = [
             [{ x: -48, y: 12 }, { x: -35, y: 10 }, { x: -22, y: 11 }],
             [{ x: -28, y: 6 }, { x: -18, y: 8 }, { x: -8, y: 7 }],
@@ -1759,51 +1828,23 @@ class WordTetrisGame {
             [{ x: -38, y: 18 }, { x: -28, y: 20 }, { x: -18, y: 19 }],
             [{ x: 12, y: 16 }, { x: 22, y: 18 }, { x: 32, y: 20 }]
         ];
-        
-        cracks.forEach(crack => {
+        cracks.forEach(c => {
             this.ctx.beginPath();
-            this.ctx.moveTo(crack[0].x, crack[0].y);
-            for (let i = 1; i < crack.length; i++) {
-                this.ctx.lineTo(crack[i].x, crack[i].y);
-            }
+            this.ctx.moveTo(c[0].x, c[0].y);
+            for (let i = 1; i < c.length; i++) this.ctx.lineTo(c[i].x, c[i].y);
             this.ctx.stroke();
         });
         
-        // 基座底部平面（宽度120px）
+        // 底部平面 + 阴影 + 顶缘描边
         this.ctx.fillStyle = '#4A5A5E';
         this.ctx.fillRect(-60, 25, 120, 6);
-        
-        // 底部平面阴影
         this.ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
         this.ctx.fillRect(-60, 25, 120, 2);
-        
-        // 基座边缘高光（左侧）
-        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
-        this.ctx.beginPath();
-        this.ctx.arc(-30, 13, 18, Math.PI * 0.7, Math.PI * 1.3);
-        this.ctx.fill();
-        
-        // 基座边缘阴影（右侧）
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
-        this.ctx.beginPath();
-        this.ctx.arc(35, 16, 15, Math.PI * 1.7, Math.PI * 0.3);
-        this.ctx.fill();
-        
-        // 基座装饰边缘（深色轮廓）
         this.ctx.strokeStyle = '#2C3E50';
         this.ctx.lineWidth = 3;
         this.ctx.beginPath();
         this.ctx.arc(0, 25, 60, Math.PI, 0);
         this.ctx.stroke();
-        
-        // 基座底部边缘线
-        this.ctx.strokeStyle = '#1A252F';
-        this.ctx.lineWidth = 2;
-        this.ctx.beginPath();
-        this.ctx.moveTo(-60, 25);
-        this.ctx.lineTo(60, 25);
-        this.ctx.stroke();
-        
         this.ctx.restore();
         
         // 应用炮管旋转和后坐力（基座不受影响）
@@ -1812,39 +1853,7 @@ class WordTetrisGame {
             this.ctx.translate(0, this.cannon.recoil);
         }
         
-        // 2. 绘制炮台基座（连接堡垒和炮管）
-        // 炮台底部（圆柱形）
-        const platformGradient = this.ctx.createLinearGradient(-25, 0, 25, 0);
-        platformGradient.addColorStop(0, '#5D6D7E');
-        platformGradient.addColorStop(0.5, '#7F8C8D');
-        platformGradient.addColorStop(1, '#5D6D7E');
-        this.ctx.fillStyle = platformGradient;
-        this.ctx.fillRect(-25, -8, 50, 12);
-        
-        // 炮台顶部椭圆
-        const topGradient = this.ctx.createRadialGradient(0, -8, 0, 0, -8, 25);
-        topGradient.addColorStop(0, '#95A5A6');
-        topGradient.addColorStop(1, '#7F8C8D');
-        this.ctx.fillStyle = topGradient;
-        this.ctx.beginPath();
-        this.ctx.ellipse(0, -8, 25, 8, 0, 0, Math.PI * 2);
-        this.ctx.fill();
-        
-        // 炮台装饰环
-        this.ctx.strokeStyle = '#34495E';
-        this.ctx.lineWidth = 2;
-        this.ctx.beginPath();
-        this.ctx.ellipse(0, -8, 23, 7, 0, 0, Math.PI * 2);
-        this.ctx.stroke();
-        
-        // 炮台高光
-        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
-        this.ctx.fillRect(-25, -8, 8, 12);
-        this.ctx.beginPath();
-        this.ctx.ellipse(-8, -8, 10, 4, 0, 0, Math.PI * 2);
-        this.ctx.fill();
-        
-        // 3. 绘制木质支架（V形支撑）
+        // 2. 绘制木质支架（V形支撑）
         this.ctx.fillStyle = '#A0522D';
         // 左支架
         this.ctx.beginPath();
@@ -1874,7 +1883,7 @@ class WordTetrisGame {
         this.ctx.closePath();
         this.ctx.fill();
         
-        // 4. 绘制金属炮管（深灰色，分段设计）
+        // 3. 绘制金属炮管（深灰色，分段设计）
         // 炮管后段（粗）
         const barrelGradient1 = this.ctx.createLinearGradient(-15, 0, 15, 0);
         barrelGradient1.addColorStop(0, '#2C3E50');
@@ -2009,6 +2018,139 @@ class WordTetrisGame {
             }
         }
         
+        // 10. 绘制炮台基座（最后绘制，遮挡相交部分）
+        // 在绘制前，先用“擦除合成”清理相交区域内的炮管像素，避免任何锯齿边缘渗透
+        (function () {
+            const prevOp = this.ctx.globalCompositeOperation;
+            this.ctx.globalCompositeOperation = 'destination-out';
+            this.ctx.beginPath();
+            // 擦除区域：略大于平台顶部的椭圆，确保覆盖交界的所有角度
+            this.ctx.ellipse(0, -20, 27, 10, 0, 0, Math.PI * 2);
+            this.ctx.fill();
+            this.ctx.globalCompositeOperation = prevOp;
+        }).call(this);
+
+        // 炮台底部（圆柱形，向上移动覆盖炮管底部）
+        const platformGradient = this.ctx.createLinearGradient(-25, 0, 25, 0);
+        platformGradient.addColorStop(0, '#5D6D7E');
+        platformGradient.addColorStop(0.5, '#7F8C8D');
+        platformGradient.addColorStop(1, '#5D6D7E');
+        this.ctx.fillStyle = platformGradient;
+        this.ctx.fillRect(-25, -20, 50, 20); // 从-20到0，高度20px
+        
+        // 炮台顶部椭圆（上移到-20位置）
+        const topGradient = this.ctx.createRadialGradient(0, -20, 0, 0, -20, 25);
+        topGradient.addColorStop(0, '#95A5A6');
+        topGradient.addColorStop(1, '#7F8C8D');
+        this.ctx.fillStyle = topGradient;
+        // 确保使用普通覆盖模式，完全遮挡下面的炮管
+        const prevOp = this.ctx.globalCompositeOperation;
+        this.ctx.globalCompositeOperation = 'source-over';
+        this.ctx.beginPath();
+        this.ctx.ellipse(0, -20, 25, 8, 0, 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.globalCompositeOperation = prevOp;
+        
+        // 炮台装饰环（覆盖式描边）
+        const prevOp2 = this.ctx.globalCompositeOperation;
+        this.ctx.globalCompositeOperation = 'source-over';
+        this.ctx.strokeStyle = '#34495E';
+        this.ctx.lineWidth = 2;
+        this.ctx.beginPath();
+        this.ctx.ellipse(0, -20, 23, 7, 0, 0, Math.PI * 2);
+        this.ctx.stroke();
+        this.ctx.globalCompositeOperation = prevOp2;
+        
+        // 炮台高光
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+        this.ctx.fillRect(-25, -20, 8, 20);
+        this.ctx.beginPath();
+        this.ctx.ellipse(-8, -20, 10, 4, 0, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // 11. （移除移动半圆基座）不再在末尾绘制半圆基座，避免跟随炮管移动
+        /* this.ctx.save();
+        
+        // 基座阴影
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+        this.ctx.beginPath();
+        this.ctx.arc(0, 25, 62, Math.PI, 0);
+        this.ctx.closePath();
+        this.ctx.fill();
+        
+        // 半圆主体（石质渐变）
+        const baseGradient2 = this.ctx.createRadialGradient(0, 25, 0, 0, 25, 60);
+        baseGradient2.addColorStop(0, '#8B8D8F');
+        baseGradient2.addColorStop(0.3, '#7F8C8D');
+        baseGradient2.addColorStop(0.6, '#6C7A7E');
+        baseGradient2.addColorStop(1, '#5D6D7E');
+        this.ctx.fillStyle = baseGradient2;
+        this.ctx.beginPath();
+        this.ctx.arc(0, 25, 60, Math.PI, 0);
+        this.ctx.closePath();
+        this.ctx.fill();
+        
+        // 石块纹理
+        this.ctx.save();
+        this.ctx.globalAlpha = 0.3;
+        const stones = [
+            { x: -40, y: 8, size: 12, darkness: 0.2 },
+            { x: -25, y: 5, size: 10, darkness: 0.15 },
+            { x: -10, y: 7, size: 14, darkness: 0.25 },
+            { x: 8, y: 10, size: 11, darkness: 0.18 },
+            { x: 28, y: 6, size: 13, darkness: 0.22 },
+            { x: 45, y: 12, size: 10, darkness: 0.2 },
+            { x: -30, y: 15, size: 8, darkness: 0.15 },
+            { x: 18, y: 17, size: 9, darkness: 0.17 },
+            { x: -48, y: 18, size: 10, darkness: 0.19 },
+            { x: 38, y: 20, size: 11, darkness: 0.21 }
+        ];
+        stones.forEach(s => {
+            const d = Math.sqrt(s.x * s.x + (s.y - 25) * (s.y - 25));
+            if (d < 55 && s.y < 25) {
+                this.ctx.fillStyle = `rgba(0,0,0,${s.darkness})`;
+                this.ctx.beginPath();
+                this.ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+                this.ctx.fill();
+                this.ctx.fillStyle = `rgba(255,255,255,${s.darkness * 0.5})`;
+                this.ctx.beginPath();
+                this.ctx.arc(s.x - s.size * 0.3, s.y - s.size * 0.3, s.size * 0.4, 0, Math.PI * 2);
+                this.ctx.fill();
+            }
+        });
+        this.ctx.restore();
+        
+        // 裂纹
+        this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.25)';
+        this.ctx.lineWidth = 1.5;
+        this.ctx.lineCap = 'round';
+        const cracks2 = [
+            [{ x: -48, y: 12 }, { x: -35, y: 10 }, { x: -22, y: 11 }],
+            [{ x: -28, y: 6 }, { x: -18, y: 8 }, { x: -8, y: 7 }],
+            [{ x: 3, y: 8 }, { x: 15, y: 10 }, { x: 25, y: 9 }],
+            [{ x: 32, y: 13 }, { x: 42, y: 11 }, { x: 52, y: 15 }],
+            [{ x: -38, y: 18 }, { x: -28, y: 20 }, { x: -18, y: 19 }],
+            [{ x: 12, y: 16 }, { x: 22, y: 18 }, { x: 32, y: 20 }]
+        ];
+        cracks2.forEach(c => {
+            this.ctx.beginPath();
+            this.ctx.moveTo(c[0].x, c[0].y);
+            for (let i = 1; i < c.length; i++) this.ctx.lineTo(c[i].x, c[i].y);
+            this.ctx.stroke();
+        });
+        
+        // 底部平面 + 阴影 + 顶缘描边
+        this.ctx.fillStyle = '#4A5A5E';
+        this.ctx.fillRect(-60, 25, 120, 6);
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+        this.ctx.fillRect(-60, 25, 120, 2);
+        this.ctx.strokeStyle = '#2C3E50';
+        this.ctx.lineWidth = 3;
+        this.ctx.beginPath();
+        this.ctx.arc(0, 25, 60, Math.PI, 0);
+        this.ctx.stroke();
+        this.ctx.restore(); */
+        
         this.ctx.restore();
     }
     
@@ -2025,6 +2167,52 @@ class WordTetrisGame {
         this.ctx.lineTo(x, y + radius);
         this.ctx.quadraticCurveTo(x, y, x + radius, y);
         this.ctx.closePath();
+    }
+
+    // 顶层半圆基座覆盖：统一在render()末尾调用，避免被后续内容再覆盖
+    drawBaseOverlay() {
+        // 仅在playing/review时显示
+        if (this.gameState !== 'playing' && this.gameState !== 'review') return;
+        this.ctx.save();
+        // 不要继承任何旋转/后坐力：仅定位
+        this.ctx.translate(this.cannon.x, this.cannon.y);
+
+        // 剪裁半圆区域
+        this.ctx.save();
+        this.ctx.beginPath();
+        this.ctx.arc(0, 23, 61, Math.PI, 0);
+        this.ctx.lineTo(61, 23);
+        this.ctx.lineTo(-61, 23);
+        this.ctx.closePath();
+        this.ctx.clip();
+
+        // 在剪裁内完全重绘半圆（不透明）
+        // 阴影
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+        this.ctx.beginPath();
+        this.ctx.arc(0, 23, 63, Math.PI, 0);
+        this.ctx.closePath();
+        this.ctx.fill();
+        // 主体渐变
+        const grad = this.ctx.createRadialGradient(0, 23, 0, 0, 23, 61);
+        grad.addColorStop(0, '#8B8D8F');
+        grad.addColorStop(0.3, '#7F8C8D');
+        grad.addColorStop(0.6, '#6C7A7E');
+        grad.addColorStop(1, '#5D6D7E');
+        this.ctx.fillStyle = grad;
+        this.ctx.beginPath();
+        this.ctx.arc(0, 23, 61, Math.PI, 0);
+        this.ctx.closePath();
+        this.ctx.fill();
+        // 顶缘描边
+        this.ctx.strokeStyle = '#2C3E50';
+        this.ctx.lineWidth = 3;
+        this.ctx.beginPath();
+        this.ctx.arc(0, 23, 61, Math.PI, 0);
+        this.ctx.stroke();
+        this.ctx.restore();
+        
+        this.ctx.restore();
     }
     
     // 更新炮管瞄准角度（在updateGame中调用）
@@ -2172,9 +2360,9 @@ class WordTetrisGame {
                 flameGradient.addColorStop(1, 'rgba(255, 150, 0, 0)');
                 
                 this.ctx.fillStyle = flameGradient;
-                this.ctx.beginPath();
+            this.ctx.beginPath();
                 this.ctx.arc(flameX, flameY, 4, 0, Math.PI * 2);
-                this.ctx.fill();
+            this.ctx.fill();
             }
             
             this.ctx.restore();
