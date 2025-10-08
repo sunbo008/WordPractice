@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音频缓存系统测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 10px;
+        }
+        
+        .section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .section h2 {
+            color: #007bff;
+            margin-top: 0;
+        }
+        
+        .test-area {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+        
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #0056b3;
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .info {
+            background: #e7f3ff;
+            padding: 15px;
+            border-left: 4px solid #007bff;
+            margin: 10px 0;
+        }
+        
+        .success {
+            background: #d4edda;
+            padding: 15px;
+            border-left: 4px solid #28a745;
+            margin: 10px 0;
+        }
+        
+        .warning {
+            background: #fff3cd;
+            padding: 15px;
+            border-left: 4px solid #ffc107;
+            margin: 10px 0;
+        }
+        
+        .error {
+            background: #f8d7da;
+            padding: 15px;
+            border-left: 4px solid #dc3545;
+            margin: 10px 0;
+        }
+        
+        #console {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        #console .log-info { color: #4fc3f7; }
+        #console .log-success { color: #81c784; }
+        #console .log-warning { color: #ffb74d; }
+        #console .log-error { color: #e57373; }
+        
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        
+        .stats-table th,
+        .stats-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .stats-table th {
+            background: #007bff;
+            color: white;
+        }
+        
+        .stats-table tr:hover {
+            background: #f5f5f5;
+        }
+        
+        input[type="text"] {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎵 音频缓存系统测试页面</h1>
+    
+    <div class="section">
+        <h2>📋 系统信息</h2>
+        <div id="systemInfo">
+            <p>检测中...</p>
+        </div>
+    </div>
+    
+    <div class="section">
+        <h2>🎤 TTS 服务测试</h2>
+        <div class="test-area">
+            <input type="text" id="wordInput" placeholder="输入单词（如 hello）" value="hello">
+            <button onclick="testSpeak()">播放单词</button>
+            <button onclick="testSpeakMultiple()">播放多个单词</button>
+            <button onclick="stopSpeaking()">停止播放</button>
+        </div>
+        <div class="info">
+            💡 首次播放会下载音频并缓存，第二次播放会直接使用缓存
+        </div>
+    </div>
+    
+    <div class="section">
+        <h2>💾 缓存管理</h2>
+        <div class="test-area">
+            <button onclick="showCacheStats()">查看缓存统计</button>
+            <button onclick="clearCache()">清空所有缓存</button>
+            <button onclick="downloadLocalAudios()">批量下载音频（本地开发）</button>
+        </div>
+        <div id="cacheStats"></div>
+    </div>
+    
+    <div class="section">
+        <h2>🧪 测试场景</h2>
+        <div class="test-area">
+            <button onclick="testLocalFile()">测试本地文件优先级</button>
+            <button onclick="testIndexedDB()">测试 IndexedDB 缓存</button>
+            <button onclick="testOnlineDownload()">测试在线下载</button>
+            <button onclick="testCacheReuse()">测试缓存复用</button>
+        </div>
+    </div>
+    
+    <div class="section">
+        <h2>📊 控制台日志</h2>
+        <div class="test-area">
+            <button onclick="clearConsole()">清空日志</button>
+            <button onclick="copyConsole()">复制日志</button>
+        </div>
+        <div id="console"></div>
+    </div>
+    
+    <!-- 引入音频缓存管理器 -->
+    <script src="../src/utils/AudioCacheManager.js"></script>
+    
+    <!-- 引入 TTS 服务 -->
+    <script src="../src/utils/TTSService.js"></script>
+    
+    <script>
+        let ttsService;
+        let cacheManager;
+        const consoleDiv = document.getElementById('console');
+        
+        // 重写 console 方法，显示在页面上
+        const originalLog = console.log;
+        const originalWarn = console.warn;
+        const originalError = console.error;
+        
+        function addToConsole(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString('zh-CN', { 
+                hour12: false, 
+                fractionalSecondDigits: 3 
+            });
+            const line = document.createElement('div');
+            line.className = `log-${type}`;
+            line.textContent = `[${timestamp}] ${message}`;
+            consoleDiv.appendChild(line);
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addToConsole(args.join(' '), 'info');
+        };
+        
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            addToConsole(args.join(' '), 'warning');
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addToConsole(args.join(' '), 'error');
+        };
+        
+        // 初始化
+        async function init() {
+            console.log('🚀 开始初始化...');
+            
+            // 显示系统信息
+            const systemInfoDiv = document.getElementById('systemInfo');
+            const isLocal = location.hostname === 'localhost' || 
+                           location.hostname === '127.0.0.1' || 
+                           location.hostname === '';
+            const hasIndexedDB = 'indexedDB' in window;
+            
+            systemInfoDiv.innerHTML = `
+                <p><strong>环境：</strong>${isLocal ? '本地开发' : 'Vercel 部署'}</p>
+                <p><strong>浏览器：</strong>${navigator.userAgent}</p>
+                <p><strong>IndexedDB 支持：</strong>${hasIndexedDB ? '✅ 是' : '❌ 否'}</p>
+            `;
+            
+            // 初始化 TTS 服务
+            ttsService = TTSService.getInstance();
+            await ttsService.initialize();
+            
+            // 获取缓存管理器
+            cacheManager = AudioCacheManager.getInstance();
+            
+            console.log('✅ 初始化完成');
+            
+            // 显示初始缓存统计
+            await showCacheStats();
+        }
+        
+        // 播放单词
+        async function testSpeak() {
+            const word = document.getElementById('wordInput').value.trim();
+            if (!word) {
+                alert('请输入单词');
+                return;
+            }
+            
+            console.log(`🎤 播放单词: ${word}`);
+            
+            try {
+                await ttsService.speak(word, {
+                    showError: false,
+                    onSuccess: (provider, duration) => {
+                        console.log(`✅ 播放成功: ${word} (${provider}, ${duration}ms)`);
+                    },
+                    onError: (error) => {
+                        console.error(`❌ 播放失败: ${error.message || error}`);
+                    }
+                });
+            } catch (error) {
+                console.error(`❌ 播放异常: ${error.message || error}`);
+            }
+        }
+        
+        // 播放多个单词
+        async function testSpeakMultiple() {
+            const words = ['hello', 'world', 'good', 'morning', 'see'];
+            console.log(`🎤 播放 ${words.length} 个单词...`);
+            
+            for (const word of words) {
+                console.log(`   播放: ${word}`);
+                await ttsService.speak(word, { showError: false });
+                await new Promise(resolve => setTimeout(resolve, 500)); // 间隔500ms
+            }
+            
+            console.log('✅ 全部播放完成');
+            await showCacheStats();
+        }
+        
+        // 停止播放
+        function stopSpeaking() {
+            console.log('⏹️ 停止播放');
+            ttsService.stop();
+        }
+        
+        // 显示缓存统计
+        async function showCacheStats() {
+            console.log('📊 查询缓存统计...');
+            
+            try {
+                const stats = await cacheManager.getStats();
+                const statsDiv = document.getElementById('cacheStats');
+                
+                if (stats.total === 0) {
+                    statsDiv.innerHTML = '<div class="info">暂无缓存</div>';
+                } else {
+                    let html = `
+                        <div class="success">
+                            <strong>缓存统计：</strong>共 ${stats.total} 个音频，总大小 ${stats.totalSizeMB} MB
+                        </div>
+                        <table class="stats-table">
+                            <thead>
+                                <tr>
+                                    <th>单词</th>
+                                    <th>提供商</th>
+                                    <th>大小</th>
+                                    <th>缓存时间</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+                    
+                    stats.items.forEach(item => {
+                        html += `
+                            <tr>
+                                <td>${item.word}</td>
+                                <td>${item.provider}</td>
+                                <td>${item.sizeKB} KB</td>
+                                <td>${item.date}</td>
+                            </tr>
+                        `;
+                    });
+                    
+                    html += '</tbody></table>';
+                    statsDiv.innerHTML = html;
+                }
+                
+                console.log(`✅ 缓存统计: ${stats.total} 个音频, ${stats.totalSizeMB} MB`);
+                
+            } catch (error) {
+                console.error(`❌ 查询缓存统计失败: ${error.message || error}`);
+                document.getElementById('cacheStats').innerHTML = 
+                    `<div class="error">查询失败: ${error.message || error}</div>`;
+            }
+        }
+        
+        // 清空缓存
+        async function clearCache() {
+            if (!confirm('确定要清空所有缓存吗？')) {
+                return;
+            }
+            
+            console.log('🗑️ 清空缓存...');
+            
+            try {
+                await cacheManager.clearAllCache();
+                console.log('✅ 缓存已清空');
+                await showCacheStats();
+            } catch (error) {
+                console.error(`❌ 清空缓存失败: ${error.message || error}`);
+            }
+        }
+        
+        // 批量下载音频
+        function downloadLocalAudios() {
+            console.log('📥 批量下载音频...');
+            
+            if (typeof downloadLocalAudio === 'function') {
+                downloadLocalAudio();
+            } else {
+                console.warn('⚠️ downloadLocalAudio() 函数未定义，请先播放一些单词');
+            }
+        }
+        
+        // 测试本地文件优先级
+        async function testLocalFile() {
+            console.log('🧪 测试本地文件优先级...');
+            console.log('💡 请在 proj/audio/ 目录放置 test_baidu.mp3 文件');
+            
+            await ttsService.speak('test', { showError: false });
+        }
+        
+        // 测试 IndexedDB 缓存
+        async function testIndexedDB() {
+            console.log('🧪 测试 IndexedDB 缓存...');
+            
+            const testWord = 'cache';
+            
+            // 第一次播放（下载并缓存）
+            console.log('   第一次播放（应该下载）...');
+            await ttsService.speak(testWord, { showError: false });
+            
+            // 等待缓存保存
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // 第二次播放（使用缓存）
+            console.log('   第二次播放（应该使用缓存）...');
+            await ttsService.speak(testWord, { showError: false });
+            
+            console.log('✅ 测试完成');
+        }
+        
+        // 测试在线下载
+        async function testOnlineDownload() {
+            console.log('🧪 测试在线下载...');
+            
+            const randomWord = 'test' + Math.random().toString(36).substring(7);
+            console.log(`   随机单词: ${randomWord}`);
+            
+            await ttsService.speak(randomWord, { showError: false });
+            
+            console.log('✅ 测试完成');
+        }
+        
+        // 测试缓存复用
+        async function testCacheReuse() {
+            console.log('🧪 测试缓存复用...');
+            
+            const word = 'reuse';
+            
+            // 播放3次
+            for (let i = 1; i <= 3; i++) {
+                console.log(`   第 ${i} 次播放...`);
+                await ttsService.speak(word, { showError: false });
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+            
+            console.log('✅ 测试完成（应该只有第1次下载，后2次使用缓存）');
+        }
+        
+        // 清空控制台
+        function clearConsole() {
+            consoleDiv.innerHTML = '';
+            console.log('🗑️ 日志已清空');
+        }
+        
+        // 复制控制台
+        function copyConsole() {
+            const text = consoleDiv.innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('日志已复制到剪贴板');
+            }).catch(err => {
+                console.error('复制失败:', err);
+            });
+        }
+        
+        // 页面加载时初始化
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
+

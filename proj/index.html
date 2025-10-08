@@ -226,11 +226,34 @@
         })();
     </script>
     
+    <!-- 脚本加载错误处理 -->
+    <script>
+        window.addEventListener('error', function(e) {
+            if (e.filename) {
+                console.error('❌ 脚本加载失败:', e.filename, e.message);
+            }
+        }, true);
+    </script>
+    
+    <!-- 引入音频缓存管理器 -->
+    <script src="src/utils/AudioCacheManager.js?v=20251008" onerror="console.error('❌ AudioCacheManager.js 加载失败')"></script>
+    
     <!-- 引入 TTS 服务 -->
-    <script src="/src/utils/TTSService.js"></script>
-    <script src="/src/core/vocabulary-config-loader.js?v=20251007-4"></script>
-    <script src="/src/core/vocabulary-manager-v2.js?v=20251007-4"></script>
-    <script src="/src/core/WordTetrisGame.js?v=20251007-4"></script>
-    <script src="/src/core/game-settings-integration.js?v=20251007-4"></script>
+    <script src="src/utils/TTSService.js?v=20251008" onerror="console.error('❌ TTSService.js 加载失败')"></script>
+    <script>
+        // 检查 TTSService 是否成功加载
+        setTimeout(function() {
+            if (typeof TTSService === 'undefined' && typeof window.TTSService === 'undefined') {
+                console.error('❌ TTSService 未定义！文件可能有语法错误或未正确导出');
+                console.error('   请打开浏览器控制台查看详细错误信息');
+            } else {
+                console.log('✅ TTSService 加载成功');
+            }
+        }, 100);
+    </script>
+    <script src="src/core/vocabulary-config-loader.js?v=20251007-4"></script>
+    <script src="src/core/vocabulary-manager-v2.js?v=20251007-4"></script>
+    <script src="src/core/WordTetrisGame.js?v=20251007-4"></script>
+    <script src="src/core/game-settings-integration.js?v=20251007-4"></script>
 </body>
 </html>

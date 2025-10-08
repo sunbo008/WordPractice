@@ -338,14 +338,20 @@
         <div>
             <div class="log-title">
                 📝 日志输出
-                <button class="btn-secondary" onclick="clearLog()" style="margin-left: auto; padding: 5px 15px; font-size: 14px;">
-                    清空日志
+                <button class="btn-secondary" onclick="copyLog()" style="margin-left: auto; padding: 5px 15px; font-size: 14px; margin-right: 10px;">
+                    📋 复制日志
+                </button>
+                <button class="btn-secondary" onclick="clearLog()" style="padding: 5px 15px; font-size: 14px;">
+                    🗑️ 清空日志
                 </button>
             </div>
             <div class="log-section" id="logContainer"></div>
         </div>
     </div>
 
+    <!-- 引入音频缓存管理器 -->
+    <script src="../src/utils/AudioCacheManager.js"></script>
+    
     <!-- 引入 TTS 服务 -->
     <script src="../src/utils/TTSService.js"></script>
 
@@ -373,6 +379,27 @@
             logContainer.scrollTop = logContainer.scrollHeight;
         }
 
+        function copyLog() {
+            const logContainer = document.getElementById('logContainer');
+            const logEntries = logContainer.querySelectorAll('.log-entry');
+            
+            let logText = '';
+            logEntries.forEach(entry => {
+                logText += entry.textContent + '\n';
+            });
+            
+            if (logText.trim() === '') {
+                addLog('❌ 没有日志可复制', 'error');
+                return;
+            }
+            
+            navigator.clipboard.writeText(logText).then(() => {
+                addLog('✅ 日志已复制到剪贴板', 'success');
+            }).catch(err => {
+                addLog('❌ 复制失败: ' + err.message, 'error');
+            });
+        }
+        
         function clearLog() {
             document.getElementById('logContainer').innerHTML = '';
             addLog('日志已清空', 'info');

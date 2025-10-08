@@ -1107,7 +1107,8 @@ if (cannon.recoil < 0.1) {
        - 其他：百度 TTS > 有道 TTS > Bing TTS > Web Speech API
      - **音频上下文激活**：
        - iOS 设备：游戏开始时激活 Web Speech API（无需复杂解锁）
-       - 其他设备：游戏开始时解锁 Audio 对象播放权限
+       - 非 iOS 设备：跳过 iOS 特定的音频解锁逻辑
+       - 仅在用户交互时（点击、按键）激活
      - **错误处理优化**：
        - iOS 设备的 Audio 播放失败视为正常（已使用 Web Speech API）
        - 自动降级到下一个可用提供商
@@ -1116,14 +1117,480 @@ if (cannon.recoil < 0.1) {
      - Web Speech API：自动选择英式语音（Google UK English Female/Male）
      - 第三方 TTS：通过 URL 参数指定英式发音
    
-   - **朗读触发时机**：
-     - 单词开始下降时立即播放第一次
-     - 启动定时器，每 5 秒自动重复播放
+   - **语音缓存系统**：双模式存储（本地开发 + Vercel部署）
+     
+     **核心功能**：
+     - **自动缓存**：首次播放单词时下载音频并缓存，后续播放直接使用缓存
+     - **持久化存储**：关闭网页、刷新页面、部署新版本后缓存依然存在
+     - **双模式存储**：
+       - 本地开发：优先使用 `proj/audio/` 目录的 MP3 文件
+       - Vercel部署：自动使用浏览器 IndexedDB 存储
+     - **文件命名规范**：`{word}_{provider}.mp3`（如 `hello_baidu.mp3`）
+     
+     **本地开发环境**：
+     - **检查顺序**：
+       1. 本地文件（`proj/audio/`）→ 直接播放
+       2. 无本地文件 → 在线下载 → 提示保存到本地
+     - **保存流程**：
+       1. 游戏播放单词时自动下载音频
+       2. 控制台执行 `downloadLocalAudio()` 批量下载
+       3. 手动保存到 `proj/audio/` 目录
+       4. 通过 git 提交到代码库
+     - **优势**：
+       - 可通过 git 管理音频文件
+       - 部署到 Vercel 后自动可用
+       - 减少在线TTS请求次数
+     
+     **Vercel生产环境**：
+     - **检查顺序**：
+       1. 本地文件（`proj/audio/`，如果有）→ 直接播放
+       2. IndexedDB 缓存 → 直接播放
+       3. 无缓存 → 在线下载 → 自动保存到 IndexedDB → 播放
+     - **自动缓存**：
+       - 首次播放：下载 + 保存到 IndexedDB（异步）
+       - 后续播放：直接从 IndexedDB 读取（秒开）
+     - **持久化**：
+       - 关闭网页后缓存依然存在
+       - 刷新页面后直接使用缓存
+       - 部署新版本后缓存不丢失
+     - **优势**：
+       - 用户首次访问后自动建立缓存
+       - 多次访问越来越快
+       - 减少网络流量和TTS服务压力
+     
+     **IndexedDB 技术细节**：
+     - **数据库名**：`WordTetrisAudioCache`
+     - **对象存储**：`audios`
+     - **复合索引**：`word_provider`（word + provider）
+     - **数据结构**：
+       ```javascript
+       {
+         id: 1,                    // 自增主键
+         word: "hello",            // 单词（小写）
+         provider: "baidu",        // 提供商（小写）
+         blob: Blob,               // 音频二进制数据
+         timestamp: 1696780800000  // 保存时间戳
+       }
+       ```
+     - **存储容量**：通常 50MB - 数GB（取决于浏览器）
+     - **浏览器支持**：Chrome、Edge、Firefox、Safari（包括iOS）
+     
+     **缓存管理 API**：
+     - **查看缓存统计**：
+       ```javascript
+       const cacheManager = AudioCacheManager.getInstance();
+       const stats = await cacheManager.getStats();
+       console.log(stats); // { total: 25, totalSizeMB: "0.49", items: [...] }
+       ```
+     - **清空缓存**：
+       ```javascript
+       await cacheManager.clearAllCache();
+       ```
+     - **批量下载（本地开发）**：
+       ```javascript
+       downloadLocalAudio(); // 下载所有待保存的音频
+       ```
+     
+     **错误降级策略**：
+     - IndexedDB 初始化失败 → 降级到在线模式
+     - 本地文件读取失败 → 检查 IndexedDB
+     - IndexedDB 读取失败 → 在线下载
+     - 缓存保存失败 → 不影响播放，静默处理
+     
+     **性能优化**：
+     - 异步保存：下载后立即播放，保存操作异步进行
+     - 内存缓存：已使用的 Blob URL 缓存到内存，避免重复创建
+     - 资源释放：播放完成后释放 Blob URL，防止内存泄漏
+     - 并发下载：多个单词可同时下载（受浏览器限制）
+     
+     **技术实现细节**：
+     
+     **(1) AudioCacheManager 类设计**：
+     ```javascript
+     class AudioCacheManager {
+       // 核心属性
+       dbName: "WordTetrisAudioCache"
+       dbVersion: 1
+       storeName: "audios"
+       db: IDBDatabase
+       isLocal: boolean  // 环境检测结果
+       blobUrlCache: Map // 内存缓存
+       
+       // 核心方法
+       async initialize()                          // 初始化 IndexedDB
+       async hasCache(word, provider)              // 检查缓存是否存在
+       async getCache(word, provider)              // 获取缓存音频（返回 Blob URL）
+       async saveCache(word, provider, audioBlob)  // 保存缓存
+       async downloadAudio(url)                    // 下载在线音频为 Blob
+       isLocalDevelopment()                        // 环境检测
+       async checkLocalFile(word, provider)        // 检查本地文件
+       getLocalFilePath(word, provider)            // 获取本地文件路径
+       async getStats()                            // 获取缓存统计
+       async clearAllCache()                       // 清空所有缓存
+       clearBlobUrlCache()                         // 清理内存缓存
+     }
+     ```
+     
+     **(2) IndexedDB 数据结构**：
+     ```javascript
+     数据库名: "WordTetrisAudioCache"
+     版本: 1
+     对象存储: "audios"
+     主键: id (自增)
+     复合索引: word_provider (word + provider, unique)
+     时间戳索引: timestamp (用于清理旧缓存)
+     
+     数据记录:
+     {
+       id: 1,                    // 自增主键
+       word: "hello",            // 单词（小写）
+       provider: "baidu",        // 提供商（小写）
+       blob: Blob,               // 音频二进制数据
+       timestamp: 1696780800000  // 保存时间戳
+     }
+     ```
+     
+     **(3) TTSService 集成改造**：
+     
+     **构造函数新增**：
+     ```javascript
+     this.cacheManager = null;      // 延迟初始化
+     this.cacheEnabled = true;      // 是否启用缓存
+     ```
+     
+     **initialize() 方法改造**：
+     ```javascript
+     async initialize() {
+       // 1. 初始化缓存管理器
+       if (!this.cacheManager && this.cacheEnabled) {
+         this.cacheManager = AudioCacheManager.getInstance();
+         await this.cacheManager.initialize();
+       }
+       
+       // 2. 原有的 TTS 提供商测试逻辑
+       // ...
+     }
+     ```
+     
+     **_speakWithAudioURL() 方法改造**：
+     ```javascript
+     async _speakWithAudioURL(url, providerName, volume, word) {
+       // 如果启用缓存且提供了单词
+       if (this.cacheEnabled && this.cacheManager && word) {
+         const providerKey = this._getProviderKey(providerName);
+         
+         // 1. 检查缓存
+         if (await this.cacheManager.hasCache(word, providerKey)) {
+           const cachedUrl = await this.cacheManager.getCache(word, providerKey);
+           return await this._playAudio(cachedUrl, volume, providerName);
+         }
+         
+         // 2. 下载音频
+         const audioBlob = await this.cacheManager.downloadAudio(url);
+         
+         // 3. 保存缓存（异步，不阻塞播放）
+         this.cacheManager.saveCache(word, providerKey, audioBlob);
+         
+         // 4. 播放
+         const blobUrl = URL.createObjectURL(audioBlob);
+         return await this._playAudio(blobUrl, volume, providerName);
+       }
+       
+       // 未启用缓存，直接播放
+       return await this._playAudio(url, volume, providerName);
+     }
+     ```
+     
+     **新增辅助方法**：
+     ```javascript
+     _getProviderKey(providerName) {
+       if (providerName.includes('百度')) return 'baidu';
+       if (providerName.includes('有道')) return 'youdao';
+       if (providerName.includes('Bing')) return 'bing';
+       return 'unknown';
+     }
+     
+     _playAudio(audioUrl, volume, providerName) {
+       return new Promise((resolve, reject) => {
+         const audio = new Audio(audioUrl);
+         audio.volume = volume;
+         
+         audio.onended = () => {
+           // 释放 Blob URL
+           if (audioUrl.startsWith('blob:')) {
+             URL.revokeObjectURL(audioUrl);
+           }
+           resolve();
+         };
+         
+         // ... 其他事件处理
+       });
+     }
+     ```
+     
+     **提供商配置修改**（所有提供商）：
+     ```javascript
+     speak: (word, volume = 1.0) => this._speakWithAudioURL(
+       url,
+       providerName,
+       volume,
+       word  // ← 新增：传递单词用于缓存
+     )
+     ```
+     
+     **(4) 缓存检查流程**：
+     ```
+     播放单词
+       ↓
+     1. 检查本地文件 (proj/audio/{word}_{provider}.mp3)
+       ↓ 存在 → 直接播放
+       ↓ 不存在
+     2. 检查 IndexedDB (word + provider 复合索引查询)
+       ↓ 存在 → 创建 Blob URL → 播放
+       ↓ 不存在
+     3. 在线下载 (fetch TTS URL)
+       ↓
+     4. 保存缓存
+       - 本地开发：提示下载文件（console + downloadLocalAudio()）
+       - Vercel部署：自动保存到 IndexedDB（异步）
+       ↓
+     5. 创建 Blob URL
+       ↓
+     6. 播放音频
+       ↓
+     7. 播放完成后释放 Blob URL
+     ```
+     
+     **(5) 环境检测逻辑**：
+     ```javascript
+     isLocalDevelopment() {
+       const hostname = location.hostname;
+       return hostname === 'localhost' || 
+              hostname === '127.0.0.1' || 
+              hostname === '' ||
+              hostname.startsWith('192.168.') ||  // 局域网
+              hostname.startsWith('10.');         // 局域网
+     }
+     ```
+     
+     **(6) 本地文件下载机制**（本地开发环境）：
+     ```javascript
+     // 全局下载队列
+     window._audioCacheDownloadQueue = [];
+     
+     // 添加到下载队列
+     _promptDownloadFile(word, provider, audioBlob) {
+       const fileName = `${word.toLowerCase()}_${provider.toLowerCase()}.mp3`;
+       
+       window._audioCacheDownloadQueue.push({
+         word,
+         provider,
+         blob: audioBlob,
+         fileName
+       });
+       
+       console.log(`💡 建议下载文件: ${fileName}`);
+       console.log(`   保存到: proj/audio/${fileName}`);
+     }
+     
+     // 全局批量下载函数
+     window.downloadLocalAudio = () => {
+       const queue = window._audioCacheDownloadQueue || [];
+       queue.forEach((item, index) => {
+         setTimeout(() => {
+           const url = URL.createObjectURL(item.blob);
+           const a = document.createElement('a');
+           a.href = url;
+           a.download = item.fileName;
+           a.click();
+           URL.revokeObjectURL(url);
+         }, index * 500); // 间隔500ms，避免浏览器阻止
+       });
+       window._audioCacheDownloadQueue = [];
+     };
+     ```
+     
+     **(7) Blob URL 内存管理**：
+     ```javascript
+     // 内存缓存
+     this.blobUrlCache = new Map(); // key: "word_provider", value: blobUrl
+     
+     // 获取缓存时先检查内存
+     async getCache(word, provider) {
+       const cacheKey = `${word}_${provider}`;
+       
+       // 1. 检查内存缓存
+       if (this.blobUrlCache.has(cacheKey)) {
+         return this.blobUrlCache.get(cacheKey);
+       }
+       
+       // 2. 检查本地文件
+       // 3. 检查 IndexedDB
+       // ...
+       
+       // 缓存到内存
+       this.blobUrlCache.set(cacheKey, blobUrl);
+       return blobUrl;
+     }
+     
+     // 清理内存缓存
+     clearBlobUrlCache() {
+       this.blobUrlCache.forEach(blobUrl => {
+         URL.revokeObjectURL(blobUrl);
+       });
+       this.blobUrlCache.clear();
+     }
+     ```
+     
+     **(8) 错误降级策略**：
+     ```javascript
+     // 缓存操作失败不影响播放
+     try {
+       // 尝试使用缓存
+       if (await this.cacheManager.hasCache(word, provider)) {
+         return await this._playAudio(cachedUrl, volume);
+       }
+       
+       // 尝试下载并缓存
+       const audioBlob = await this.cacheManager.downloadAudio(url);
+       this.cacheManager.saveCache(word, provider, audioBlob); // 异步，不等待
+       return await this._playAudio(blobUrl, volume);
+       
+     } catch (error) {
+       // 降级到直接播放在线 URL
+       console.warn('缓存操作失败，降级到在线播放');
+       return await this._playAudio(url, volume);
+     }
+     ```
+     
+     **(9) 文件命名规范**：
+     ```
+     格式: {word}_{provider}.mp3
+     规则:
+     - word: 全部小写
+     - provider: 全部小写（baidu/youdao/bing）
+     - 扩展名: .mp3
+     
+     示例:
+     ✅ hello_baidu.mp3
+     ✅ world_youdao.mp3
+     ✅ good_bing.mp3
+     
+     ❌ Hello_Baidu.mp3  (大写)
+     ❌ hello-baidu.mp3  (连字符)
+     ❌ hello_baidu.wav  (错误格式)
+     ```
+     
+     **(10) 测试验证要点**：
+     
+     **本地开发测试**：
+     - 首次播放单词，控制台提示可以下载
+     - 执行 `downloadLocalAudio()` 后浏览器提示下载
+     - 将文件保存到 `proj/audio/` 目录
+     - 第二次播放使用本地文件（控制台显示"使用本地文件"）
+     - 文件可以通过 `git add proj/audio/*.mp3` 提交
+     
+     **Vercel部署测试**：
+     - 首次播放单词自动缓存到 IndexedDB（控制台显示"保存到 IndexedDB"）
+     - 刷新页面后直接使用 IndexedDB 缓存（控制台显示"从 IndexedDB 读取"）
+     - 关闭浏览器重新打开后缓存依然存在
+     - 部署新版本后缓存不丢失（验证方法：更新代码版本后刷新页面，缓存依然可用）
+     
+     **跨浏览器测试**：
+     - Chrome/Edge：完整支持（推荐）
+     - Firefox：完整支持
+     - Safari（macOS）：完整支持
+     - Safari（iOS）：完整支持（使用 Web Speech API 优先）
+   
+   - **游戏模式差异化播放策略**：
+     
+     **😊 休闲模式（Casual Mode）**：
+     - **初次播放延迟**：单词开始下降后，延迟 2 秒播放第一次音频
+     - **重复播放间隔**：每 5 秒重复播放一次
+     - **播放停止时机**：
+       - 单词被停止（调用 `stopSpeaking()`）
+       - 清除首次播放定时器（2秒延迟）
+       - 清除重复播放定时器（5秒间隔）
+     - **设计理念**：给学生充足的思考时间，降低焦虑感
+     
+    **🔥 挑战模式（Challenge Mode）**：
+    - **缓冲区倒数播放**：单词在缓冲区**开始倒数时**（红灯亮起时）立即播放第一次音频
+    - **播放时机优化**：音频播放与倒数同步开始（红灯→黄灯→绿灯）
+    - **下降时播放策略**：
+      - 单词开始下降时，**不立即播放**（避免与缓冲区播放冲突）
+      - 仅设置 5 秒重复播放定时器
+      - 如果缓冲区播放成功，5秒后进行第一次重复
+      - 如果缓冲区播放失败，立即进行第一次播放，并设置 5 秒重复播放
+    - **重复播放间隔**：每 5 秒重复播放一次
+    - **播放失败重试**：
+      - 播放失败后立即尝试下一个 TTS 提供商
+      - 不等待 5 秒，直接重试
+    - **设计理念**：提前播放增强记忆压力，模拟考试环境
+   
+   - **播放超时控制**：
+     - **统一超时时间**：所有模式使用 3 秒超时限制
+     - **超时计算方式**：每个 TTS 提供商独立计时
+     - **超时处理**：
+       - 单个提供商超时后，自动尝试下一个，并降低该提供商的优先级（也就是移动到队列尾部）
+       - 记录失败次数，3 次失败后自动移除该提供商
+       - 超时不影响游戏进行，静默处理
+   
+   - **取消令牌系统**：
+     - **设计原因**：解决多个播放请求并发时的取消冲突
+     - **实现机制**：
+       - 为每个 `speak()` 调用分配唯一 ID（单调递增）
+       - 使用 ID 集合追踪活跃和已取消的调用
+       - 独立检查每个调用的取消状态
+     - **ID 管理**：
+       - `currentSpeakId`：计数器，分配唯一 ID
+       - `activeSpeakIds`：Set，存储当前活跃的调用 ID
+       - `cancelledSpeakIds`：Set，存储已取消的调用 ID
+     - **溢出保护**：
+       - 检测 ID 接近 `Number.MAX_SAFE_INTEGER`（9千万亿）
+       - 自动重置计数器并清理取消记录
+       - 实际使用中几乎不可能触发（需要连续运行 1644 万年）
+     - **取消逻辑**：
+       - 外部取消（单词失败、暂停）：标记所有活跃 ID 为已取消
+       - 内部清理（提供商失败）：仅清理资源，不取消其他尝试
+       - 取消检查：在循环开始和 Promise 完成后检查
+     - **内存管理**：
+       - ID 使用后立即从集合中删除
+       - 重置时清空所有集合
+       - 防止内存泄漏
+   
+   - **游戏状态检查**：
+     - **播放前检查**：`speakWord()` 方法检查 `gameState`
+     - **允许播放状态**：仅在 `gameState === 'playing'` 时播放
+     - **阻止播放场景**：
+       - 游戏暂停（`paused`）
+       - 游戏结束（`gameOver`）
+       - 游戏停止（`stopped`）
+       - 升级过渡（`levelup`）
+     - **设计目的**：防止游戏暂停后音频继续播放
    
    - **朗读停止条件**：
      - 单词被成功射击击落时停止
      - 单词被放入堆叠区时停止
-     - 清除定时器，停止后续重复播放
+     - 游戏暂停时停止
+     - 清除所有定时器（首次播放、重复播放）
+     - 调用 `TTSService.stop()` 停止当前音频
+   
+   - **错误处理与日志**：
+     - **错误分类**：
+       - 🚫 浏览器限制（NotAllowedError）
+       - 🍎 iOS 设备限制（Audio 对象限制）
+       - ⏱️ TTS 服务超时（3秒限制）
+       - 🌐 网络问题（加载失败、403、404）
+       - ⚠️ 播放被中断（正常现象，不计入失败）
+     - **日志级别**：
+       - `info`（白色）：正常操作、播放中断
+       - `warning`（黄色）：真正的错误、提供商失败
+       - `error`（红色）：所有提供商不可用
+     - **详细信息**：
+       - 显示单词、提供商名称、失败序号
+       - 显示播放开始时间、用时、超时限制
+       - 显示错误类型、原因、解决建议
+       - 显示调用堆栈（调试用）
    
    - **音量控制**：提供音量调节和静音选项
    
@@ -1131,6 +1598,7 @@ if (cannon.recoil < 0.1) {
      - 提供商失败时自动切换到下一个
      - 所有提供商失败时静默处理（不影响游戏）
      - 连续失败 3 次的提供商自动移除
+     - 自动重新初始化并重试
 
 6. **数据存储模块**
    - 游戏进度保存
@@ -1344,6 +1812,154 @@ if (cannon.recoil < 0.1) {
 ---
 
 ## 📝 设计更新日志
+
+### 2025-10-08 更新 v13
+- **语音缓存系统实现**：双模式存储（本地开发 + Vercel部署）
+  
+  **🎯 核心功能**：
+  
+  1. **自动音频缓存**：
+     - 首次播放单词时自动下载 TTS 音频并缓存
+     - 后续播放直接使用缓存，无需重新下载
+     - 支持多个 TTS 提供商独立缓存（baidu/youdao/bing）
+  
+  2. **本地开发环境**：
+     - 优先使用 `proj/audio/` 目录的 MP3 文件
+     - 无缓存时自动下载音频并提示保存
+     - 控制台执行 `downloadLocalAudio()` 批量下载
+     - 手动保存到本地目录后可通过 git 提交
+     - 文件命名：`{word}_{provider}.mp3`（如 `hello_baidu.mp3`）
+  
+  3. **Vercel 生产环境**：
+     - 自动使用浏览器 IndexedDB 持久化存储
+     - 首次播放下载并保存到 IndexedDB
+     - 后续访问直接从 IndexedDB 读取（秒开）
+     - 关闭网页、刷新页面、部署新版本后缓存不丢失
+     - 支持 Chrome、Edge、Firefox、Safari（包括 iOS）
+  
+  4. **IndexedDB 技术实现**：
+     - 数据库名：`WordTetrisAudioCache`
+     - 对象存储：`audios`（自增主键）
+     - 复合索引：`word_provider`（快速查询）
+     - 数据结构：`{ word, provider, blob, timestamp }`
+     - 存储容量：50MB - 数GB（取决于浏览器）
+  
+  5. **性能优化**：
+     - 异步保存：下载后立即播放，保存操作不阻塞
+     - 内存缓存：已使用的 Blob URL 缓存到内存
+     - 资源释放：播放完成后自动释放 Blob URL
+     - 错误降级：缓存失败时降级到在线播放
+  
+  6. **缓存管理 API**：
+     - `getStats()`：查看缓存统计（数量、大小、详情）
+     - `clearAllCache()`：清空所有缓存
+     - `downloadLocalAudio()`：批量下载音频文件（本地开发）
+  
+  **📁 新增文件**：
+  - `proj/src/utils/AudioCacheManager.js`：音频缓存管理器
+  - `proj/audio/.gitkeep`：空目录占位
+  - `proj/audio/README.md`：使用说明
+  
+  **🔧 修改文件**：
+  - `proj/src/utils/TTSService.js`：
+    - 集成 AudioCacheManager
+    - 修改 `_speakWithAudioURL()` 支持缓存
+    - 新增 `_getProviderKey()` 提取提供商简称
+    - 新增 `_playAudio()` 统一播放逻辑
+    - 所有提供商的 `speak` 函数传递 word 参数
+  - `proj/index.html`：加载 AudioCacheManager.js
+  - `word_tetris_game_design.md`：添加语音缓存系统文档
+  
+  **✅ 验证要点**：
+  - 本地开发：首次播放提示下载，执行 `downloadLocalAudio()` 保存文件
+  - Vercel部署：首次播放自动缓存，刷新页面后直接使用缓存
+  - 跨浏览器：Chrome/Edge/Firefox/Safari 均支持 IndexedDB
+  - git 提交：`proj/audio/` 目录的 MP3 文件可提交到代码库
+
+### 2025-10-08 更新 v12
+- **音频播放系统全面优化**：解决播放冲突、取消逻辑、游戏状态联动等核心问题
+  
+  **🎯 核心问题修复**：
+  
+  1. **游戏模式差异化播放策略**：
+     - **休闲模式**：
+       - 单词开始下降后延迟 2 秒播放第一次
+       - 每 5 秒重复播放
+       - 给学生充足思考时间
+    - **挑战模式**：
+      - 单词在缓冲区**开始倒数时**（红灯亮起时）立即播放
+      - 下降时仅设置 5 秒重复定时器（避免播放冲突）
+      - 提前播放增强记忆压力
+  
+  2. **取消令牌系统（Cancel Token）**：
+     - **问题**：多个 `speak()` 调用共享全局 `isCancelled` 标志，导致取消冲突
+     - **解决方案**：
+       - 为每个 `speak()` 调用分配唯一 ID（单调递增）
+       - 使用 `activeSpeakIds` Set 追踪活跃调用
+       - 使用 `cancelledSpeakIds` Set 追踪已取消调用
+       - 独立检查每个调用的取消状态
+     - **溢出保护**：
+       - 检测 ID 接近 `Number.MAX_SAFE_INTEGER`（9千万亿）
+       - 自动重置计数器，实际永远不会触发
+     - **内存管理**：
+       - 调用完成后立即删除 ID
+       - 防止内存泄漏
+  
+  3. **`stop()` 方法优化**：
+     - **参数化控制**：添加 `setCancelled` 参数（默认 `true`）
+     - **区分场景**：
+       - `stop(true)`：外部主动取消（单词失败、暂停）→ 标记所有活跃调用为已取消
+       - `stop(false)`：内部清理资源（提供商失败）→ 仅清理，允许继续尝试其他提供商
+     - **调用堆栈追踪**：日志显示 `stop()` 调用来源，便于调试
+  
+  4. **游戏状态联动检查**：
+     - **播放前检查**：`speakWord()` 检查 `gameState`
+     - **允许播放**：仅在 `gameState === 'playing'` 时播放
+     - **阻止场景**：暂停、结束、停止、升级过渡时不播放
+     - **解决问题**：防止游戏暂停后音频继续播放
+  
+  5. **iOS 设备检测优化**：
+     - **自动检测**：通过 `navigator.userAgent` 检测 iOS 设备
+     - **条件执行**：iOS 音频解锁逻辑仅在 iOS 设备上运行
+     - **跳过非 iOS**：非 iOS 设备跳过 iOS 特定逻辑
+  
+  6. **超时控制优化**：
+     - **统一超时**：所有模式使用 3 秒超时（从 1 秒 → 2 秒 → 3 秒演进）
+     - **独立计时**：每个 TTS 提供商独立计时
+     - **超时处理**：超时后自动尝试下一个提供商
+  
+  7. **错误处理与日志优化**：
+     - **错误分类**：
+       - 🚫 浏览器限制（NotAllowedError）
+       - 🍎 iOS 设备限制（Audio 对象限制）
+       - ⏱️ TTS 服务超时（3秒限制）
+       - 🌐 网络问题（加载失败、403、404）
+       - ⚠️ 播放被中断（正常现象，不计入失败）
+     - **日志级别优化**：
+       - `info`（白色）：正常操作、播放中断
+       - `warning`（黄色）：真正的错误、提供商失败
+       - `error`（红色）：所有提供商不可用
+     - **详细信息增强**：
+       - 显示单词、提供商名称、失败序号
+       - 显示播放开始时间、实际用时、超时限制
+       - 显示错误类型、原因、解决建议
+       - 显示调用堆栈（调试用）
+       - 显示取消令牌 ID（调试用）
+  
+  **🎨 实现细节**：
+  - **文件修改**：
+    - `proj/src/core/WordTetrisGame.js`：游戏逻辑、模式差异化、状态检查
+    - `proj/src/utils/TTSService.js`：取消令牌系统、超时控制、错误处理
+  - **数据结构**：
+    - `currentSpeakId`：Number，speak() 调用计数器
+    - `activeSpeakIds`：Set\<Number\>，当前活跃的调用 ID
+    - `cancelledSpeakIds`：Set\<Number\>，已取消的调用 ID
+  - **关键方法**：
+    - `speak(word, options)`：分配 ID、检查取消、清理 ID
+    - `stop(setCancelled = true)`：标记取消或仅清理
+    - `speakWord(word)`：游戏状态检查
+    - `startRepeatedSpeech(word)`：模式差异化逻辑
+    - `startBufferCountdown()`：挑战模式缓冲区播放
 
 ### 2025-10-08 更新 v11
 - **iOS 音频播放优化**：完美解决 iOS 设备 TTS 播放限制问题

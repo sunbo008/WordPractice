@@ -8,8 +8,12 @@
  * await tts.speak('hello');
  */
 
+// 标记文件开始执行
+window._TTSServiceLoadStart = true;
+console.log('🔧 [TTSService.js] 文件开始执行...');
+
 // 日志辅助函数（兼容 debugLog 和 console）
-const log = {
+const ttsLog = {
     info: (msg) => {
         if (typeof debugLog !== 'undefined' && debugLog.info) {
             debugLog.info(msg);
@@ -65,13 +69,17 @@ class TTSService {
         this.audioContextUnlocked = false; // 标记 iOS 音频上下文是否已解锁
         this.preloadedAudio = null; // 预加载的 Audio 对象（用于 iOS 兼容）
         
+        // 音频缓存管理器
+        this.cacheManager = null; // 延迟初始化（在 initialize() 中）
+        this.cacheEnabled = true; // 是否启用缓存
+        
         // 检测是否是 iOS 设备
         this.isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
         
         // 定义 TTS 提供商列表（按优先级排序）
         // iOS 设备优先使用 Web Speech API（避免 Audio 对象的 autoplay 限制）
         if (this.isIOS) {
-            log.info('🍎 检测到 iOS 设备，优先使用 Web Speech API（避免音频播放限制）');
+            ttsLog.info('🍎 检测到 iOS 设备，优先使用 Web Speech API（避免音频播放限制）');
             this.providers = [
                 {
                     name: 'Web Speech API',
@@ -91,7 +99,8 @@ class TTSService {
                     speak: (word, volume = 1.0) => this._speakWithAudioURL(
                         `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(word)}&type=1`,
                         '有道智云 TTS',
-                        volume
+                        volume,
+                        word // 传递单词用于缓存
                     )
                 },
                 {
@@ -101,7 +110,8 @@ class TTSService {
                     speak: (word, volume = 1.0) => this._speakWithAudioURL(
                         `https://fanyi.baidu.com/gettts?lan=en&text=${encodeURIComponent(word)}&spd=5&source=web`,
                         '百度翻译 TTS',
-                        volume
+                        volume,
+                        word // 传递单词用于缓存
                     )
                 }
             ];
@@ -115,7 +125,8 @@ class TTSService {
                     speak: (word, volume = 1.0) => this._speakWithAudioURL(
                         `https://fanyi.baidu.com/gettts?lan=en&text=${encodeURIComponent(word)}&spd=5&source=web`,
                         '百度翻译 TTS',
-                        volume
+                        volume,
+                        word // 传递单词用于缓存
                     )
                 },
                 {
@@ -125,17 +136,19 @@ class TTSService {
                     speak: (word, volume = 1.0) => this._speakWithAudioURL(
                         `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(word)}&type=1`,
                         '有道智云 TTS',
-                        volume
+                        volume,
+                        word // 传递单词用于缓存
                     )
                 },
                 {
-                    name: '微软 Bing TTS',
-                    description: '微软 Bing 语音合成（备用方案）',
+                    name: 'Google Translate TTS',
+                    description: 'Google 翻译语音合成（备用方案）',
                     test: () => true,
                     speak: (word, volume = 1.0) => this._speakWithAudioURL(
-                        `https://www.bing.com/tts?text=${encodeURIComponent(word)}&lang=en-US&format=audio/mp3`,
-                        '微软 Bing TTS',
-                        volume
+                        `https://translate.google.com/translate_tts?ie=UTF-8&tl=en&client=tw-ob&q=${encodeURIComponent(word)}`,
+                        'Google Translate TTS',
+                        volume,
+                        word // 传递单词用于缓存
                     )
                 },
                 {
@@ -173,8 +186,25 @@ class TTSService {
             return; // 已经测试过了
         }
         
-        log.info('🔍 TTSService: 开始并行测试所有 TTS 提供商（使用测试单词 "see"）...');
-        log.info('⏱️ TTSService: 将并行测试真实播放能力并按响应速度排序');
+        // 初始化音频缓存管理器
+        if (!this.cacheManager && this.cacheEnabled) {
+            try {
+                if (typeof AudioCacheManager !== 'undefined') {
+                    this.cacheManager = AudioCacheManager.getInstance();
+                    await this.cacheManager.initialize();
+                    ttsLog.success('✅ TTSService: 音频缓存管理器初始化成功');
+                } else {
+                    ttsLog.warning('⚠️ TTSService: AudioCacheManager 未加载，缓存功能将不可用');
+                    this.cacheEnabled = false;
+                }
+            } catch (error) {
+                ttsLog.error(`❌ TTSService: 缓存管理器初始化失败: ${error.message || error}`);
+                this.cacheEnabled = false;
+            }
+        }
+        
+        ttsLog.info('🔍 TTSService: 开始并行测试所有 TTS 提供商（使用测试单词 "see"）...');
+        ttsLog.info('⏱️ TTSService: 将并行测试真实播放能力并按响应速度排序');
         
         // 创建所有测试任务
         const testPromises = this.providers.map((provider, i) => {
@@ -197,13 +227,13 @@ class TTSService {
         
         // 输出测试结果
         if (this.availableProviders.length > 0) {
-            log.success(`✅ TTS 服务初始化完成，找到 ${this.availableProviders.length} 个可用提供商（已按速度排序）:`);
+            ttsLog.success(`✅ TTS 服务初始化完成，找到 ${this.availableProviders.length} 个可用提供商（已按速度排序）:`);
             this.availableProviders.forEach((provider, idx) => {
                 const speedBadge = idx === 0 ? '⚡' : '  ';
-                log.info(`${speedBadge} ${idx + 1}. ${provider.name} - ${provider.responseTime.toFixed(0)}ms`);
+                ttsLog.info(`${speedBadge} ${idx + 1}. ${provider.name} - ${provider.responseTime.toFixed(0)}ms`);
             });
         } else {
-            log.error('❌ TTSService: 没有找到可用的 TTS 提供商');
+            ttsLog.error('❌ TTSService: 没有找到可用的 TTS 提供商');
         }
     }
     
@@ -389,8 +419,8 @@ class TTSService {
                     url = `https://fanyi.baidu.com/gettts?lan=en&text=${encodeURIComponent(testWord)}&spd=5&source=web`;
                 } else if (provider.name === '有道智云 TTS') {
                     url = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(testWord)}&type=1`;
-                } else if (provider.name === '微软 Bing TTS') {
-                    url = `https://www.bing.com/tts?text=${encodeURIComponent(testWord)}&lang=en-US&format=audio/mp3`;
+                } else if (provider.name === 'Google Translate TTS') {
+                    url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=en&client=tw-ob&q=${encodeURIComponent(testWord)}`;
                 } else {
                     resolve(false);
                     return;
@@ -602,19 +632,19 @@ class TTSService {
             // iOS 设备优先激活 Web Speech API（主要方案）
             if (this.isIOS) {
                 if (!silent) {
-                    log.info('🔓 TTSService: iOS 设备，激活 Web Speech API...');
+                    ttsLog.info('🔓 TTSService: iOS 设备，激活 Web Speech API...');
                 }
                 
                 try {
                     this.activateWebSpeechAPI();
                     this.audioContextUnlocked = true;
                     if (!silent) {
-                        log.success('✅ TTSService: Web Speech API 已激活（iOS 推荐方案）');
+                        ttsLog.success('✅ TTSService: Web Speech API 已激活（iOS 推荐方案）');
                     }
                     return true;
                 } catch (e) {
                     if (!silent) {
-                        log.warning(`⚠️ TTSService: Web Speech API 激活失败: ${e.message}`);
+                        ttsLog.warning(`⚠️ TTSService: Web Speech API 激活失败: ${e.message}`);
                     }
                     return false;
                 }
@@ -622,12 +652,12 @@ class TTSService {
             
             // 非 iOS 设备：尝试解锁 Audio 对象
             if (this.audioContextUnlocked && !silent) {
-                log.warning('⚠️ TTSService: 音频上下文已解锁，无需重复解锁');
+                ttsLog.warning('⚠️ TTSService: 音频上下文已解锁，无需重复解锁');
                 return true;
             }
             
             if (!silent) {
-                log.info('🔓 TTSService: 开始尝试解锁音频上下文...');
+                ttsLog.info('🔓 TTSService: 开始尝试解锁音频上下文...');
             }
             
             // 创建并播放一个静音的 Audio 对象
@@ -642,7 +672,7 @@ class TTSService {
                     await playPromise;
                     
                     if (!silent) {
-                        log.success('✅ TTSService: 音频上下文已解锁');
+                        ttsLog.success('✅ TTSService: 音频上下文已解锁');
                     }
                     this.audioContextUnlocked = true;
                     
@@ -655,7 +685,7 @@ class TTSService {
                     return true;
                 } catch (error) {
                     if (!silent) {
-                        log.warning(`⚠️ TTSService: 音频解锁失败: ${error.message}`);
+                        ttsLog.warning(`⚠️ TTSService: 音频解锁失败: ${error.message}`);
                     }
                     return false;
                 }
@@ -666,7 +696,7 @@ class TTSService {
             
         } catch (error) {
             if (!silent) {
-                log.error(`❌ TTSService: 解锁音频上下文失败: ${error.message || error}`);
+                ttsLog.error(`❌ TTSService: 解锁音频上下文失败: ${error.message || error}`);
             }
             return false;
         }
@@ -747,16 +777,89 @@ class TTSService {
     }
     
     /**
-     * 使用音频 URL 朗读
+     * 使用音频 URL 朗读（集成缓存功能）
+     * @param {string} url - TTS 音频 URL
+     * @param {string} providerName - 提供商名称
+     * @param {number} volume - 音量 (0.0-1.0)
+     * @param {string} word - 单词（用于缓存，可选）
      */
-    _speakWithAudioURL(url, providerName, volume = 1.0) {
-        return new Promise((resolve, reject) => {
-            // iOS 设备提示：Audio URL 方案可能受限
-            if (this.isIOS && !this.audioContextUnlocked) {
-                log.warning(`⚠️ TTSService: iOS 设备上 ${providerName} 可能无法播放（建议使用 Web Speech API）`);
+    async _speakWithAudioURL(url, providerName, volume = 1.0, word = null) {
+        // iOS 设备提示：Audio URL 方案可能受限
+        if (this.isIOS && !this.audioContextUnlocked) {
+            ttsLog.warning(`⚠️ TTSService: iOS 设备上 ${providerName} 可能无法播放（建议使用 Web Speech API）`);
+        }
+        
+        // 如果启用了缓存且提供了单词，尝试使用缓存
+        if (this.cacheEnabled && this.cacheManager && word) {
+            try {
+                const providerKey = this._getProviderKey(providerName);
+                
+                // 1. 检查缓存是否存在
+                const hasCache = await this.cacheManager.hasCache(word, providerKey);
+                
+                if (hasCache) {
+                    // 2. 使用缓存播放
+                    const cachedUrl = await this.cacheManager.getCache(word, providerKey);
+                    if (cachedUrl) {
+                        ttsLog.info(`🎵 TTSService: 使用缓存播放: ${word} (${providerKey})`);
+                        return await this._playAudio(cachedUrl, volume, providerName);
+                    }
+                }
+                
+                // 3. 没有缓存，尝试下载音频
+                ttsLog.info(`📥 TTSService: 尝试下载并缓存音频: ${word} (${providerKey})`);
+                
+                try {
+                    const audioBlob = await this.cacheManager.downloadAudio(url);
+                    
+                    // 4. 保存缓存（异步，不阻塞播放）
+                    this.cacheManager.saveCache(word, providerKey, audioBlob).catch(err => {
+                        ttsLog.warning(`⚠️ TTSService: 保存缓存失败: ${err.message || err}`);
+                    });
+                    
+                    // 5. 使用 Blob URL 播放
+                    const blobUrl = URL.createObjectURL(audioBlob);
+                    return await this._playAudio(blobUrl, volume, providerName);
+                    
+                } catch (downloadError) {
+                    // 下载失败（通常是 CORS 限制），降级到直接播放
+                    ttsLog.info(`ℹ️ TTSService: 无法缓存音频（${downloadError.message || 'CORS限制'}），直接播放: ${word} (${providerKey})`);
+                    return await this._playAudio(url, volume, providerName);
+                }
+                
+            } catch (error) {
+                // 其他缓存操作失败，降级到直接播放
+                ttsLog.warning(`⚠️ TTSService: 缓存检查失败，降级到直接播放: ${error.message || error}`);
+                return await this._playAudio(url, volume, providerName);
             }
-            
-            const audio = new Audio(url);
+        } else {
+            // 未启用缓存或未提供单词，直接播放
+            return await this._playAudio(url, volume, providerName);
+        }
+    }
+    
+    /**
+     * 提取提供商简称（用于缓存文件命名）
+     * @param {string} providerName - 提供商完整名称
+     * @returns {string} 提供商简称 (baidu/youdao/google/unknown)
+     */
+    _getProviderKey(providerName) {
+        if (providerName.includes('百度')) return 'baidu';
+        if (providerName.includes('有道')) return 'youdao';
+        if (providerName.includes('Google') || providerName.includes('谷歌')) return 'google';
+        return 'unknown';
+    }
+    
+    /**
+     * 播放音频（统一的播放逻辑）
+     * @param {string} audioUrl - 音频 URL（可以是在线 URL 或 Blob URL）
+     * @param {number} volume - 音量 (0.0-1.0)
+     * @param {string} providerName - 提供商名称（用于错误日志）
+     * @returns {Promise<void>}
+     */
+    _playAudio(audioUrl, volume, providerName) {
+        return new Promise((resolve, reject) => {
+            const audio = new Audio(audioUrl);
             audio.volume = volume; // 设置音量
             
             // 添加到活动音频列表（用于 stop()）
@@ -768,6 +871,12 @@ class TTSService {
                 if (index > -1) {
                     this.activeAudios.splice(index, 1);
                 }
+                
+                // 如果是 Blob URL，释放资源
+                if (audioUrl.startsWith('blob:')) {
+                    URL.revokeObjectURL(audioUrl);
+                }
+                
                 resolve();
             };
             
@@ -777,6 +886,12 @@ class TTSService {
                 if (index > -1) {
                     this.activeAudios.splice(index, 1);
                 }
+                
+                // 如果是 Blob URL，释放资源
+                if (audioUrl.startsWith('blob:')) {
+                    URL.revokeObjectURL(audioUrl);
+                }
+                
                 reject(new Error(`${providerName} 音频加载失败`));
             };
             
@@ -785,6 +900,11 @@ class TTSService {
                 const index = this.activeAudios.indexOf(audio);
                 if (index > -1) {
                     this.activeAudios.splice(index, 1);
+                }
+                
+                // 如果是 Blob URL，释放资源
+                if (audioUrl.startsWith('blob:')) {
+                    URL.revokeObjectURL(audioUrl);
                 }
                 
                 // iOS 特殊处理：如果是 NotAllowedError
@@ -838,7 +958,7 @@ class TTSService {
             // 为当前 speak() 调用分配唯一 ID（用于取消令牌）
             // 如果接近最大安全整数，重置计数器（实际上几乎不可能达到）
             if (this.currentSpeakId >= Number.MAX_SAFE_INTEGER - 1) {
-                log.warning('⚠️ TTSService: speak ID 接近最大值，重置计数器');
+                ttsLog.warning('⚠️ TTSService: speak ID 接近最大值，重置计数器');
                 this.currentSpeakId = 0;
                 // 清理所有旧的取消记录（活跃的调用早已完成）
                 this.cancelledSpeakIds.clear();
@@ -846,7 +966,7 @@ class TTSService {
             
             const speakId = ++this.currentSpeakId;
             this.activeSpeakIds.add(speakId); // 添加到活跃集合
-            log.info(`🆔 TTSService.speak() 分配 ID: ${speakId} (单词: "${word}")`);
+            ttsLog.info(`🆔 TTSService.speak() 分配 ID: ${speakId} (单词: "${word}")`);
             
             this.currentWord = word; // 记录当前正在播放的单词
             
@@ -867,7 +987,7 @@ class TTSService {
             while (attemptCount < this.availableProviders.length) {
                 // 检查当前 speak() 调用是否已被取消
                 if (this.cancelledSpeakIds.has(speakId)) {
-                    log.info(`🚫 TTSService: "${word}" (ID: ${speakId}) - 播放已被取消，停止尝试`);
+                    ttsLog.info(`🚫 TTSService: "${word}" (ID: ${speakId}) - 播放已被取消，停止尝试`);
                     this.cancelledSpeakIds.delete(speakId); // 清理已取消的 ID
                     this.activeSpeakIds.delete(speakId); // 从活跃集合移除
                     this.isSpeaking = false;
@@ -909,7 +1029,7 @@ class TTSService {
                 } catch (error) {
                     // 首先检查当前 speak() 调用是否已被取消
                     if (this.cancelledSpeakIds.has(speakId)) {
-                        log.info(`🚫 TTSService: "${word}" (ID: ${speakId}) - 播放已被取消（在等待中）`);
+                        ttsLog.info(`🚫 TTSService: "${word}" (ID: ${speakId}) - 播放已被取消（在等待中）`);
                         this.cancelledSpeakIds.delete(speakId); // 清理已取消的 ID
                         this.activeSpeakIds.delete(speakId); // 从活跃集合移除
                         this.isSpeaking = false;
@@ -981,18 +1101,18 @@ class TTSService {
                     
                     if (isInterrupted) {
                         // 播放被中断是正常现象（如快速连续播放），使用 info 级别
-                        log.info(`ℹ️ TTSService: "${word}" - ${provider.name} 播放被新请求中断（正常现象）`);
+                        ttsLog.info(`ℹ️ TTSService: "${word}" - ${provider.name} 播放被新请求中断（正常现象）`);
                         this.isSpeaking = false;
                         // 不继续尝试其他提供商，因为是主动中断
                         return;
                     }
                     
                     // 输出详细的错误分析（仅对真正的错误使用 warning）
-                    log.warning(`⚠️ TTSService: "${word}" - ${provider.name} 失败 [${this.currentAvailableIndex + 1}/${this.availableProviders.length}] (播放开始于: ${speakStartTimeStr})`);
-                    log.warning(`   📋 错误类型: ${errorCategory}`);
-                    log.warning(`   💬 错误原因: ${errorCause}`);
+                    ttsLog.warning(`⚠️ TTSService: "${word}" - ${provider.name} 失败 [${this.currentAvailableIndex + 1}/${this.availableProviders.length}] (播放开始于: ${speakStartTimeStr})`);
+                    ttsLog.warning(`   📋 错误类型: ${errorCategory}`);
+                    ttsLog.warning(`   💬 错误原因: ${errorCause}`);
                     if (solution) {
-                        log.warning(`   💡 解决建议: ${solution}`);
+                        ttsLog.warning(`   💡 解决建议: ${solution}`);
                     }
                     
                     // 记录失败次数（非中断错误）
@@ -1001,7 +1121,7 @@ class TTSService {
                     
                     // 如果连续失败3次，从可用列表移除
                     if (failCount >= 3) {
-                        log.error(`❌ ${provider.name} 连续失败3次，已从可用列表移除`);
+                        ttsLog.error(`❌ ${provider.name} 连续失败3次，已从可用列表移除`);
                         this.availableProviders.splice(this.currentAvailableIndex, 1);
                         
                         // 调整索引
@@ -1056,8 +1176,8 @@ class TTSService {
             
             // 重新初始化后仍然没有可用的提供商
             const errorMsg = '所有 TTS 服务均不可用（重新初始化后仍失败）';
-            log.error(`❌ TTSService: "${word}" - ${errorMsg}`);
-            log.error(`💡 建议: 检查网络连接，或在 iOS 设备上确保音频上下文已解锁`);
+            ttsLog.error(`❌ TTSService: "${word}" - ${errorMsg}`);
+            ttsLog.error(`💡 建议: 检查网络连接，或在 iOS 设备上确保音频上下文已解锁`);
             
             this.activeSpeakIds.delete(speakId); // 从活跃集合移除
             
@@ -1074,8 +1194,8 @@ class TTSService {
         
         // 没有可用的提供商
         const errorMsg = '所有 TTS 服务均不可用';
-        log.error(`❌ TTSService: "${word}" - ${errorMsg}`);
-        log.error(`💡 可能原因: 1) 网络问题 2) iOS 音频上下文未解锁 3) 所有提供商都不可用`);
+        ttsLog.error(`❌ TTSService: "${word}" - ${errorMsg}`);
+        ttsLog.error(`💡 可能原因: 1) 网络问题 2) iOS 音频上下文未解锁 3) 所有提供商都不可用`);
         
         if (showError) {
             this._showErrorNotification(errorMsg);
@@ -1185,22 +1305,22 @@ class TTSService {
         const stack = new Error().stack;
         const callerLine = stack ? stack.split('\n')[2] : 'unknown';
         
-        log.info(`⏹️ TTSService.stop() 被调用${stoppedWord ? ` (停止单词: "${stoppedWord}")` : ''} [setCancelled=${setCancelled}] [调用自: ${callerLine.trim()}]`);
+        ttsLog.info(`⏹️ TTSService.stop() 被调用${stoppedWord ? ` (停止单词: "${stoppedWord}")` : ''} [setCancelled=${setCancelled}] [调用自: ${callerLine.trim()}]`);
         
         // 设置取消标志，阻止正在进行中的 speak() 继续执行
         if (setCancelled) {
             // 将所有活跃的 speak() 调用标记为已取消
             const activeCount = this.activeSpeakIds.size;
             if (activeCount > 0) {
-                log.info(`   🚫 取消 ${activeCount} 个活跃的 speak() 调用: [${Array.from(this.activeSpeakIds).join(', ')}]`);
+                ttsLog.info(`   🚫 取消 ${activeCount} 个活跃的 speak() 调用: [${Array.from(this.activeSpeakIds).join(', ')}]`);
                 this.activeSpeakIds.forEach(id => {
                     this.cancelledSpeakIds.add(id);
                 });
             } else {
-                log.info(`   ℹ️ 没有活跃的 speak() 调用需要取消`);
+                ttsLog.info(`   ℹ️ 没有活跃的 speak() 调用需要取消`);
             }
         } else {
-            log.info(`   🔧 仅清理资源，不设置取消标志`);
+            ttsLog.info(`   🔧 仅清理资源，不设置取消标志`);
         }
         
         // 停止 Web Speech API
@@ -1210,7 +1330,7 @@ class TTSService {
         
         // 停止所有正在播放的 Audio 对象
         if (this.activeAudios.length > 0) {
-            log.info(`⏹️ 停止 ${this.activeAudios.length} 个音频对象`);
+            ttsLog.info(`⏹️ 停止 ${this.activeAudios.length} 个音频对象`);
             // 复制数组以避免在迭代时修改
             const audiosToStop = [...this.activeAudios];
             this.activeAudios = [];
@@ -1235,7 +1355,7 @@ class TTSService {
         this.isSpeaking = false;
         // 不立即清空 currentWord，保留用于日志追踪
         // this.currentWord = null; 
-        log.info(`⏹️ TTSService 停止完成${stoppedWord ? ` ("${stoppedWord}")` : ''}`);
+        ttsLog.info(`⏹️ TTSService 停止完成${stoppedWord ? ` ("${stoppedWord}")` : ''}`);
     }
     
     
@@ -1249,9 +1369,20 @@ class TTSService {
     }
 }
 
+// 立即检查类是否定义成功
+if (typeof TTSService === 'undefined') {
+    console.error('❌ [TTSService.js] TTSService 类定义失败！');
+} else {
+    console.log('✅ [TTSService.js] TTSService 类定义成功');
+}
+
 // 导出到 window 对象，供全局使用
 if (typeof window !== 'undefined') {
     window.TTSService = TTSService;
+    console.log('✅ [TTSService.js] 已导出到 window.TTSService');
+    console.log('   检查: typeof window.TTSService =', typeof window.TTSService);
+} else {
+    console.error('❌ [TTSService.js] window 对象不存在！');
 }
 
 // 如果使用 ES6 模块，也提供 export

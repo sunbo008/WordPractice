@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>最小化 TTSService 测试</title>
+</head>
+<body>
+    <h1>最小化 TTSService 测试</h1>
+    <div id="output" style="font-family: monospace; white-space: pre-wrap; padding: 20px; background: #f0f0f0;"></div>
+
+    <script>
+        const output = document.getElementById('output');
+        
+        function log(msg) {
+            output.textContent += msg + '\n';
+            console.log(msg);
+        }
+        
+        log('=== 开始测试 ===');
+        log('1. 检查 window 对象: ' + typeof window);
+        log('2. 检查 window._TTSServiceLoadStart: ' + window._TTSServiceLoadStart);
+        log('3. 检查 TTSService: ' + typeof TTSService);
+        log('4. 检查 window.TTSService: ' + typeof window.TTSService);
+        log('5. 检查 AudioCacheManager: ' + typeof AudioCacheManager);
+        log('6. 检查 window.AudioCacheManager: ' + typeof window.AudioCacheManager);
+        
+        // 捕获全局错误
+        window.addEventListener('error', function(e) {
+            log('\n❌ 捕获到错误:');
+            log('  文件: ' + e.filename);
+            log('  行号: ' + e.lineno + ':' + e.colno);
+            log('  消息: ' + e.message);
+            log('  错误对象: ' + e.error);
+            if (e.error && e.error.stack) {
+                log('  堆栈:\n' + e.error.stack);
+            }
+        }, true);
+        
+        log('\n等待脚本加载...\n');
+    </script>
+    
+    <!-- 加载 AudioCacheManager -->
+    <script src="../src/utils/AudioCacheManager.js"></script>
+    
+    <!-- 加载 TTSService -->
+    <script src="../src/utils/TTSService.js"></script>
+    
+    <script>
+        setTimeout(function() {
+            log('\n=== 加载后检查 ===');
+            log('TTSService: ' + typeof TTSService);
+            log('window.TTSService: ' + typeof window.TTSService);
+            log('AudioCacheManager: ' + typeof AudioCacheManager);
+            log('window.AudioCacheManager: ' + typeof window.AudioCacheManager);
+            log('window._TTSServiceLoadStart: ' + window._TTSServiceLoadStart);
+            
+            if (typeof TTSService !== 'undefined') {
+                log('\n✅ TTSService 加载成功！');
+                try {
+                    const tts = TTSService.getInstance();
+                    log('✅ 成功创建实例');
+                } catch (err) {
+                    log('❌ 创建实例失败: ' + err.message);
+                }
+            } else {
+                log('\n❌ TTSService 加载失败！');
+            }
+        }, 500);
+    </script>
+</body>
+</html>
+

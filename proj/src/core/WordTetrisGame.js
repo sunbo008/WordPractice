@@ -379,26 +379,75 @@ class WordTetrisGame {
     setupSpeechSynthesis() {
         debugLog.info('🎤 初始化语音合成系统...');
         
+        // 详细检查 TTSService
+        debugLog.info(`   🔍 检查 window.TTSService: ${typeof window.TTSService}`);
+        debugLog.info(`   🔍 检查 TTSService: ${typeof TTSService}`);
+        debugLog.info(`   🔍 检查 AudioCacheManager: ${typeof AudioCacheManager}`);
+        
         // 使用 TTSService
         if (typeof TTSService !== 'undefined') {
-            this.ttsService = TTSService.getInstance();
+            debugLog.info('   ✅ TTSService 已加载，开始获取实例...');
             
-            // 异步初始化 TTS 服务（提前测试找到可用的提供商）
-            // 注意：TTSService 内部会输出初始化日志，这里不再重复输出
-            this.ttsService.initialize().then(() => {
-                // 静默检查初始化结果
-                const providersDetails = this.ttsService.getAvailableProvidersDetails();
+            try {
+                this.ttsService = TTSService.getInstance();
+                debugLog.info('   ✅ TTSService 实例获取成功');
                 
-                if (providersDetails.length === 0) {
-                    debugLog.warning('⚠️ 没有找到可用的 TTS 提供商');
+                // 异步初始化 TTS 服务（提前测试找到可用的提供商）
+                debugLog.info('   🔄 开始初始化 TTSService...');
+                this.ttsService.initialize().then(() => {
+                    debugLog.success('   ✅ TTSService 初始化完成');
+                    
+                    // 检查初始化结果
+                    const providersDetails = this.ttsService.getAvailableProvidersDetails();
+                    debugLog.info(`   📊 可用提供商数量: ${providersDetails.length}`);
+                    
+                    if (providersDetails.length === 0) {
+                        debugLog.warning('   ⚠️ 没有找到可用的 TTS 提供商');
+                        this.speechEnabled = false;
+                    } else {
+                        debugLog.success('   ✅ 语音系统初始化成功');
+                        this.speechEnabled = true;
+                    }
+                }).catch((error) => {
+                    debugLog.error('   ❌ TTS 服务初始化失败:', error);
+                    debugLog.error('   📋 错误详情:', error.message || error);
                     this.speechEnabled = false;
-                }
-            }).catch((error) => {
-                debugLog.error('❌ TTS 服务初始化失败:', error);
+                });
+            } catch (error) {
+                debugLog.error('   ❌ TTSService 实例获取失败:', error);
+                debugLog.error('   📋 错误详情:', error.message || error);
                 this.speechEnabled = false;
-            });
+            }
+        } else if (typeof window.TTSService !== 'undefined') {
+            debugLog.warning('   ⚠️ TTSService 在 window 对象中，尝试使用 window.TTSService');
+            
+            try {
+                this.ttsService = window.TTSService.getInstance();
+                debugLog.info('   ✅ window.TTSService 实例获取成功');
+                
+                // 异步初始化
+                this.ttsService.initialize().then(() => {
+                    debugLog.success('   ✅ TTSService 初始化完成');
+                    const providersDetails = this.ttsService.getAvailableProvidersDetails();
+                    if (providersDetails.length === 0) {
+                        debugLog.warning('   ⚠️ 没有找到可用的 TTS 提供商');
+                        this.speechEnabled = false;
+                    } else {
+                        this.speechEnabled = true;
+                    }
+                }).catch((error) => {
+                    debugLog.error('   ❌ TTS 服务初始化失败:', error);
+                    this.speechEnabled = false;
+                });
+            } catch (error) {
+                debugLog.error('   ❌ window.TTSService 实例获取失败:', error);
+                this.speechEnabled = false;
+            }
         } else {
-            debugLog.error('❌ TTSService 未加载');
+            debugLog.error('   ❌ TTSService 未加载（检查脚本加载顺序）');
+            debugLog.error('   📋 请确认以下脚本已正确加载:');
+            debugLog.error('      1. src/utils/AudioCacheManager.js');
+            debugLog.error('      2. src/utils/TTSService.js');
             this.speechEnabled = false;
         }
     }
