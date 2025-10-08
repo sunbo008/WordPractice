@@ -1305,22 +1305,27 @@ class TTSService {
         const stack = new Error().stack;
         const callerLine = stack ? stack.split('\n')[2] : 'unknown';
         
-        ttsLog.info(`⏹️ TTSService.stop() 被调用${stoppedWord ? ` (停止单词: "${stoppedWord}")` : ''} [setCancelled=${setCancelled}] [调用自: ${callerLine.trim()}]`);
+        // 收集ID信息用于日志
+        const activeIds = Array.from(this.activeSpeakIds);
+        const cancelledIds = Array.from(this.cancelledSpeakIds);
+        const currentId = this.currentSpeakId;
+        
+        ttsLog.info(`⏹️ TTSService.stop() 被调用${stoppedWord ? ` (停止单词: "${stoppedWord}")` : ''} [setCancelled=${setCancelled}] [当前ID=${currentId}] [调用自: ${callerLine.trim()}]`);
         
         // 设置取消标志，阻止正在进行中的 speak() 继续执行
         if (setCancelled) {
             // 将所有活跃的 speak() 调用标记为已取消
             const activeCount = this.activeSpeakIds.size;
             if (activeCount > 0) {
-                ttsLog.info(`   🚫 取消 ${activeCount} 个活跃的 speak() 调用: [${Array.from(this.activeSpeakIds).join(', ')}]`);
+                ttsLog.info(`   🚫 取消 ${activeCount} 个活跃的 speak() 调用: [${activeIds.join(', ')}]`);
                 this.activeSpeakIds.forEach(id => {
                     this.cancelledSpeakIds.add(id);
                 });
             } else {
-                ttsLog.info(`   ℹ️ 没有活跃的 speak() 调用需要取消`);
+                ttsLog.info(`   ℹ️ 没有活跃的 speak() 调用需要取消 [已取消ID: ${cancelledIds.length > 0 ? cancelledIds.join(', ') : '无'}]`);
             }
         } else {
-            ttsLog.info(`   🔧 仅清理资源，不设置取消标志`);
+            ttsLog.info(`   🔧 仅清理资源，不设置取消标志 [活跃ID: ${activeIds.length > 0 ? activeIds.join(', ') : '无'}]`);
         }
         
         // 停止 Web Speech API

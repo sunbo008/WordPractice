@@ -536,7 +536,14 @@ class WordTetrisGame {
     }
 
     stopSpeaking() {
-        debugLog.info('⏹️ stopSpeaking() 被调用');
+        // 收集ID信息用于调试
+        const ttsInfo = this.ttsService ? {
+            currentId: this.ttsService.currentSpeakId,
+            activeIds: Array.from(this.ttsService.activeSpeakIds || []),
+            currentWord: this.ttsService.currentWord
+        } : null;
+        
+        debugLog.info(`⏹️ stopSpeaking() 被调用 [TTS当前ID=${ttsInfo?.currentId || 'N/A'}, 活跃ID=[${ttsInfo?.activeIds.join(', ') || '无'}], 单词="${ttsInfo?.currentWord || '无'}"]`);
         
         // 取消首次朗读定时器
         if (this.firstSpeechTimer) {
