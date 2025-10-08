@@ -502,14 +502,14 @@ class WordTetrisGame {
     startRepeatedSpeech(word) {
         debugLog.info(`🔁 开始重复朗读: "${word}" (模式: ${this.gameMode})`);
         
-        // 记录当前朗读的单词（用于防止竞态条件）
-        this.currentSpeechWord = word;
-        
         // 根据游戏模式决定播放策略
         if (this.gameMode === 'challenge') {
             // 挑战模式：单词已在缓冲区倒数时开始播放
             // 不停止当前播放，只设置5秒重复播放定时器
             debugLog.info(`🔥 挑战模式 - 设置5秒重复播放定时器（不中断缓冲区播放）: "${word}"`);
+            
+            // 记录当前朗读的单词（用于防止竞态条件）
+            this.currentSpeechWord = word;
             
             // 先清理旧的定时器（如果存在）
             if (this.speechTimer) {
@@ -530,6 +530,9 @@ class WordTetrisGame {
         } else {
             // 休闲模式：先停止之前的朗读，然后立即播放第一次
             this.stopSpeaking();
+            
+            // 在 stopSpeaking() 之后再设置新的 currentSpeechWord（避免被清除）
+            this.currentSpeechWord = word;
             
             debugLog.info(`😊 休闲模式 - 立即播放: "${word}"`);
             
