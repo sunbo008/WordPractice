@@ -477,9 +477,9 @@ class WordTetrisGame {
             await this.ttsService.speak(word, {
                 timeout: timeout, // 根据游戏模式设置超时
                 showError: false, // 不显示错误通知，避免干扰游戏
-                onSuccess: (providerName, duration) => {
+                onSuccess: (providerName, duration, speakId) => {
                     // duration 是 TTS 服务内部计算的单个提供商的实际用时
-                    debugLog.info(`🔊 朗读成功: "${word}" (${providerName}, 用时: ${duration}ms, 超时: ${timeout}ms)`);
+                    debugLog.info(`🔊 朗读成功: "${word}" (ID: ${speakId}, ${providerName}, 用时: ${duration}ms, 超时: ${timeout}ms)`);
                 },
                 onError: (error) => {
                     // 显示详细的错误信息

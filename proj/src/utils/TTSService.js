@@ -1018,7 +1018,7 @@ class TTSService {
                     this.providerFailureCount.set(provider.name, 0);
                     
                     if (onSuccess) {
-                        onSuccess(provider.name, providerDuration);
+                        onSuccess(provider.name, providerDuration, speakId);
                     }
                     
                     // 成功后，保持使用当前提供商，不轮换
