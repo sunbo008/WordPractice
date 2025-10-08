@@ -290,6 +290,18 @@ class WordTetrisGame {
         this.currentSpeech = null;
         this.speechTimer = null;
         this.ttsService = null; // TTS 服务实例
+        
+        // 检测是否是 iOS 设备
+        this.isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        if (this.isIOS) {
+            debugLog.info('🍎 检测到 iOS 设备');
+        }
+        
+        // 游戏模式（从 localStorage 读取）
+        const savedMode = localStorage.getItem('wordTetris_gameMode');
+        this.gameMode = savedMode === 'challenge' ? 'challenge' : 'casual';
+        debugLog.info(`🎮 游戏模式: ${this.gameMode === 'challenge' ? '挑战模式' : '休闲模式'}`);
+        
         this.setupSpeechSynthesis();
         
         // 炮塔基座纹理缓存（静态生成，避免每帧重新计算）
@@ -398,12 +410,18 @@ class WordTetrisGame {
             return;
         }
 
+        // 根据游戏模式设置超时时间
+        // 挑战模式和休闲模式都使用3秒超时
+        const timeout = 3000;
+
         // 使用 TTSService 朗读
         try {
             await this.ttsService.speak(word, {
+                timeout: timeout, // 根据游戏模式设置超时
                 showError: false, // 不显示错误通知，避免干扰游戏
-                onSuccess: (providerName) => {
-                    debugLog.info(`🔊 朗读成功: "${word}" (${providerName})`);
+                onSuccess: (providerName, duration) => {
+                    // duration 是 TTS 服务内部计算的单个提供商的实际用时
+                    debugLog.info(`🔊 朗读成功: "${word}" (${providerName}, 用时: ${duration}ms, 超时: ${timeout}ms)`);
                 },
                 onError: (error) => {
                     // 显示详细的错误信息
@@ -422,22 +440,41 @@ class WordTetrisGame {
     }
 
     startRepeatedSpeech(word) {
-        debugLog.info(`🔁 开始重复朗读: "${word}"`);
+        debugLog.info(`🔁 开始重复朗读: "${word}" (模式: ${this.gameMode})`);
         
-        // 先停止之前的朗读
-        this.stopSpeaking();
-        
-        // 2秒后播放第一次
-        this.firstSpeechTimer = setTimeout(() => {
-            debugLog.info(`🔊 首次朗读: "${word}"`);
-            this.speakWord(word);
+        // 根据游戏模式决定播放策略
+        if (this.gameMode === 'challenge') {
+            // 挑战模式：单词已在缓冲区倒数时开始播放
+            // 不停止当前播放，只设置5秒重复播放定时器
+            debugLog.info(`🔥 挑战模式 - 设置5秒重复播放定时器（不中断缓冲区播放）: "${word}"`);
             
-            // 首次播放后，设置定时器每5秒重复播放
-            this.speechTimer = setInterval(() => {
+            // 先清理旧的定时器（如果存在）
+            if (this.speechTimer) {
+                clearInterval(this.speechTimer);
+                this.speechTimer = null;
+            }
+            
+            // 设置定时器每5秒重复播放
+            this.speechTimer = setInterval(async () => {
                 debugLog.info(`⏰ 定时重复朗读: "${word}"`);
-                this.speakWord(word);
+                await this.speakWord(word);
             }, 5000); // 5秒 = 5000毫秒
-        }, 2000); // 2秒后首次播放
+        } else {
+            // 休闲模式：先停止之前的朗读，然后2秒后播放第一次
+            this.stopSpeaking();
+            
+            debugLog.info(`😊 休闲模式 - 2秒后播放: "${word}"`);
+            this.firstSpeechTimer = setTimeout(async () => {
+                debugLog.info(`🔊 首次朗读: "${word}"`);
+                await this.speakWord(word);
+                
+                // 首次播放后，设置定时器每5秒重复播放
+                this.speechTimer = setInterval(async () => {
+                    debugLog.info(`⏰ 定时重复朗读: "${word}"`);
+                    await this.speakWord(word);
+                }, 5000); // 5秒 = 5000毫秒
+            }, 2000); // 2秒后首次播放
+        }
     }
 
     stopSpeaking() {
@@ -671,7 +708,8 @@ class WordTetrisGame {
         // 全局键盘事件
         document.addEventListener('keydown', (e) => {
             // 任何按键都尝试重新激活 iOS 音频上下文（静默模式，不刷屏）
-            if (this.ttsService && typeof this.ttsService.unlockAudioContext === 'function') {
+            // 只在 iOS 设备上执行
+            if (this.isIOS && this.ttsService && typeof this.ttsService.unlockAudioContext === 'function') {
                 this.ttsService.unlockAudioContext(true).catch(() => {}); // silent = true
             }
             
@@ -751,8 +789,9 @@ class WordTetrisGame {
         debugLog.info('🎬 startGame() 被调用');
         debugLog.info(`📊 this.ttsService 状态: ${this.ttsService ? '已初始化' : '未初始化'}`);
         
-        if (this.ttsService && typeof this.ttsService.unlockAudioContext === 'function') {
-            debugLog.info('🔓 开始异步解锁 iOS 音频上下文（不阻塞游戏启动）...');
+        // 只在 iOS 设备上执行音频解锁
+        if (this.isIOS && this.ttsService && typeof this.ttsService.unlockAudioContext === 'function') {
+            debugLog.info('🔓 iOS 设备：开始异步解锁音频上下文（不阻塞游戏启动）...');
             
             // 异步执行，不阻塞主流程
             this.ttsService.unlockAudioContext()
@@ -766,6 +805,8 @@ class WordTetrisGame {
                 .catch((error) => {
                     debugLog.warning(`⚠️ 解锁音频上下文出错（但不影响游戏运行）: ${error.message}`);
                 });
+        } else if (!this.isIOS) {
+            debugLog.info('💻 非 iOS 设备，跳过音频解锁');
         } else if (!this.ttsService) {
             debugLog.warning('⚠️ ttsService 未初始化，跳过音频解锁');
         }
@@ -1189,6 +1230,12 @@ class WordTetrisGame {
         this.bufferState = 'countdown';
         this.bufferTimer = 0;
         this.resetBufferLights();
+        
+        // 挑战模式：在缓冲区倒数开始时就播放音频
+        if (this.gameMode === 'challenge' && this.nextWord) {
+            debugLog.info(`🔥 挑战模式 - 缓冲区倒数开始，立即播放音频: "${this.nextWord.original}"`);
+            this.speakWord(this.nextWord.original);
+        }
     }
 
     updateBufferCountdown() {

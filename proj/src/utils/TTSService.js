@@ -813,6 +813,7 @@ class TTSService {
             onSuccess = null,
             onError = null,
             volume = 1.0, // 音量：0.0 到 1.0
+            timeout = 3000, // 超时时间（毫秒），默认3秒
             _isRetry = false // 内部参数：是否是重试调用
         } = options;
         
@@ -837,10 +838,13 @@ class TTSService {
             while (attemptCount < this.availableProviders.length) {
                 const provider = this.availableProviders[this.currentAvailableIndex];
                 
+                // 记录当前提供商的开始时间
+                const providerStartTime = performance.now();
+                
                 try {
-                    // 创建3秒超时Promise
+                    // 创建超时Promise（使用配置的超时时间）
                     const timeoutPromise = new Promise((_, reject) => {
-                        setTimeout(() => reject(new Error('超时（3秒）')), 3000);
+                        setTimeout(() => reject(new Error(`超时（${timeout}毫秒）`)), timeout);
                     });
                     
                     // 竞速：朗读 vs 超时
@@ -849,11 +853,14 @@ class TTSService {
                         timeoutPromise
                     ]);
                     
+                    // 计算实际用时
+                    const providerDuration = Math.round(performance.now() - providerStartTime);
+                    
                     // 成功后，重置该提供商的失败计数
                     this.providerFailureCount.set(provider.name, 0);
                     
                     if (onSuccess) {
-                        onSuccess(provider.name);
+                        onSuccess(provider.name, providerDuration);
                     }
                     
                     // 成功后，保持使用当前提供商，不轮换
@@ -884,13 +891,13 @@ class TTSService {
                         errorCategory = '🚫 浏览器限制';
                         errorCause = '音频上下文未激活';
                         solution = '需要在用户点击时解锁音频上下文';
-                    } else if (errorName === 'AbortError' || errorDetail.includes('interrupted')) {
+                    } else if (errorName === 'AbortError' || errorDetail.includes('interrupted') || errorDetail.includes('中断')) {
                         errorCategory = '⚠️ 播放被中断';
                         errorCause = '音频播放被新的播放请求中断';
                         solution = '这是正常现象，系统会自动重试';
                     } else if (errorDetail.includes('超时') || errorDetail.includes('timeout')) {
                         errorCategory = '⏱️ TTS 服务超时';
-                        errorCause = `${provider.name} 响应超时（3秒限制）`;
+                        errorCause = `${provider.name} 响应超时（${timeout}毫秒限制）`;
                         solution = '可能是网络延迟或服务商负载过高';
                     } else if (errorDetail.includes('加载失败') || errorDetail.includes('load') || errorName === 'NetworkError') {
                         errorCategory = '🌐 TTS 服务请求失败';
@@ -929,7 +936,18 @@ class TTSService {
                     // 停止当前提供商的播放（清理资源）
                     this.stop();
                     
-                    // 记录失败次数
+                    // 判断是否是"播放被中断"错误
+                    const isInterrupted = errorCategory === '⚠️ 播放被中断';
+                    
+                    if (isInterrupted) {
+                        // 播放被中断不计入失败次数，直接结束本次播放尝试
+                        log.info(`   ℹ️ 播放被中断，不计入失败次数`);
+                        this.isSpeaking = false;
+                        // 不继续尝试其他提供商，因为是主动中断
+                        return;
+                    }
+                    
+                    // 记录失败次数（非中断错误）
                     const failCount = (this.providerFailureCount.get(provider.name) || 0) + 1;
                     this.providerFailureCount.set(provider.name, failCount);
                     
@@ -1121,6 +1139,12 @@ class TTSService {
             
             audiosToStop.forEach((audio) => {
                 try {
+                    // 先移除所有事件监听器，避免触发错误回调
+                    audio.onended = null;
+                    audio.onerror = null;
+                    audio.onpause = null;
+                    
+                    // 然后停止播放
                     audio.pause();
                     audio.currentTime = 0;
                     audio.src = ''; // 清空源以释放资源
