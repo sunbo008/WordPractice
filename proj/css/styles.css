@@ -650,13 +650,16 @@ button:disabled {
 
 .debug-controls {
     display: flex;
-    gap: 10px;
+    gap: 8px;
 }
 
 .debug-btn {
     background: #3498db;
     color: white;
     border: none;
+    display: flex;
+    align-items: center;
+    gap: 4px;
     padding: 5px 12px;
     border-radius: 4px;
     cursor: pointer;
@@ -666,6 +669,32 @@ button:disabled {
 
 .debug-btn:hover {
     background: #2980b9;
+}
+
+.debug-btn .btn-icon {
+    font-size: 14px;
+    line-height: 1;
+}
+
+.debug-btn .btn-text {
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/* 响应式：小屏幕隐藏文字，只显示图标 */
+@media (max-width: 768px) {
+    .debug-btn {
+        padding: 6px 8px;
+        gap: 0;
+    }
+    
+    .debug-btn .btn-text {
+        display: none;
+    }
+    
+    .debug-btn .btn-icon {
+        font-size: 16px;
+    }
 }
 
 .debug-console {

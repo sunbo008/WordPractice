@@ -12,6 +12,7 @@ class DebugLogger {
         
         // 绑定控制按钮
         const toggleBtn = document.getElementById('toggleDebugBtn');
+        const copyBtn = document.getElementById('copyDebugBtn');
         const clearBtn = document.getElementById('clearDebugBtn');
         const exportBtn = document.getElementById('exportDebugBtn');
         const panel = document.getElementById('debugPanel');
@@ -19,8 +20,15 @@ class DebugLogger {
         if (toggleBtn) {
             toggleBtn.addEventListener('click', () => {
                 panel.classList.toggle('hidden');
-                toggleBtn.textContent = panel.classList.contains('hidden') ? '显示' : '隐藏';
+                const btnText = toggleBtn.querySelector('.btn-text');
+                if (btnText) {
+                    btnText.textContent = panel.classList.contains('hidden') ? '显示' : '隐藏';
+                }
             });
+        }
+        
+        if (copyBtn) {
+            copyBtn.addEventListener('click', () => this.copyToClipboard());
         }
         
         if (clearBtn) {
@@ -134,6 +142,44 @@ class DebugLogger {
         URL.revokeObjectURL(url);
         
         this.success(`✅ 日志已导出 (${this.logHistory.length} 条记录)`);
+    }
+    
+    async copyToClipboard() {
+        if (this.logHistory.length === 0) {
+            alert('没有日志可以复制');
+            return;
+        }
+        
+        // 生成日志文本
+        const logText = this.logHistory.map(entry => entry.fullMessage).join('\n');
+        
+        try {
+            // 使用现代 Clipboard API
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                await navigator.clipboard.writeText(logText);
+                this.success(`✅ 已复制 ${this.logHistory.length} 条日志到剪贴板`);
+            } else {
+                // 降级方案：使用传统方法
+                const textarea = document.createElement('textarea');
+                textarea.value = logText;
+                textarea.style.position = 'fixed';
+                textarea.style.left = '-9999px';
+                document.body.appendChild(textarea);
+                textarea.select();
+                
+                const successful = document.execCommand('copy');
+                document.body.removeChild(textarea);
+                
+                if (successful) {
+                    this.success(`✅ 已复制 ${this.logHistory.length} 条日志到剪贴板`);
+                } else {
+                    this.error('❌ 复制失败，请手动复制日志');
+                }
+            }
+        } catch (error) {
+            this.error(`❌ 复制失败: ${error.message}`);
+            console.error('复制到剪贴板失败:', error);
+        }
     }
 }
 
@@ -326,20 +372,13 @@ class WordTetrisGame {
             this.ttsService = TTSService.getInstance();
             
             // 异步初始化 TTS 服务（提前测试找到可用的提供商）
+            // 注意：TTSService 内部会输出初始化日志，这里不再重复输出
             this.ttsService.initialize().then(() => {
-                // 获取可用的提供商详细信息（包含响应时间）
+                // 静默检查初始化结果
                 const providersDetails = this.ttsService.getAvailableProvidersDetails();
-                const currentProvider = this.ttsService.getCurrentProvider();
                 
-                if (providersDetails.length > 0) {
-                    debugLog.success(`✅ TTS 服务初始化完成，找到 ${providersDetails.length} 个可用提供商（已按速度排序）:`);
-                    providersDetails.forEach((provider, index) => {
-                        const prefix = (provider.name === currentProvider) ? '⚡' : '  ';
-                        const responseTime = provider.responseTime ? `${provider.responseTime.toFixed(0)}ms` : '-';
-                        debugLog.info(`${prefix} ${index + 1}. ${provider.name} - ${responseTime}`);
-                    });
-                } else {
-                    debugLog.warning('⚠️ TTS 服务初始化完成，但没有找到可用的提供商');
+                if (providersDetails.length === 0) {
+                    debugLog.warning('⚠️ 没有找到可用的 TTS 提供商');
                     this.speechEnabled = false;
                 }
             }).catch((error) => {
@@ -367,11 +406,18 @@ class WordTetrisGame {
                     debugLog.info(`🔊 朗读成功: "${word}" (${providerName})`);
                 },
                 onError: (error) => {
-                    debugLog.error(`❌ 朗读失败: "${word}"`, error);
+                    // 显示详细的错误信息
+                    debugLog.error(`❌ 朗读失败: "${word}" - ${error.message || error}`);
+                    
+                    // 如果是 iOS 音频上下文未解锁的错误，给出具体提示
+                    if (error.message && error.message.includes('音频上下文未解锁')) {
+                        debugLog.warning('💡 iOS 设备需要在用户交互时解锁音频上下文');
+                        debugLog.warning('💡 请确保在点击"开始游戏"时正确调用了 unlockAudioContext()');
+                    }
                 }
             });
         } catch (error) {
-            debugLog.error(`❌ 朗读异常: "${word}"`, error);
+            debugLog.error(`❌ 朗读异常: "${word}" - ${error.message || error}`, error);
         }
     }
 
@@ -624,6 +670,11 @@ class WordTetrisGame {
         
         // 全局键盘事件
         document.addEventListener('keydown', (e) => {
+            // 任何按键都尝试重新激活 iOS 音频上下文（静默模式，不刷屏）
+            if (this.ttsService && typeof this.ttsService.unlockAudioContext === 'function') {
+                this.ttsService.unlockAudioContext(true).catch(() => {}); // silent = true
+            }
+            
             // 空格键放弃单词
             if (e.code === 'Space' && this.gameState === 'playing') {
                 e.preventDefault(); // 防止页面滚动
@@ -695,6 +746,30 @@ class WordTetrisGame {
     }
 
     startGame() {
+        // ✅ iOS 兼容性：解锁音频上下文（必须在用户交互事件中调用）
+        // 重要：不使用 await，避免阻塞游戏启动流程
+        debugLog.info('🎬 startGame() 被调用');
+        debugLog.info(`📊 this.ttsService 状态: ${this.ttsService ? '已初始化' : '未初始化'}`);
+        
+        if (this.ttsService && typeof this.ttsService.unlockAudioContext === 'function') {
+            debugLog.info('🔓 开始异步解锁 iOS 音频上下文（不阻塞游戏启动）...');
+            
+            // 异步执行，不阻塞主流程
+            this.ttsService.unlockAudioContext()
+                .then((unlocked) => {
+                    if (unlocked) {
+                        debugLog.success('✅ iOS 音频上下文解锁成功');
+                    } else {
+                        debugLog.warning('⚠️ iOS 音频上下文解锁失败（但不影响游戏运行）');
+                    }
+                })
+                .catch((error) => {
+                    debugLog.warning(`⚠️ 解锁音频上下文出错（但不影响游戏运行）: ${error.message}`);
+                });
+        } else if (!this.ttsService) {
+            debugLog.warning('⚠️ ttsService 未初始化，跳过音频解锁');
+        }
+        
         // 智能检测起始等级
         const availableDifficulties = this.vocabularyManager.getAvailableDifficulties();
         if (availableDifficulties && availableDifficulties.length > 0) {
@@ -1125,17 +1200,17 @@ class WordTetrisGame {
             this.bufferLights.red = true;
             this.bufferLights.yellow = false;
             this.bufferLights.green = false;
-            debugLog.info(`⏱️ 缓冲区倒计时: 红灯 (1秒)`);
+            // debugLog.info(`⏱️ 缓冲区倒计时: 红灯 (1秒)`);
         } else if (this.bufferTimer === 120) { // 2秒 - 只亮黄灯
             this.bufferLights.red = false;
             this.bufferLights.yellow = true;
             this.bufferLights.green = false;
-            debugLog.info(`⏱️ 缓冲区倒计时: 黄灯 (2秒)`);
+            // debugLog.info(`⏱️ 缓冲区倒计时: 黄灯 (2秒)`);
         } else if (this.bufferTimer === 180) { // 3秒 - 只亮绿灯
             this.bufferLights.red = false;
             this.bufferLights.yellow = false;
             this.bufferLights.green = true;
-            debugLog.info(`⏱️ 缓冲区倒计时: 绿灯 (3秒)`);
+            // debugLog.info(`⏱️ 缓冲区倒计时: 绿灯 (3秒)`);
         } else if (this.bufferTimer === 240) { // 4秒 - 绿灯亮满1秒后释放单词
             debugLog.success(`🚀 缓冲区倒计时完成，准备释放单词`);
             this.releaseWord();
@@ -2820,7 +2895,7 @@ class WordTetrisGame {
     }
 
     tryLoadImage(img, url, label = '未知来源', onError) {
-        debugLog.info(`➡️ 开始加载图片 [${label}]: ${url}`);
+        // debugLog.info(`➡️ 开始加载图片 [${label}]: ${url}`);
         const test = new Image();
         // 不跨域读取像素，仅展示即可
         test.onload = () => {

@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>iOS 音频兼容性测试</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        .status-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-label {
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .status-value {
+            font-size: 13px;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .test-section {
+            background: #f0f7ff;
+            border: 2px solid #667eea;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .test-word {
+            font-size: 36px;
+            font-weight: 700;
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        button {
+            padding: 15px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .log-section {
+            background: #1e1e1e;
+            border-radius: 12px;
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .log-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .clear-log-btn {
+            padding: 5px 12px;
+            font-size: 12px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .log-entry {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            padding: 6px;
+            margin-bottom: 3px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            line-height: 1.4;
+        }
+
+        .log-info { color: #61dafb; }
+        .log-success { color: #98c379; }
+        .log-warning { color: #e5c07b; }
+        .log-error { color: #e06c75; }
+
+        .device-info {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            line-height: 1.6;
+            border-radius: 4px;
+        }
+
+        .device-info-title {
+            font-weight: 600;
+            color: #856404;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🍎 iOS 音频兼容性测试</h1>
+        <div class="subtitle">测试 TTS 服务在 iOS Safari 上的表现</div>
+
+        <!-- 设备信息 -->
+        <div class="device-info">
+            <div class="device-info-title">📱 设备信息</div>
+            <div id="deviceInfo">检测中...</div>
+        </div>
+
+        <!-- 状态信息 -->
+        <div class="status-card">
+            <div class="status-item">
+                <span class="status-label">音频上下文</span>
+                <span class="status-value status-pending" id="audioContextStatus">未解锁</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">TTS 服务</span>
+                <span class="status-value status-pending" id="ttsStatus">未初始化</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">可用提供商</span>
+                <span class="status-value" id="providerCount">-</span>
+            </div>
+        </div>
+
+        <!-- 测试区域 -->
+        <div class="test-section">
+            <div class="test-word">English</div>
+            <div class="button-group">
+                <button class="btn-primary" onclick="unlockAudio()" id="unlockBtn">
+                    🔓 第一步：解锁音频上下文
+                </button>
+                <button class="btn-success" onclick="testSpeak()" id="speakBtn" disabled>
+                    🔊 第二步：测试朗读
+                </button>
+                <button class="btn-warning" onclick="testAutoSpeak()" id="autoSpeakBtn" disabled>
+                    ⏱️ 第三步：测试延迟朗读（3秒后）
+                </button>
+            </div>
+        </div>
+
+        <!-- 日志输出 -->
+        <div>
+            <div class="log-title">
+                📝 测试日志
+                <button class="clear-log-btn" onclick="clearLog()">清空</button>
+            </div>
+            <div class="log-section" id="logContainer"></div>
+        </div>
+    </div>
+
+    <!-- 引入 TTS 服务 -->
+    <script src="../src/utils/TTSService.js"></script>
+
+    <script>
+        let ttsService;
+        const testWord = 'English';
+
+        // 检测设备信息
+        function detectDevice() {
+            const ua = navigator.userAgent;
+            const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+            const isSafari = /Safari/.test(ua) && !/Chrome/.test(ua);
+            const isMobile = /Mobile|Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+            
+            const info = [];
+            if (isIOS) {
+                info.push('✅ 检测到 iOS 设备');
+            } else {
+                info.push('⚠️ 非 iOS 设备');
+            }
+            
+            if (isSafari) {
+                info.push('✅ 检测到 Safari 浏览器');
+            } else {
+                info.push('⚠️ 非 Safari 浏览器');
+            }
+            
+            if (isMobile) {
+                info.push('📱 移动设备');
+            } else {
+                info.push('💻 桌面设备');
+            }
+            
+            info.push(`<br>User Agent: ${ua.substring(0, 50)}...`);
+            
+            document.getElementById('deviceInfo').innerHTML = info.join('<br>');
+        }
+
+        // 日志系统
+        function addLog(message, type = 'info') {
+            const logContainer = document.getElementById('logContainer');
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            
+            const timestamp = new Date().toLocaleTimeString('zh-CN', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            entry.textContent = `[${timestamp}] ${message}`;
+            
+            logContainer.appendChild(entry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('logContainer').innerHTML = '';
+            addLog('日志已清空', 'info');
+        }
+
+        // 劫持 console
+        const originalConsole = {
+            log: console.log,
+            warn: console.warn,
+            error: console.error
+        };
+
+        console.log = function(...args) {
+            originalConsole.log.apply(console, args);
+            addLog(args.join(' '), 'info');
+        };
+
+        console.warn = function(...args) {
+            originalConsole.warn.apply(console, args);
+            addLog(args.join(' '), 'warning');
+        };
+
+        console.error = function(...args) {
+            originalConsole.error.apply(console, args);
+            addLog(args.join(' '), 'error');
+        };
+
+        // 初始化 TTS 服务
+        async function initTTS() {
+            try {
+                addLog('开始初始化 TTS 服务...', 'info');
+                ttsService = TTSService.getInstance();
+                
+                await ttsService.initialize();
+                
+                const providers = ttsService.getAvailableProviders();
+                document.getElementById('providerCount').textContent = providers.length;
+                document.getElementById('ttsStatus').textContent = '已初始化';
+                document.getElementById('ttsStatus').className = 'status-value status-success';
+                
+                addLog(`✅ TTS 初始化成功，找到 ${providers.length} 个提供商`, 'success');
+                addLog(`📋 提供商列表: ${providers.join(', ')}`, 'info');
+                
+            } catch (error) {
+                addLog(`❌ TTS 初始化失败: ${error.message}`, 'error');
+                document.getElementById('ttsStatus').textContent = '初始化失败';
+                document.getElementById('ttsStatus').className = 'status-value status-error';
+            }
+        }
+
+        // 解锁音频上下文
+        function unlockAudio() {
+            addLog('用户点击"解锁音频上下文"按钮', 'info');
+            
+            if (!ttsService) {
+                addLog('❌ TTS 服务未初始化', 'error');
+                return;
+            }
+            
+            try {
+                ttsService.unlockAudioContext();
+                
+                // 等待一小段时间，让解锁完成
+                setTimeout(() => {
+                    if (ttsService.audioContextUnlocked) {
+                        addLog('✅ 音频上下文解锁成功！', 'success');
+                        document.getElementById('audioContextStatus').textContent = '已解锁';
+                        document.getElementById('audioContextStatus').className = 'status-value status-success';
+                        
+                        // 启用测试按钮
+                        document.getElementById('speakBtn').disabled = false;
+                        document.getElementById('autoSpeakBtn').disabled = false;
+                        document.getElementById('unlockBtn').disabled = true;
+                    } else {
+                        addLog('⚠️ 音频上下文解锁状态未确认', 'warning');
+                    }
+                }, 500);
+                
+            } catch (error) {
+                addLog(`❌ 解锁失败: ${error.message}`, 'error');
+            }
+        }
+
+        // 测试朗读（用户交互触发）
+        async function testSpeak() {
+            addLog('用户点击"测试朗读"按钮', 'info');
+            
+            if (!ttsService) {
+                addLog('❌ TTS 服务未初始化', 'error');
+                return;
+            }
+            
+            if (!ttsService.audioContextUnlocked) {
+                addLog('⚠️ 警告：音频上下文未解锁，可能播放失败', 'warning');
+            }
+            
+            const speakBtn = document.getElementById('speakBtn');
+            speakBtn.disabled = true;
+            speakBtn.textContent = '🔊 朗读中...';
+            
+            try {
+                addLog(`准备朗读单词: "${testWord}"`, 'info');
+                
+                await ttsService.speak(testWord, {
+                    showError: false,
+                    onSuccess: (providerName) => {
+                        addLog(`✅ 朗读成功！使用提供商: ${providerName}`, 'success');
+                    },
+                    onError: (error) => {
+                        addLog(`❌ 朗读失败: ${error.message}`, 'error');
+                    }
+                });
+                
+            } catch (error) {
+                addLog(`❌ 朗读异常: ${error.message}`, 'error');
+            } finally {
+                speakBtn.disabled = false;
+                speakBtn.textContent = '🔊 第二步：测试朗读';
+            }
+        }
+
+        // 测试延迟朗读（模拟游戏中的自动朗读）
+        async function testAutoSpeak() {
+            addLog('用户点击"测试延迟朗读"按钮', 'info');
+            addLog('⏱️ 3秒后将自动朗读（模拟游戏场景）...', 'info');
+            
+            const autoSpeakBtn = document.getElementById('autoSpeakBtn');
+            autoSpeakBtn.disabled = true;
+            
+            let countdown = 3;
+            const originalText = autoSpeakBtn.textContent;
+            
+            const timer = setInterval(() => {
+                autoSpeakBtn.textContent = `⏱️ ${countdown} 秒后朗读...`;
+                countdown--;
+                
+                if (countdown < 0) {
+                    clearInterval(timer);
+                }
+            }, 1000);
+            
+            setTimeout(async () => {
+                addLog('⏰ 开始延迟朗读（非用户交互触发）', 'info');
+                
+                try {
+                    await ttsService.speak(testWord, {
+                        showError: false,
+                        onSuccess: (providerName) => {
+                            addLog(`✅ 延迟朗读成功！提供商: ${providerName}`, 'success');
+                            addLog('🎉 iOS 兼容性测试通过！', 'success');
+                        },
+                        onError: (error) => {
+                            addLog(`❌ 延迟朗读失败: ${error.message}`, 'error');
+                            addLog('⚠️ 这是 iOS 的预期行为：自动播放被阻止', 'warning');
+                            addLog('💡 解决方案：在用户交互时预先解锁音频上下文', 'info');
+                        }
+                    });
+                } catch (error) {
+                    addLog(`❌ 延迟朗读异常: ${error.message}`, 'error');
+                } finally {
+                    autoSpeakBtn.disabled = false;
+                    autoSpeakBtn.textContent = originalText;
+                }
+            }, 3000);
+        }
+
+        // 页面加载完成后初始化
+        window.addEventListener('load', () => {
+            detectDevice();
+            addLog('页面加载完成', 'info');
+            addLog('正在初始化 TTS 服务...', 'info');
+            initTTS();
+        });
+    </script>
+</body>
+</html>
+

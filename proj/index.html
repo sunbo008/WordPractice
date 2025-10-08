@@ -133,9 +133,22 @@
                 <div class="debug-header">
                     <h3>🔍 调试日志</h3>
                     <div class="debug-controls">
-                        <button id="toggleDebugBtn" class="debug-btn">显示</button>
-                        <button id="clearDebugBtn" class="debug-btn">清空</button>
-                        <button id="exportDebugBtn" class="debug-btn">导出</button>
+                        <button id="toggleDebugBtn" class="debug-btn" title="显示/隐藏日志">
+                            <span class="btn-icon">👁️</span>
+                            <span class="btn-text">隐藏</span>
+                        </button>
+                        <button id="copyDebugBtn" class="debug-btn" title="复制全部日志到剪贴板">
+                            <span class="btn-icon">📋</span>
+                            <span class="btn-text">复制</span>
+                        </button>
+                        <button id="clearDebugBtn" class="debug-btn" title="清空日志">
+                            <span class="btn-icon">🗑️</span>
+                            <span class="btn-text">清空</span>
+                        </button>
+                        <button id="exportDebugBtn" class="debug-btn" title="导出日志到文件">
+                            <span class="btn-icon">💾</span>
+                            <span class="btn-text">导出</span>
+                        </button>
                     </div>
                 </div>
                 <div id="debugConsole" class="debug-console"></div>
