@@ -896,13 +896,41 @@ class WordTetrisGame {
         this.startTime = Date.now();
         this.updateButtons();
         
-        // 【修复】先生成第一个单词，再启动缓冲区
-        this.generateNextWord();
-        this.startBufferCountdown();
+        // 【修复】确保单词库加载完成后再启动游戏流程
+        this.waitForVocabularyAndStart();
         
         // 确保输入框可以接收键盘输入（但不需要焦点）
         const letterInput = document.getElementById('letterInput');
         letterInput.blur(); // 移除焦点，让全局键盘事件生效
+    }
+    
+    // 等待单词库加载完成后启动游戏流程
+    waitForVocabularyAndStart() {
+        if (!this.vocabularyManager.isLoaded) {
+            if (this.vocabularyManager.loadError) {
+                debugLog.error('❌ 单词库加载失败，无法开始游戏');
+                alert('单词库加载失败，请刷新页面重试');
+                this.gameState = 'stopped';
+                return;
+            }
+            debugLog.info('⏳ 等待单词库加载...');
+            setTimeout(() => this.waitForVocabularyAndStart(), 50);
+            return;
+        }
+        
+        debugLog.success('✅ 单词库已加载，开始游戏流程');
+        // 先生成第一个单词
+        this.generateNextWord();
+        
+        // 确保单词生成成功后再启动缓冲区
+        if (this.nextWord) {
+            debugLog.success(`✅ 第一个单词已生成: ${this.nextWord.original}`);
+            this.startBufferCountdown();
+        } else {
+            debugLog.error('❌ 第一个单词生成失败');
+            alert('单词生成失败，请刷新页面重试');
+            this.gameState = 'stopped';
+        }
     }
 
     pauseGame() {
@@ -1137,14 +1165,7 @@ class WordTetrisGame {
     generateNextWord() {
         // 检查单词库是否已加载
         if (!this.vocabularyManager.isLoaded) {
-            // 如果有加载错误，不再重试
-            if (this.vocabularyManager.loadError) {
-                console.error('单词库加载失败，停止生成单词');
-                return;
-            }
-            console.log('等待单词库加载...');
-            // 延迟重试
-            setTimeout(() => this.generateNextWord(), 100);
+            debugLog.error('❌ generateNextWord: 单词库未加载');
             return;
         }
         
@@ -1162,16 +1183,15 @@ class WordTetrisGame {
         if (!this.nextWord) {
             // 检查是否所有单词都已掉落完毕
             if (this.checkAllWordsCompleted()) {
-                console.log('🎉 所有单词已完成，等待最后一个单词处理...');
+                debugLog.success('🎉 所有单词已完成，等待最后一个单词处理...');
                 // 不立即结束游戏，等待当前单词被处理
                 return;
             }
-            console.warn('获取单词失败，重试中...');
-            setTimeout(() => this.generateNextWord(), 100);
+            debugLog.error('❌ 获取单词失败，单词池可能已空');
             return;
         }
         
-        debugLog.info(`✅ 生成新单词: ${this.nextWord.original}，单词池剩余: ${this.vocabularyManager.wordPool.length} 个`);
+        debugLog.success(`✅ 生成新单词: ${this.nextWord.original}，单词池剩余: ${this.vocabularyManager.wordPool.length} 个`);
         this.levelWordCount++;
         this.updateNextWordDisplay();
     }
