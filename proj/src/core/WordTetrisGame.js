@@ -288,7 +288,9 @@ class WordTetrisGame {
         // 语音朗读系统
         this.speechEnabled = true;
         this.currentSpeech = null;
-        this.speechTimer = null;
+        this.currentSpeechWord = null; // 当前朗读的单词（用于防止竞态条件）
+        this.speechTimer = null; // 重复朗读定时器
+        this.firstSpeechTimer = null; // 首次朗读定时器
         this.ttsService = null; // TTS 服务实例
         
         // 检测是否是 iOS 设备
@@ -500,6 +502,9 @@ class WordTetrisGame {
     startRepeatedSpeech(word) {
         debugLog.info(`🔁 开始重复朗读: "${word}" (模式: ${this.gameMode})`);
         
+        // 记录当前朗读的单词（用于防止竞态条件）
+        this.currentSpeechWord = word;
+        
         // 根据游戏模式决定播放策略
         if (this.gameMode === 'challenge') {
             // 挑战模式：单词已在缓冲区倒数时开始播放
@@ -514,6 +519,11 @@ class WordTetrisGame {
             
             // 设置定时器每5秒重复播放
             this.speechTimer = setInterval(async () => {
+                // 检查是否还是当前单词（防止竞态条件）
+                if (this.currentSpeechWord !== word) {
+                    debugLog.info(`⚠️ 定时器触发但单词已改变 (期望: "${word}", 当前: "${this.currentSpeechWord}")，取消朗读`);
+                    return;
+                }
                 debugLog.info(`⏰ 定时重复朗读: "${word}"`);
                 await this.speakWord(word);
             }, 5000); // 5秒 = 5000毫秒
@@ -523,11 +533,27 @@ class WordTetrisGame {
             
             debugLog.info(`😊 休闲模式 - 2秒后播放: "${word}"`);
             this.firstSpeechTimer = setTimeout(async () => {
+                // 检查是否还是当前单词（防止竞态条件）
+                if (this.currentSpeechWord !== word) {
+                    debugLog.info(`⚠️ 首次朗读定时器触发但单词已改变 (期望: "${word}", 当前: "${this.currentSpeechWord}")，取消朗读`);
+                    return;
+                }
                 debugLog.info(`⏰ 首次朗读（2秒延迟后）: "${word}"`);
                 await this.speakWord(word);
                 
+                // 再次检查是否还是当前单词（防止在 await 期间单词改变）
+                if (this.currentSpeechWord !== word) {
+                    debugLog.info(`⚠️ 首次朗读完成但单词已改变 (期望: "${word}", 当前: "${this.currentSpeechWord}")，不设置重复定时器`);
+                    return;
+                }
+                
                 // 首次播放后，设置定时器每5秒重复播放
                 this.speechTimer = setInterval(async () => {
+                    // 检查是否还是当前单词（防止竞态条件）
+                    if (this.currentSpeechWord !== word) {
+                        debugLog.info(`⚠️ 定时器触发但单词已改变 (期望: "${word}", 当前: "${this.currentSpeechWord}")，取消朗读`);
+                        return;
+                    }
                     debugLog.info(`⏰ 定时重复朗读: "${word}"`);
                     await this.speakWord(word);
                 }, 5000); // 5秒 = 5000毫秒
@@ -544,6 +570,9 @@ class WordTetrisGame {
         } : null;
         
         debugLog.info(`⏹️ stopSpeaking() 被调用 [TTS当前ID=${ttsInfo?.currentId || 'N/A'}, 活跃ID=[${ttsInfo?.activeIds.join(', ') || '无'}], 单词="${ttsInfo?.currentWord || '无'}"]`);
+        
+        // 清除当前朗读单词标记（用于防止竞态条件）
+        this.currentSpeechWord = null;
         
         // 取消首次朗读定时器
         if (this.firstSpeechTimer) {
