@@ -528,17 +528,19 @@ class WordTetrisGame {
                 await this.speakWord(word);
             }, 5000); // 5秒 = 5000毫秒
         } else {
-            // 休闲模式：先停止之前的朗读，然后2秒后播放第一次
+            // 休闲模式：先停止之前的朗读，然后立即播放第一次
             this.stopSpeaking();
             
-            debugLog.info(`😊 休闲模式 - 2秒后播放: "${word}"`);
-            this.firstSpeechTimer = setTimeout(async () => {
+            debugLog.info(`😊 休闲模式 - 立即播放: "${word}"`);
+            
+            // 立即播放第一次（使用异步函数包装）
+            (async () => {
                 // 检查是否还是当前单词（防止竞态条件）
                 if (this.currentSpeechWord !== word) {
-                    debugLog.info(`⚠️ 首次朗读定时器触发但单词已改变 (期望: "${word}", 当前: "${this.currentSpeechWord}")，取消朗读`);
+                    debugLog.info(`⚠️ 首次朗读前单词已改变 (期望: "${word}", 当前: "${this.currentSpeechWord}")，取消朗读`);
                     return;
                 }
-                debugLog.info(`⏰ 首次朗读（2秒延迟后）: "${word}"`);
+                debugLog.info(`⏰ 首次朗读（立即播放）: "${word}"`);
                 await this.speakWord(word);
                 
                 // 再次检查是否还是当前单词（防止在 await 期间单词改变）
@@ -557,7 +559,7 @@ class WordTetrisGame {
                     debugLog.info(`⏰ 定时重复朗读: "${word}"`);
                     await this.speakWord(word);
                 }, 5000); // 5秒 = 5000毫秒
-            }, 2000); // 2秒后首次播放
+            })();
         }
     }
 
