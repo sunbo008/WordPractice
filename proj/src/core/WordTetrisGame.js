@@ -410,9 +410,18 @@ class WordTetrisGame {
             return;
         }
 
+        // 检查游戏状态，如果游戏未在进行中则不播放
+        if (this.gameState !== 'playing') {
+            debugLog.info(`⏸️ 游戏未在进行中 (状态: ${this.gameState})，跳过朗读: "${word}"`);
+            return;
+        }
+
         // 根据游戏模式设置超时时间
         // 挑战模式和休闲模式都使用3秒超时
         const timeout = 3000;
+        
+        // 记录调用来源（用于调试）
+        debugLog.info(`🎤 准备朗读: "${word}"`);
 
         // 使用 TTSService 朗读
         try {
@@ -465,7 +474,7 @@ class WordTetrisGame {
             
             debugLog.info(`😊 休闲模式 - 2秒后播放: "${word}"`);
             this.firstSpeechTimer = setTimeout(async () => {
-                debugLog.info(`🔊 首次朗读: "${word}"`);
+                debugLog.info(`⏰ 首次朗读（2秒延迟后）: "${word}"`);
                 await this.speakWord(word);
                 
                 // 首次播放后，设置定时器每5秒重复播放
@@ -478,26 +487,30 @@ class WordTetrisGame {
     }
 
     stopSpeaking() {
+        debugLog.info('⏹️ stopSpeaking() 被调用');
+        
         // 取消首次朗读定时器
         if (this.firstSpeechTimer) {
             clearTimeout(this.firstSpeechTimer);
             this.firstSpeechTimer = null;
-            debugLog.info('⏹️ 停止首次朗读定时器');
+            debugLog.info('   ⏹️ 停止首次朗读定时器');
         }
         
         // 取消重复朗读定时器
         if (this.speechTimer) {
             clearInterval(this.speechTimer);
             this.speechTimer = null;
-            debugLog.info('⏹️ 停止重复朗读定时器');
+            debugLog.info('   ⏹️ 停止重复朗读定时器');
         }
 
         // 停止当前语音（使用 TTSService）
         if (this.ttsService) {
+            debugLog.info('   ⏹️ 停止当前音频播放（调用 TTSService.stop）');
             this.ttsService.stop();
         }
 
         this.currentSpeech = null;
+        debugLog.info('⏹️ stopSpeaking() 完成');
     }
 
     toggleSpeech() {

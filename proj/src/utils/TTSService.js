@@ -53,6 +53,10 @@ class TTSService {
         this.britishVoice = null;
         this.currentProviderIndex = 0;
         this.isSpeaking = false;
+        this.currentSpeakId = 0; // 当前 speak() 调用的 ID（用于取消令牌）
+        this.activeSpeakIds = new Set(); // 当前活跃的 speak() 调用 ID 集合
+        this.cancelledSpeakIds = new Set(); // 已取消的 speak() 调用 ID 集合
+        this.currentWord = null; // 当前正在播放的单词
         this.providerTested = false; // 标记是否已测试过提供商
         this.availableProviders = []; // 缓存所有可用的提供商（数组）
         this.currentAvailableIndex = 0; // 当前使用的可用提供商索引（用于轮换）
@@ -831,11 +835,45 @@ class TTSService {
         if (this.availableProviders.length > 0) {
             this.isSpeaking = true;
             
+            // 为当前 speak() 调用分配唯一 ID（用于取消令牌）
+            // 如果接近最大安全整数，重置计数器（实际上几乎不可能达到）
+            if (this.currentSpeakId >= Number.MAX_SAFE_INTEGER - 1) {
+                log.warning('⚠️ TTSService: speak ID 接近最大值，重置计数器');
+                this.currentSpeakId = 0;
+                // 清理所有旧的取消记录（活跃的调用早已完成）
+                this.cancelledSpeakIds.clear();
+            }
+            
+            const speakId = ++this.currentSpeakId;
+            this.activeSpeakIds.add(speakId); // 添加到活跃集合
+            log.info(`🆔 TTSService.speak() 分配 ID: ${speakId} (单词: "${word}")`);
+            
+            this.currentWord = word; // 记录当前正在播放的单词
+            
+            // 记录播放开始时间（用于错误日志）
+            const speakStartTime = Date.now();
+            const speakStartTimeStr = new Date(speakStartTime).toLocaleTimeString('zh-CN', { 
+                hour12: false, 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit',
+                fractionalSecondDigits: 3
+            });
+            
             // 尝试当前提供商和后续的所有提供商
             const startIndex = this.currentAvailableIndex;
             let attemptCount = 0;
             
             while (attemptCount < this.availableProviders.length) {
+                // 检查当前 speak() 调用是否已被取消
+                if (this.cancelledSpeakIds.has(speakId)) {
+                    log.info(`🚫 TTSService: "${word}" (ID: ${speakId}) - 播放已被取消，停止尝试`);
+                    this.cancelledSpeakIds.delete(speakId); // 清理已取消的 ID
+                    this.activeSpeakIds.delete(speakId); // 从活跃集合移除
+                    this.isSpeaking = false;
+                    return;
+                }
+                
                 const provider = this.availableProviders[this.currentAvailableIndex];
                 
                 // 记录当前提供商的开始时间
@@ -864,10 +902,20 @@ class TTSService {
                     }
                     
                     // 成功后，保持使用当前提供商，不轮换
+                    this.activeSpeakIds.delete(speakId); // 从活跃集合移除
                     this.isSpeaking = false;
                     return;
                     
                 } catch (error) {
+                    // 首先检查当前 speak() 调用是否已被取消
+                    if (this.cancelledSpeakIds.has(speakId)) {
+                        log.info(`🚫 TTSService: "${word}" (ID: ${speakId}) - 播放已被取消（在等待中）`);
+                        this.cancelledSpeakIds.delete(speakId); // 清理已取消的 ID
+                        this.activeSpeakIds.delete(speakId); // 从活跃集合移除
+                        this.isSpeaking = false;
+                        return;
+                    }
+                    
                     // 分析错误原因并输出详细信息
                     const errorDetail = error.message || error.toString();
                     const errorName = error.name || 'Error';
@@ -925,26 +973,26 @@ class TTSService {
                         solution = '请查看详细错误信息';
                     }
                     
-                    // 输出详细的错误分析
-                    log.warning(`⚠️ TTSService: ${provider.name} 失败 [${this.currentAvailableIndex + 1}/${this.availableProviders.length}]`);
-                    log.warning(`   📋 错误类型: ${errorCategory}`);
-                    log.warning(`   💬 错误原因: ${errorCause}`);
-                    if (solution) {
-                        log.warning(`   💡 解决建议: ${solution}`);
-                    }
-                    
-                    // 停止当前提供商的播放（清理资源）
-                    this.stop();
+                    // 停止当前提供商的播放（清理资源，但不设置取消标志）
+                    this.stop(false); // false = 仅清理资源，允许继续尝试其他提供商
                     
                     // 判断是否是"播放被中断"错误
                     const isInterrupted = errorCategory === '⚠️ 播放被中断';
                     
                     if (isInterrupted) {
-                        // 播放被中断不计入失败次数，直接结束本次播放尝试
-                        log.info(`   ℹ️ 播放被中断，不计入失败次数`);
+                        // 播放被中断是正常现象（如快速连续播放），使用 info 级别
+                        log.info(`ℹ️ TTSService: "${word}" - ${provider.name} 播放被新请求中断（正常现象）`);
                         this.isSpeaking = false;
                         // 不继续尝试其他提供商，因为是主动中断
                         return;
+                    }
+                    
+                    // 输出详细的错误分析（仅对真正的错误使用 warning）
+                    log.warning(`⚠️ TTSService: "${word}" - ${provider.name} 失败 [${this.currentAvailableIndex + 1}/${this.availableProviders.length}] (播放开始于: ${speakStartTimeStr})`);
+                    log.warning(`   📋 错误类型: ${errorCategory}`);
+                    log.warning(`   💬 错误原因: ${errorCause}`);
+                    if (solution) {
+                        log.warning(`   💡 解决建议: ${solution}`);
                     }
                     
                     // 记录失败次数（非中断错误）
@@ -1008,8 +1056,10 @@ class TTSService {
             
             // 重新初始化后仍然没有可用的提供商
             const errorMsg = '所有 TTS 服务均不可用（重新初始化后仍失败）';
-            log.error(`❌ TTSService: ${errorMsg}`);
+            log.error(`❌ TTSService: "${word}" - ${errorMsg}`);
             log.error(`💡 建议: 检查网络连接，或在 iOS 设备上确保音频上下文已解锁`);
+            
+            this.activeSpeakIds.delete(speakId); // 从活跃集合移除
             
             if (showError) {
                 this._showErrorNotification(errorMsg);
@@ -1024,7 +1074,7 @@ class TTSService {
         
         // 没有可用的提供商
         const errorMsg = '所有 TTS 服务均不可用';
-        log.error(`❌ TTSService: ${errorMsg}`);
+        log.error(`❌ TTSService: "${word}" - ${errorMsg}`);
         log.error(`💡 可能原因: 1) 网络问题 2) iOS 音频上下文未解锁 3) 所有提供商都不可用`);
         
         if (showError) {
@@ -1124,8 +1174,35 @@ class TTSService {
     
     /**
      * 停止当前朗读
+     * @param {boolean} setCancelled - 是否设置取消标志（默认 true）
+     *                                  true: 外部主动取消（如单词失败），阻止后续尝试
+     *                                  false: 内部清理资源（如提供商失败），允许继续尝试其他提供商
      */
-    stop() {
+    stop(setCancelled = true) {
+        const stoppedWord = this.currentWord; // 记录被停止的单词
+        
+        // 获取调用堆栈（用于调试重复调用）
+        const stack = new Error().stack;
+        const callerLine = stack ? stack.split('\n')[2] : 'unknown';
+        
+        log.info(`⏹️ TTSService.stop() 被调用${stoppedWord ? ` (停止单词: "${stoppedWord}")` : ''} [setCancelled=${setCancelled}] [调用自: ${callerLine.trim()}]`);
+        
+        // 设置取消标志，阻止正在进行中的 speak() 继续执行
+        if (setCancelled) {
+            // 将所有活跃的 speak() 调用标记为已取消
+            const activeCount = this.activeSpeakIds.size;
+            if (activeCount > 0) {
+                log.info(`   🚫 取消 ${activeCount} 个活跃的 speak() 调用: [${Array.from(this.activeSpeakIds).join(', ')}]`);
+                this.activeSpeakIds.forEach(id => {
+                    this.cancelledSpeakIds.add(id);
+                });
+            } else {
+                log.info(`   ℹ️ 没有活跃的 speak() 调用需要取消`);
+            }
+        } else {
+            log.info(`   🔧 仅清理资源，不设置取消标志`);
+        }
+        
         // 停止 Web Speech API
         if ('speechSynthesis' in window) {
             speechSynthesis.cancel();
@@ -1133,6 +1210,7 @@ class TTSService {
         
         // 停止所有正在播放的 Audio 对象
         if (this.activeAudios.length > 0) {
+            log.info(`⏹️ 停止 ${this.activeAudios.length} 个音频对象`);
             // 复制数组以避免在迭代时修改
             const audiosToStop = [...this.activeAudios];
             this.activeAudios = [];
@@ -1155,6 +1233,9 @@ class TTSService {
         }
         
         this.isSpeaking = false;
+        // 不立即清空 currentWord，保留用于日志追踪
+        // this.currentWord = null; 
+        log.info(`⏹️ TTSService 停止完成${stoppedWord ? ` ("${stoppedWord}")` : ''}`);
     }
     
     
