@@ -1,0 +1,64 @@
+{
+  "metadata": {
+    "id": "day37",
+    "name": "Day 37 - 辅音 /tʃ/ 和 /dʒ/",
+    "phoneme": "/tʃ/ /dʒ/",
+    "description": "学习/tʃ/和/dʒ/辅音的发音和拼读规则",
+    "day": 37,
+    "category": "daily-phonics",
+    "difficulty": "intermediate",
+    "wordCount": 5,
+    "lastUpdated": "2025-01-27"
+  },
+  "lesson": {
+    "pronunciationTips": [
+      "/tʃ/ 清辅音：舌前部接触硬腭，气流阻塞后突然释放，声带不振动",
+      "/dʒ/ 浊辅音：舌前部接触硬腭，气流阻塞后突然释放，声带振动",
+      "区别：/tʃ/ 清音不振动，/dʒ/ 浊音声带振",
+      "位置：都是舌腭音，发音位置相同"
+    ],
+    "phonicsPatterns": [
+      "ch 组合：chair, child, cheese",
+      "j 字母：jump, juice",
+      "记住：ch 发清音，j 发浊音"
+    ],
+    "practiceSteps": [
+      "分解练习：先发/tʃ/，再发/dʒ/，分别体会",
+      "对比练习：/tʃ/ /dʒ/ 对比发音",
+      "单词练习：在单词中练习发音",
+      "句子练习：在句子中练习发音"
+    ]
+  },
+  "words": [
+    {
+      "word": "chair",
+      "phonetic": "[tʃeə]",
+      "meaning": "椅子",
+      "difficulty": 2
+    },
+    {
+      "word": "child",
+      "phonetic": "[tʃaɪld]",
+      "meaning": "孩子",
+      "difficulty": 2
+    },
+    {
+      "word": "cheese",
+      "phonetic": "[tʃiːz]",
+      "meaning": "奶酪",
+      "difficulty": 2
+    },
+    {
+      "word": "jump",
+      "phonetic": "[dʒʌmp]",
+      "meaning": "跳",
+      "difficulty": 2
+    },
+    {
+      "word": "juice",
+      "phonetic": "[dʒuːs]",
+      "meaning": "果汁",
+      "difficulty": 2
+    }
+  ]
+}

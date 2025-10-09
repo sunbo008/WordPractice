@@ -1,0 +1,64 @@
+{
+  "metadata": {
+    "id": "day30",
+    "name": "Day 30 - 辅音 /k/ 和 /ɡ/",
+    "phoneme": "/k/ /ɡ/",
+    "description": "学习/k/和/ɡ/辅音的发音和拼读规则",
+    "day": 30,
+    "category": "daily-phonics",
+    "difficulty": "intermediate",
+    "wordCount": 5,
+    "lastUpdated": "2025-01-27"
+  },
+  "lesson": {
+    "pronunciationTips": [
+      "/k/ 清辅音：舌后部抬起，接触软腭，气流阻塞后突然释放，声带不振动",
+      "/ɡ/ 浊辅音：舌后部抬起，接触软腭，气流阻塞后突然释放，声带振动",
+      "区别：/k/ 清音不振动，/ɡ/ 浊音声带振",
+      "位置：都是舌后音，发音位置相同"
+    ],
+    "phonicsPatterns": [
+      "k 字母：cat, cake, car",
+      "g 字母：good, girl",
+      "记住：k 发清音，g 发浊音"
+    ],
+    "practiceSteps": [
+      "分解练习：先发/k/，再发/ɡ/，分别体会",
+      "对比练习：/k/ /ɡ/ 对比发音",
+      "单词练习：在单词中练习发音",
+      "句子练习：在句子中练习发音"
+    ]
+  },
+  "words": [
+    {
+      "word": "cat",
+      "phonetic": "[kæt]",
+      "meaning": "猫",
+      "difficulty": 2
+    },
+    {
+      "word": "cake",
+      "phonetic": "[keɪk]",
+      "meaning": "蛋糕",
+      "difficulty": 2
+    },
+    {
+      "word": "car",
+      "phonetic": "[kɑː]",
+      "meaning": "汽车",
+      "difficulty": 2
+    },
+    {
+      "word": "good",
+      "phonetic": "[ɡʊd]",
+      "meaning": "好的",
+      "difficulty": 2
+    },
+    {
+      "word": "girl",
+      "phonetic": "[ɡɜːl]",
+      "meaning": "女孩",
+      "difficulty": 2
+    }
+  ]
+}

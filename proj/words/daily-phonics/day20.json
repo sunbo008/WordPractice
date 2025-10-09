@@ -1,0 +1,65 @@
+{
+  "metadata": {
+    "id": "day20",
+    "name": "Day 20 - 双元音 /aʊ/",
+    "phoneme": "/aʊ/",
+    "description": "学习/aʊ/双元音的发音和拼读规则",
+    "day": 20,
+    "category": "daily-phonics",
+    "difficulty": "intermediate",
+    "wordCount": 5,
+    "lastUpdated": "2025-01-27"
+  },
+  "lesson": {
+    "pronunciationTips": [
+      "起始音：从/a/开始，舌位低，口大开",
+      "结束音：滑向/ʊ/，嘴唇圆起，舌后部上抬",
+      "唇形：从大开到圆小，变化很大",
+      "滑动：平滑过渡，不要停顿",
+      "重音：重音在前，/a/比/ʊ/响亮"
+    ],
+    "phonicsPatterns": [
+      "ou 组合：house, mouse",
+      "ow 组合：now, how, flower",
+      "记住：看到 ou 或 ow，就读双元音 /aʊ/"
+    ],
+    "practiceSteps": [
+      "分解练习：先发/a/，再发/ʊ/，分别体会",
+      "连接练习：/a/→/ʊ/，慢速滑动",
+      "加速练习：逐渐加快滑动速度",
+      "整体练习：一气呵成发出/aʊ/"
+    ]
+  },
+  "words": [
+    {
+      "word": "house",
+      "phonetic": "[haʊs]",
+      "meaning": "房子",
+      "difficulty": 2
+    },
+    {
+      "word": "mouse",
+      "phonetic": "[maʊs]",
+      "meaning": "老鼠",
+      "difficulty": 2
+    },
+    {
+      "word": "now",
+      "phonetic": "[naʊ]",
+      "meaning": "现在",
+      "difficulty": 2
+    },
+    {
+      "word": "how",
+      "phonetic": "[haʊ]",
+      "meaning": "怎么样",
+      "difficulty": 2
+    },
+    {
+      "word": "flower",
+      "phonetic": "[ˈflaʊə]",
+      "meaning": "花",
+      "difficulty": 2
+    }
+  ]
+}

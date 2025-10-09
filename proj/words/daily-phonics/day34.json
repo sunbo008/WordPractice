@@ -1,0 +1,64 @@
+{
+  "metadata": {
+    "id": "day34",
+    "name": "Day 34 - 辅音 /s/ 和 /z/",
+    "phoneme": "/s/ /z/",
+    "description": "学习/s/和/z/辅音的发音和拼读规则",
+    "day": 34,
+    "category": "daily-phonics",
+    "difficulty": "intermediate",
+    "wordCount": 5,
+    "lastUpdated": "2025-01-27"
+  },
+  "lesson": {
+    "pronunciationTips": [
+      "/s/ 清辅音：舌尖轻触上齿龈，气流从舌齿间通过，声带不振动",
+      "/z/ 浊辅音：舌尖轻触上齿龈，气流从舌齿间通过，声带振动",
+      "区别：/s/ 清音不振动，/z/ 浊音声带振",
+      "位置：都是舌齿音，发音位置相同"
+    ],
+    "phonicsPatterns": [
+      "s 字母：sun, six, see",
+      "z 字母：zoo, zero",
+      "记住：s 发清音，z 发浊音"
+    ],
+    "practiceSteps": [
+      "分解练习：先发/s/，再发/z/，分别体会",
+      "对比练习：/s/ /z/ 对比发音",
+      "单词练习：在单词中练习发音",
+      "句子练习：在句子中练习发音"
+    ]
+  },
+  "words": [
+    {
+      "word": "sun",
+      "phonetic": "[sʌn]",
+      "meaning": "太阳",
+      "difficulty": 2
+    },
+    {
+      "word": "six",
+      "phonetic": "[sɪks]",
+      "meaning": "六",
+      "difficulty": 2
+    },
+    {
+      "word": "see",
+      "phonetic": "[siː]",
+      "meaning": "看见",
+      "difficulty": 2
+    },
+    {
+      "word": "zoo",
+      "phonetic": "[zuː]",
+      "meaning": "动物园",
+      "difficulty": 2
+    },
+    {
+      "word": "zero",
+      "phonetic": "[ˈzɪərəʊ]",
+      "meaning": "零",
+      "difficulty": 2
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "metadata": {
+    "id": "day39",
+    "name": "Day 39 - 辅音 /m/ /n/ /ŋ/",
+    "phoneme": "/m/ /n/ /ŋ/",
+    "description": "学习/m/、/n/、/ŋ/三种鼻音的发音和拼读规则",
+    "day": 39,
+    "category": "daily-phonics",
+    "difficulty": "intermediate",
+    "wordCount": 5,
+    "lastUpdated": "2025-01-27"
+  },
+  "lesson": {
+    "pronunciationTips": [
+      "/m/ 双唇鼻音：双唇紧闭，气流从鼻腔通过，声带振动",
+      "/n/ 舌尖鼻音：舌尖轻触上齿龈，气流从鼻腔通过，声带振动",
+      "/ŋ/ 舌后鼻音：舌后部接触软腭，气流从鼻腔通过，声带振动",
+      "共同特点：都是鼻音，声带振动，气流从鼻腔通过"
+    ],
+    "phonicsPatterns": [
+      "m 字母：moon, name",
+      "n 字母：nine",
+      "ng 组合：sing, ring",
+      "记住：m 双唇鼻音，n 舌尖鼻音，ng 舌后鼻音"
+    ],
+    "practiceSteps": [
+      "分解练习：先发/m/，再发/n/，最后发/ŋ/，分别体会",
+      "对比练习：三种鼻音对比发音",
+      "单词练习：在单词中练习发音",
+      "句子练习：在句子中练习发音"
+    ]
+  },
+  "words": [
+    {
+      "word": "moon",
+      "phonetic": "[muːn]",
+      "meaning": "月亮",
+      "difficulty": 2
+    },
+    {
+      "word": "name",
+      "phonetic": "[neɪm]",
+      "meaning": "名字",
+      "difficulty": 2
+    },
+    {
+      "word": "nine",
+      "phonetic": "[naɪn]",
+      "meaning": "九",
+      "difficulty": 2
+    },
+    {
+      "word": "sing",
+      "phonetic": "[sɪŋ]",
+      "meaning": "唱歌",
+      "difficulty": 2
+    },
+    {
+      "word": "ring",
+      "phonetic": "[rɪŋ]",
+      "meaning": "戒指",
+      "difficulty": 2
+    }
+  ]
+}

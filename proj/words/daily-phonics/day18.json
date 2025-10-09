@@ -1,0 +1,65 @@
+{
+  "metadata": {
+    "id": "day18",
+    "name": "Day 18 - 双元音 /aɪ/",
+    "phoneme": "/aɪ/",
+    "description": "学习/aɪ/双元音的发音和拼读规则",
+    "day": 18,
+    "category": "daily-phonics",
+    "difficulty": "intermediate",
+    "wordCount": 5,
+    "lastUpdated": "2025-01-27"
+  },
+  "lesson": {
+    "pronunciationTips": [
+      "起始音：从/a/开始，舌位低，口大开",
+      "结束音：滑向/ɪ/，舌前部上抬",
+      "唇形：从大开逐渐收小",
+      "滑动：平滑过渡，不要停顿",
+      "重音：重音在前，/a/比/ɪ/响亮"
+    ],
+    "phonicsPatterns": [
+      "i-e 结构（神奇的e）：like, bike, time, nine, white",
+      "i-e 中的 e 不发音，但让前面的 i 发长音",
+      "记住：看到 i-e，就读双元音 /aɪ/"
+    ],
+    "practiceSteps": [
+      "分解练习：先发/a/，再发/ɪ/，分别体会",
+      "连接练习：/a/→/ɪ/，慢速滑动",
+      "加速练习：逐渐加快滑动速度",
+      "整体练习：一气呵成发出/aɪ/"
+    ]
+  },
+  "words": [
+    {
+      "word": "like",
+      "phonetic": "[laɪk]",
+      "meaning": "喜欢",
+      "difficulty": 2
+    },
+    {
+      "word": "bike",
+      "phonetic": "[baɪk]",
+      "meaning": "自行车",
+      "difficulty": 2
+    },
+    {
+      "word": "time",
+      "phonetic": "[taɪm]",
+      "meaning": "时间",
+      "difficulty": 2
+    },
+    {
+      "word": "nine",
+      "phonetic": "[naɪn]",
+      "meaning": "九",
+      "difficulty": 2
+    },
+    {
+      "word": "white",
+      "phonetic": "[waɪt]",
+      "meaning": "白色的",
+      "difficulty": 2
+    }
+  ]
+}

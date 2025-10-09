@@ -1,0 +1,65 @@
+{
+  "metadata": {
+    "id": "day35",
+    "name": "Day 35 - 辅音 /ʃ/ 和 /ʒ/",
+    "phoneme": "/ʃ/ /ʒ/",
+    "description": "学习/ʃ/和/ʒ/辅音的发音和拼读规则",
+    "day": 35,
+    "category": "daily-phonics",
+    "difficulty": "intermediate",
+    "wordCount": 5,
+    "lastUpdated": "2025-01-27"
+  },
+  "lesson": {
+    "pronunciationTips": [
+      "/ʃ/ 清辅音：舌前部接近硬腭，气流从舌腭间通过，声带不振动",
+      "/ʒ/ 浊辅音：舌前部接近硬腭，气流从舌腭间通过，声带振动",
+      "区别：/ʃ/ 清音不振动，/ʒ/ 浊音声带振",
+      "位置：都是舌腭音，发音位置相同"
+    ],
+    "phonicsPatterns": [
+      "sh 组合：ship, shoe, shop",
+      "sh 组合：fish",
+      "s 字母：measure",
+      "记住：sh 发清音，s 在某些情况下发浊音"
+    ],
+    "practiceSteps": [
+      "分解练习：先发/ʃ/，再发/ʒ/，分别体会",
+      "对比练习：/ʃ/ /ʒ/ 对比发音",
+      "单词练习：在单词中练习发音",
+      "句子练习：在句子中练习发音"
+    ]
+  },
+  "words": [
+    {
+      "word": "ship",
+      "phonetic": "[ʃɪp]",
+      "meaning": "船",
+      "difficulty": 2
+    },
+    {
+      "word": "shoe",
+      "phonetic": "[ʃuː]",
+      "meaning": "鞋子",
+      "difficulty": 2
+    },
+    {
+      "word": "shop",
+      "phonetic": "[ʃɒp]",
+      "meaning": "商店",
+      "difficulty": 2
+    },
+    {
+      "word": "fish",
+      "phonetic": "[fɪʃ]",
+      "meaning": "鱼",
+      "difficulty": 2
+    },
+    {
+      "word": "measure",
+      "phonetic": "[ˈmeʒə]",
+      "meaning": "测量",
+      "difficulty": 2
+    }
+  ]
+}

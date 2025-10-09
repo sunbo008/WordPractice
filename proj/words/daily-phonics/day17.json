@@ -1,0 +1,65 @@
+{
+  "metadata": {
+    "id": "day17",
+    "name": "Day 17 - 双元音 /eɪ/",
+    "phoneme": "/eɪ/",
+    "description": "学习/eɪ/双元音的发音和拼读规则",
+    "day": 17,
+    "category": "daily-phonics",
+    "difficulty": "intermediate",
+    "wordCount": 5,
+    "lastUpdated": "2025-01-27"
+  },
+  "lesson": {
+    "pronunciationTips": [
+      "起始音：从/e/开始，舌前中部",
+      "结束音：滑向/ɪ/，舌前部上抬",
+      "唇形：从半开逐渐收小",
+      "滑动：平滑过渡，不要停顿",
+      "重音：重音在前，/e/比/ɪ/响亮"
+    ],
+    "phonicsPatterns": [
+      "a-e 结构（神奇的e）：name, game, cake, make, take",
+      "a-e 中的 e 不发音，但让前面的 a 发长音",
+      "记住：看到 a-e，就读双元音 /eɪ/"
+    ],
+    "practiceSteps": [
+      "分解练习：先发/e/，再发/ɪ/，分别体会",
+      "连接练习：/e/→/ɪ/，慢速滑动",
+      "加速练习：逐渐加快滑动速度",
+      "整体练习：一气呵成发出/eɪ/"
+    ]
+  },
+  "words": [
+    {
+      "word": "name",
+      "phonetic": "[neɪm]",
+      "meaning": "名字",
+      "difficulty": 2
+    },
+    {
+      "word": "game",
+      "phonetic": "[ɡeɪm]",
+      "meaning": "游戏",
+      "difficulty": 2
+    },
+    {
+      "word": "cake",
+      "phonetic": "[keɪk]",
+      "meaning": "蛋糕",
+      "difficulty": 2
+    },
+    {
+      "word": "make",
+      "phonetic": "[meɪk]",
+      "meaning": "制作",
+      "difficulty": 2
+    },
+    {
+      "word": "take",
+      "phonetic": "[teɪk]",
+      "meaning": "拿",
+      "difficulty": 2
+    }
+  ]
+}

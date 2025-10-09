@@ -1,0 +1,65 @@
+{
+  "metadata": {
+    "id": "day19",
+    "name": "Day 19 - 双元音 /ɔɪ/",
+    "phoneme": "/ɔɪ/",
+    "description": "学习/ɔɪ/双元音的发音和拼读规则",
+    "day": 19,
+    "category": "daily-phonics",
+    "difficulty": "intermediate",
+    "wordCount": 5,
+    "lastUpdated": "2025-01-27"
+  },
+  "lesson": {
+    "pronunciationTips": [
+      "起始音：从/ɔ/开始，舌后部，嘴唇圆起",
+      "结束音：滑向/ɪ/，舌前部上抬",
+      "唇形：从圆唇逐渐收小",
+      "滑动：平滑过渡，不要停顿",
+      "重音：重音在前，/ɔ/比/ɪ/响亮"
+    ],
+    "phonicsPatterns": [
+      "oy 组合：boy, toy, joy",
+      "oi 组合：voice, choice",
+      "记住：看到 oy 或 oi，就读双元音 /ɔɪ/"
+    ],
+    "practiceSteps": [
+      "分解练习：先发/ɔ/，再发/ɪ/，分别体会",
+      "连接练习：/ɔ/→/ɪ/，慢速滑动",
+      "加速练习：逐渐加快滑动速度",
+      "整体练习：一气呵成发出/ɔɪ/"
+    ]
+  },
+  "words": [
+    {
+      "word": "boy",
+      "phonetic": "[bɔɪ]",
+      "meaning": "男孩",
+      "difficulty": 2
+    },
+    {
+      "word": "toy",
+      "phonetic": "[tɔɪ]",
+      "meaning": "玩具",
+      "difficulty": 2
+    },
+    {
+      "word": "joy",
+      "phonetic": "[dʒɔɪ]",
+      "meaning": "快乐",
+      "difficulty": 2
+    },
+    {
+      "word": "voice",
+      "phonetic": "[vɔɪs]",
+      "meaning": "声音",
+      "difficulty": 2
+    },
+    {
+      "word": "choice",
+      "phonetic": "[tʃɔɪs]",
+      "meaning": "选择",
+      "difficulty": 2
+    }
+  ]
+}

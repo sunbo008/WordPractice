@@ -1,0 +1,65 @@
+{
+  "metadata": {
+    "id": "day25",
+    "name": "Day 25 - 双元音 /ʊə/",
+    "phoneme": "/ʊə/",
+    "description": "学习/ʊə/双元音的发音和拼读规则",
+    "day": 25,
+    "category": "daily-phonics",
+    "difficulty": "intermediate",
+    "wordCount": 5,
+    "lastUpdated": "2025-01-27"
+  },
+  "lesson": {
+    "pronunciationTips": [
+      "起始音：从/ʊ/开始，舌后部上抬，嘴唇圆起",
+      "结束音：滑向/ə/，舌中央，口微开",
+      "唇形：从圆唇到微开",
+      "滑动：平滑过渡，不要停顿",
+      "重音：重音在前，/ʊ/比/ə/响亮"
+    ],
+    "phonicsPatterns": [
+      "ure 组合：sure, poor, tour, pure, cure",
+      "ure 组合通常发 /ʊə/ 音",
+      "记住：看到 ure，就读双元音 /ʊə/"
+    ],
+    "practiceSteps": [
+      "分解练习：先发/ʊ/，再发/ə/，分别体会",
+      "连接练习：/ʊ/→/ə/，慢速滑动",
+      "加速练习：逐渐加快滑动速度",
+      "整体练习：一气呵成发出/ʊə/"
+    ]
+  },
+  "words": [
+    {
+      "word": "sure",
+      "phonetic": "[ʃʊə]",
+      "meaning": "确定的",
+      "difficulty": 2
+    },
+    {
+      "word": "poor",
+      "phonetic": "[pʊə]",
+      "meaning": "贫穷的",
+      "difficulty": 2
+    },
+    {
+      "word": "tour",
+      "phonetic": "[tʊə]",
+      "meaning": "旅游",
+      "difficulty": 2
+    },
+    {
+      "word": "pure",
+      "phonetic": "[pjʊə]",
+      "meaning": "纯净的",
+      "difficulty": 2
+    },
+    {
+      "word": "cure",
+      "phonetic": "[kjʊə]",
+      "meaning": "治愈",
+      "difficulty": 2
+    }
+  ]
+}

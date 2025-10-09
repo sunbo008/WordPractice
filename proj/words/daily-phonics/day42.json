@@ -1,0 +1,64 @@
+{
+  "metadata": {
+    "id": "day42",
+    "name": "Day 42 - 辅音 /w/ 和 /j/",
+    "phoneme": "/w/ /j/",
+    "description": "学习/w/和/j/辅音的发音和拼读规则",
+    "day": 42,
+    "category": "daily-phonics",
+    "difficulty": "intermediate",
+    "wordCount": 5,
+    "lastUpdated": "2025-01-27"
+  },
+  "lesson": {
+    "pronunciationTips": [
+      "/w/ 双唇半元音：双唇收圆，舌后部上抬，气流从双唇间通过，声带振动",
+      "/j/ 舌前半元音：舌前部上抬，接近硬腭，气流从舌腭间通过，声带振动",
+      "区别：/w/ 双唇音，/j/ 舌前音",
+      "特点：都是半元音，声带振动，气流通过"
+    ],
+    "phonicsPatterns": [
+      "w 字母：water, white, window",
+      "y 字母：yes, yellow",
+      "记住：w 双唇音，y 舌前音"
+    ],
+    "practiceSteps": [
+      "分解练习：先发/w/，再发/j/，分别体会",
+      "对比练习：/w/ /j/ 对比发音",
+      "单词练习：在单词中练习发音",
+      "句子练习：在句子中练习发音"
+    ]
+  },
+  "words": [
+    {
+      "word": "water",
+      "phonetic": "[ˈwɔːtə]",
+      "meaning": "水",
+      "difficulty": 2
+    },
+    {
+      "word": "white",
+      "phonetic": "[waɪt]",
+      "meaning": "白色的",
+      "difficulty": 2
+    },
+    {
+      "word": "window",
+      "phonetic": "[ˈwɪndəʊ]",
+      "meaning": "窗户",
+      "difficulty": 2
+    },
+    {
+      "word": "yes",
+      "phonetic": "[jes]",
+      "meaning": "是的",
+      "difficulty": 2
+    },
+    {
+      "word": "yellow",
+      "phonetic": "[ˈjeləʊ]",
+      "meaning": "黄色的",
+      "difficulty": 2
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "metadata": {
+    "id": "day24",
+    "name": "Day 24 - 双元音 /eə/",
+    "phoneme": "/eə/",
+    "description": "学习/eə/双元音的发音和拼读规则",
+    "day": 24,
+    "category": "daily-phonics",
+    "difficulty": "intermediate",
+    "wordCount": 5,
+    "lastUpdated": "2025-01-27"
+  },
+  "lesson": {
+    "pronunciationTips": [
+      "起始音：从/e/开始，舌前中部",
+      "结束音：滑向/ə/，舌中央，口微开",
+      "唇形：从半开到微开",
+      "滑动：平滑过渡，不要停顿",
+      "重音：重音在前，/e/比/ə/响亮"
+    ],
+    "phonicsPatterns": [
+      "air 组合：hair, chair, care, share, where",
+      "air 组合通常发 /eə/ 音",
+      "记住：看到 air，就读双元音 /eə/"
+    ],
+    "practiceSteps": [
+      "分解练习：先发/e/，再发/ə/，分别体会",
+      "连接练习：/e/→/ə/，慢速滑动",
+      "加速练习：逐渐加快滑动速度",
+      "整体练习：一气呵成发出/eə/"
+    ]
+  },
+  "words": [
+    {
+      "word": "hair",
+      "phonetic": "[heə]",
+      "meaning": "头发",
+      "difficulty": 2
+    },
+    {
+      "word": "chair",
+      "phonetic": "[tʃeə]",
+      "meaning": "椅子",
+      "difficulty": 2
+    },
+    {
+      "word": "care",
+      "phonetic": "[keə]",
+      "meaning": "关心",
+      "difficulty": 2
+    },
+    {
+      "word": "share",
+      "phonetic": "[ʃeə]",
+      "meaning": "分享",
+      "difficulty": 2
+    },
+    {
+      "word": "where",
+      "phonetic": "[weə]",
+      "meaning": "哪里",
+      "difficulty": 2
+    }
+  ]
+}

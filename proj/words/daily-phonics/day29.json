@@ -1,0 +1,64 @@
+{
+  "metadata": {
+    "id": "day29",
+    "name": "Day 29 - 辅音 /t/ 和 /d/",
+    "phoneme": "/t/ /d/",
+    "description": "学习/t/和/d/辅音的发音和拼读规则",
+    "day": 29,
+    "category": "daily-phonics",
+    "difficulty": "intermediate",
+    "wordCount": 5,
+    "lastUpdated": "2025-01-27"
+  },
+  "lesson": {
+    "pronunciationTips": [
+      "/t/ 清辅音：舌尖轻触上齿龈，气流阻塞后突然释放，声带不振动",
+      "/d/ 浊辅音：舌尖轻触上齿龈，气流阻塞后突然释放，声带振动",
+      "区别：/t/ 清音不振动，/d/ 浊音声带振",
+      "位置：都是舌尖音，发音位置相同"
+    ],
+    "phonicsPatterns": [
+      "t 字母：table, ten",
+      "d 字母：dog, door, day",
+      "记住：t 发清音，d 发浊音"
+    ],
+    "practiceSteps": [
+      "分解练习：先发/t/，再发/d/，分别体会",
+      "对比练习：/t/ /d/ 对比发音",
+      "单词练习：在单词中练习发音",
+      "句子练习：在句子中练习发音"
+    ]
+  },
+  "words": [
+    {
+      "word": "table",
+      "phonetic": "[ˈteɪbl]",
+      "meaning": "桌子",
+      "difficulty": 2
+    },
+    {
+      "word": "ten",
+      "phonetic": "[ten]",
+      "meaning": "十",
+      "difficulty": 2
+    },
+    {
+      "word": "dog",
+      "phonetic": "[dɒɡ]",
+      "meaning": "狗",
+      "difficulty": 2
+    },
+    {
+      "word": "door",
+      "phonetic": "[dɔː]",
+      "meaning": "门",
+      "difficulty": 2
+    },
+    {
+      "word": "day",
+      "phonetic": "[deɪ]",
+      "meaning": "天",
+      "difficulty": 2
+    }
+  ]
+}

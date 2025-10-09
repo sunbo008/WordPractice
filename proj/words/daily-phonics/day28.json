@@ -1,0 +1,64 @@
+{
+  "metadata": {
+    "id": "day28",
+    "name": "Day 28 - 辅音 /p/ 和 /b/",
+    "phoneme": "/p/ /b/",
+    "description": "学习/p/和/b/辅音的发音和拼读规则",
+    "day": 28,
+    "category": "daily-phonics",
+    "difficulty": "intermediate",
+    "wordCount": 5,
+    "lastUpdated": "2025-01-27"
+  },
+  "lesson": {
+    "pronunciationTips": [
+      "/p/ 清辅音：双唇紧闭，气流阻塞后突然释放，声带不振动",
+      "/b/ 浊辅音：双唇紧闭，气流阻塞后突然释放，声带振动",
+      "区别：/p/ 清音不振动，/b/ 浊音声带振",
+      "位置：都是双唇音，发音位置相同"
+    ],
+    "phonicsPatterns": [
+      "p 字母：pen, pig",
+      "b 字母：bag, book, baby",
+      "记住：p 发清音，b 发浊音"
+    ],
+    "practiceSteps": [
+      "分解练习：先发/p/，再发/b/，分别体会",
+      "对比练习：/p/ /b/ 对比发音",
+      "单词练习：在单词中练习发音",
+      "句子练习：在句子中练习发音"
+    ]
+  },
+  "words": [
+    {
+      "word": "pen",
+      "phonetic": "[pen]",
+      "meaning": "钢笔",
+      "difficulty": 2
+    },
+    {
+      "word": "pig",
+      "phonetic": "[pɪɡ]",
+      "meaning": "猪",
+      "difficulty": 2
+    },
+    {
+      "word": "bag",
+      "phonetic": "[bæɡ]",
+      "meaning": "包",
+      "difficulty": 2
+    },
+    {
+      "word": "book",
+      "phonetic": "[bʊk]",
+      "meaning": "书",
+      "difficulty": 2
+    },
+    {
+      "word": "baby",
+      "phonetic": "[ˈbeɪbi]",
+      "meaning": "婴儿",
+      "difficulty": 2
+    }
+  ]
+}

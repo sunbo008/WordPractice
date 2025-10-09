@@ -1,0 +1,64 @@
+{
+  "metadata": {
+    "id": "day38",
+    "name": "Day 38 - 辅音 /h/",
+    "phoneme": "/h/",
+    "description": "学习/h/辅音的发音和拼读规则",
+    "day": 38,
+    "category": "daily-phonics",
+    "difficulty": "intermediate",
+    "wordCount": 5,
+    "lastUpdated": "2025-01-27"
+  },
+  "lesson": {
+    "pronunciationTips": [
+      "/h/ 清辅音：气流从声门通过，声带不振动",
+      "发音特点：气流摩擦音，类似哈气声",
+      "位置：声门音，发音位置在声门",
+      "注意：/h/ 只在音节开头出现"
+    ],
+    "phonicsPatterns": [
+      "h 字母：house, happy, hand, head, help",
+      "h 字母通常发 /h/ 音",
+      "记住：h 发清音，类似哈气声"
+    ],
+    "practiceSteps": [
+      "分解练习：发/h/音，体会气流摩擦",
+      "单词练习：在单词中练习发音",
+      "句子练习：在句子中练习发音",
+      "注意：/h/ 只在音节开头出现"
+    ]
+  },
+  "words": [
+    {
+      "word": "house",
+      "phonetic": "[haʊs]",
+      "meaning": "房子",
+      "difficulty": 2
+    },
+    {
+      "word": "happy",
+      "phonetic": "[ˈhæpi]",
+      "meaning": "快乐的",
+      "difficulty": 2
+    },
+    {
+      "word": "hand",
+      "phonetic": "[hænd]",
+      "meaning": "手",
+      "difficulty": 2
+    },
+    {
+      "word": "head",
+      "phonetic": "[hed]",
+      "meaning": "头",
+      "difficulty": 2
+    },
+    {
+      "word": "help",
+      "phonetic": "[help]",
+      "meaning": "帮助",
+      "difficulty": 2
+    }
+  ]
+}

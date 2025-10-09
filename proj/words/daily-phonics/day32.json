@@ -1,0 +1,64 @@
+{
+  "metadata": {
+    "id": "day32",
+    "name": "Day 32 - 辅音 /f/ 和 /v/",
+    "phoneme": "/f/ /v/",
+    "description": "学习/f/和/v/辅音的发音和拼读规则",
+    "day": 32,
+    "category": "daily-phonics",
+    "difficulty": "intermediate",
+    "wordCount": 5,
+    "lastUpdated": "2025-01-27"
+  },
+  "lesson": {
+    "pronunciationTips": [
+      "/f/ 清辅音：上齿轻触下唇，气流从唇齿间通过，声带不振动",
+      "/v/ 浊辅音：上齿轻触下唇，气流从唇齿间通过，声带振动",
+      "区别：/f/ 清音不振动，/v/ 浊音声带振",
+      "位置：都是唇齿音，发音位置相同"
+    ],
+    "phonicsPatterns": [
+      "f 字母：fish, five, face",
+      "v 字母：very, voice",
+      "记住：f 发清音，v 发浊音"
+    ],
+    "practiceSteps": [
+      "分解练习：先发/f/，再发/v/，分别体会",
+      "对比练习：/f/ /v/ 对比发音",
+      "单词练习：在单词中练习发音",
+      "句子练习：在句子中练习发音"
+    ]
+  },
+  "words": [
+    {
+      "word": "fish",
+      "phonetic": "[fɪʃ]",
+      "meaning": "鱼",
+      "difficulty": 2
+    },
+    {
+      "word": "five",
+      "phonetic": "[faɪv]",
+      "meaning": "五",
+      "difficulty": 2
+    },
+    {
+      "word": "face",
+      "phonetic": "[feɪs]",
+      "meaning": "脸",
+      "difficulty": 2
+    },
+    {
+      "word": "very",
+      "phonetic": "[ˈveri]",
+      "meaning": "非常",
+      "difficulty": 2
+    },
+    {
+      "word": "voice",
+      "phonetic": "[vɔɪs]",
+      "meaning": "声音",
+      "difficulty": 2
+    }
+  ]
+}

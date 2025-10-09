@@ -1,0 +1,65 @@
+{
+  "metadata": {
+    "id": "day22",
+    "name": "Day 22 - 双元音 /əʊ/",
+    "phoneme": "/əʊ/",
+    "description": "学习/əʊ/双元音的发音和拼读规则",
+    "day": 22,
+    "category": "daily-phonics",
+    "difficulty": "intermediate",
+    "wordCount": 5,
+    "lastUpdated": "2025-01-27"
+  },
+  "lesson": {
+    "pronunciationTips": [
+      "起始音：从/ə/开始，舌中央，口微开",
+      "结束音：滑向/ʊ/，嘴唇圆起，舌后部上抬",
+      "唇形：从微开到圆唇",
+      "滑动：平滑过渡，不要停顿",
+      "重音：重音在前，/ə/比/ʊ/响亮"
+    ],
+    "phonicsPatterns": [
+      "o-e 结构：go, no, home, phone, hope",
+      "o-e 中的 e 不发音，但让前面的 o 发长音",
+      "记住：看到 o-e，就读双元音 /əʊ/"
+    ],
+    "practiceSteps": [
+      "分解练习：先发/ə/，再发/ʊ/，分别体会",
+      "连接练习：/ə/→/ʊ/，慢速滑动",
+      "加速练习：逐渐加快滑动速度",
+      "整体练习：一气呵成发出/əʊ/"
+    ]
+  },
+  "words": [
+    {
+      "word": "go",
+      "phonetic": "[ɡəʊ]",
+      "meaning": "去",
+      "difficulty": 2
+    },
+    {
+      "word": "no",
+      "phonetic": "[nəʊ]",
+      "meaning": "不",
+      "difficulty": 2
+    },
+    {
+      "word": "home",
+      "phonetic": "[həʊm]",
+      "meaning": "家",
+      "difficulty": 2
+    },
+    {
+      "word": "phone",
+      "phonetic": "[fəʊn]",
+      "meaning": "电话",
+      "difficulty": 2
+    },
+    {
+      "word": "hope",
+      "phonetic": "[həʊp]",
+      "meaning": "希望",
+      "difficulty": 2
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "metadata": {
+    "id": "day23",
+    "name": "Day 23 - 双元音 /ɪə/",
+    "phoneme": "/ɪə/",
+    "description": "学习/ɪə/双元音的发音和拼读规则",
+    "day": 23,
+    "category": "daily-phonics",
+    "difficulty": "intermediate",
+    "wordCount": 5,
+    "lastUpdated": "2025-01-27"
+  },
+  "lesson": {
+    "pronunciationTips": [
+      "起始音：从/ɪ/开始，舌前部上抬",
+      "结束音：滑向/ə/，舌中央，口微开",
+      "唇形：从扁唇到微开",
+      "滑动：平滑过渡，不要停顿",
+      "重音：重音在前，/ɪ/比/ə/响亮"
+    ],
+    "phonicsPatterns": [
+      "ear 组合：here, near, year, clear, dear",
+      "ear 组合通常发 /ɪə/ 音",
+      "记住：看到 ear，就读双元音 /ɪə/"
+    ],
+    "practiceSteps": [
+      "分解练习：先发/ɪ/，再发/ə/，分别体会",
+      "连接练习：/ɪ/→/ə/，慢速滑动",
+      "加速练习：逐渐加快滑动速度",
+      "整体练习：一气呵成发出/ɪə/"
+    ]
+  },
+  "words": [
+    {
+      "word": "here",
+      "phonetic": "[hɪə]",
+      "meaning": "这里",
+      "difficulty": 2
+    },
+    {
+      "word": "near",
+      "phonetic": "[nɪə]",
+      "meaning": "近的",
+      "difficulty": 2
+    },
+    {
+      "word": "year",
+      "phonetic": "[jɪə]",
+      "meaning": "年",
+      "difficulty": 2
+    },
+    {
+      "word": "clear",
+      "phonetic": "[klɪə]",
+      "meaning": "清楚的",
+      "difficulty": 2
+    },
+    {
+      "word": "dear",
+      "phonetic": "[dɪə]",
+      "meaning": "亲爱的",
+      "difficulty": 2
+    }
+  ]
+}

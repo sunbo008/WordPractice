@@ -1,0 +1,64 @@
+{
+  "metadata": {
+    "id": "day40",
+    "name": "Day 40 - 辅音 /l/ 和 /r/",
+    "phoneme": "/l/ /r/",
+    "description": "学习/l/和/r/流音的发音和拼读规则",
+    "day": 40,
+    "category": "daily-phonics",
+    "difficulty": "intermediate",
+    "wordCount": 5,
+    "lastUpdated": "2025-01-27"
+  },
+  "lesson": {
+    "pronunciationTips": [
+      "/l/ 流音：舌尖轻触上齿龈，舌面自然放松，气流从舌尖两侧通过，声带振动",
+      "/r/ 流音：舌尖轻触上齿龈，舌面自然放松，气流从舌尖两侧通过，声带振动",
+      "区别：两种流音发音位置相同，都是气流从舌尖两侧通过",
+      "特点：都是流音，声带振动，气流从舌尖两侧通过"
+    ],
+    "phonicsPatterns": [
+      "l 字母：like, look, love",
+      "r 字母：red, run",
+      "记住：l 和 r 都是流音，发音位置相同"
+    ],
+    "practiceSteps": [
+      "分解练习：先发/l/，再发/r/，分别体会",
+      "对比练习：/l/ /r/ 对比发音",
+      "单词练习：在单词中练习发音",
+      "句子练习：在句子中练习发音"
+    ]
+  },
+  "words": [
+    {
+      "word": "like",
+      "phonetic": "[laɪk]",
+      "meaning": "喜欢",
+      "difficulty": 2
+    },
+    {
+      "word": "look",
+      "phonetic": "[lʊk]",
+      "meaning": "看",
+      "difficulty": 2
+    },
+    {
+      "word": "love",
+      "phonetic": "[lʌv]",
+      "meaning": "爱",
+      "difficulty": 2
+    },
+    {
+      "word": "red",
+      "phonetic": "[red]",
+      "meaning": "红色的",
+      "difficulty": 2
+    },
+    {
+      "word": "run",
+      "phonetic": "[rʌn]",
+      "meaning": "跑",
+      "difficulty": 2
+    }
+  ]
+}

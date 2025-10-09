@@ -1,0 +1,64 @@
+{
+  "metadata": {
+    "id": "day33",
+    "name": "Day 33 - 辅音 /θ/ 和 /ð/",
+    "phoneme": "/θ/ /ð/",
+    "description": "学习/θ/和/ð/辅音的发音和拼读规则",
+    "day": 33,
+    "category": "daily-phonics",
+    "difficulty": "intermediate",
+    "wordCount": 5,
+    "lastUpdated": "2025-01-27"
+  },
+  "lesson": {
+    "pronunciationTips": [
+      "/θ/ 清辅音：舌尖轻触上齿，气流从舌齿间通过，声带不振动",
+      "/ð/ 浊辅音：舌尖轻触上齿，气流从舌齿间通过，声带振动",
+      "区别：/θ/ 清音不振动，/ð/ 浊音声带振",
+      "位置：都是舌齿音，发音位置相同"
+    ],
+    "phonicsPatterns": [
+      "th 组合：three, think, thank",
+      "th 组合：this, that",
+      "记住：th 可以发清音或浊音"
+    ],
+    "practiceSteps": [
+      "分解练习：先发/θ/，再发/ð/，分别体会",
+      "对比练习：/θ/ /ð/ 对比发音",
+      "单词练习：在单词中练习发音",
+      "句子练习：在句子中练习发音"
+    ]
+  },
+  "words": [
+    {
+      "word": "three",
+      "phonetic": "[θriː]",
+      "meaning": "三",
+      "difficulty": 2
+    },
+    {
+      "word": "think",
+      "phonetic": "[θɪŋk]",
+      "meaning": "想",
+      "difficulty": 2
+    },
+    {
+      "word": "thank",
+      "phonetic": "[θæŋk]",
+      "meaning": "谢谢",
+      "difficulty": 2
+    },
+    {
+      "word": "this",
+      "phonetic": "[ðɪs]",
+      "meaning": "这个",
+      "difficulty": 2
+    },
+    {
+      "word": "that",
+      "phonetic": "[ðæt]",
+      "meaning": "那个",
+      "difficulty": 2
+    }
+  ]
+}
