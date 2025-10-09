@@ -44,8 +44,15 @@ class SettingsManagerV2 {
         try {
             const saved = localStorage.getItem('wordTetris_selectedLibraries');
             if (saved) {
-                this.selectedLibraries = new Set(JSON.parse(saved));
-                console.log('⚙️ 用户设置加载成功:', Array.from(this.selectedLibraries));
+                const parsed = JSON.parse(saved);
+                // 如果保存的配置为空数组，使用默认配置
+                if (Array.isArray(parsed) && parsed.length === 0) {
+                    console.warn('⚠️ 保存的配置为空，使用默认配置');
+                    this.selectedLibraries = new Set(this.config.defaultConfig.enabledLibraries);
+                } else {
+                    this.selectedLibraries = new Set(parsed);
+                    console.log('⚙️ 用户设置加载成功:', Array.from(this.selectedLibraries));
+                }
             } else {
                 // 使用默认配置
                 this.selectedLibraries = new Set(this.config.defaultConfig.enabledLibraries);

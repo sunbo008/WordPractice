@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Word Tetris - 单词俄罗斯方块</title>
-    <link rel="stylesheet" href="css/styles.css?v=20251007-3">
+    <link rel="stylesheet" href="css/styles.css?v=20251009-2">
 </head>
 <body>
     <div class="game-container">
@@ -191,17 +191,18 @@
 
     <!-- 一次性清理旧配置（仅在2025-10-06之前的旧版本运行过） -->
     <script>
-        // 检查并清理旧的4天配置缓存（只清理一次）
+        // 检查并清理旧的配置缓存（只清理一次）
         (function() {
-            const cleanupFlag = localStorage.getItem('wordTetris_configCleanedV2');
+            const cleanupFlag = localStorage.getItem('wordTetris_configCleanedV3');
             if (!cleanupFlag) {
                 // 第一次运行新版本，检查是否需要清理
                 const savedLibraries = localStorage.getItem('wordTetris_selectedLibraries');
                 if (savedLibraries) {
                     try {
                         const libs = JSON.parse(savedLibraries);
-                        // 只有当保存的配置恰好是 ['day01', 'day02', 'day03', 'day04'] 时才清除
-                        // 这是旧版本的默认配置
+                        
+                        // 检查是否是空数组或旧的4天配置
+                        const isEmpty = Array.isArray(libs) && libs.length === 0;
                         const isOldDefaultConfig = 
                             libs.length === 4 && 
                             libs.includes('day01') && 
@@ -209,19 +210,25 @@
                             libs.includes('day03') && 
                             libs.includes('day04');
                         
-                        if (isOldDefaultConfig) {
+                        if (isEmpty) {
+                            console.log('🔄 检测到空配置，正在清理...');
+                            localStorage.removeItem('wordTetris_selectedLibraries');
+                            console.log('✅ 空配置已清理，将使用默认配置（包含所有可用课程）');
+                        } else if (isOldDefaultConfig) {
                             console.log('🔄 检测到旧版本默认配置（day01-04），正在清理...');
                             localStorage.removeItem('wordTetris_selectedLibraries');
-                            console.log('✅ 旧配置已清理，将使用新的默认配置（包含所有15天课程）');
+                            console.log('✅ 旧配置已清理，将使用新的默认配置（包含所有可用课程）');
                         } else {
                             console.log('✅ 用户自定义配置保留:', libs);
                         }
                     } catch (e) {
                         console.error('配置检查失败:', e);
+                        // 如果解析失败，清除配置
+                        localStorage.removeItem('wordTetris_selectedLibraries');
                     }
                 }
                 // 标记已清理，下次不再执行
-                localStorage.setItem('wordTetris_configCleanedV2', 'true');
+                localStorage.setItem('wordTetris_configCleanedV3', 'true');
             }
         })();
     </script>
@@ -251,9 +258,9 @@
             }
         }, 100);
     </script>
-    <script src="src/core/vocabulary-config-loader.js?v=20251007-4"></script>
-    <script src="src/core/vocabulary-manager-v2.js?v=20251007-4"></script>
-    <script src="src/core/WordTetrisGame.js?v=20251007-4"></script>
-    <script src="src/core/game-settings-integration.js?v=20251007-4"></script>
+    <script src="src/core/vocabulary-config-loader.js?v=20251009-2"></script>
+    <script src="src/core/vocabulary-manager-v2.js?v=20251009-2"></script>
+    <script src="src/core/WordTetrisGame.js?v=20251009-2"></script>
+    <script src="src/core/game-settings-integration.js?v=20251009-2"></script>
 </body>
 </html>

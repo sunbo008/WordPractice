@@ -55,7 +55,8 @@ class VocabularyConfigLoader {
                     }
                 ],
                 defaultConfig: {
-                    enabledLibraries: dailyPhonics.map(item => item.id), // 加载所有daily-phonics课程
+                    // 使用动态发现的所有 daily-phonics 文件作为默认配置
+                    enabledLibraries: dailyPhonics.map(item => item.id),
                     maxWords: 200,
                     difficultyRange: [1, 3],
                     categories: ["daily-phonics"]
@@ -65,8 +66,11 @@ class VocabularyConfigLoader {
             console.log('✅ 配置加载完成:', {
                 dailyPhonics: dailyPhonics.length,
                 specialPractice: specialPractice.length,
-                gradeBased: this.countGradeItems(gradeBased)
+                gradeBased: this.countGradeItems(gradeBased),
+                defaultEnabled: this.config.defaultConfig.enabledLibraries.length
             });
+            
+            console.log('📋 默认启用的课程:', this.config.defaultConfig.enabledLibraries);
             
             return this.config;
             
@@ -79,33 +83,31 @@ class VocabularyConfigLoader {
     
     /**
      * 扫描 daily-phonics 目录
+     * 自动探测 day01.json 到 day50.json 的所有文件
      */
     async scanDailyPhonics() {
         const directory = './words/daily-phonics';
-        const filePattern = /^day\d+\.json$/;
-        
-        // 尝试加载已知的文件名
-        const knownFiles = [
-            'day01', 'day02', 'day03', 'day04', 'day05',
-            'day06', 'day07', 'day08', 'day09', 'day10',
-            'day11', 'day12', 'day13', 'day14', 'day15'
-        ];
-        
         const results = [];
         
-        for (const filename of knownFiles) {
+        console.log('🔍 扫描 daily-phonics 目录...');
+        
+        // 动态探测 day01 到 day50 的所有文件
+        for (let i = 1; i <= 50; i++) {
+            const filename = `day${String(i).padStart(2, '0')}`;
             const filepath = `${directory}/${filename}.json`;
             
             try {
-                const response = await fetch(filepath);
+                const response = await fetch(filepath, { method: 'HEAD' });
                 if (!response.ok) continue; // 文件不存在，跳过
                 
-                const data = await response.json();
+                // 文件存在，获取完整数据
+                const fullResponse = await fetch(filepath);
+                const data = await fullResponse.json();
                 const metadata = data.metadata || {};
                 
                 results.push({
                     id: metadata.id || filename,
-                    name: metadata.name || filename,
+                    name: metadata.name || `Day ${i}`,
                     filename: `daily-phonics/${filename}.json`,
                     phoneme: metadata.phoneme || '',
                     description: metadata.description || '',
@@ -114,45 +116,59 @@ class VocabularyConfigLoader {
                     recommended: true
                 });
                 
-                console.log(`  ✓ ${filename}.json`);
+                console.log(`  ✓ 发现文件: ${filename}.json (${metadata.name || filename})`);
             } catch (error) {
                 // 文件不存在或解析失败，静默跳过
-                console.log(`  ⊘ ${filename}.json (not found)`);
             }
         }
         
+        console.log(`✅ daily-phonics 扫描完成，发现 ${results.length} 个文件`);
         return results.sort((a, b) => a.id.localeCompare(b.id));
     }
     
     /**
      * 扫描 special-practice 目录
+     * 自动探测常见的音标练习文件命名模式
      */
     async scanSpecialPractice() {
         const directory = './words/special-practice';
-        
-        // 已知的专项练习文件
-        const knownFiles = [
-            'ae-practice',
-            'e-practice',
-            'or-practice',
-            'o-practice'
-        ];
-        
         const results = [];
         
-        for (const filename of knownFiles) {
+        console.log('🔍 扫描 special-practice 目录...');
+        
+        // 常见的音标和练习文件命名模式
+        const potentialFiles = [
+            // 元音音标
+            'ae-practice', 'e-practice', 'i-practice', 'o-practice', 'or-practice', 'u-practice',
+            'a-practice', 'ar-practice', 'er-practice', 'ir-practice', 'ur-practice',
+            'oo-practice', 'ou-practice', 'ow-practice', 'oi-practice', 'oy-practice',
+            'ai-practice', 'ay-practice', 'ea-practice', 'ee-practice', 'ie-practice',
+            'ue-practice', 'ui-practice', 'au-practice', 'aw-practice', 'ew-practice',
+            // 辅音音标
+            'th-practice', 'sh-practice', 'ch-practice', 'ph-practice', 'wh-practice',
+            'ng-practice', 'nk-practice', 'ck-practice', 'gh-practice',
+            // 其他可能的命名
+            'vowels-practice', 'consonants-practice', 'diphthongs-practice',
+            'long-vowels', 'short-vowels', 'silent-e', 'r-controlled',
+            // 数字命名（如果有）
+            ...Array.from({length: 20}, (_, i) => `special${String(i + 1).padStart(2, '0')}`)
+        ];
+        
+        for (const filename of potentialFiles) {
             const filepath = `${directory}/${filename}.json`;
             
             try {
-                const response = await fetch(filepath);
+                const response = await fetch(filepath, { method: 'HEAD' });
                 if (!response.ok) continue;
                 
-                const data = await response.json();
+                // 文件存在，获取完整数据
+                const fullResponse = await fetch(filepath);
+                const data = await fullResponse.json();
                 const metadata = data.metadata || {};
                 
                 results.push({
                     id: metadata.id || filename,
-                    name: metadata.name || filename,
+                    name: metadata.name || filename.replace(/-/g, ' '),
                     filename: `special-practice/${filename}.json`,
                     phoneme: metadata.phoneme || '',
                     description: metadata.description || '',
@@ -161,60 +177,47 @@ class VocabularyConfigLoader {
                     recommended: false
                 });
                 
-                console.log(`  ✓ ${filename}.json`);
+                console.log(`  ✓ 发现文件: ${filename}.json (${metadata.name || filename})`);
             } catch (error) {
-                console.log(`  ⊘ ${filename}.json (not found)`);
+                // 文件不存在或解析失败，静默跳过
             }
         }
         
+        console.log(`✅ special-practice 扫描完成，发现 ${results.length} 个文件`);
         return results;
     }
     
     /**
      * 扫描 grade-based 目录
+     * 自动探测所有年级和学期的文件
      */
     async scanGradeBased() {
+        console.log('🔍 扫描 grade-based 目录...');
+        
         const gradeStructure = {
             primary: {
                 id: "primary-school",
                 name: "小学词汇",
                 description: "小学三至六年级词汇",
-                grades: [
-                    {id: "grade3-term1", name: "三年级上学期", words: 50},
-                    {id: "grade3-term2", name: "三年级下学期", words: 50},
-                    {id: "grade4-term1", name: "四年级上学期", words: 60},
-                    {id: "grade4-term2", name: "四年级下学期", words: 60},
-                    {id: "grade5-term1", name: "五年级上学期", words: 70},
-                    {id: "grade5-term2", name: "五年级下学期", words: 70},
-                    {id: "grade6-term1", name: "六年级上学期", words: 80},
-                    {id: "grade6-term2", name: "六年级下学期", words: 80}
-                ]
+                // 动态探测 grade1-grade6 的所有学期
+                gradeRange: [1, 2, 3, 4, 5, 6],
+                defaultWords: 60
             },
             middle: {
                 id: "middle-school",
                 name: "初中词汇",
                 description: "初中七至九年级词汇",
-                grades: [
-                    {id: "grade7-term1", name: "七年级上学期", words: 100},
-                    {id: "grade7-term2", name: "七年级下学期", words: 100},
-                    {id: "grade8-term1", name: "八年级上学期", words: 120},
-                    {id: "grade8-term2", name: "八年级下学期", words: 120},
-                    {id: "grade9-term1", name: "九年级上学期", words: 150},
-                    {id: "grade9-term2", name: "九年级下学期", words: 150}
-                ]
+                // 动态探测 grade7-grade9
+                gradeRange: [7, 8, 9],
+                defaultWords: 120
             },
             high: {
                 id: "high-school",
                 name: "高中词汇",
                 description: "高中十至十二年级词汇",
-                grades: [
-                    {id: "grade10-term1", name: "高一上学期", words: 200},
-                    {id: "grade10-term2", name: "高一下学期", words: 200},
-                    {id: "grade11-term1", name: "高二上学期", words: 200},
-                    {id: "grade11-term2", name: "高二下学期", words: 200},
-                    {id: "grade12-term1", name: "高三上学期", words: 200},
-                    {id: "grade12-term2", name: "高三下学期", words: 200}
-                ]
+                // 动态探测 grade10-grade12
+                gradeRange: [10, 11, 12],
+                defaultWords: 200
             }
         };
         
@@ -223,61 +226,68 @@ class VocabularyConfigLoader {
         for (const [levelKey, levelInfo] of Object.entries(gradeStructure)) {
             const items = [];
             
-            for (const grade of levelInfo.grades) {
-                const filepath = `./words/grade-based/${levelKey}/${grade.id}.json`;
-                
-                try {
-                    const response = await fetch(filepath);
-                    if (response.ok) {
-                        const data = await response.json();
-                        const metadata = data.metadata || {};
-                        
-                        items.push({
-                            id: metadata.id || grade.id,
-                            name: metadata.name || grade.name,
-                            filename: `grade-based/${levelKey}/${grade.id}.json`,
-                            description: metadata.description || `${grade.name}必学词汇`,
-                            wordCount: metadata.wordCount || data.words?.length || grade.words,
-                            difficulty: metadata.difficulty || 'beginner',
-                            recommended: true
-                        });
-                        
-                        console.log(`  ✓ ${levelKey}/${grade.id}.json`);
-                    } else {
-                        // 文件不存在，使用占位符
-                        items.push({
-                            id: grade.id,
-                            name: grade.name,
-                            filename: `grade-based/${levelKey}/${grade.id}.json`,
-                            description: `${grade.name}必学词汇`,
-                            wordCount: grade.words,
-                            difficulty: 'beginner',
-                            recommended: true
-                        });
+            // 动态探测每个年级的两个学期
+            for (const gradeNum of levelInfo.gradeRange) {
+                for (const term of [1, 2]) {
+                    const gradeId = `grade${gradeNum}-term${term}`;
+                    const filepath = `./words/grade-based/${levelKey}/${gradeId}.json`;
+                    
+                    try {
+                        const response = await fetch(filepath, { method: 'HEAD' });
+                        if (response.ok) {
+                            // 文件存在，获取完整数据
+                            const fullResponse = await fetch(filepath);
+                            const data = await fullResponse.json();
+                            const metadata = data.metadata || {};
+                            
+                            // 生成年级名称
+                            const gradeName = this.getGradeName(gradeNum, term);
+                            
+                            items.push({
+                                id: metadata.id || gradeId,
+                                name: metadata.name || gradeName,
+                                filename: `grade-based/${levelKey}/${gradeId}.json`,
+                                description: metadata.description || `${gradeName}必学词汇`,
+                                wordCount: metadata.wordCount || data.words?.length || levelInfo.defaultWords,
+                                difficulty: metadata.difficulty || 'beginner',
+                                recommended: true
+                            });
+                            
+                            console.log(`  ✓ 发现文件: ${levelKey}/${gradeId}.json (${metadata.name || gradeName})`);
+                        }
+                    } catch (error) {
+                        // 文件不存在或解析失败，静默跳过
                     }
-                } catch (error) {
-                    // 使用占位符
-                    items.push({
-                        id: grade.id,
-                        name: grade.name,
-                        filename: `grade-based/${levelKey}/${grade.id}.json`,
-                        description: `${grade.name}必学词汇`,
-                        wordCount: grade.words,
-                        difficulty: 'beginner',
-                        recommended: true
-                    });
                 }
             }
             
-            subcategories.push({
-                id: levelInfo.id,
-                name: levelInfo.name,
-                description: levelInfo.description,
-                items: items
-            });
+            // 只有在找到至少一个文件时才添加这个分类
+            if (items.length > 0) {
+                subcategories.push({
+                    id: levelInfo.id,
+                    name: levelInfo.name,
+                    description: levelInfo.description,
+                    items: items
+                });
+                console.log(`  ✓ ${levelInfo.name}: 发现 ${items.length} 个文件`);
+            }
         }
         
+        console.log(`✅ grade-based 扫描完成，发现 ${subcategories.length} 个分类`);
         return subcategories;
+    }
+    
+    /**
+     * 生成年级名称
+     */
+    getGradeName(gradeNum, term) {
+        const gradeNames = {
+            1: '一年级', 2: '二年级', 3: '三年级', 4: '四年级', 5: '五年级', 6: '六年级',
+            7: '七年级', 8: '八年级', 9: '九年级',
+            10: '高一', 11: '高二', 12: '高三'
+        };
+        const termName = term === 1 ? '上学期' : '下学期';
+        return `${gradeNames[gradeNum] || `${gradeNum}年级`}${termName}`;
     }
     
     /**

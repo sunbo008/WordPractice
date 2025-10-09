@@ -81,8 +81,14 @@ class VocabularyManagerV2 {
             const savedLibraries = localStorage.getItem('wordTetris_selectedLibraries');
             if (savedLibraries) {
                 const libraries = JSON.parse(savedLibraries);
-                this.currentConfig.enabledLibraries = libraries;
-                console.log('⚙️ 用户词库选择加载成功:', libraries);
+                // 如果保存的配置为空数组，使用默认配置
+                if (Array.isArray(libraries) && libraries.length === 0) {
+                    console.warn('⚠️ 保存的配置为空，使用默认配置');
+                    this.currentConfig.enabledLibraries = [...this.wordsConfig.defaultConfig.enabledLibraries];
+                } else {
+                    this.currentConfig.enabledLibraries = libraries;
+                    console.log('⚙️ 用户词库选择加载成功:', libraries);
+                }
             } else {
                 // 使用默认配置
                 this.currentConfig.enabledLibraries = [...this.wordsConfig.defaultConfig.enabledLibraries];
@@ -107,6 +113,12 @@ class VocabularyManagerV2 {
     // 加载启用的词库
     async loadEnabledLibraries() {
         const enabledIds = this.currentConfig.enabledLibraries;
+        
+        // 如果没有启用的词库，抛出错误
+        if (!enabledIds || enabledIds.length === 0) {
+            throw new Error('未选择任何词库！请前往设置页面选择学习内容。');
+        }
+        
         const loadPromises = [];
         
         for (const libraryId of enabledIds) {
@@ -119,6 +131,11 @@ class VocabularyManagerV2 {
         }
         
         await Promise.all(loadPromises);
+        
+        // 如果没有成功加载任何词库，抛出错误
+        if (this.loadedLibraries.size === 0) {
+            throw new Error('未能成功加载任何词库！请检查词库文件是否存在。');
+        }
     }
     
     // 在层级结构中查找词库信息
@@ -373,7 +390,23 @@ class VocabularyManagerV2 {
             display: flex; align-items: center; justify-content: center;
         `;
         
-        modal.innerHTML = `
+        // 判断错误类型
+        const isNoLibraryError = error.message.includes('未选择任何词库') || error.message.includes('未能成功加载任何词库');
+        
+        const errorContent = isNoLibraryError ? `
+            <div style="background: white; padding: 30px; border-radius: 10px; max-width: 500px; text-align: center;">
+                <h2 style="color: #f39c12; margin-bottom: 20px;">⚠️ 未选择学习内容</h2>
+                <p style="margin-bottom: 15px; color: #2c3e50; font-size: 18px;">请先选择要学习的词库课程</p>
+                <p style="margin-bottom: 20px; color: #7f8c8d;">首次使用需要在设置页面选择学习内容，<br>推荐选择"按天学习音标"分类</p>
+                <div style="background: #fff3cd; padding: 15px; border-radius: 5px; margin-bottom: 20px; border-left: 4px solid #f39c12;">
+                    <strong>提示：</strong> 可以使用"全选"按钮快速选择所有课程
+                </div>
+                <button onclick="location.href='./settings.html'" style="
+                    background: #27ae60; color: white; border: none; padding: 12px 30px;
+                    border-radius: 5px; cursor: pointer; font-size: 18px; margin-right: 10px;
+                ">前往设置页面</button>
+            </div>
+        ` : `
             <div style="background: white; padding: 30px; border-radius: 10px; max-width: 500px; text-align: center;">
                 <h2 style="color: #e74c3c; margin-bottom: 20px;">❌ 词库加载失败</h2>
                 <p style="margin-bottom: 15px; color: #2c3e50;">无法加载词汇库文件，请检查以下问题：</p>
@@ -387,6 +420,10 @@ class VocabularyManagerV2 {
                     <strong>错误详情：</strong><br>
                     <code style="color: #e74c3c;">${error.message}</code>
                 </div>
+                <button onclick="location.href='./settings.html'" style="
+                    background: #27ae60; color: white; border: none; padding: 10px 20px;
+                    border-radius: 5px; cursor: pointer; font-size: 16px; margin-right: 10px;
+                ">前往设置页面</button>
                 <button onclick="location.reload()" style="
                     background: #3498db; color: white; border: none; padding: 10px 20px;
                     border-radius: 5px; cursor: pointer; font-size: 16px;
@@ -394,6 +431,7 @@ class VocabularyManagerV2 {
             </div>
         `;
         
+        modal.innerHTML = errorContent;
         document.body.appendChild(modal);
     }
     
