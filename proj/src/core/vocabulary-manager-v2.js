@@ -46,15 +46,15 @@ class VocabularyManagerV2 {
             // 2. 加载用户设置
             this.loadUserSettings();
             
-            // 3. 加载启用的词库
-            await this.loadEnabledLibraries();
-            
-            // 4. 处理单词数据
-            this.processAllWords();
-            
-            this.isLoaded = true;
-            console.log('✅ 分布式词汇系统加载成功');
-            console.log(`📊 总词库: ${this.loadedLibraries.size}个, 总单词: ${this.allWords.length}个`);
+        // 3. 加载启用的词库
+        await this.loadEnabledLibraries();
+        
+        // 4. 处理单词数据
+        await this.processAllWords();
+        
+        this.isLoaded = true;
+        console.log('✅ 分布式词汇系统加载成功');
+        console.log(`📊 总词库: ${this.loadedLibraries.size}个, 总单词: ${this.allWords.length}个`);
             
         } catch (error) {
             console.error('❌ 词汇系统加载失败:', error);
@@ -412,7 +412,7 @@ class VocabularyManagerV2 {
             
             // 重新加载
             await this.loadEnabledLibraries();
-            this.processAllWords();
+            await this.processAllWords();
         }
         
         // 保存设置
