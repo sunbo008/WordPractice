@@ -914,24 +914,9 @@ class WordTetrisGame {
             debugLog.warning('⚠️ ttsService 未初始化，跳过音频解锁');
         }
         
-        // 智能检测起始等级
-        const availableDifficulties = this.vocabularyManager.getAvailableDifficulties();
-        if (availableDifficulties && availableDifficulties.length > 0) {
-            const minDifficulty = Math.min(...availableDifficulties);
-            if (minDifficulty > 1) {
-                console.log(`⚠️ 词库中没有难度1的单词，自动从等级${minDifficulty}开始`);
-                console.log(`📊 可用难度: ${availableDifficulties.join(', ')}`);
-                this.level = minDifficulty;
-                this.targetScore = minDifficulty * 100; // 调整目标分数
-                
-                // 更新显示
-                document.getElementById('level').textContent = this.level;
-                document.getElementById('target').textContent = this.targetScore;
-                
-                // 显示提示信息
-                alert(`当前词库没有难度1的单词\n自动从等级${minDifficulty}开始游戏`);
-            }
-        }
+        // 【已移除】智能检测起始等级
+        // 考试/测试模式不应该有难度等级限制
+        // 所有单词都从全部词库中随机选择，不受难度限制
         
         this.gameState = 'playing';
         this.startTime = Date.now();
