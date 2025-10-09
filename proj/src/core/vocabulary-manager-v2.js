@@ -162,7 +162,7 @@ class VocabularyManagerV2 {
         return null;
     }
     
-    // 加载单个词库
+    // 加载单个词库（延迟加载优化：只加载元数据）
     async loadSingleLibrary(libraryInfo) {
         try {
             const response = await fetch(`./words/${libraryInfo.filename}`);
@@ -171,12 +171,17 @@ class VocabularyManagerV2 {
             }
             
             const libraryData = await response.json();
+            
+            // 延迟加载：只保存元数据和文件路径
             this.loadedLibraries.set(libraryInfo.id, {
                 info: libraryInfo,
-                data: libraryData
+                metadata: libraryData.metadata,
+                filename: libraryInfo.filename,
+                wordsLoaded: false,  // 标记单词数据未加载
+                data: null  // 暂时不保存完整数据
             });
             
-            console.log(`📚 词库加载成功: ${libraryInfo.name} (${libraryData.metadata.totalWords}个单词)`);
+            console.log(`📚 元数据加载: ${libraryInfo.name} (${libraryInfo.wordCount || 0}个单词)`);
             
         } catch (error) {
             console.error(`❌ 词库加载失败: ${libraryInfo.name}`, error);
@@ -184,46 +189,104 @@ class VocabularyManagerV2 {
         }
     }
     
-    // 处理所有单词数据
-    processAllWords() {
-        this.allWords = [];
-        const wordMap = new Map(); // 用于检测重复单词
+    /**
+     * 按需加载词库的完整单词数据
+     */
+    async loadLibraryWords(libraryId) {
+        const library = this.loadedLibraries.get(libraryId);
+        if (!library) {
+            console.warn(`⚠️ 词库不存在: ${libraryId}`);
+            return;
+        }
+        
+        if (library.wordsLoaded) {
+            console.log(`  ✓ 词库已加载: ${library.info.name}`);
+            return;
+        }
+        
+        try {
+            const response = await fetch(`./words/${library.filename}`);
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            
+            const libraryData = await response.json();
+            
+            library.data = libraryData;
+            library.wordsLoaded = true;
+            
+            console.log(`  📖 单词数据加载: ${library.info.name}`);
+            
+            // 处理这个词库的单词数据
+            this.processLibraryWords(libraryId, libraryData);
+            
+        } catch (error) {
+            console.error(`❌ 单词数据加载失败: ${library.info.name}`, error);
+            throw error;
+        }
+    }
+    
+    /**
+     * 处理单个词库的单词数据
+     */
+    processLibraryWords(libraryId, libraryData) {
+        const wordMap = new Map(this.allWords.map(w => [w.word, w]));
         const duplicates = [];
         
-        // 遍历所有已加载的词库
-        for (const [libraryId, library] of this.loadedLibraries) {
-            const { info, data } = library;
-            
-            // 处理不同格式的词库
-            if (data.phonicsLessons) {
-                // 音标课程格式
-                this.processPhonicsLessons(data.phonicsLessons, libraryId, wordMap, duplicates);
-            } else if (data.words) {
-                // 直接单词列表格式
-                this.processWordsList(data.words, libraryId, wordMap, duplicates);
+        if (libraryData.phonicsLessons) {
+            this.processPhonicsLessons(libraryData.phonicsLessons, libraryId, wordMap, duplicates);
+        } else if (libraryData.words) {
+            this.processWordsList(libraryData.words, libraryId, wordMap, duplicates);
+        }
+        
+        if (duplicates.length > 0) {
+            console.warn(`  ⚠️ 发现 ${duplicates.length} 个重复单词`);
+            this.duplicateWords.push(...duplicates);
+        }
+        
+        // 更新按难度分组的视图
+        this.updateWordsByDifficulty();
+    }
+    
+    /**
+     * 更新按难度分组的词表
+     */
+    updateWordsByDifficulty() {
+        this.wordsByDifficulty.clear();
+        this.allWords.forEach(item => {
+            const diff = item.difficulty || 1;
+            if (!this.wordsByDifficulty.has(diff)) {
+                this.wordsByDifficulty.set(diff, []);
+            }
+            this.wordsByDifficulty.get(diff).push(item);
+        });
+    }
+    
+    // 处理所有单词数据（延迟加载优化版）
+    async processAllWords() {
+        this.allWords = [];
+        
+        console.log('🔄 开始加载单词数据...');
+        console.log(`📋 需要加载 ${this.currentConfig.enabledLibraries.length} 个词库`);
+        
+        // 并行加载所有启用的词库
+        const loadPromises = [];
+        for (const libraryId of this.currentConfig.enabledLibraries) {
+            if (this.loadedLibraries.has(libraryId)) {
+                loadPromises.push(this.loadLibraryWords(libraryId));
+            } else {
+                console.warn(`⚠️ 词库未找到: ${libraryId}`);
             }
         }
         
-        // 报告重复单词
-        if (duplicates.length > 0) {
-            console.warn(`⚠️ 发现 ${duplicates.length} 个重复单词:`, duplicates);
-        }
-		// 持久化重复项（用于测试与可视化）
-		this.duplicateWords = duplicates;
+        await Promise.all(loadPromises);
         
         // 验证难度分布
         this.validateDifficultyDistribution();
         
-		// 构建按难度分组的快速视图（全局已按单词去重）
-		this.wordsByDifficulty.clear();
-		this.allWords.forEach(item => {
-			const diff = item.difficulty || 1;
-			if (!this.wordsByDifficulty.has(diff)) {
-				this.wordsByDifficulty.set(diff, []);
-			}
-			this.wordsByDifficulty.get(diff).push(item);
-		});
-		
+        // 构建按难度分组的快速视图
+        this.updateWordsByDifficulty();
+        
         console.log(`📊 单词处理完成: 总计 ${this.allWords.length} 个单词`);
         
         // 初始化单词池

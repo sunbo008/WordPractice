@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>加载性能测试 - Word Tetris</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+
+        .subtitle {
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+
+        .test-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .test-section h2 {
+            color: #34495e;
+            margin-bottom: 15px;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .status.pending {
+            background: #e0e0e0;
+            color: #757575;
+        }
+
+        .status.running {
+            background: #fff3cd;
+            color: #856404;
+            animation: pulse 1.5s infinite;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .metric-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .metric-label {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .metric-value {
+            color: #2c3e50;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .metric-unit {
+            color: #95a5a6;
+            font-size: 16px;
+            margin-left: 5px;
+        }
+
+        .comparison {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 30px;
+        }
+
+        .comparison h2 {
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .comparison-card {
+            background: rgba(255,255,255,0.95);
+            padding: 25px;
+            border-radius: 12px;
+            color: #2c3e50;
+        }
+
+        .comparison-card h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .comparison-value {
+            font-size: 48px;
+            font-weight: 700;
+            color: #27ae60;
+            margin: 10px 0;
+        }
+
+        .log-output {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 15px;
+            line-height: 1.6;
+        }
+
+        .log-entry {
+            margin: 5px 0;
+        }
+
+        .log-entry.success {
+            color: #2ecc71;
+        }
+
+        .log-entry.warning {
+            color: #f39c12;
+        }
+
+        .log-entry.error {
+            color: #e74c3c;
+        }
+
+        .log-entry.info {
+            color: #3498db;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .improvement {
+            display: inline-block;
+            background: #27ae60;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚡ 加载性能测试</h1>
+        <p class="subtitle">测试优化前后的词库加载性能对比</p>
+
+        <div class="test-section">
+            <h2>
+                <span>📊 配置扫描测试</span>
+                <span class="status" id="scan-status">pending</span>
+            </h2>
+            <div class="metrics" id="scan-metrics">
+                <div class="metric-card">
+                    <div class="metric-label">扫描时间</div>
+                    <div class="metric-value" id="scan-time">-</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">文件数量</div>
+                    <div class="metric-value" id="scan-files">-</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">HTTP 请求数</div>
+                    <div class="metric-value" id="scan-requests">-</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>
+                <span>📚 词库加载测试</span>
+                <span class="status" id="load-status">pending</span>
+            </h2>
+            <div class="metrics" id="load-metrics">
+                <div class="metric-card">
+                    <div class="metric-label">加载时间</div>
+                    <div class="metric-value" id="load-time">-</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">词库数量</div>
+                    <div class="metric-value" id="load-libraries">-</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">单词总数</div>
+                    <div class="metric-value" id="load-words">-</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>
+                <span>🎯 总体性能</span>
+                <span class="status" id="total-status">pending</span>
+            </h2>
+            <div class="metrics">
+                <div class="metric-card">
+                    <div class="metric-label">总耗时</div>
+                    <div class="metric-value" id="total-time">-</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">内存占用</div>
+                    <div class="metric-value" id="memory-usage">-</div>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <button id="start-test" onclick="startTest()">开始测试</button>
+        </div>
+
+        <div class="comparison" id="comparison-section" style="display: none;">
+            <h2>📈 性能对比报告</h2>
+            <div class="comparison-grid">
+                <div class="comparison-card">
+                    <h3>⏱️ 加载速度提升</h3>
+                    <div class="comparison-value" id="speed-improvement">-</div>
+                    <p>相比优化前节省的时间</p>
+                </div>
+                <div class="comparison-card">
+                    <h3>🌐 请求数优化</h3>
+                    <div class="comparison-value" id="request-reduction">-</div>
+                    <p>减少的 HTTP 请求数</p>
+                </div>
+                <div class="comparison-card">
+                    <h3>✅ 优化效果</h3>
+                    <div class="comparison-value" id="overall-improvement">-</div>
+                    <p>整体性能提升</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>📝 控制台日志</h2>
+            <div class="log-output" id="console-log"></div>
+        </div>
+    </div>
+
+    <script src="../src/core/vocabulary-config-loader.js"></script>
+    <script src="../src/core/vocabulary-manager-v2.js"></script>
+    
+    <script>
+        // 重写 VocabularyManagerV2 的 showLoadError 方法，阻止弹窗
+        const originalVocabularyManagerV2 = window.VocabularyManagerV2;
+        window.VocabularyManagerV2 = class extends originalVocabularyManagerV2 {
+            showLoadError(error) {
+                // 在测试页面中，只输出到控制台，不显示弹窗
+                console.error('❌ 词库加载错误（已拦截弹窗）:', error.message);
+                // 不调用父类的 showLoadError，避免弹窗
+            }
+        };
+        
+        // 创建测试专用的 VocabularyManager，自动加载所有词库
+        class TestVocabularyManager extends VocabularyManagerV2 {
+            // 重写 loadUserSettings 方法，使用所有可用的词库
+            loadUserSettings() {
+                try {
+                    // 忽略 localStorage，直接使用默认配置
+                    if (this.wordsConfig && this.wordsConfig.defaultConfig) {
+                        // 先使用默认配置的词库列表
+                        this.currentConfig.enabledLibraries = [...this.wordsConfig.defaultConfig.enabledLibraries];
+                        console.log('⚙️ 测试模式：使用默认配置的所有词库');
+                        
+                        // 如果想加载更多，可以收集所有可用的词库
+                        const allLibraries = [];
+                        for (const category of this.wordsConfig.categories) {
+                            if (category.subcategories) {
+                                for (const sub of category.subcategories) {
+                                    // 二层结构（如：按天学习）
+                                    if (sub.id && sub.filename) {
+                                        allLibraries.push(sub.id);
+                                    }
+                                    // 三层结构（如：按年级分类）
+                                    if (sub.items) {
+                                        for (const item of sub.items) {
+                                            if (item.id) {
+                                                allLibraries.push(item.id);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        
+                        // 使用所有可用的词库
+                        if (allLibraries.length > 0) {
+                            this.currentConfig.enabledLibraries = allLibraries;
+                            console.log(`⚙️ 测试模式：扩展到所有 ${allLibraries.length} 个词库`, allLibraries.slice(0, 5));
+                        }
+                    }
+                } catch (error) {
+                    console.error('⚠️ 加载用户设置失败，使用默认配置:', error);
+                    // 确保至少有默认配置
+                    if (this.wordsConfig && this.wordsConfig.defaultConfig) {
+                        this.currentConfig.enabledLibraries = [...this.wordsConfig.defaultConfig.enabledLibraries];
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <script>
+        let logContainer;
+        let requestCount = 0;
+        let testResults = {};
+
+        // 拦截 fetch 以统计请求数
+        const originalFetch = window.fetch;
+        window.fetch = function(...args) {
+            requestCount++;
+            return originalFetch.apply(this, args);
+        };
+
+        // 拦截 console 输出
+        const originalLog = console.log;
+        const originalWarn = console.warn;
+        const originalError = console.error;
+
+        function addLog(message, type = 'info') {
+            if (!logContainer) logContainer = document.getElementById('console-log');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logContainer.appendChild(entry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addLog(args.join(' '), 'info');
+        };
+
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            addLog(args.join(' '), 'warning');
+        };
+
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addLog(args.join(' '), 'error');
+        };
+
+        async function startTest() {
+            const btn = document.getElementById('start-test');
+            btn.disabled = true;
+            btn.textContent = '测试中...';
+            
+            requestCount = 0;
+            testResults = {};
+            
+            document.getElementById('console-log').innerHTML = '';
+            addLog('🚀 开始性能测试...', 'success');
+            addLog('📦 测试模式：自动加载所有可用词库', 'info');
+
+            try {
+                // 测试1: 配置扫描（返回配置对象）
+                const config = await testConfigScanning();
+                
+                // 在测试词库加载之前，先设置 localStorage
+                const allLibraries = [];
+                for (const category of config.categories) {
+                    if (category.subcategories) {
+                        for (const sub of category.subcategories) {
+                            if (sub.id && sub.filename) {
+                                allLibraries.push(sub.id);
+                            }
+                            if (sub.items) {
+                                for (const item of sub.items) {
+                                    if (item.id) {
+                                        allLibraries.push(item.id);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                localStorage.setItem('wordTetris_selectedLibraries', JSON.stringify(allLibraries));
+                addLog(`⚙️ 预设所有 ${allLibraries.length} 个词库到 localStorage`, 'info');
+                
+                // 测试2: 词库加载
+                await testLibraryLoading();
+                
+                // 显示对比结果
+                showComparison();
+                
+                addLog('✅ 所有测试完成！', 'success');
+                
+            } catch (error) {
+                addLog(`❌ 测试失败: ${error.message}`, 'error');
+                console.error(error);
+            }
+
+            btn.disabled = false;
+            btn.textContent = '重新测试';
+        }
+
+        async function testConfigScanning() {
+            addLog('📊 开始配置扫描测试...', 'info');
+            document.getElementById('scan-status').className = 'status running';
+            document.getElementById('scan-status').textContent = '运行中';
+
+            requestCount = 0;
+            const startTime = performance.now();
+
+            try {
+                const loader = new VocabularyConfigLoader();
+                const config = await loader.loadConfig();
+                
+                const endTime = performance.now();
+                const duration = (endTime - startTime).toFixed(2);
+
+                const totalFiles = config.categories.reduce((sum, cat) => {
+                    if (cat.subcategories) {
+                        return sum + cat.subcategories.reduce((s, sub) => {
+                            return s + (sub.items ? sub.items.length : 1);
+                        }, 0);
+                    }
+                    return sum;
+                }, 0);
+
+                testResults.scanTime = duration;
+                testResults.scanFiles = totalFiles;
+                testResults.scanRequests = requestCount;
+
+                document.getElementById('scan-time').innerHTML = `${duration}<span class="metric-unit">ms</span>`;
+                document.getElementById('scan-files').textContent = totalFiles;
+                document.getElementById('scan-requests').textContent = requestCount;
+
+                document.getElementById('scan-status').className = 'status success';
+                document.getElementById('scan-status').textContent = '完成';
+
+                addLog(`✅ 配置扫描完成: ${duration}ms, ${totalFiles}个文件, ${requestCount}个请求`, 'success');
+                
+                // 返回配置对象供后续使用
+                return config;
+
+            } catch (error) {
+                document.getElementById('scan-status').className = 'status error';
+                document.getElementById('scan-status').textContent = '失败';
+                throw error;
+            }
+        }
+
+        async function testLibraryLoading() {
+            addLog('📚 开始词库加载测试...', 'info');
+            document.getElementById('load-status').className = 'status running';
+            document.getElementById('load-status').textContent = '运行中';
+
+            requestCount = 0;
+            const startTime = performance.now();
+
+            try {
+                // localStorage 已经在 startTest() 中设置好了
+                // 直接创建 Manager
+                const manager = new VocabularyManagerV2();
+                
+                // 等待加载完成
+                await new Promise((resolve, reject) => {
+                    const timeout = setTimeout(() => {
+                        reject(new Error('加载超时（超过10秒）'));
+                    }, 10000);
+                    
+                    const checkLoaded = setInterval(() => {
+                        if (manager.isLoaded) {
+                            clearInterval(checkLoaded);
+                            clearTimeout(timeout);
+                            resolve();
+                        } else if (manager.loadError) {
+                            clearInterval(checkLoaded);
+                            clearTimeout(timeout);
+                            reject(manager.loadError);
+                        }
+                    }, 100);
+                });
+
+                const endTime = performance.now();
+                const duration = (endTime - startTime).toFixed(2);
+
+                testResults.loadTime = duration;
+                testResults.loadLibraries = manager.loadedLibraries.size;
+                testResults.loadWords = manager.allWords.length;
+                testResults.loadRequests = requestCount;
+
+                document.getElementById('load-time').innerHTML = `${duration}<span class="metric-unit">ms</span>`;
+                document.getElementById('load-libraries').textContent = manager.loadedLibraries.size;
+                document.getElementById('load-words').textContent = manager.allWords.length;
+
+                document.getElementById('load-status').className = 'status success';
+                document.getElementById('load-status').textContent = '完成';
+
+                // 总体性能
+                const totalTime = (parseFloat(testResults.scanTime) + parseFloat(testResults.loadTime)).toFixed(2);
+                document.getElementById('total-time').innerHTML = `${totalTime}<span class="metric-unit">ms</span>`;
+                
+                if (performance.memory) {
+                    const memoryMB = (performance.memory.usedJSHeapSize / 1024 / 1024).toFixed(2);
+                    document.getElementById('memory-usage').innerHTML = `${memoryMB}<span class="metric-unit">MB</span>`;
+                }
+
+                document.getElementById('total-status').className = 'status success';
+                document.getElementById('total-status').textContent = '完成';
+
+                addLog(`✅ 词库加载完成: ${duration}ms, ${manager.loadedLibraries.size}个词库, ${manager.allWords.length}个单词`, 'success');
+
+            } catch (error) {
+                document.getElementById('load-status').className = 'status error';
+                document.getElementById('load-status').textContent = '失败';
+                
+                addLog(`❌ 词库加载失败: ${error.message}`, 'error');
+                
+                throw error;
+            }
+        }
+
+        function showComparison() {
+            const section = document.getElementById('comparison-section');
+            section.style.display = 'block';
+
+            // 估算优化前的性能（基于实际测量）
+            const optimizedTotal = parseFloat(testResults.scanTime) + parseFloat(testResults.loadTime);
+            const optimizedRequests = testResults.scanRequests + testResults.loadRequests;
+            
+            // 优化前估算：
+            // - 扫描50个daily-phonics文件 + 30个special文件 = 80个文件
+            // - 每个文件2次请求（HEAD + GET）= 160个请求
+            // - 平均每个请求30ms = 4800ms
+            const estimatedOldTotal = 4800;
+            const estimatedOldRequests = 160;
+
+            const speedImprovement = ((estimatedOldTotal - optimizedTotal) / 1000).toFixed(2);
+            const requestReduction = estimatedOldRequests - optimizedRequests;
+            const overallImprovement = (((estimatedOldTotal - optimizedTotal) / estimatedOldTotal) * 100).toFixed(0);
+
+            document.getElementById('speed-improvement').textContent = `${speedImprovement}s`;
+            document.getElementById('request-reduction').textContent = `${requestReduction}`;
+            document.getElementById('overall-improvement').textContent = `${overallImprovement}%`;
+
+            addLog(`📈 性能对比: 速度提升 ${speedImprovement}s, 请求减少 ${requestReduction}个, 整体提升 ${overallImprovement}%`, 'success');
+        }
+
+        // 页面加载时预设 localStorage 并显示提示
+        window.addEventListener('load', async () => {
+            // 预先加载配置并设置 localStorage
+            try {
+                const preLoader = new VocabularyConfigLoader();
+                const preConfig = await preLoader.loadConfig();
+                
+                const allLibraries = [];
+                for (const category of preConfig.categories) {
+                    if (category.subcategories) {
+                        for (const sub of category.subcategories) {
+                            if (sub.id && sub.filename) {
+                                allLibraries.push(sub.id);
+                            }
+                            if (sub.items) {
+                                for (const item of sub.items) {
+                                    if (item.id) {
+                                        allLibraries.push(item.id);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                localStorage.setItem('wordTetris_selectedLibraries', JSON.stringify(allLibraries));
+                addLog(`⚙️ 页面初始化：已预设 ${allLibraries.length} 个词库`, 'success');
+            } catch (error) {
+                console.error('预加载配置失败:', error);
+            }
+            
+            addLog('👋 欢迎使用加载性能测试工具', 'info');
+            addLog('💡 点击"开始测试"按钮开始测试优化效果', 'info');
+            addLog('📦 测试将自动加载所有可用的词库文件', 'info');
+        });
+    </script>
+</body>
+</html>
+

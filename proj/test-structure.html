@@ -57,6 +57,7 @@
     <button onclick="window.location.href='index.html'">进入游戏</button>
     <button onclick="window.location.href='tests/tts-service-test.html'" style="background: #9C27B0;">🎤 TTS 服务测试</button>
     <button onclick="window.location.href='tests/ios-compatibility-test.html'" style="background: #FF9800;">🍎 iOS 兼容性测试</button>
+    <button onclick="window.location.href='tests/test-loading-performance.html'" style="background: #667eea;">⚡ 加载性能测试</button>
 
     <div id="results"></div>
 
@@ -90,6 +91,7 @@
             // 测试6: 测试页面
             addResult('测试 TTS 测试页面', await testFile('tests/tts-service-test.html'));
             addResult('测试 iOS 兼容性测试页面', await testFile('tests/ios-compatibility-test.html'));
+            addResult('测试加载性能测试页面', await testFile('tests/test-loading-performance.html'));
 
             // 最终总结
             const allTests = document.querySelectorAll('.test-result');
