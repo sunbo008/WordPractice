@@ -1299,7 +1299,7 @@ class WordTetrisGame {
         
         if (finalScoreEl) finalScoreEl.textContent = this.score;
         if (finalLevelEl) finalLevelEl.textContent = this.level;
-        if (finalVocabularyEl) finalVocabularyEl.textContent = this.vocabularyManager.getVocabularyStats().totalWords;
+        if (finalVocabularyEl) finalVocabularyEl.textContent = this.vocabularyManager.getVocabularyStats().missedWords;
         
         // 显示完成统计
         const gameOverModal = document.getElementById('gameOverModal');
@@ -1327,6 +1327,9 @@ class WordTetrisGame {
                 🎯 覆盖率: ${coveragePercentage}% (${hitWordsCount}/${this.totalWords})
             </p>
         `;
+        
+        // 更新错词本显示
+        this.updateVocabularyList();
         
         gameOverModal.style.display = 'flex';
         debugLog.success('📊 游戏完成弹窗已显示');
@@ -3717,6 +3720,10 @@ class WordTetrisGame {
         document.getElementById('finalScore').textContent = this.score;
         document.getElementById('finalLevel').textContent = this.level;
         document.getElementById('finalVocabulary').textContent = this.vocabularyManager.getVocabularyStats().missedWords;
+        
+        // 更新错词本显示
+        this.updateVocabularyList();
+        
         document.getElementById('gameOverModal').style.display = 'block';
     }
 
