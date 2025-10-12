@@ -1,0 +1,74 @@
+{
+  "metadata": {
+    "id": "grade3-term2-unit5",
+    "name": "三年级下册 Unit 5",
+    "description": "人教版三年级下册第5单元 - 交通工具和家具",
+    "category": "grade-based",
+    "difficulty": "beginner",
+    "wordCount": 10,
+    "lastUpdated": "2025-10-12"
+  },
+  "words": [
+    {
+      "word": "bus",
+      "phonetic": "[bʌs]",
+      "meaning": "公共汽车",
+      "difficulty": 1
+    },
+    {
+      "word": "bike",
+      "phonetic": "[baɪk]",
+      "meaning": "自行车",
+      "difficulty": 1
+    },
+    {
+      "word": "taxi",
+      "phonetic": "[ˈtæksi]",
+      "meaning": "出租车",
+      "difficulty": 1
+    },
+    {
+      "word": "jeep",
+      "phonetic": "[dʒiːp]",
+      "meaning": "吉普车",
+      "difficulty": 1
+    },
+    {
+      "word": "desk",
+      "phonetic": "[desk]",
+      "meaning": "课桌",
+      "difficulty": 1
+    },
+    {
+      "word": "chair",
+      "phonetic": "[tʃeə]",
+      "meaning": "椅子",
+      "difficulty": 2
+    },
+    {
+      "word": "Walkman",
+      "phonetic": "[ˈwɔːkmən]",
+      "meaning": "随身听",
+      "difficulty": 2
+    },
+    {
+      "word": "lamp",
+      "phonetic": "[læmp]",
+      "meaning": "台灯",
+      "difficulty": 1
+    },
+    {
+      "word": "your",
+      "phonetic": "[jɔː]",
+      "meaning": "你的；你们的",
+      "difficulty": 1
+    },
+    {
+      "word": "zoo",
+      "phonetic": "[zuː]",
+      "meaning": "动物园",
+      "difficulty": 1
+    }
+  ]
+}
+

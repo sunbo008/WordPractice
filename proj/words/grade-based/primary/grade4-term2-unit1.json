@@ -1,0 +1,104 @@
+{
+  "metadata": {
+    "id": "grade4-term2-unit1",
+    "name": "四年级下册 Unit 1",
+    "description": "人教版四年级下册第1单元 - 教室物品",
+    "category": "grade-based",
+    "difficulty": "beginner",
+    "wordCount": 12,
+    "lastUpdated": "2025-10-12"
+  },
+  "words": [
+    {
+      "word": "computer",
+      "phonetic": "[kəmˈpjuːtə]",
+      "meaning": "计算机",
+      "difficulty": 3
+    },
+    {
+      "word": "board",
+      "phonetic": "[bɔːd]",
+      "meaning": "写字板",
+      "difficulty": 2
+    },
+    {
+      "word": "fan",
+      "phonetic": "[fæn]",
+      "meaning": "风扇",
+      "difficulty": 1
+    },
+    {
+      "word": "this",
+      "phonetic": "[ðɪs]",
+      "meaning": "这；这个",
+      "difficulty": 1
+    },
+    {
+      "word": "is",
+      "phonetic": "[ɪz]",
+      "meaning": "是",
+      "difficulty": 1
+    },
+    {
+      "word": "my",
+      "phonetic": "[maɪ]",
+      "meaning": "我的",
+      "difficulty": 1
+    },
+    {
+      "word": "that",
+      "phonetic": "[ðæt]",
+      "meaning": "那；那个",
+      "difficulty": 1
+    },
+    {
+      "word": "your",
+      "phonetic": "[jɔː]",
+      "meaning": "你的",
+      "difficulty": 1
+    },
+    {
+      "word": "picture",
+      "phonetic": "[ˈpɪktʃə]",
+      "meaning": "图画；照片",
+      "difficulty": 2
+    },
+    {
+      "word": "wall",
+      "phonetic": "[wɔːl]",
+      "meaning": "墙壁",
+      "difficulty": 1
+    },
+    {
+      "word": "light",
+      "phonetic": "[laɪt]",
+      "meaning": "灯",
+      "difficulty": 2
+    },
+    {
+      "word": "class",
+      "phonetic": "[klɑːs]",
+      "meaning": "课",
+      "difficulty": 2
+    },
+    {
+      "word": "floor",
+      "phonetic": "[flɔː]",
+      "meaning": "地板",
+      "difficulty": 2
+    },
+    {
+      "word": "yes",
+      "phonetic": "[jes]",
+      "meaning": "是；是的",
+      "difficulty": 1
+    },
+    {
+      "word": "it",
+      "phonetic": "[ɪt]",
+      "meaning": "它",
+      "difficulty": 1
+    }
+  ]
+}
+

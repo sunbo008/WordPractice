@@ -1,0 +1,104 @@
+{
+  "metadata": {
+    "id": "grade3-term2-unit2",
+    "name": "三年级下册 Unit 2",
+    "description": "人教版三年级下册第2单元 - 家庭成员",
+    "category": "grade-based",
+    "difficulty": "beginner",
+    "wordCount": 13,
+    "lastUpdated": "2025-10-12"
+  },
+  "words": [
+    {
+      "word": "father",
+      "phonetic": "[ˈfɑːðə]",
+      "meaning": "爸爸",
+      "difficulty": 2
+    },
+    {
+      "word": "dad",
+      "phonetic": "[dæd]",
+      "meaning": "爸爸（口语）",
+      "difficulty": 1
+    },
+    {
+      "word": "mother",
+      "phonetic": "[ˈmʌðə]",
+      "meaning": "母亲；妈妈",
+      "difficulty": 2
+    },
+    {
+      "word": "mom",
+      "phonetic": "[mɒm]",
+      "meaning": "妈妈（口语）",
+      "difficulty": 1
+    },
+    {
+      "word": "man",
+      "phonetic": "[mæn]",
+      "meaning": "男人",
+      "difficulty": 1
+    },
+    {
+      "word": "woman",
+      "phonetic": "[ˈwʊmən]",
+      "meaning": "女人",
+      "difficulty": 2
+    },
+    {
+      "word": "grandmother",
+      "phonetic": "[ˈɡrændˌmʌðə]",
+      "meaning": "（外）祖母",
+      "difficulty": 3
+    },
+    {
+      "word": "grandma",
+      "phonetic": "[ˈɡrændmɑː]",
+      "meaning": "（外）祖母",
+      "difficulty": 2
+    },
+    {
+      "word": "grandfather",
+      "phonetic": "[ˈɡrændˌfɑːðə]",
+      "meaning": "（外）祖父",
+      "difficulty": 3
+    },
+    {
+      "word": "grandpa",
+      "phonetic": "[ˈɡrændpɑː]",
+      "meaning": "（外）祖父",
+      "difficulty": 2
+    },
+    {
+      "word": "sister",
+      "phonetic": "[ˈsɪstə]",
+      "meaning": "姐妹",
+      "difficulty": 2
+    },
+    {
+      "word": "brother",
+      "phonetic": "[ˈbrʌðə]",
+      "meaning": "兄弟",
+      "difficulty": 2
+    },
+    {
+      "word": "great",
+      "phonetic": "[ɡreɪt]",
+      "meaning": "太好了",
+      "difficulty": 2
+    },
+    {
+      "word": "really",
+      "phonetic": "[ˈrɪəli]",
+      "meaning": "真地；确切地",
+      "difficulty": 2
+    },
+    {
+      "word": "and",
+      "phonetic": "[ænd]",
+      "meaning": "和；并且",
+      "difficulty": 1
+    }
+  ]
+}
+

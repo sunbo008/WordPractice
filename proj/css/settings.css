@@ -296,6 +296,31 @@ body {
     gap: 15px;
 }
 
+/* 小学词汇专用网格 - 固定每行4个卡片 */
+#primary-school-grid {
+    display: grid; /* 关键：启用网格布局 */
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+@media (max-width: 1200px) {
+    #primary-school-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 900px) {
+    #primary-school-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    #primary-school-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* 子分类项 */
 .subcategory-item {
     background: #f8f9fa;

@@ -1,0 +1,92 @@
+{
+  "metadata": {
+    "id": "grade6-term1-unit5",
+    "name": "六年级上册 Unit 5",
+    "description": "人教版六年级上册第5单元 - 职业",
+    "category": "grade-based",
+    "difficulty": "intermediate",
+    "wordCount": 13,
+    "lastUpdated": "2025-10-12"
+  },
+  "words": [
+    {
+      "word": "singer",
+      "phonetic": "[ˈsɪŋə]",
+      "meaning": "歌唱家；歌手",
+      "difficulty": 2
+    },
+    {
+      "word": "writer",
+      "phonetic": "[ˈraɪtə]",
+      "meaning": "作家",
+      "difficulty": 2
+    },
+    {
+      "word": "actor",
+      "phonetic": "[ˈæktə]",
+      "meaning": "男演员",
+      "difficulty": 2
+    },
+    {
+      "word": "actress",
+      "phonetic": "[ˈæktrɪs]",
+      "meaning": "女演员",
+      "difficulty": 2
+    },
+    {
+      "word": "work",
+      "phonetic": "[wɜːk]",
+      "meaning": "工作",
+      "difficulty": 1
+    },
+    {
+      "word": "artist",
+      "phonetic": "[ˈɑːtɪst]",
+      "meaning": "画家",
+      "difficulty": 2
+    },
+    {
+      "word": "TV reporter",
+      "phonetic": "[ˌtiːˈviː rɪˈpɔːtə]",
+      "meaning": "电视台记者",
+      "difficulty": 3
+    },
+    {
+      "word": "engineer",
+      "phonetic": "[ˌendʒɪˈnɪə]",
+      "meaning": "工程师",
+      "difficulty": 3
+    },
+    {
+      "word": "accountant",
+      "phonetic": "[əˈkaʊntənt]",
+      "meaning": "会计",
+      "difficulty": 3
+    },
+    {
+      "word": "policeman",
+      "phonetic": "[pəˈliːsmən]",
+      "meaning": "男警察",
+      "difficulty": 3
+    },
+    {
+      "word": "salesperson",
+      "phonetic": "[ˈseɪlzˌpɜːsn]",
+      "meaning": "销售员",
+      "difficulty": 3
+    },
+    {
+      "word": "cleaner",
+      "phonetic": "[ˈkliːnə]",
+      "meaning": "清洁工",
+      "difficulty": 2
+    },
+    {
+      "word": "where",
+      "phonetic": "[weə]",
+      "meaning": "在哪里；到哪里",
+      "difficulty": 2
+    }
+  ]
+}
+

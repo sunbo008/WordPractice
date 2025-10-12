@@ -1,0 +1,92 @@
+{
+  "metadata": {
+    "id": "grade3-term2-unit1",
+    "name": "三年级下册 Unit 1",
+    "description": "人教版三年级下册第1单元 - 人际交往",
+    "category": "grade-based",
+    "difficulty": "beginner",
+    "wordCount": 12,
+    "lastUpdated": "2025-10-12"
+  },
+  "words": [
+    {
+      "word": "boy",
+      "phonetic": "[bɔɪ]",
+      "meaning": "男孩",
+      "difficulty": 1
+    },
+    {
+      "word": "girl",
+      "phonetic": "[ɡɜːl]",
+      "meaning": "女孩",
+      "difficulty": 1
+    },
+    {
+      "word": "teacher",
+      "phonetic": "[ˈtiːtʃə]",
+      "meaning": "教师",
+      "difficulty": 2
+    },
+    {
+      "word": "student",
+      "phonetic": "[ˈstjuːdənt]",
+      "meaning": "学生",
+      "difficulty": 2
+    },
+    {
+      "word": "this",
+      "phonetic": "[ðɪs]",
+      "meaning": "这个",
+      "difficulty": 1
+    },
+    {
+      "word": "my",
+      "phonetic": "[maɪ]",
+      "meaning": "我的",
+      "difficulty": 1
+    },
+    {
+      "word": "friend",
+      "phonetic": "[frend]",
+      "meaning": "朋友",
+      "difficulty": 2
+    },
+    {
+      "word": "nice",
+      "phonetic": "[naɪs]",
+      "meaning": "好的；愉快的",
+      "difficulty": 1
+    },
+    {
+      "word": "good morning",
+      "phonetic": "[ɡʊd ˈmɔːnɪŋ]",
+      "meaning": "早上好",
+      "difficulty": 3
+    },
+    {
+      "word": "good afternoon",
+      "phonetic": "[ɡʊd ˌɑːftəˈnuːn]",
+      "meaning": "下午好",
+      "difficulty": 3
+    },
+    {
+      "word": "meet",
+      "phonetic": "[miːt]",
+      "meaning": "遇见；碰见",
+      "difficulty": 1
+    },
+    {
+      "word": "goodbye",
+      "phonetic": "[ˌɡʊdˈbaɪ]",
+      "meaning": "再见",
+      "difficulty": 2
+    },
+    {
+      "word": "too",
+      "phonetic": "[tuː]",
+      "meaning": "也；太",
+      "difficulty": 1
+    }
+  ]
+}
+

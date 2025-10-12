@@ -6,6 +6,9 @@ class SettingsManagerV2 {
         // 新增：难度模式（休闲/挑战）
         this.gameMode = 'casual';
         this._modeBound = false;
+        // 记录展开状态
+        this.expandedCategories = new Set();
+        this.expandedGradeGroups = new Set();
         this.init();
     }
     
@@ -61,10 +64,18 @@ class SettingsManagerV2 {
             // 新增：加载难度模式
             const savedMode = localStorage.getItem('wordTetris_gameMode');
             this.gameMode = savedMode === 'challenge' ? 'challenge' : 'casual';
+
+            // 加载展开状态
+            const savedCat = localStorage.getItem('wordTetris_expandedCategories');
+            const savedGrade = localStorage.getItem('wordTetris_expandedGradeGroups');
+            this.expandedCategories = new Set(Array.isArray(JSON.parse(savedCat || '[]')) ? JSON.parse(savedCat || '[]') : []);
+            this.expandedGradeGroups = new Set(Array.isArray(JSON.parse(savedGrade || '[]')) ? JSON.parse(savedGrade || '[]') : []);
         } catch (error) {
             console.warn('⚠️ 用户设置加载失败，使用默认配置:', error);
             this.selectedLibraries = new Set(this.config.defaultConfig.enabledLibraries);
             this.gameMode = 'casual';
+            this.expandedCategories = new Set();
+            this.expandedGradeGroups = new Set();
         }
     }
     
@@ -74,6 +85,9 @@ class SettingsManagerV2 {
                 JSON.stringify(Array.from(this.selectedLibraries)));
             // 新增：保存难度模式
             localStorage.setItem('wordTetris_gameMode', this.gameMode);
+            // 保存展开状态
+            localStorage.setItem('wordTetris_expandedCategories', JSON.stringify(Array.from(this.expandedCategories)));
+            localStorage.setItem('wordTetris_expandedGradeGroups', JSON.stringify(Array.from(this.expandedGradeGroups)));
             console.log('💾 用户设置已保存');
         } catch (error) {
             console.error('❌ 用户设置保存失败:', error);
@@ -160,6 +174,46 @@ class SettingsManagerV2 {
                 this.renderSpecialPractice(category);
             } else if (category.id === 'grade-based') {
                 this.renderGradeBased(category);
+            }
+        });
+
+        // 应用展开状态
+        this.applyExpandState();
+    }
+
+    applyExpandState() {
+        // 顶层分类
+        ['daily-phonics','special-practice','grade-based'].forEach(id => {
+            const content = document.getElementById(`${id}-content`);
+            if (!content) return;
+            const header = content.previousElementSibling;
+            const icon = header.querySelector('.expand-icon');
+            const shouldExpand = this.expandedCategories.has(id);
+            if (shouldExpand) {
+                content.classList.remove('collapsed');
+                icon && icon.classList.add('expanded');
+                content.style.maxHeight = 'none';
+            } else {
+                content.classList.add('collapsed');
+                icon && icon.classList.remove('expanded');
+                content.style.maxHeight = '0px';
+            }
+        });
+        // 年级组
+        ['primary-school','middle-school','high-school'].forEach(id => {
+            const content = document.getElementById(`${id}-grid`);
+            if (!content) return;
+            const header = content.previousElementSibling;
+            const icon = header.querySelector('.expand-icon');
+            const shouldExpand = this.expandedGradeGroups.has(id);
+            if (shouldExpand) {
+                content.classList.remove('collapsed');
+                icon && icon.classList.add('expanded');
+                content.style.maxHeight = 'none';
+            } else {
+                content.classList.add('collapsed');
+                icon && icon.classList.remove('expanded');
+                content.style.maxHeight = '0px';
             }
         });
     }
@@ -438,18 +492,89 @@ function toggleCategory(categoryId) {
     const content = document.getElementById(`${categoryId}-content`);
     const header = content.previousElementSibling;
     const icon = header.querySelector('.expand-icon');
-    
-    content.classList.toggle('collapsed');
-    icon.classList.toggle('expanded');
+
+    const expand = content.classList.contains('collapsed');
+
+    // 动画：使用 max-height 过渡，结束后设置为 none 以自适应
+    if (expand) {
+        content.classList.remove('collapsed');
+        icon.classList.add('expanded');
+        // 先清零再在下一帧设置目标高度
+        content.style.maxHeight = '0px';
+        requestAnimationFrame(() => {
+            const target = content.scrollHeight;
+            content.style.maxHeight = `${target}px`;
+        });
+        content.addEventListener('transitionend', function onEnd(e){
+            if (e.propertyName === 'max-height') {
+                content.style.maxHeight = 'none';
+                content.removeEventListener('transitionend', onEnd);
+            }
+        });
+    } else {
+        // 从当前内容高度开始收起
+        const start = content.scrollHeight;
+        content.style.maxHeight = `${start}px`;
+        requestAnimationFrame(() => {
+            content.style.maxHeight = '0px';
+        });
+        content.classList.add('collapsed');
+        icon.classList.remove('expanded');
+    }
+
+    // 记录展开状态
+    if (window.settingsManager) {
+        const set = window.settingsManager.expandedCategories;
+        if (expand) {
+            set.add(categoryId);
+        } else {
+            set.delete(categoryId);
+        }
+        window.settingsManager.saveUserSettings();
+    }
 }
 
 function toggleGradeGroup(gradeId) {
     const content = document.getElementById(`${gradeId}-grid`);
     const header = content.previousElementSibling;
     const icon = header.querySelector('.expand-icon');
-    
-    content.classList.toggle('collapsed');
-    icon.classList.toggle('expanded');
+
+    const expand = content.classList.contains('collapsed');
+
+    if (expand) {
+        content.classList.remove('collapsed');
+        icon.classList.add('expanded');
+        content.style.maxHeight = '0px';
+        requestAnimationFrame(() => {
+            const target = content.scrollHeight;
+            content.style.maxHeight = `${target}px`;
+        });
+        content.addEventListener('transitionend', function onEnd(e){
+            if (e.propertyName === 'max-height') {
+                content.style.maxHeight = 'none';
+                content.removeEventListener('transitionend', onEnd);
+            }
+        });
+    } else {
+        const start = content.scrollHeight;
+        content.style.maxHeight = `${start}px`;
+        requestAnimationFrame(() => {
+            content.style.maxHeight = '0px';
+        });
+        content.classList.add('collapsed');
+        icon.classList.remove('expanded');
+    }
+
+    // 记录年级展开状态
+    if (window.settingsManager) {
+        const set = window.settingsManager.expandedGradeGroups;
+        if (expand) {
+            set.add(gradeId);
+        } else {
+            set.delete(gradeId);
+        }
+        window.settingsManager.saveUserSettings();
+    }
 }
 
 function selectAllInCategory(event, categoryId) {
@@ -536,6 +661,12 @@ function applyAndStart() {
 // 打开学习页面
 function openLesson(event, lessonId) {
     event.stopPropagation();
+    // 对按年级单元的课程使用新的单元模板
+    if (/^grade\d+-term\d+-unit\d+$/i.test(lessonId)) {
+        window.location.href = `./study/unit-lesson-template.html?lesson=${lessonId}`;
+        return;
+    }
+    // 默认回退到自然拼读模板
     window.location.href = `./study/phonics-lesson-template.html?lesson=${lessonId}`;
 }
 
