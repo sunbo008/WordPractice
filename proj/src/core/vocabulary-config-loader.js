@@ -213,13 +213,22 @@ class VocabularyConfigLoader {
         for (const [levelKey, levelInfo] of Object.entries(gradeStructure)) {
             const loadPromises = [];
             
-            // 动态探测每个年级的两个学期
+            // 动态探测每个年级的两个学期（支持按学期和按单元两种格式）
             for (const gradeNum of levelInfo.gradeRange) {
                 for (const term of [1, 2]) {
+                    // 尝试按学期扫描（整个学期一个文件）
                     const gradeId = `grade${gradeNum}-term${term}`;
                     loadPromises.push(
                         this.loadFileMetadata(`./words/grade-based/${levelKey}`, gradeId, 'grade', gradeNum, term, levelInfo.defaultWords)
                     );
+                    
+                    // 尝试按单元扫描（每个单元一个文件，最多6个单元）
+                    for (let unit = 1; unit <= 6; unit++) {
+                        const unitId = `grade${gradeNum}-term${term}-unit${unit}`;
+                        loadPromises.push(
+                            this.loadFileMetadata(`./words/grade-based/${levelKey}`, unitId, 'grade', gradeNum, term, levelInfo.defaultWords, unit)
+                        );
+                    }
                 }
             }
             
@@ -245,7 +254,7 @@ class VocabularyConfigLoader {
     /**
      * 加载单个文件的元数据（只获取 metadata，不加载完整单词数据）
      */
-    async loadFileMetadata(directory, filename, type = 'daily', gradeNum = null, term = null, defaultWords = 0) {
+    async loadFileMetadata(directory, filename, type = 'daily', gradeNum = null, term = null, defaultWords = 0, unit = null) {
         const filepath = `${directory}/${filename}.json`;
         
         try {
@@ -281,7 +290,7 @@ class VocabularyConfigLoader {
                     recommended: false
                 };
             } else if (type === 'grade') {
-                const gradeName = this.getGradeName(gradeNum, term);
+                const gradeName = this.getGradeName(gradeNum, term, unit);
                 return {
                     id: metadata.id || filename,
                     name: metadata.name || gradeName,
@@ -302,14 +311,15 @@ class VocabularyConfigLoader {
     /**
      * 生成年级名称
      */
-    getGradeName(gradeNum, term) {
+    getGradeName(gradeNum, term, unit = null) {
         const gradeNames = {
             1: '一年级', 2: '二年级', 3: '三年级', 4: '四年级', 5: '五年级', 6: '六年级',
             7: '七年级', 8: '八年级', 9: '九年级',
             10: '高一', 11: '高二', 12: '高三'
         };
-        const termName = term === 1 ? '上学期' : '下学期';
-        return `${gradeNames[gradeNum] || `${gradeNum}年级`}${termName}`;
+        const termName = term === 1 ? '上册' : '下册';
+        const unitName = unit ? ` Unit ${unit}` : '';
+        return `${gradeNames[gradeNum] || `${gradeNum}年级`}${termName}${unitName}`;
     }
     
     /**

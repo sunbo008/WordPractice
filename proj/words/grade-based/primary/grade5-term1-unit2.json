@@ -1,0 +1,92 @@
+{
+  "metadata": {
+    "id": "grade5-term1-unit2",
+    "name": "五年级上册 Unit 2",
+    "description": "人教版五年级上册第2单元 - 星期和活动",
+    "category": "grade-based",
+    "difficulty": "intermediate",
+    "wordCount": 11,
+    "lastUpdated": "2025-10-12"
+  },
+  "words": [
+    {
+      "word": "Monday",
+      "phonetic": "[ˈmʌndeɪ]",
+      "meaning": "星期一",
+      "difficulty": 2
+    },
+    {
+      "word": "Tuesday",
+      "phonetic": "[ˈtjuːzdeɪ]",
+      "meaning": "星期二",
+      "difficulty": 2
+    },
+    {
+      "word": "Wednesday",
+      "phonetic": "[ˈwenzdeɪ]",
+      "meaning": "星期三",
+      "difficulty": 3
+    },
+    {
+      "word": "Thursday",
+      "phonetic": "[ˈθɜːzdeɪ]",
+      "meaning": "星期四",
+      "difficulty": 2
+    },
+    {
+      "word": "Friday",
+      "phonetic": "[ˈfraɪdeɪ]",
+      "meaning": "星期五",
+      "difficulty": 2
+    },
+    {
+      "word": "Saturday",
+      "phonetic": "[ˈsætədeɪ]",
+      "meaning": "星期六",
+      "difficulty": 3
+    },
+    {
+      "word": "Sunday",
+      "phonetic": "[ˈsʌndeɪ]",
+      "meaning": "星期天",
+      "difficulty": 2
+    },
+    {
+      "word": "day",
+      "phonetic": "[deɪ]",
+      "meaning": "天",
+      "difficulty": 1
+    },
+    {
+      "word": "have",
+      "phonetic": "[hæv]",
+      "meaning": "有；吃",
+      "difficulty": 1
+    },
+    {
+      "word": "on",
+      "phonetic": "[ɒn]",
+      "meaning": "在……时候",
+      "difficulty": 1
+    },
+    {
+      "word": "do homework",
+      "phonetic": "[duː ˈhəʊmwɜːk]",
+      "meaning": "做作业",
+      "difficulty": 2
+    },
+    {
+      "word": "watch TV",
+      "phonetic": "[wɒtʃ ˌtiːˈviː]",
+      "meaning": "看电视",
+      "difficulty": 2
+    },
+    {
+      "word": "read books",
+      "phonetic": "[riːd bʊks]",
+      "meaning": "读书",
+      "difficulty": 2
+    }
+  ]
+}
+

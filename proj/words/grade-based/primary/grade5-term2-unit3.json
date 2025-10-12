@@ -1,0 +1,110 @@
+{
+  "metadata": {
+    "id": "grade5-term2-unit3",
+    "name": "五年级下册 Unit 3",
+    "description": "人教版五年级下册第3单元 - 月份和日期",
+    "category": "grade-based",
+    "difficulty": "intermediate",
+    "wordCount": 16,
+    "lastUpdated": "2025-10-12"
+  },
+  "words": [
+    {
+      "word": "January",
+      "phonetic": "[ˈdʒænjuəri]",
+      "meaning": "一月",
+      "difficulty": 3
+    },
+    {
+      "word": "February",
+      "phonetic": "[ˈfebruəri]",
+      "meaning": "二月",
+      "difficulty": 3
+    },
+    {
+      "word": "March",
+      "phonetic": "[mɑːtʃ]",
+      "meaning": "三月",
+      "difficulty": 2
+    },
+    {
+      "word": "April",
+      "phonetic": "[ˈeɪprəl]",
+      "meaning": "四月",
+      "difficulty": 2
+    },
+    {
+      "word": "May",
+      "phonetic": "[meɪ]",
+      "meaning": "五月",
+      "difficulty": 1
+    },
+    {
+      "word": "June",
+      "phonetic": "[dʒuːn]",
+      "meaning": "六月",
+      "difficulty": 1
+    },
+    {
+      "word": "July",
+      "phonetic": "[dʒuˈlaɪ]",
+      "meaning": "七月",
+      "difficulty": 1
+    },
+    {
+      "word": "August",
+      "phonetic": "[ˈɔːɡəst]",
+      "meaning": "八月",
+      "difficulty": 2
+    },
+    {
+      "word": "September",
+      "phonetic": "[sepˈtembə]",
+      "meaning": "九月",
+      "difficulty": 3
+    },
+    {
+      "word": "October",
+      "phonetic": "[ɒkˈtəʊbə]",
+      "meaning": "十月",
+      "difficulty": 3
+    },
+    {
+      "word": "November",
+      "phonetic": "[nəʊˈvembə]",
+      "meaning": "十一月",
+      "difficulty": 3
+    },
+    {
+      "word": "December",
+      "phonetic": "[dɪˈsembə]",
+      "meaning": "十二月",
+      "difficulty": 3
+    },
+    {
+      "word": "birthday",
+      "phonetic": "[ˈbɜːθdeɪ]",
+      "meaning": "生日",
+      "difficulty": 2
+    },
+    {
+      "word": "uncle",
+      "phonetic": "[ˈʌŋkl]",
+      "meaning": "叔叔；舅舅",
+      "difficulty": 2
+    },
+    {
+      "word": "her",
+      "phonetic": "[hɜː]",
+      "meaning": "她的",
+      "difficulty": 1
+    },
+    {
+      "word": "date",
+      "phonetic": "[deɪt]",
+      "meaning": "日期",
+      "difficulty": 1
+    }
+  ]
+}
+

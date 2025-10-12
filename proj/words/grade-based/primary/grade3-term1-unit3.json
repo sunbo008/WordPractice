@@ -1,0 +1,74 @@
+{
+  "metadata": {
+    "id": "grade3-term1-unit3",
+    "name": "三年级上册 Unit 3",
+    "description": "人教版三年级上册第3单元 - 颜色",
+    "category": "grade-based",
+    "difficulty": "beginner",
+    "wordCount": 10,
+    "lastUpdated": "2025-10-12"
+  },
+  "words": [
+    {
+      "word": "red",
+      "phonetic": "[red]",
+      "meaning": "红色的",
+      "difficulty": 1
+    },
+    {
+      "word": "yellow",
+      "phonetic": "[ˈjeləʊ]",
+      "meaning": "黄色的",
+      "difficulty": 2
+    },
+    {
+      "word": "green",
+      "phonetic": "[ɡriːn]",
+      "meaning": "绿色的",
+      "difficulty": 2
+    },
+    {
+      "word": "blue",
+      "phonetic": "[bluː]",
+      "meaning": "蓝色的",
+      "difficulty": 1
+    },
+    {
+      "word": "purple",
+      "phonetic": "[ˈpɜːpl]",
+      "meaning": "紫色的",
+      "difficulty": 2
+    },
+    {
+      "word": "white",
+      "phonetic": "[waɪt]",
+      "meaning": "白色的",
+      "difficulty": 2
+    },
+    {
+      "word": "black",
+      "phonetic": "[blæk]",
+      "meaning": "黑色的",
+      "difficulty": 2
+    },
+    {
+      "word": "orange",
+      "phonetic": "[ˈɒrɪndʒ]",
+      "meaning": "橙色的",
+      "difficulty": 2
+    },
+    {
+      "word": "pink",
+      "phonetic": "[pɪŋk]",
+      "meaning": "粉色的",
+      "difficulty": 1
+    },
+    {
+      "word": "brown",
+      "phonetic": "[braʊn]",
+      "meaning": "棕色的",
+      "difficulty": 2
+    }
+  ]
+}
+

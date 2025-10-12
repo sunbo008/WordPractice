@@ -1,0 +1,92 @@
+{
+  "metadata": {
+    "id": "grade6-term1-unit2",
+    "name": "六年级上册 Unit 2",
+    "description": "人教版六年级上册第2单元 - 地点和方位",
+    "category": "grade-based",
+    "difficulty": "intermediate",
+    "wordCount": 11,
+    "lastUpdated": "2025-10-12"
+  },
+  "words": [
+    {
+      "word": "library",
+      "phonetic": "[ˈlaɪbrəri]",
+      "meaning": "图书馆",
+      "difficulty": 3
+    },
+    {
+      "word": "post office",
+      "phonetic": "[pəʊst ˈɒfɪs]",
+      "meaning": "邮局",
+      "difficulty": 2
+    },
+    {
+      "word": "hospital",
+      "phonetic": "[ˈhɒspɪtl]",
+      "meaning": "医院",
+      "difficulty": 3
+    },
+    {
+      "word": "cinema",
+      "phonetic": "[ˈsɪnəmə]",
+      "meaning": "电影院",
+      "difficulty": 2
+    },
+    {
+      "word": "bookstore",
+      "phonetic": "[ˈbʊkstɔː]",
+      "meaning": "书店",
+      "difficulty": 3
+    },
+    {
+      "word": "where",
+      "phonetic": "[weə]",
+      "meaning": "在哪里；到哪里",
+      "difficulty": 2
+    },
+    {
+      "word": "please",
+      "phonetic": "[pliːz]",
+      "meaning": "请",
+      "difficulty": 2
+    },
+    {
+      "word": "next to",
+      "phonetic": "[nekst tə]",
+      "meaning": "与……相邻",
+      "difficulty": 2
+    },
+    {
+      "word": "turn",
+      "phonetic": "[tɜːn]",
+      "meaning": "转弯",
+      "difficulty": 1
+    },
+    {
+      "word": "right",
+      "phonetic": "[raɪt]",
+      "meaning": "右边",
+      "difficulty": 2
+    },
+    {
+      "word": "left",
+      "phonetic": "[left]",
+      "meaning": "左边",
+      "difficulty": 1
+    },
+    {
+      "word": "straight",
+      "phonetic": "[streɪt]",
+      "meaning": "成直线地",
+      "difficulty": 2
+    },
+    {
+      "word": "then",
+      "phonetic": "[ðen]",
+      "meaning": "然后",
+      "difficulty": 1
+    }
+  ]
+}
+

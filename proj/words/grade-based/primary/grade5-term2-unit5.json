@@ -1,0 +1,80 @@
+{
+  "metadata": {
+    "id": "grade5-term2-unit5",
+    "name": "五年级下册 Unit 5",
+    "description": "人教版五年级下册第5单元 - 动物动作",
+    "category": "grade-based",
+    "difficulty": "intermediate",
+    "wordCount": 11,
+    "lastUpdated": "2025-10-12"
+  },
+  "words": [
+    {
+      "word": "fly",
+      "phonetic": "[flaɪ]",
+      "meaning": "飞",
+      "difficulty": 1
+    },
+    {
+      "word": "jump",
+      "phonetic": "[dʒʌmp]",
+      "meaning": "跳",
+      "difficulty": 1
+    },
+    {
+      "word": "walk",
+      "phonetic": "[wɔːk]",
+      "meaning": "走",
+      "difficulty": 1
+    },
+    {
+      "word": "run",
+      "phonetic": "[rʌn]",
+      "meaning": "跑",
+      "difficulty": 1
+    },
+    {
+      "word": "swim",
+      "phonetic": "[swɪm]",
+      "meaning": "游泳",
+      "difficulty": 1
+    },
+    {
+      "word": "kangaroo",
+      "phonetic": "[ˌkæŋɡəˈruː]",
+      "meaning": "袋鼠",
+      "difficulty": 3
+    },
+    {
+      "word": "sleep",
+      "phonetic": "[sliːp]",
+      "meaning": "睡觉",
+      "difficulty": 2
+    },
+    {
+      "word": "climb",
+      "phonetic": "[klaɪm]",
+      "meaning": "往上爬",
+      "difficulty": 2
+    },
+    {
+      "word": "fight",
+      "phonetic": "[faɪt]",
+      "meaning": "打架",
+      "difficulty": 2
+    },
+    {
+      "word": "swing",
+      "phonetic": "[swɪŋ]",
+      "meaning": "荡；荡秋千",
+      "difficulty": 2
+    },
+    {
+      "word": "drink water",
+      "phonetic": "[drɪŋk ˈwɔːtə]",
+      "meaning": "喝水",
+      "difficulty": 2
+    }
+  ]
+}
+

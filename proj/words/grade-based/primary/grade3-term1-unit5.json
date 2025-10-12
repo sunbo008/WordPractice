@@ -1,0 +1,86 @@
+{
+  "metadata": {
+    "id": "grade3-term1-unit5",
+    "name": "三年级上册 Unit 5",
+    "description": "人教版三年级上册第5单元 - 食物和饮料",
+    "category": "grade-based",
+    "difficulty": "beginner",
+    "wordCount": 12,
+    "lastUpdated": "2025-10-12"
+  },
+  "words": [
+    {
+      "word": "cake",
+      "phonetic": "[keɪk]",
+      "meaning": "蛋糕",
+      "difficulty": 1
+    },
+    {
+      "word": "bread",
+      "phonetic": "[bred]",
+      "meaning": "面包",
+      "difficulty": 2
+    },
+    {
+      "word": "hot dog",
+      "phonetic": "[hɒt dɒɡ]",
+      "meaning": "热狗",
+      "difficulty": 2
+    },
+    {
+      "word": "hamburger",
+      "phonetic": "[ˈhæmbɜːɡə]",
+      "meaning": "汉堡包",
+      "difficulty": 3
+    },
+    {
+      "word": "chicken",
+      "phonetic": "[ˈtʃɪkɪn]",
+      "meaning": "鸡肉",
+      "difficulty": 2
+    },
+    {
+      "word": "French fries",
+      "phonetic": "[frentʃ fraɪz]",
+      "meaning": "炸薯条",
+      "difficulty": 3
+    },
+    {
+      "word": "Coke",
+      "phonetic": "[kəʊk]",
+      "meaning": "可乐",
+      "difficulty": 1
+    },
+    {
+      "word": "juice",
+      "phonetic": "[dʒuːs]",
+      "meaning": "果汁",
+      "difficulty": 2
+    },
+    {
+      "word": "milk",
+      "phonetic": "[mɪlk]",
+      "meaning": "牛奶",
+      "difficulty": 1
+    },
+    {
+      "word": "water",
+      "phonetic": "[ˈwɔːtə]",
+      "meaning": "水",
+      "difficulty": 2
+    },
+    {
+      "word": "tea",
+      "phonetic": "[tiː]",
+      "meaning": "茶",
+      "difficulty": 1
+    },
+    {
+      "word": "coffee",
+      "phonetic": "[ˈkɒfi]",
+      "meaning": "咖啡",
+      "difficulty": 2
+    }
+  ]
+}
+
