@@ -6,7 +6,7 @@
     "version": "1.0",
     "category": "phonics",
     "difficulty": "beginner",
-    "totalWords": 80,
+    "totalWords": 20,
     "lessons": 12,
     "source": "phonics_methods 15天学习计划",
     "tags": ["音标", "基础", "元音", "辅音"],

@@ -115,7 +115,8 @@
                     wordsEl.appendChild(div);
                 });
 
-                const story = buildStory(data.words);
+                // 优先使用 JSON 中提供的 story，否则自动生成
+                const story = data.metadata?.story || buildStory(data.words);
                 document.getElementById('story').textContent = story;
 
                 document.getElementById('play-story').onclick = async ()=>{
