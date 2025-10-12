@@ -324,6 +324,14 @@
                     🔄 测试所有提供商
                 </button>
             </div>
+            <div class="button-group" style="margin-top: 15px;">
+                <input id="downloadWordInput" type="text" placeholder="输入要下载的单词（默认使用上方测试词）" 
+                    style="flex: 1; min-width: 220px; padding: 12px 14px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; outline: none;" 
+                    onkeydown="if(event.key==='Enter'){ downloadYoudaoTTS(); }">
+                <button class="btn-primary" onclick="downloadYoudaoTTS()">
+                    📥 下载有道 TTS 到本地
+                </button>
+            </div>
             <div class="button-group" style="margin-top: 15px; padding-top: 15px; border-top: 2px dashed rgba(102, 126, 234, 0.3);">
                 <button class="btn-secondary" onclick="clearWebSpeechCache()" style="background: #e74c3c;">
                     🗑️ 清空 Web Speech 缓存
@@ -578,6 +586,131 @@
 
             addLog(`\n📊 测试完成: 成功 ${successCount} 个, 失败 ${failCount} 个`, 'info');
             testAllBtn.disabled = false;
+        }
+
+        // 下载有道 TTS 音频到本地（命名：{word}_youdao.mp3）
+        async function downloadYoudaoTTS() {
+            try {
+                let word = (document.getElementById('downloadWordInput')?.value || '').trim();
+                if (!word) {
+                    // 从页面上的测试词或默认变量获取
+                    const displayEl = document.querySelector('.test-word');
+                    word = (displayEl?.textContent || testWord || '').trim();
+                }
+
+                if (!word) {
+                    addLog('❌ 请输入要下载的单词', 'error');
+                    return;
+                }
+
+                const lowerWord = word.toLowerCase();
+                const fileName = `${lowerWord}_youdao.mp3`;
+                const youdaoUrl = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(word)}&type=1`;
+                // 代理地址：优先使用以规避浏览器侧跨域与 Content-Disposition 限制
+                // 本地预览（file:// 或 127.0.0.1）下建议通过本地静态服务访问 /api/
+                const proxyUrl = `/api/youdao-tts?word=${encodeURIComponent(word)}`;
+
+                addLog(`📥 准备下载有道 TTS: "${word}" → ${fileName}`, 'info');
+
+                // 优先尝试通过 fetch 获取 Blob（如遇 CORS 将抛错）
+                try {
+                    // 若缓存管理器存在，使用其下载工具获得一致的日志与行为
+                    if (typeof AudioCacheManager !== 'undefined') {
+                        const cacheMgr = AudioCacheManager.getInstance();
+                        // 初始化可能已由 TTSService 完成；这里再次调用是幂等的
+                        await cacheMgr.initialize().catch(() => {});
+                        // 先尝试代理（可返回带 Content-Disposition 的二进制）
+                        let blob;
+                        try {
+                            blob = await cacheMgr.downloadAudio(proxyUrl);
+                        } catch (e1) {
+                            // 代理不可用（本地没跑或部署未生效），退回直连
+                            blob = await cacheMgr.downloadAudio(youdaoUrl);
+                        }
+                        // 优先尝试文件系统保存对话框（需 https 或 localhost，Chromium 系浏览器）
+                        if (window.showSaveFilePicker) {
+                            try {
+                                const handle = await window.showSaveFilePicker({
+                                    suggestedName: fileName,
+                                    types: [{ description: 'MP3 音频', accept: { 'audio/mpeg': ['.mp3'] } }]
+                                });
+                                const writable = await handle.createWritable();
+                                await writable.write(blob);
+                                await writable.close();
+                                addLog(`✅ 已保存：${fileName}（请放入 proj/audio/ 目录）`, 'success');
+                                return;
+                            } catch (pickerErr) {
+                                // 用户取消或权限受限，回退为锚点下载
+                            }
+                        }
+
+                        const blobUrl = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = blobUrl;
+                        a.download = fileName;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(blobUrl);
+
+                        addLog(`✅ 已触发下载（命名：${fileName}）。请将文件保存到 proj/audio/ 目录。`, 'success');
+                        return;
+                    }
+
+                    // 无缓存管理器时，直接使用 fetch；先尝试代理
+                    let resp = await fetch(proxyUrl);
+                    if (!resp.ok) {
+                        // 代理不可用则退回直连
+                        resp = await fetch(youdaoUrl);
+                    }
+                    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                    const blob = await resp.blob();
+                    // 优先尝试系统级保存对话框
+                    if (window.showSaveFilePicker) {
+                        try {
+                            const handle = await window.showSaveFilePicker({
+                                suggestedName: fileName,
+                                types: [{ description: 'MP3 音频', accept: { 'audio/mpeg': ['.mp3'] } }]
+                            });
+                            const writable = await handle.createWritable();
+                            await writable.write(blob);
+                            await writable.close();
+                            addLog(`✅ 已保存：${fileName}（请放入 proj/audio/ 目录）`, 'success');
+                            return;
+                        } catch {}
+                    }
+
+                    const blobUrl = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = blobUrl;
+                    a.download = fileName;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(blobUrl);
+
+                    addLog(`✅ 已触发下载（命名：${fileName}）。请将文件保存到 proj/audio/ 目录。`, 'success');
+                    return;
+                } catch (e) {
+                    // CORS 或网络限制：退化为直接跨域下载链接（大多数浏览器会沿用 download 文件名）
+                    addLog(`⚠️ 直接下载受限（可能是 CORS）。尝试使用直链下载...`, 'warning');
+                    const a = document.createElement('a');
+                    a.href = youdaoUrl;
+                    a.download = fileName;
+                    a.target = '_blank';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    addLog(`✅ 已打开直链下载。若浏览器未按期望命名，请手动另存为 ${fileName} 并放入 proj/audio/。`, 'success');
+                    // 额外辅助：复制建议文件名到剪贴板
+                    try {
+                        await navigator.clipboard.writeText(fileName);
+                        addLog(`📋 已复制文件名到剪贴板：${fileName}`, 'info');
+                    } catch {}
+                }
+            } catch (error) {
+                addLog(`❌ 下载失败：${error.message || error}`, 'error');
+            }
         }
 
 

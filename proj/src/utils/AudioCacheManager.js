@@ -70,8 +70,8 @@ class AudioCacheManager {
         this.db = null;
         this.initialized = false;
         
-        // 本地文件路径前缀
-        this.localAudioPath = 'audio/';
+        // 本地文件路径前缀（使用站点根路径，避免在 /tests 等子路径下相对路径解析到 tests/audio/）
+        this.localAudioPath = '/audio/';
         
         // Blob URL 缓存（用于内存管理）
         this.blobUrlCache = new Map(); // key: "word_provider", value: blobUrl

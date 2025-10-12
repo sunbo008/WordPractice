@@ -951,6 +951,24 @@ class TTSService {
             await this.initialize();
         }
         
+        // 优先命中本地缓存（例如你已下载的 {word}_youdao.mp3），避免走在线/语音合成
+        try {
+            if (this.cacheEnabled && this.cacheManager) {
+                // 先检查有道本地缓存（与下载命名规则一致）
+                const hasLocalYoudao = await this.cacheManager.hasCache(word, 'youdao');
+                if (hasLocalYoudao) {
+                    const localUrl = await this.cacheManager.getCache(word, 'youdao');
+                    await this._playAudio(localUrl, volume, '有道智云 TTS(本地)');
+                    if (onSuccess) {
+                        onSuccess('有道智云 TTS(本地)', 0, null);
+                    }
+                    return;
+                }
+            }
+        } catch (e) {
+            // 本地检查异常则忽略，继续走正常提供商流程
+        }
+
         // 如果有可用的提供商，轮换使用
         if (this.availableProviders.length > 0) {
             this.isSpeaking = true;
