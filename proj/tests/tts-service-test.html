@@ -328,6 +328,9 @@
                 <input id="downloadWordInput" type="text" placeholder="输入要下载的单词（默认使用上方测试词）" 
                     style="flex: 1; min-width: 220px; padding: 12px 14px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; outline: none;" 
                     onkeydown="if(event.key==='Enter'){ downloadYoudaoTTS(); }">
+                <button class="btn-primary" onclick="webSpeechSpeak()" id="webSpeechBtn" title="直接调用浏览器 Web Speech API 发音（英式优先）">
+                    🗣️ Web Speech API 发音
+                </button>
                 <button class="btn-primary" onclick="downloadYoudaoTTS()">
                     📥 下载有道 TTS 到本地
                 </button>
@@ -509,6 +512,16 @@
             `).join('');
         }
 
+        // 获取要朗读/下载的单词：优先取输入框，其次取标题里的单词，最后取默认 testWord
+        function getWordToSpeak() {
+            let word = (document.getElementById('downloadWordInput')?.value || '').trim();
+            if (!word) {
+                const displayEl = document.querySelector('.test-word');
+                word = (displayEl?.textContent || testWord || '').trim();
+            }
+            return word;
+        }
+
         async function testSpeak() {
             if (!ttsService) {
                 addLog('TTS 服务未初始化', 'error');
@@ -521,10 +534,18 @@
             speakBtn.disabled = true;
             stopBtn.disabled = false;
 
-            addLog(`准备朗读单词: "${testWord}"`, 'info');
+            const wordToSpeak = getWordToSpeak();
+            if (!wordToSpeak) {
+                addLog('❌ 没有可朗读的单词', 'error');
+                speakBtn.disabled = false;
+                stopBtn.disabled = true;
+                return;
+            }
+
+            addLog(`准备朗读单词: "${wordToSpeak}"`, 'info');
 
             try {
-                await ttsService.speak(testWord, {
+                await ttsService.speak(wordToSpeak, {
                     showError: false,
                     onSuccess: (providerName) => {
                         addLog(`✅ 朗读成功，使用: ${providerName}`, 'success');
@@ -539,6 +560,66 @@
             } finally {
                 speakBtn.disabled = false;
                 stopBtn.disabled = true;
+            }
+        }
+
+        // 直接调用浏览器 Web Speech API 发音（与 TTSService 的英式语音选择一致）
+        async function webSpeechSpeak() {
+            const word = getWordToSpeak();
+            if (!word) {
+                addLog('❌ 没有可发音的单词', 'error');
+                return;
+            }
+
+            if (!('speechSynthesis' in window)) {
+                addLog('❌ 当前浏览器不支持 Web Speech API', 'error');
+                return;
+            }
+
+            try {
+                // 激活（与 TTSService.activateWebSpeechAPI 行为一致）
+                const utter0 = new SpeechSynthesisUtterance('');
+                utter0.volume = 0;
+                speechSynthesis.speak(utter0);
+
+                // 等待语音列表加载（最多 2 秒）
+                const waitVoices = () => new Promise((resolve) => {
+                    const voices = speechSynthesis.getVoices();
+                    if (voices.length > 0) return resolve(voices);
+                    const timer = setTimeout(() => resolve(speechSynthesis.getVoices()), 2000);
+                    speechSynthesis.onvoiceschanged = () => { clearTimeout(timer); resolve(speechSynthesis.getVoices()); };
+                });
+
+                const voices = await waitVoices();
+
+                // 选择英式语音（优先在线，其次本地），规则与 TTSService._selectBritishVoice 对齐
+                let britishVoice = voices.find(v => !v.localService && v.lang === 'en-GB' && v.name.includes('UK'))
+                    || voices.find(v => !v.localService && v.lang === 'en-GB' && v.name.includes('British'))
+                    || voices.find(v => !v.localService && v.lang === 'en-GB')
+                    || voices.find(v => !v.localService && v.lang.startsWith('en-') && v.name.includes('UK'))
+                    || voices.find(v => !v.localService && v.lang.startsWith('en-') && v.name.includes('British'))
+                    || voices.find(v => !v.localService && v.lang.startsWith('en-'));
+
+                if (!britishVoice) {
+                    britishVoice = voices.find(v => v.localService && v.lang === 'en-GB')
+                        || voices.find(v => v.localService && v.lang.startsWith('en-'));
+                }
+
+                // 取消任何进行中的发音
+                speechSynthesis.cancel();
+
+                const utter = new SpeechSynthesisUtterance(word);
+                if (britishVoice) utter.voice = britishVoice;
+                utter.lang = 'en-GB';
+                utter.rate = 0.8;
+                utter.pitch = 1.0;
+
+                addLog(`🗣️ Web Speech API 正在发音: "${word}"${britishVoice ? `（${britishVoice.name}）` : ''}`, 'info');
+                utter.onend = () => addLog('✅ Web Speech API 发音完成', 'success');
+                utter.onerror = (e) => addLog(`❌ Web Speech API 错误: ${e.error || 'unknown'}`, 'error');
+                speechSynthesis.speak(utter);
+            } catch (e) {
+                addLog(`❌ Web Speech API 调用失败：${e.message || e}`, 'error');
             }
         }
 

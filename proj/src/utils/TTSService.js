@@ -222,6 +222,36 @@ class TTSService {
         
         // 将排序后的结果赋值给 availableProviders
         this.availableProviders = candidates;
+
+        // 调整优先级：若有道 TTS 可用，则提升优先级
+        // - 非 iOS：将有道放到首位（最高优先级）
+        // - iOS：保持 Web Speech API 为首位，如有道可用则放在其后
+        try {
+            const youdaoIndex = this.availableProviders.findIndex(p => (p.name || '').includes('有道'));
+            if (youdaoIndex !== -1) {
+                const youdaoProvider = this.availableProviders.splice(youdaoIndex, 1)[0];
+                if (this.isIOS) {
+                    const webIndex = this.availableProviders.findIndex(p => p.name === 'Web Speech API');
+                    if (webIndex > -1) {
+                        // 确保 Web Speech API 在首位
+                        if (webIndex !== 0) {
+                            const webProvider = this.availableProviders.splice(webIndex, 1)[0];
+                            this.availableProviders.unshift(webProvider);
+                        }
+                        // 将有道插入到 Web Speech API 之后
+                        this.availableProviders.splice(1, 0, youdaoProvider);
+                    } else {
+                        // iOS 但未检测到 Web Speech（极少见），将有道放到首位
+                        this.availableProviders.unshift(youdaoProvider);
+                    }
+                } else {
+                    // 非 iOS：有道置顶
+                    this.availableProviders.unshift(youdaoProvider);
+                }
+            }
+        } catch (e) {
+            // 安全降级：若重排失败则忽略，保持按速度排序
+        }
         
         this.providerTested = true;
         
