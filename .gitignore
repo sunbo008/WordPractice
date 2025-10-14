@@ -16,6 +16,10 @@ Thumbs.db
 # 忽略日志文件
 *.log
 
+# 忽略图片生成工具的日志和记录
+proj/tools/generate_word_images.log
+proj/tools/generate_word_images_records.csv
+
 # 忽略node_modules（如果有Node.js项目）
 node_modules/
 

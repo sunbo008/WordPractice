@@ -1,30 +1,8 @@
 {
   "apiKey": "sk-mppoksejcqbcukdtoqkqvgwvjklwhrupmycdkczbbdztsyir",
-  "results": {
-    "apple": {
-      "word": "apple",
-      "image_path": "/Users/zfleng/workspace/github/WordPractice/proj/images/generated/apple.jpg",
-      "model": "Qwen/Qwen-Image",
-      "size": "300x300",
-      "created_at": 1760420305.926754,
-      "status": "ok"
-    },
-    "banana": {
-      "word": "banana",
-      "image_path": "/Users/zfleng/workspace/github/WordPractice/proj/images/generated/banana.jpg",
-      "model": "Qwen/Qwen-Image",
-      "size": "300x300",
-      "created_at": 1760420311.0638149,
-      "status": "ok"
-    },
-    "cat": {
-      "word": "cat",
-      "image_path": "/Users/zfleng/workspace/github/WordPractice/proj/images/generated/cat.jpg",
-      "model": "Qwen/Qwen-Image",
-      "size": "300x300",
-      "created_at": 1760420316.182196,
-      "status": "ok"
-    }
-  },
-  "model": "Qwen/Qwen-Image"
+  "model": "Qwen/Qwen-Image",
+  "promptConstraints": "Natural realistic style, kid-friendly. IMPORTANT: Carefully understand and accurately represent the exact meaning of the given English word - avoid confusion with similar-sounding words or unrelated concepts. The main subject should be clear, prominent and directly represent the word meaning through VISUAL elements only (use symbols, metaphors, or representative scenes for abstract concepts). Simple real-world context with minimal distracting elements. Natural lighting and authentic textures. Objects may show subtle signs of use or natural imperfections for realism, but avoid overly perfect or artificial appearance. CRITICAL: ABSOLUTELY NO English text, letters, words, or Latin alphabet (A-Z, a-z) visible anywhere in the image - not on objects, not on signs, not on labels, not as overlay, NEVER. Chinese characters are acceptable only if absolutely necessary, but English letters are STRICTLY FORBIDDEN under any circumstances.",
+  "guidance_scale": 15.0,
+  "num_inference_steps": 20,
+  "negative_prompt": "English text, English words, English letters, English characters, Latin letters, Latin alphabet, A-Z, a-z, any text in English, Roman alphabet, English writing, English typography, Western alphabet, wrong word meaning, misunderstood concept, unrelated concept, confused meaning, incorrect interpretation, written text, printed text, handwritten text, labels with text, signs with text, text overlay, captions, subtitles, watermark with text, signature with text, alphabet characters, Roman letters, lettering, writing, inscriptions, typography, text of any kind, letters of any kind, words of any kind, numbers, blurry, low quality, distorted, deformed, ugly, bad anatomy, portrait photos, ID photo, half-body photo, full-body photo, pure white background, solid color background, overly smooth, too perfect, artificial, sterile, 3D render, CGI, overly polished, plastic-looking, nsfw, adult content, sexual, nude, nudity, violence, violent, blood, gore, bloody, weapon, gun, knife, scary, horror, disturbing, inappropriate, smoking, alcohol, drugs, gambling"
 }
