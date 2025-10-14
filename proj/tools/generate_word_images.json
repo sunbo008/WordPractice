@@ -1,0 +1,30 @@
+{
+  "apiKey": "sk-mppoksejcqbcukdtoqkqvgwvjklwhrupmycdkczbbdztsyir",
+  "results": {
+    "apple": {
+      "word": "apple",
+      "image_path": "/Users/zfleng/workspace/github/WordPractice/proj/images/generated/apple.jpg",
+      "model": "Qwen/Qwen-Image",
+      "size": "300x300",
+      "created_at": 1760420305.926754,
+      "status": "ok"
+    },
+    "banana": {
+      "word": "banana",
+      "image_path": "/Users/zfleng/workspace/github/WordPractice/proj/images/generated/banana.jpg",
+      "model": "Qwen/Qwen-Image",
+      "size": "300x300",
+      "created_at": 1760420311.0638149,
+      "status": "ok"
+    },
+    "cat": {
+      "word": "cat",
+      "image_path": "/Users/zfleng/workspace/github/WordPractice/proj/images/generated/cat.jpg",
+      "model": "Qwen/Qwen-Image",
+      "size": "300x300",
+      "created_at": 1760420316.182196,
+      "status": "ok"
+    }
+  },
+  "model": "Qwen/Qwen-Image"
+}

@@ -25,3 +25,6 @@ build/
 
 # 忽略生成的 CSV 词表
 proj/words/words.csv
+
+# 生成的图像与日志（包含敏感密钥）
+proj/images/generated/
