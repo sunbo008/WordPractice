@@ -22,3 +22,6 @@ node_modules/
 # 忽略构建输出
 dist/
 build/
+
+# 忽略生成的 CSV 词表
+proj/words/words.csv
