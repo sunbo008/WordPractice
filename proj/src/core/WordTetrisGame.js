@@ -964,7 +964,10 @@ class WordTetrisGame {
             this.gameState = 'paused';
             this.stopSpeaking(); // 暂停时停止朗读
             // 暂停时保存当前错词
-            this.saveMissedWordsToGlobal();
+            console.log('⏸️ 暂停游戏，准备保存错词...');
+            this.saveMissedWordsToGlobal().catch(error => {
+                console.error('❌ 保存错词失败:', error);
+            });
         } else if (this.gameState === 'paused') {
             this.gameState = 'playing';
             // 恢复游戏时，如果有单词在下降，重新开始朗读
@@ -3833,9 +3836,11 @@ class WordTetrisGame {
      * 将游戏中的所有错词保存为一个错词卡
      */
     async saveMissedWordsToGlobal() {
+        console.log('💾 saveMissedWordsToGlobal 开始执行...');
         try {
             // 获取当前错词本中的所有单词
             const vocabularyBook = this.vocabularyManager.getVocabularyBook();
+            console.log(`📚 获取到错词本，包含 ${vocabularyBook.length} 个单词:`, vocabularyBook);
             
             if (vocabularyBook.length === 0) {
                 console.log('📝 暂无错词需要保存');
@@ -3848,7 +3853,9 @@ class WordTetrisGame {
                 return;
             }
             
+            console.log('🔑 开始获取用户IP...');
             await window.missedWordsManager.getUserIP();
+            console.log('✅ 用户IP获取成功:', window.missedWordsManager.userIP);
             
             // 生成错词卡名称（使用当前日期，每日一个错词卡）
             const now = new Date();
