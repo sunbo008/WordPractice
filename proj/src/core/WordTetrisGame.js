@@ -3861,12 +3861,15 @@ class WordTetrisGame {
             const now = new Date();
             const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
             const cardName = `游戏错词_${dateStr}`;
+            console.log('🏷️ 错词卡名称:', cardName);
             
             // 获取现有的错词卡
             const allMissedCards = await window.missedWordsManager.getMissedWords();
+            console.log('📋 所有错词卡:', allMissedCards.map(c => c.word));
             
             // 检查是否已存在今日的错词卡
             let existingCard = allMissedCards.find(card => card.word === cardName);
+            console.log('🔍 查找结果:', existingCard ? `找到现有错词卡: ${existingCard.word}` : '未找到现有错词卡');
             
             // 如果存在同名错词卡，获取其中的单词
             let existingWords = [];
@@ -3914,17 +3917,24 @@ class WordTetrisGame {
             const allMissedWordsData = JSON.parse(
                 localStorage.getItem('wordTetris_missedWords') || '{}'
             );
+            console.log('📦 当前 localStorage 中的所有错词卡 keys:', Object.keys(allMissedWordsData));
             
             const key = `${window.missedWordsManager.userIP}::${cardName.toLowerCase()}`;
+            console.log('🔑 生成的 key:', key);
+            console.log('🔍 检查 key 是否存在:', allMissedWordsData[key] ? '存在' : '不存在');
+            
             const now2 = Date.now();
             
             if (allMissedWordsData[key]) {
                 // 更新现有错词卡
+                console.log('♻️ 更新现有错词卡...');
                 allMissedWordsData[key].meaning = JSON.stringify(mergedWords);
                 allMissedWordsData[key].lastUpdate = now2;
                 allMissedWordsData[key].count++;
+                console.log('✅ 更新完成，新的 count:', allMissedWordsData[key].count);
             } else {
                 // 创建新错词卡
+                console.log('➕ 创建新错词卡...');
                 allMissedWordsData[key] = {
                     ip: window.missedWordsManager.userIP,
                     word: cardName,
@@ -3936,6 +3946,7 @@ class WordTetrisGame {
             }
             
             localStorage.setItem('wordTetris_missedWords', JSON.stringify(allMissedWordsData));
+            console.log('💾 已写入 localStorage');
             
             console.log(`✅ 已保存错词卡"${cardName}"，包含 ${mergedWords.length} 个单词（去重后）`);
         } catch (error) {
