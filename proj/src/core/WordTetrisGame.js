@@ -710,7 +710,7 @@ class WordTetrisGame {
         return imgH + ctrlH + gap + paddingTop + paddingBottom;
     }
 
-    init() {
+    async init() {
         // 初始化调试日志系统
         debugLog.init();
         debugLog.info('🎮 游戏初始化开始...');
@@ -720,7 +720,7 @@ class WordTetrisGame {
         this.updateUI();
         // 【修复】不在 init 中生成单词，让 startGame() 统一处理
         // this.generateNextWord(); 
-        this.initExamStats(); // 初始化考试统计
+        await this.initExamStats(); // 等待初始化考试统计完成
         this.gameLoop();
         
         debugLog.success('✅ 游戏初始化完成');
@@ -3830,6 +3830,7 @@ class WordTetrisGame {
     
     /**
      * 保存错词到全局错词管理器（用于设置页面展示）
+     * 将游戏中的所有错词保存为一个错词卡
      */
     async saveMissedWordsToGlobal() {
         try {
@@ -3847,9 +3848,89 @@ class WordTetrisGame {
                 return;
             }
             
-            // 批量保存错词
-            const count = await window.missedWordsManager.saveMissedWords(vocabularyBook);
-            console.log(`✅ 已保存 ${count} 个错词到全局管理器`);
+            await window.missedWordsManager.getUserIP();
+            
+            // 生成错词卡名称（使用当前日期，每日一个错词卡）
+            const now = new Date();
+            const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+            const cardName = `游戏错词_${dateStr}`;
+            
+            // 获取现有的错词卡
+            const allMissedCards = await window.missedWordsManager.getMissedWords();
+            
+            // 检查是否已存在今日的错词卡
+            let existingCard = allMissedCards.find(card => card.word === cardName);
+            
+            // 如果存在同名错词卡，获取其中的单词
+            let existingWords = [];
+            if (existingCard) {
+                try {
+                    existingWords = JSON.parse(existingCard.meaning);
+                } catch (e) {
+                    existingWords = [];
+                }
+            }
+            
+            // 合并单词，去重（以单词为key）
+            const wordMap = new Map();
+            
+            // 先添加已存在的单词
+            existingWords.forEach(w => {
+                if (w.word) {
+                    wordMap.set(w.word.toLowerCase(), w);
+                }
+            });
+            
+            // 添加新的错词，如果已存在则更新（增加错误次数）
+            vocabularyBook.forEach(word => {
+                const key = (word.word || word.original).toLowerCase();
+                const existing = wordMap.get(key);
+                
+                if (existing) {
+                    // 如果已存在，增加错误次数
+                    existing.errorCount = (existing.errorCount || 1) + 1;
+                } else {
+                    // 新单词
+                    wordMap.set(key, {
+                        word: word.word || word.original,
+                        phonetic: word.phonetic || '',
+                        meaning: word.meaning || '',
+                        errorCount: 1
+                    });
+                }
+            });
+            
+            // 转换为数组
+            const mergedWords = Array.from(wordMap.values());
+            
+            // 保存为错词卡（使用 SettingsManagerV2 的格式）
+            const allMissedWordsData = JSON.parse(
+                localStorage.getItem('wordTetris_missedWords') || '{}'
+            );
+            
+            const key = `${window.missedWordsManager.userIP}::${cardName.toLowerCase()}`;
+            const now2 = Date.now();
+            
+            if (allMissedWordsData[key]) {
+                // 更新现有错词卡
+                allMissedWordsData[key].meaning = JSON.stringify(mergedWords);
+                allMissedWordsData[key].lastUpdate = now2;
+                allMissedWordsData[key].count++;
+            } else {
+                // 创建新错词卡
+                allMissedWordsData[key] = {
+                    ip: window.missedWordsManager.userIP,
+                    word: cardName,
+                    phonetic: `包含 ${mergedWords.length} 个单词`,
+                    meaning: JSON.stringify(mergedWords),
+                    count: 1,
+                    lastUpdate: now2
+                };
+            }
+            
+            localStorage.setItem('wordTetris_missedWords', JSON.stringify(allMissedWordsData));
+            
+            console.log(`✅ 已保存错词卡"${cardName}"，包含 ${mergedWords.length} 个单词（去重后）`);
         } catch (error) {
             console.error('❌ 保存错词到全局管理器失败:', error);
         }

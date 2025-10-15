@@ -12,6 +12,7 @@ class SettingsManagerV2 {
         // 错词管理
         this.userIP = null;
         this.missedWords = [];
+        this.selectedMissedWords = new Set();
         this.init();
     }
     
@@ -79,12 +80,20 @@ class SettingsManagerV2 {
             const savedGrade = localStorage.getItem('wordTetris_expandedGradeGroups');
             this.expandedCategories = new Set(Array.isArray(JSON.parse(savedCat || '[]')) ? JSON.parse(savedCat || '[]') : []);
             this.expandedGradeGroups = new Set(Array.isArray(JSON.parse(savedGrade || '[]')) ? JSON.parse(savedGrade || '[]') : []);
+            
+            // 加载选中的错词
+            const savedMissedWords = localStorage.getItem('wordTetris_selectedMissedWords');
+            if (savedMissedWords) {
+                this.selectedMissedWords = new Set(JSON.parse(savedMissedWords));
+                console.log('⚙️ 已加载选中的错词:', Array.from(this.selectedMissedWords));
+            }
         } catch (error) {
             console.warn('⚠️ 用户设置加载失败，使用默认配置:', error);
             this.selectedLibraries = new Set(this.config.defaultConfig.enabledLibraries);
             this.gameMode = 'casual';
             this.expandedCategories = new Set();
             this.expandedGradeGroups = new Set();
+            this.selectedMissedWords = new Set();
         }
     }
     
@@ -97,6 +106,8 @@ class SettingsManagerV2 {
             // 保存展开状态
             localStorage.setItem('wordTetris_expandedCategories', JSON.stringify(Array.from(this.expandedCategories)));
             localStorage.setItem('wordTetris_expandedGradeGroups', JSON.stringify(Array.from(this.expandedGradeGroups)));
+            // 保存选中的错词
+            localStorage.setItem('wordTetris_selectedMissedWords', JSON.stringify(Array.from(this.selectedMissedWords)));
             console.log('💾 用户设置已保存');
         } catch (error) {
             console.error('❌ 用户设置保存失败:', error);
@@ -113,10 +124,14 @@ class SettingsManagerV2 {
     }
     
     renderOverview() {
-        document.getElementById('enabled-count').textContent = this.selectedLibraries.size;
+        // 计算已选课程数（包括普通课程和错词本）
+        const totalSelectedCount = this.selectedLibraries.size + this.selectedMissedWords.size;
+        document.getElementById('enabled-count').textContent = totalSelectedCount;
         
         // 计算总单词数
         let totalWords = 0;
+        
+        // 1. 计算普通课程的单词数
         this.config.categories.forEach(category => {
             if (category.subcategories) {
                 category.subcategories.forEach(sub => {
@@ -137,6 +152,23 @@ class SettingsManagerV2 {
                 });
             }
         });
+        
+        // 2. 计算选中的错词本中的单词数
+        if (this.selectedMissedWords.size > 0) {
+            this.missedWords.forEach(card => {
+                if (this.selectedMissedWords.has(card.word)) {
+                    // 解析错词卡中的单词数量
+                    try {
+                        const wordsInCard = JSON.parse(card.meaning);
+                        totalWords += wordsInCard.length;
+                    } catch (e) {
+                        // 兼容旧格式：逗号分隔的单词列表
+                        const wordList = card.meaning.split(',').map(w => w.trim()).filter(w => w);
+                        totalWords += wordList.length;
+                    }
+                }
+            });
+        }
         
         document.getElementById('total-words-count').textContent = totalWords;
     }
@@ -461,8 +493,9 @@ class SettingsManagerV2 {
     }
     
     saveSettings() {
-        if (this.selectedLibraries.size === 0) {
-            this.showStatus('请至少选择一个课程！', 'error');
+        // 检查是否至少选择了一个课程或错词本
+        if (this.selectedLibraries.size === 0 && this.selectedMissedWords.size === 0) {
+            this.showStatus('请至少选择一个课程或错词本！', 'error');
             return;
         }
         
@@ -472,14 +505,16 @@ class SettingsManagerV2 {
     
     resetToDefault() {
         this.selectedLibraries = new Set(this.config.defaultConfig.enabledLibraries);
+        this.selectedMissedWords = new Set();
         this.gameMode = 'casual';
         this.renderInterface();
         this.showStatus('已恢复默认设置！', 'success');
     }
     
     applyAndStart() {
-        if (this.selectedLibraries.size === 0) {
-            this.showStatus('请至少选择一个课程！', 'error');
+        // 检查是否至少选择了一个课程或错词本
+        if (this.selectedLibraries.size === 0 && this.selectedMissedWords.size === 0) {
+            this.showStatus('请至少选择一个课程或错词本！', 'error');
             return;
         }
         
@@ -705,9 +740,13 @@ class SettingsManagerV2 {
                 lines.forEach(line => {
                     const parts = line.split(',').map(p => p.trim());
                     if (parts.length >= 1 && parts[0]) {
+                        // 清理音标：去除方括号 [] 和斜杠 //
+                        let phonetic = parts[1] || '';
+                        phonetic = phonetic.replace(/[\[\]\/]/g, '').trim();
+                        
                         words.push({
                             word: parts[0],
-                            phonetic: parts[1] || '',
+                            phonetic: phonetic,
                             meaning: parts[2] || ''
                         });
                     }
@@ -722,7 +761,7 @@ class SettingsManagerV2 {
     }
     
     /**
-     * 导入错词（整个文件作为一个错词卡）
+     * 导入错词（将整个文件作为一个错词卡，但保存单词数据）
      */
     async importMissedWords(file) {
         try {
@@ -741,11 +780,15 @@ class SettingsManagerV2 {
             const fileName = file.name.replace(/\.(txt|csv|json)$/i, '');
             
             // 将整个文件保存为一个错词卡
-            // 使用文件名作为"单词"，文件内容摘要作为"音标"，单词列表作为"意思"
-            const wordList = words.map(w => w.word).join(', ');
+            // 使用文件名作为"单词"
+            // 将单词数据保存为 JSON 字符串在 meaning 字段
             const summary = `包含 ${words.length} 个单词`;
+            const wordsData = JSON.stringify(words);
             
-            this.saveMissedWord(fileName, summary, wordList);
+            this.saveMissedWord(fileName, summary, wordsData);
+            
+            // 重新加载错词列表
+            this.loadMissedWords();
             
             this.showStatus(`成功导入文件"${fileName}"，包含 ${words.length} 个单词！`, 'success');
             
@@ -841,8 +884,9 @@ class SettingsManagerV2 {
         
         // 渲染错词卡片
         this.missedWords.forEach(word => {
+            const isSelected = this.selectedMissedWords.has(word.word);
             const card = document.createElement('div');
-            card.className = 'subcategory-item missed-word-card';
+            card.className = `subcategory-item missed-word-card ${isSelected ? 'selected' : ''}`;
             card.setAttribute('data-word', word.word);
             
             // 格式化日期
@@ -854,14 +898,16 @@ class SettingsManagerV2 {
                     <span class="subcategory-title">${word.word}</span>
                     <span class="subcategory-phoneme">${word.phonetic}</span>
                 </div>
-                <div class="subcategory-description">${word.meaning}</div>
+                <div class="subcategory-description">包含单词（点击学习按钮查看详情）</div>
                 <div class="subcategory-meta">
                     <span class="word-count">错误 ${word.count} 次</span>
                     <span class="last-update">${dateStr}</span>
                 </div>
                 <div class="subcategory-actions">
                     <button class="action-btn learn-btn" onclick="openMissedWordLesson(event, '${word.word}')">学习</button>
-                    <button class="action-btn select-btn" onclick="toggleMissedWord(event, '${word.word}')">选择</button>
+                    <button class="action-btn select-btn" onclick="toggleMissedWord(event, '${word.word}')">
+                        ${isSelected ? '✓ 已选' : '选择'}
+                    </button>
                     <button class="action-btn delete-btn" onclick="deleteMissedWord(event, '${word.word}')">删除</button>
                 </div>
             `;
@@ -1095,8 +1141,32 @@ function deleteMissedWord(event, word) {
 // 选择/取消选择错词
 function toggleMissedWord(event, word) {
     event.stopPropagation();
+    
+    if (!window.settingsManager) return;
+    
+    // 切换选中状态
+    if (window.settingsManager.selectedMissedWords.has(word)) {
+        window.settingsManager.selectedMissedWords.delete(word);
+    } else {
+        window.settingsManager.selectedMissedWords.add(word);
+    }
+    
+    // 更新UI
     const card = event.currentTarget.closest('.missed-word-card');
-    card.classList.toggle('selected');
+    const btn = event.currentTarget;
+    const isSelected = window.settingsManager.selectedMissedWords.has(word);
+    
+    if (isSelected) {
+        card.classList.add('selected');
+        btn.textContent = '✓ 已选';
+    } else {
+        card.classList.remove('selected');
+        btn.textContent = '选择';
+    }
+    
+    // 立即保存
+    window.settingsManager.saveUserSettings();
+    console.log(`${isSelected ? '✓' : '✗'} 错词选择: ${word}`);
 }
 
 // 展开/折叠错词分类
