@@ -3979,6 +3979,10 @@ class WordTetrisGame {
 document.addEventListener('DOMContentLoaded', () => {
     const game = new WordTetrisGame();
     
+    // 将游戏实例挂载到 window 对象，供其他脚本使用
+    window.game = game;
+    console.log('✅ 游戏实例已挂载到 window.game');
+    
     // 页面加载时自动重置游戏
     setTimeout(() => {
         game.resetGame();
