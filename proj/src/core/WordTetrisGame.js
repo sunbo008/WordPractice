@@ -963,6 +963,8 @@ class WordTetrisGame {
         if (this.gameState === 'playing') {
             this.gameState = 'paused';
             this.stopSpeaking(); // 暂停时停止朗读
+            // 暂停时保存当前错词
+            this.saveMissedWordsToGlobal();
         } else if (this.gameState === 'paused') {
             this.gameState = 'playing';
             // 恢复游戏时，如果有单词在下降，重新开始朗读
@@ -1616,6 +1618,9 @@ class WordTetrisGame {
         });
         
         console.log('📚 游戏结束后错词本统计:', this.vocabularyManager.getVocabularyStats());
+        
+        // 保存错词到全局错词管理器（用于设置页面显示）
+        this.saveMissedWordsToGlobal();
         
         this.saveGameData(); // 保存最终数据
         this.showGameOverModal();
@@ -3821,6 +3826,33 @@ class WordTetrisGame {
         document.body.removeChild(link);
         
         alert(`成功导出 ${vocabularyBook.length} 个生词到文本文件！`);
+    }
+    
+    /**
+     * 保存错词到全局错词管理器（用于设置页面展示）
+     */
+    async saveMissedWordsToGlobal() {
+        try {
+            // 获取当前错词本中的所有单词
+            const vocabularyBook = this.vocabularyManager.getVocabularyBook();
+            
+            if (vocabularyBook.length === 0) {
+                console.log('📝 暂无错词需要保存');
+                return;
+            }
+            
+            // 确保错词管理器已加载
+            if (!window.missedWordsManager) {
+                console.warn('⚠️ 错词管理器未加载');
+                return;
+            }
+            
+            // 批量保存错词
+            const count = await window.missedWordsManager.saveMissedWords(vocabularyBook);
+            console.log(`✅ 已保存 ${count} 个错词到全局管理器`);
+        } catch (error) {
+            console.error('❌ 保存错词到全局管理器失败:', error);
+        }
     }
 
     // 游戏主循环

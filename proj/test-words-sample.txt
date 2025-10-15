@@ -1,0 +1,11 @@
+hello, /həˈləʊ/, 你好
+world, /wɜːld/, 世界
+good, /ɡʊd/, 好的
+morning, /ˈmɔːnɪŋ/, 早上
+night, /naɪt/, 晚上
+thank, /θæŋk/, 谢谢
+please, /pliːz/, 请
+sorry, /ˈsɒri/, 抱歉
+excuse, /ɪkˈskjuːz/, 原谅
+welcome, /ˈwelkəm/, 欢迎
+

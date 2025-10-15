@@ -693,3 +693,120 @@ body {
         gap: 5px;
     }
 }
+
+/* ========== 错词复习样式 ========== */
+#missed-words-section {
+    background: linear-gradient(135deg, #fff5f5, #ffffff);
+    border-color: #ffcccc;
+}
+
+#missed-words-section:hover {
+    border-color: #ff6b6b;
+}
+
+#missed-words-section .category-header {
+    background: linear-gradient(135deg, #ffe8e8, #ffd4d4);
+}
+
+#missed-words-section .category-header:hover {
+    background: linear-gradient(135deg, #ffd4d4, #ffc0c0);
+}
+
+/* 错词控制按钮 */
+.import-btn,
+.clear-all-btn {
+    background: #f39c12;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: all 0.3s ease;
+    margin-left: 10px;
+}
+
+.import-btn:hover {
+    background: #e67e22;
+    transform: scale(1.05);
+}
+
+.clear-all-btn {
+    background: #c0392b;
+}
+
+.clear-all-btn:hover {
+    background: #a93226;
+    transform: scale(1.05);
+}
+
+/* 错词卡片特殊样式 */
+.missed-word-card {
+    border-color: #ffcccc;
+    background: linear-gradient(135deg, #fffafa, #ffffff);
+}
+
+.missed-word-card:hover {
+    border-color: #ff6b6b;
+}
+
+.missed-word-card.selected {
+    border-color: #27ae60;
+    background: linear-gradient(135deg, #d5f4e6, #f0fff4);
+}
+
+/* 删除按钮特殊样式 */
+.delete-btn {
+    background: #e74c3c;
+    color: white;
+}
+
+.delete-btn:hover {
+    background: #c0392b;
+}
+
+/* 空态占位符 */
+.empty-placeholder {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    color: #95a5a6;
+}
+
+.empty-icon {
+    font-size: 4em;
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+.empty-text {
+    font-size: 1.3em;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #7f8c8d;
+}
+
+.empty-hint {
+    font-size: 0.9em;
+    color: #95a5a6;
+}
+
+/* 最后更新时间 */
+.last-update {
+    font-size: 0.85em;
+    color: #95a5a6;
+}
+
+/* 响应式：错词卡片 */
+@media (max-width: 768px) {
+    #missed-words-section .category-controls {
+        flex-wrap: wrap;
+    }
+    
+    .import-btn,
+    .clear-all-btn {
+        font-size: 0.85em;
+        padding: 6px 12px;
+        margin-left: 5px;
+    }
+}

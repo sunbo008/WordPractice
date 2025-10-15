@@ -155,9 +155,30 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- 分类4: 错词复习 -->
+                <div class="category-section" id="missed-words-section">
+                    <div class="category-header" onclick="toggleMissedWordsCategory()">
+                        <div class="category-title">
+                            <span class="category-icon">📝</span>
+                            <span class="category-name">错词复习 (0)</span>
+                            <span class="category-desc">保存游戏中的错误单词</span>
+                        </div>
+                        <div class="category-controls">
+                            <button class="import-btn" onclick="importMissedWords()">📥 导入</button>
+                            <button class="clear-all-btn" onclick="clearMissedWords()">🗑️ 清空</button>
+                            <span class="expand-icon">▼</span>
+                        </div>
+                    </div>
+                    <div class="category-content collapsed" id="missed-words-content">
+                        <div class="subcategory-grid" id="missed-words-grid">
+                            <!-- 动态生成错词卡片 -->
+                        </div>
+                    </div>
+                </div>
             </section>
 
-            <!-- 操作按钮 -->，
+            <!-- 操作按钮 -->
             <section class="actions">
                 <button class="btn btn-primary" onclick="saveSettings()">💾 保存设置</button>
                 <button class="btn btn-secondary" onclick="resetToDefault()">🔄 恢复默认</button>
@@ -169,6 +190,7 @@
         <div id="status-message" class="status-message"></div>
     </div>
 
+    <script src="/src/utils/MissedWordsManager.js?v=20251015"></script>
     <script src="/src/core/vocabulary-config-loader.js?v=20251009-2"></script>
     <script src="/src/core/vocabulary-manager-v2.js?v=20251009-2"></script>
     <script src="/src/ui/settings.js?v=20251009-2"></script>

@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>错词功能测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        h2 {
+            color: #666;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #2980b9;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            background: #ecf0f1;
+            border-radius: 5px;
+            font-family: monospace;
+        }
+        .success {
+            color: #27ae60;
+        }
+        .error {
+            color: #e74c3c;
+        }
+        .info {
+            color: #3498db;
+        }
+        pre {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 错词功能测试</h1>
+    
+    <div class="test-section">
+        <h2>1. IP 获取测试</h2>
+        <button onclick="testGetIP()">获取 IP</button>
+        <div id="ip-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. 保存错词测试</h2>
+        <button onclick="testSaveSingleWord()">保存单个错词</button>
+        <button onclick="testSaveBatchWords()">批量保存错词</button>
+        <div id="save-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. 读取错词测试</h2>
+        <button onclick="testGetWords()">读取所有错词</button>
+        <button onclick="testGetWordsCount()">获取错词数量</button>
+        <div id="get-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. 文件解析测试</h2>
+        <button onclick="testParseTxt()">解析 TXT 格式</button>
+        <button onclick="testParseCsv()">解析 CSV 格式</button>
+        <button onclick="testParseJson()">解析 JSON 格式</button>
+        <div id="parse-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>5. 清空测试</h2>
+        <button onclick="testClearWords()">清空所有错词</button>
+        <div id="clear-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>6. localStorage 查看</h2>
+        <button onclick="viewLocalStorage()">查看 localStorage</button>
+        <button onclick="clearLocalStorage()">清空 localStorage</button>
+        <div id="storage-result" class="result"></div>
+    </div>
+
+    <!-- 加载错词管理器 -->
+    <script src="../src/utils/MissedWordsManager.js"></script>
+    
+    <script>
+        const manager = window.missedWordsManager;
+        
+        // 测试1: 获取IP
+        async function testGetIP() {
+            const result = document.getElementById('ip-result');
+            result.innerHTML = '正在获取 IP...';
+            
+            try {
+                const ip = await manager.getUserIP();
+                result.innerHTML = `<span class="success">✅ IP获取成功: ${ip}</span>`;
+            } catch (error) {
+                result.innerHTML = `<span class="error">❌ IP获取失败: ${error.message}</span>`;
+            }
+        }
+        
+        // 测试2: 保存单个错词文件
+        async function testSaveSingleWord() {
+            const result = document.getElementById('save-result');
+            result.innerHTML = '正在保存...';
+            
+            // 模拟导入一个文件（文件名作为错词卡名称）
+            const fileName = '测试文件1';
+            const summary = '包含 3 个单词';
+            const wordList = 'hello, world, good';
+            
+            const testWord = {
+                word: fileName,
+                phonetic: summary,
+                meaning: wordList
+            };
+            
+            try {
+                const success = await manager.saveMissedWord(testWord);
+                if (success) {
+                    result.innerHTML = `<span class="success">✅ 保存成功: ${testWord.word}</span>`;
+                } else {
+                    result.innerHTML = `<span class="error">❌ 保存失败</span>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<span class="error">❌ 错误: ${error.message}</span>`;
+            }
+        }
+        
+        // 测试3: 批量保存错词文件
+        async function testSaveBatchWords() {
+            const result = document.getElementById('save-result');
+            result.innerHTML = '正在批量保存...';
+            
+            // 模拟导入多个文件
+            const testFiles = [
+                { word: '测试文件2', phonetic: '包含 5 个单词', meaning: 'apple, banana, orange, grape, pear' },
+                { word: '测试文件3', phonetic: '包含 4 个单词', meaning: 'cat, dog, bird, fish' },
+                { word: '测试文件4', phonetic: '包含 3 个单词', meaning: 'red, blue, green' }
+            ];
+            
+            try {
+                const count = await manager.saveMissedWords(testFiles);
+                result.innerHTML = `<span class="success">✅ 批量保存成功: ${count}/${testFiles.length} 个文件</span>`;
+            } catch (error) {
+                result.innerHTML = `<span class="error">❌ 错误: ${error.message}</span>`;
+            }
+        }
+        
+        // 测试4: 读取所有错词
+        async function testGetWords() {
+            const result = document.getElementById('get-result');
+            result.innerHTML = '正在读取...';
+            
+            try {
+                const words = await manager.getMissedWords();
+                result.innerHTML = `
+                    <span class="info">📝 共 ${words.length} 个错词:</span>
+                    <pre>${JSON.stringify(words, null, 2)}</pre>
+                `;
+            } catch (error) {
+                result.innerHTML = `<span class="error">❌ 错误: ${error.message}</span>`;
+            }
+        }
+        
+        // 测试5: 获取错词数量
+        async function testGetWordsCount() {
+            const result = document.getElementById('get-result');
+            result.innerHTML = '正在统计...';
+            
+            try {
+                const count = await manager.getMissedWordsCount();
+                result.innerHTML = `<span class="info">📊 错词数量: ${count}</span>`;
+            } catch (error) {
+                result.innerHTML = `<span class="error">❌ 错误: ${error.message}</span>`;
+            }
+        }
+        
+        // 测试6: 解析 TXT 格式
+        function testParseTxt() {
+            const result = document.getElementById('parse-result');
+            const content = `hello, /həˈləʊ/, 你好
+world, /wɜːld/, 世界
+good, /ɡʊd/, 好的`;
+            
+            try {
+                // 模拟文件解析（需要settings.js中的parseImportFile方法）
+                result.innerHTML = `
+                    <span class="info">📄 TXT 格式示例:</span>
+                    <pre>${content}</pre>
+                    <span class="success">✅ 格式正确，每行格式：单词, 音标, 中文翻译</span>
+                `;
+            } catch (error) {
+                result.innerHTML = `<span class="error">❌ 错误: ${error.message}</span>`;
+            }
+        }
+        
+        // 测试7: 解析 CSV 格式
+        function testParseCsv() {
+            const result = document.getElementById('parse-result');
+            const content = `word,phonetic,meaning
+hello,/həˈləʊ/,你好
+world,/wɜːld/,世界`;
+            
+            result.innerHTML = `
+                <span class="info">📄 CSV 格式示例:</span>
+                <pre>${content}</pre>
+                <span class="success">✅ 格式正确，首行为标题，后续每行一个单词</span>
+            `;
+        }
+        
+        // 测试8: 解析 JSON 格式
+        function testParseJson() {
+            const result = document.getElementById('parse-result');
+            const content = `[
+  {"word": "hello", "phonetic": "/həˈləʊ/", "meaning": "你好"},
+  {"word": "world", "phonetic": "/wɜːld/", "meaning": "世界"}
+]`;
+            
+            result.innerHTML = `
+                <span class="info">📄 JSON 格式示例:</span>
+                <pre>${content}</pre>
+                <span class="success">✅ 格式正确，数组格式，每个对象包含 word/phonetic/meaning</span>
+            `;
+        }
+        
+        // 测试9: 清空错词
+        function testClearWords() {
+            const result = document.getElementById('clear-result');
+            
+            if (confirm('确定要清空所有错词吗？')) {
+                try {
+                    localStorage.removeItem('wordTetris_missedWords');
+                    result.innerHTML = `<span class="success">✅ 已清空所有错词</span>`;
+                } catch (error) {
+                    result.innerHTML = `<span class="error">❌ 错误: ${error.message}</span>`;
+                }
+            }
+        }
+        
+        // 测试10: 查看 localStorage
+        function viewLocalStorage() {
+            const result = document.getElementById('storage-result');
+            
+            try {
+                const data = localStorage.getItem('wordTetris_missedWords');
+                if (data) {
+                    const parsed = JSON.parse(data);
+                    result.innerHTML = `
+                        <span class="info">💾 localStorage 内容:</span>
+                        <pre>${JSON.stringify(parsed, null, 2)}</pre>
+                    `;
+                } else {
+                    result.innerHTML = `<span class="info">💾 localStorage 为空</span>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<span class="error">❌ 错误: ${error.message}</span>`;
+            }
+        }
+        
+        // 测试11: 清空 localStorage
+        function clearLocalStorage() {
+            const result = document.getElementById('storage-result');
+            
+            if (confirm('确定要清空 localStorage 吗？')) {
+                try {
+                    localStorage.removeItem('wordTetris_missedWords');
+                    result.innerHTML = `<span class="success">✅ 已清空 localStorage</span>`;
+                } catch (error) {
+                    result.innerHTML = `<span class="error">❌ 错误: ${error.message}</span>`;
+                }
+            }
+        }
+        
+        // 页面加载时自动获取IP
+        window.addEventListener('DOMContentLoaded', async () => {
+            console.log('🧪 错词功能测试页面已加载');
+            await testGetIP();
+        });
+    </script>
+</body>
+</html>
+
