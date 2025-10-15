@@ -155,15 +155,24 @@ class SettingsManagerV2 {
         
         // 2. 计算选中的错词本中的单词数
         if (this.selectedMissedWords.size > 0) {
+            console.log('🔍 计算错词本单词数:');
+            console.log('  - 选中的错词卡:', Array.from(this.selectedMissedWords));
+            console.log('  - 所有错词卡数量:', this.missedWords.length);
+            console.log('  - 所有错词卡:', this.missedWords.map(c => c.word));
+            
             this.missedWords.forEach(card => {
                 if (this.selectedMissedWords.has(card.word)) {
+                    console.log(`  ✓ 匹配到错词卡: ${card.word}`);
                     // 解析错词卡中的单词数量
                     try {
                         const wordsInCard = JSON.parse(card.meaning);
+                        console.log(`    - 包含 ${wordsInCard.length} 个单词`);
                         totalWords += wordsInCard.length;
                     } catch (e) {
+                        console.log(`    - 解析失败，使用旧格式`);
                         // 兼容旧格式：逗号分隔的单词列表
                         const wordList = card.meaning.split(',').map(w => w.trim()).filter(w => w);
+                        console.log(`    - 包含 ${wordList.length} 个单词`);
                         totalWords += wordList.length;
                     }
                 }
@@ -1166,6 +1175,10 @@ function toggleMissedWord(event, word) {
     
     // 立即保存
     window.settingsManager.saveUserSettings();
+    
+    // 更新概览统计
+    window.settingsManager.renderOverview();
+    
     console.log(`${isSelected ? '✓' : '✗'} 错词选择: ${word}`);
 }
 
