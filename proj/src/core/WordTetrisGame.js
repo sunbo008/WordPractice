@@ -960,20 +960,26 @@ class WordTetrisGame {
     }
 
     pauseGame() {
+        console.log('🎯 pauseGame() 被调用，当前状态:', this.gameState);
         if (this.gameState === 'playing') {
             this.gameState = 'paused';
             this.stopSpeaking(); // 暂停时停止朗读
             // 暂停时保存当前错词
             console.log('⏸️ 暂停游戏，准备保存错词...');
+            const vocabularyBook = this.vocabularyManager.getVocabularyBook();
+            console.log('📚 当前错词本包含:', vocabularyBook.length, '个单词');
             this.saveMissedWordsToGlobal().catch(error => {
                 console.error('❌ 保存错词失败:', error);
             });
         } else if (this.gameState === 'paused') {
+            console.log('▶️ 恢复游戏...');
             this.gameState = 'playing';
             // 恢复游戏时，如果有单词在下降，重新开始朗读
             if (this.fallingWords.length > 0) {
                 this.startRepeatedSpeech(this.fallingWords[0].original);
             }
+        } else {
+            console.warn('⚠️ 无法暂停，当前状态不是 playing 或 paused:', this.gameState);
         }
         this.updateButtons();
     }
