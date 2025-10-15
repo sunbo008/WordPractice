@@ -1614,7 +1614,7 @@ class WordTetrisGame {
         }
     }
 
-    gameOver() {
+    async gameOver() {
         this.stopSpeaking(); // 游戏结束时停止朗读
         this.gameState = 'gameOver';
         
@@ -1629,7 +1629,13 @@ class WordTetrisGame {
         console.log('📚 游戏结束后错词本统计:', this.vocabularyManager.getVocabularyStats());
         
         // 保存错词到全局错词管理器（用于设置页面显示）
-        this.saveMissedWordsToGlobal();
+        try {
+            console.log('💾 游戏结束，开始保存错词卡...');
+            await this.saveMissedWordsToGlobal();
+            console.log('✅ 游戏结束错词卡保存完成');
+        } catch (e) {
+            console.error('❌ 游戏结束保存错词卡失败:', e);
+        }
         
         this.saveGameData(); // 保存最终数据
         this.showGameOverModal();
