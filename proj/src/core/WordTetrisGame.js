@@ -3868,31 +3868,11 @@ class WordTetrisGame {
             await window.missedWordsManager.getUserIP();
             console.log('✅ 用户IP获取成功:', window.missedWordsManager.userIP);
             
-            // 生成错词卡名称（日期 + 8位随机数，避免同名冲突）
+            // 生成错词卡名称（日期 + 时分秒），避免同名冲突且可读
             const now = new Date();
             const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-            const baseName = `游戏错词_${dateStr}`;
-            // 预先读取存储，便于检查唯一性
-            const allMissedWordsData_pre = JSON.parse(
-                localStorage.getItem('wordTetris_missedWords') || '{}'
-            );
-            let randomSuffix = Math.random().toString().slice(2, 10); // 8位数字
-            let cardName = `${baseName}_${randomSuffix}`;
-            // 确保 key 唯一
-            if (!window.missedWordsManager) {
-                console.warn('⚠️ 错词管理器未加载');
-                return;
-            }
-            const tryMakeUnique = () => {
-                const tryKey = `${window.missedWordsManager.userIP}::${cardName.toLowerCase()}`;
-                if (allMissedWordsData_pre[tryKey]) {
-                    randomSuffix = Math.random().toString().slice(2, 10);
-                    cardName = `${baseName}_${randomSuffix}`;
-                    return tryMakeUnique();
-                }
-                return tryKey;
-            };
-            const ensuredKey = tryMakeUnique();
+            const timeStr = `${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}${String(now.getSeconds()).padStart(2, '0')}`;
+            const cardName = `游戏错词_${dateStr}_${timeStr}`;
             console.log('🏷️ 错词卡名称:', cardName);
             
             // 获取现有的错词卡（仅用于日志/兼容旧逻辑）
@@ -3951,7 +3931,7 @@ class WordTetrisGame {
             );
             console.log('📦 当前 localStorage 中的所有错词卡 keys:', Object.keys(allMissedWordsData));
             
-            const key = ensuredKey; // 使用上面保证唯一的 key
+            const key = `${window.missedWordsManager.userIP}::${cardName.toLowerCase()}`;
             console.log('🔑 生成的 key:', key);
             console.log('🔍 检查 key 是否存在:', allMissedWordsData[key] ? '存在' : '不存在');
             
