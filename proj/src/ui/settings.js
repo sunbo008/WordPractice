@@ -56,21 +56,42 @@ class SettingsManagerV2 {
     loadUserSettings() {
         try {
             const saved = localStorage.getItem('wordTetris_selectedLibraries');
+            
+            // 检查是否选择了错词本
+            const savedMissedWords = localStorage.getItem('wordTetris_selectedMissedWords');
+            const hasMissedWords = savedMissedWords && JSON.parse(savedMissedWords).length > 0;
+            
             if (saved) {
                 const parsed = JSON.parse(saved);
-                // 如果保存的配置为空数组，使用默认配置
+                // 如果保存的配置为空数组
                 if (Array.isArray(parsed) && parsed.length === 0) {
-                    console.warn('⚠️ 保存的配置为空，使用默认配置');
-                    this.selectedLibraries = new Set(this.config.defaultConfig.enabledLibraries);
+                    // 检查是否选择了错词本
+                    if (hasMissedWords) {
+                        // 只选择了错词本，不加载默认配置
+                        this.selectedLibraries = new Set();
+                        console.log('⚙️ 用户只选择了错词本，不加载默认课程');
+                    } else {
+                        // 既没有普通课程也没有错词本，使用默认配置
+                        console.warn('⚠️ 保存的配置为空，使用默认配置');
+                        this.selectedLibraries = new Set(this.config.defaultConfig.enabledLibraries);
+                    }
                 } else {
                     this.selectedLibraries = new Set(parsed);
                     console.log('⚙️ 用户设置加载成功:', Array.from(this.selectedLibraries));
                 }
             } else {
-                // 使用默认配置
-                this.selectedLibraries = new Set(this.config.defaultConfig.enabledLibraries);
-                console.log('⚙️ 使用默认配置:', Array.from(this.selectedLibraries));
+                // 没有保存的配置
+                if (hasMissedWords) {
+                    // 只选择了错词本
+                    this.selectedLibraries = new Set();
+                    console.log('⚙️ 用户只选择了错词本，不加载默认课程');
+                } else {
+                    // 使用默认配置
+                    this.selectedLibraries = new Set(this.config.defaultConfig.enabledLibraries);
+                    console.log('⚙️ 使用默认配置:', Array.from(this.selectedLibraries));
+                }
             }
+            
             // 新增：加载难度模式
             const savedMode = localStorage.getItem('wordTetris_gameMode');
             this.gameMode = savedMode === 'challenge' ? 'challenge' : 'casual';
@@ -82,8 +103,7 @@ class SettingsManagerV2 {
             this.expandedGradeGroups = new Set(Array.isArray(JSON.parse(savedGrade || '[]')) ? JSON.parse(savedGrade || '[]') : []);
             
             // 加载选中的错词
-            const savedMissedWords = localStorage.getItem('wordTetris_selectedMissedWords');
-            if (savedMissedWords) {
+            if (hasMissedWords) {
                 this.selectedMissedWords = new Set(JSON.parse(savedMissedWords));
                 console.log('⚙️ 已加载选中的错词:', Array.from(this.selectedMissedWords));
             }
