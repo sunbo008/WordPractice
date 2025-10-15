@@ -3004,21 +3004,26 @@ class WordTetrisGame {
         const startBtn = document.getElementById('startBtn');
         const pauseBtn = document.getElementById('pauseBtn');
         
+        console.log('🔘 updateButtons() 被调用，gameState:', this.gameState);
+        
         switch (this.gameState) {
             case 'stopped':
                 startBtn.textContent = '开始游戏';
                 startBtn.disabled = false;
                 pauseBtn.disabled = true;
+                console.log('  ➡️ 暂停按钮已禁用 (stopped 状态)');
                 break;
             case 'playing':
                 startBtn.textContent = '游戏中';
                 startBtn.disabled = true;
                 pauseBtn.textContent = '暂停';
                 pauseBtn.disabled = false;
+                console.log('  ➡️ 暂停按钮已启用 (playing 状态)，disabled=', pauseBtn.disabled);
                 break;
             case 'paused':
                 pauseBtn.textContent = '继续';
                 pauseBtn.disabled = false;
+                console.log('  ➡️ 暂停按钮已启用 (paused 状态)，文本="继续"');
                 break;
         }
         
