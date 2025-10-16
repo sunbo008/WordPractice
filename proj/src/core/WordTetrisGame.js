@@ -1,192 +1,5 @@
-// 调试日志系统
-class DebugLogger {
-    constructor() {
-        this.console = null;
-        this.maxLines = 500; // 增加最大行数
-        this.enabled = true;
-        this.logHistory = []; // 完整日志历史
-    }
-    
-    init() {
-        this.console = document.getElementById('debugConsole');
-        
-        // 绑定控制按钮
-        const toggleBtn = document.getElementById('toggleDebugBtn');
-        const copyBtn = document.getElementById('copyDebugBtn');
-        const clearBtn = document.getElementById('clearDebugBtn');
-        const exportBtn = document.getElementById('exportDebugBtn');
-        const panel = document.getElementById('debugPanel');
-        
-        if (toggleBtn) {
-            toggleBtn.addEventListener('click', () => {
-                panel.classList.toggle('hidden');
-                const btnText = toggleBtn.querySelector('.btn-text');
-                if (btnText) {
-                    btnText.textContent = panel.classList.contains('hidden') ? '显示' : '隐藏';
-                }
-            });
-        }
-        
-        if (copyBtn) {
-            copyBtn.addEventListener('click', () => this.copyToClipboard());
-        }
-        
-        if (clearBtn) {
-            clearBtn.addEventListener('click', () => this.clear());
-        }
-        
-        if (exportBtn) {
-            exportBtn.addEventListener('click', () => this.export());
-        }
-        
-        // 捕获全局错误
-        window.addEventListener('error', (event) => {
-            this.error(`❌ 全局错误: ${event.message}`);
-            this.error(`   文件: ${event.filename}:${event.lineno}:${event.colno}`);
-        });
-        
-        // 捕获Promise错误
-        window.addEventListener('unhandledrejection', (event) => {
-            this.error(`❌ Promise错误: ${event.reason}`);
-        });
-        
-        this.info('🔍 调试日志系统已启动');
-    }
-    
-    log(message, type = 'info') {
-        if (!this.enabled) return;
-        
-        const timestamp = new Date().toLocaleTimeString('zh-CN', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit', fractionalSecondDigits: 3 });
-        const logEntry = {
-            timestamp,
-            message,
-            type,
-            fullMessage: `[${timestamp}] ${message}`
-        };
-        
-        // 保存到历史记录
-        this.logHistory.push(logEntry);
-        
-        // 显示到调试面板
-        if (this.console) {
-            const line = document.createElement('div');
-            line.className = `debug-line ${type}`;
-            line.textContent = logEntry.fullMessage;
-            
-            this.console.appendChild(line);
-            
-            // 限制行数（只限制显示，不限制历史记录）
-            while (this.console.children.length > this.maxLines) {
-                this.console.removeChild(this.console.firstChild);
-            }
-            
-            // 自动滚动到底部
-            this.console.scrollTop = this.console.scrollHeight;
-        }
-        
-        // 同时输出到浏览器控制台
-        const consoleMethod = type === 'error' ? 'error' : type === 'warning' ? 'warn' : 'log';
-        console[consoleMethod](message);
-    }
-    
-    info(message) {
-        this.log(message, 'info');
-    }
-    
-    success(message) {
-        this.log(message, 'success');
-    }
-    
-    warning(message) {
-        this.log(message, 'warning');
-    }
-    
-    error(message) {
-        this.log(message, 'error');
-    }
-    
-    clear() {
-        if (this.console) {
-            this.console.innerHTML = '';
-        }
-        this.logHistory = [];
-        this.info('📝 日志已清空');
-    }
-    
-    export() {
-        if (this.logHistory.length === 0) {
-            alert('没有日志可以导出');
-            return;
-        }
-        
-        // 生成日志文本
-        const logText = this.logHistory.map(entry => entry.fullMessage).join('\n');
-        
-        // 创建下载链接
-        const blob = new Blob([logText], { type: 'text/plain;charset=utf-8' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        
-        // 文件名包含时间戳
-        const now = new Date();
-        const dateStr = now.toISOString().replace(/[:.]/g, '-').slice(0, 19);
-        link.download = `word-tetris-debug-${dateStr}.txt`;
-        
-        // 触发下载
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        
-        // 释放URL对象
-        URL.revokeObjectURL(url);
-        
-        this.success(`✅ 日志已导出 (${this.logHistory.length} 条记录)`);
-    }
-    
-    async copyToClipboard() {
-        if (this.logHistory.length === 0) {
-            alert('没有日志可以复制');
-            return;
-        }
-        
-        // 生成日志文本
-        const logText = this.logHistory.map(entry => entry.fullMessage).join('\n');
-        
-        try {
-            // 使用现代 Clipboard API
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                await navigator.clipboard.writeText(logText);
-                this.success(`✅ 已复制 ${this.logHistory.length} 条日志到剪贴板`);
-            } else {
-                // 降级方案：使用传统方法
-                const textarea = document.createElement('textarea');
-                textarea.value = logText;
-                textarea.style.position = 'fixed';
-                textarea.style.left = '-9999px';
-                document.body.appendChild(textarea);
-                textarea.select();
-                
-                const successful = document.execCommand('copy');
-                document.body.removeChild(textarea);
-                
-                if (successful) {
-                    this.success(`✅ 已复制 ${this.logHistory.length} 条日志到剪贴板`);
-                } else {
-                    this.error('❌ 复制失败，请手动复制日志');
-                }
-            }
-        } catch (error) {
-            this.error(`❌ 复制失败: ${error.message}`);
-            console.error('复制到剪贴板失败:', error);
-        }
-    }
-}
-
-// 创建全局调试日志实例
-const debugLog = new DebugLogger();
-
 // 游戏主类
+// 注意：DebugLogger 已通过独立文件引入 (DebugLogger-standalone.js)
 class WordTetrisGame {
     constructor() {
         this.canvas = document.getElementById('gameCanvas');
@@ -203,6 +16,9 @@ class WordTetrisGame {
         this.targetScore = 100;
         this.startTime = null;
         this.gameTime = 0;
+        
+        // 错词卡管理
+        this.lastSavedCardName = null; // 最近保存的错词卡名称
         
         // 游戏对象
         this.fallingWords = [];
@@ -710,7 +526,7 @@ class WordTetrisGame {
         return imgH + ctrlH + gap + paddingTop + paddingBottom;
     }
 
-    init() {
+    async init() {
         // 初始化调试日志系统
         debugLog.init();
         debugLog.info('🎮 游戏初始化开始...');
@@ -720,7 +536,7 @@ class WordTetrisGame {
         this.updateUI();
         // 【修复】不在 init 中生成单词，让 startGame() 统一处理
         // this.generateNextWord(); 
-        this.initExamStats(); // 初始化考试统计
+        await this.initExamStats(); // 等待初始化考试统计完成
         this.gameLoop();
         
         debugLog.success('✅ 游戏初始化完成');
@@ -797,7 +613,7 @@ class WordTetrisGame {
         // 弹窗事件
         document.getElementById('restartBtn').addEventListener('click', () => this.restartGame());
         document.getElementById('continueBtn').addEventListener('click', () => this.continueGame());
-        document.getElementById('reviewVocabBtn').addEventListener('click', () => this.showVocabularyBook());
+        document.getElementById('reviewVocabBtn').addEventListener('click', () => this.handleReviewVocabBtn());
         document.getElementById('viewVocabBtn').addEventListener('click', () => this.showVocabularyBook());
         
         // 输入框事件
@@ -960,15 +776,26 @@ class WordTetrisGame {
     }
 
     pauseGame() {
+        console.log('🎯 pauseGame() 被调用，当前状态:', this.gameState);
         if (this.gameState === 'playing') {
             this.gameState = 'paused';
             this.stopSpeaking(); // 暂停时停止朗读
+            // 暂停时保存当前错词
+            console.log('⏸️ 暂停游戏，准备保存错词...');
+            const vocabularyBook = this.vocabularyManager.getVocabularyBook();
+            console.log('📚 当前错词本包含:', vocabularyBook.length, '个单词');
+            this.saveMissedWordsToGlobal().catch(error => {
+                console.error('❌ 保存错词失败:', error);
+            });
         } else if (this.gameState === 'paused') {
+            console.log('▶️ 恢复游戏...');
             this.gameState = 'playing';
             // 恢复游戏时，如果有单词在下降，重新开始朗读
             if (this.fallingWords.length > 0) {
                 this.startRepeatedSpeech(this.fallingWords[0].original);
             }
+        } else {
+            console.warn('⚠️ 无法暂停，当前状态不是 playing 或 paused:', this.gameState);
         }
         this.updateButtons();
     }
@@ -992,6 +819,9 @@ class WordTetrisGame {
         this.speedMultiplier = 1.0;
         this.wordSpeed = this.baseSpeed;
         this._lastStackedWordsCount = 0;
+        
+        // 重置错词卡名称
+        this.lastSavedCardName = null;
         
         // 重置游戏时清空生词本和统计数据
         this.vocabularyManager.clearCurrentLevelVocabulary();
@@ -1282,9 +1112,18 @@ class WordTetrisGame {
         }
     }
     
-    // 显示游戏完成弹窗
-    showGameCompletionModal() {
+    // 显示游戏完成弹窗（正常完成流程）
+    async showGameCompletionModal() {
         this.gameState = 'gameOver';
+
+        // 在正常完成时也保存错词卡（与 gameOver 流程保持一致）
+        try {
+            console.log('💾 正常完成，开始保存错词卡...');
+            await this.saveMissedWordsToGlobal();
+            console.log('✅ 正常完成错词卡保存完成');
+        } catch (e) {
+            console.error('❌ 正常完成保存错词卡失败:', e);
+        }
         
         // 计算最终统计
         const hitWordsCount = this.hitWords.size;
@@ -1296,10 +1135,11 @@ class WordTetrisGame {
         const finalScoreEl = document.getElementById('finalScore');
         const finalLevelEl = document.getElementById('finalLevel');
         const finalVocabularyEl = document.getElementById('finalVocabulary');
+        const missedWordsCount = this.vocabularyManager.getVocabularyStats().missedWords;
         
         if (finalScoreEl) finalScoreEl.textContent = this.score;
         if (finalLevelEl) finalLevelEl.textContent = this.level;
-        if (finalVocabularyEl) finalVocabularyEl.textContent = this.vocabularyManager.getVocabularyStats().missedWords;
+        if (finalVocabularyEl) finalVocabularyEl.textContent = missedWordsCount;
         
         // 显示完成统计
         const gameOverModal = document.getElementById('gameOverModal');
@@ -1328,10 +1168,20 @@ class WordTetrisGame {
             </p>
         `;
         
+        // 根据是否有错词，更新按钮文本
+        const reviewVocabBtn = document.getElementById('reviewVocabBtn');
+        if (reviewVocabBtn) {
+            if (missedWordsCount === 0) {
+                reviewVocabBtn.textContent = '结束游戏';
+            } else {
+                reviewVocabBtn.textContent = '查看错词本';
+            }
+        }
+        
         // 更新错词本显示
         this.updateVocabularyList();
         
-        gameOverModal.style.display = 'flex';
+        gameOverModal.style.display = 'block';
         debugLog.success('📊 游戏完成弹窗已显示');
     }
 
@@ -1603,7 +1453,7 @@ class WordTetrisGame {
         }
     }
 
-    gameOver() {
+    async gameOver() {
         this.stopSpeaking(); // 游戏结束时停止朗读
         this.gameState = 'gameOver';
         
@@ -1616,6 +1466,15 @@ class WordTetrisGame {
         });
         
         console.log('📚 游戏结束后错词本统计:', this.vocabularyManager.getVocabularyStats());
+        
+        // 保存错词到全局错词管理器（用于设置页面显示）
+        try {
+            console.log('💾 游戏结束，开始保存错词卡...');
+            await this.saveMissedWordsToGlobal();
+            console.log('✅ 游戏结束错词卡保存完成');
+        } catch (e) {
+            console.error('❌ 游戏结束保存错词卡失败:', e);
+        }
         
         this.saveGameData(); // 保存最终数据
         this.showGameOverModal();
@@ -2990,21 +2849,26 @@ class WordTetrisGame {
         const startBtn = document.getElementById('startBtn');
         const pauseBtn = document.getElementById('pauseBtn');
         
+        console.log('🔘 updateButtons() 被调用，gameState:', this.gameState);
+        
         switch (this.gameState) {
             case 'stopped':
                 startBtn.textContent = '开始游戏';
                 startBtn.disabled = false;
                 pauseBtn.disabled = true;
+                console.log('  ➡️ 暂停按钮已禁用 (stopped 状态)');
                 break;
             case 'playing':
                 startBtn.textContent = '游戏中';
                 startBtn.disabled = true;
                 pauseBtn.textContent = '暂停';
                 pauseBtn.disabled = false;
+                console.log('  ➡️ 暂停按钮已启用 (playing 状态)，disabled=', pauseBtn.disabled);
                 break;
             case 'paused':
                 pauseBtn.textContent = '继续';
                 pauseBtn.disabled = false;
+                console.log('  ➡️ 暂停按钮已启用 (paused 状态)，文本="继续"');
                 break;
         }
         
@@ -3783,9 +3647,31 @@ class WordTetrisGame {
         }, 1000);
     }
 
+    // 处理"查看错词本/结束游戏"按钮点击
+    handleReviewVocabBtn() {
+        const missedWordsCount = this.vocabularyManager.getVocabularyStats().missedWords;
+        
+        if (missedWordsCount === 0) {
+            // 没有错词，关闭弹窗
+            console.log('✅ 没有错词，关闭游戏完成弹窗');
+            this.hideModals();
+        } else {
+            // 有错词，打开错词本
+            console.log('📖 有错词，打开错词本');
+            this.showVocabularyBook();
+        }
+    }
+
     showVocabularyBook() {
-        // 这里可以实现一个详细的生词本查看界面
-        alert('生词本功能开发中...');
+        // 检查是否有保存的错词卡
+        if (!this.lastSavedCardName) {
+            alert('暂无错词卡，请先完成游戏！');
+            return;
+        }
+        
+        // 跳转到错词学习页面
+        console.log(`📖 打开错词卡学习页面: ${this.lastSavedCardName}`);
+        window.location.href = `./study/missed-words-lesson.html?file=${encodeURIComponent(this.lastSavedCardName)}`;
     }
 
     hideModals() {
@@ -3822,6 +3708,133 @@ class WordTetrisGame {
         
         alert(`成功导出 ${vocabularyBook.length} 个生词到文本文件！`);
     }
+    
+    /**
+     * 保存错词到全局错词管理器（用于设置页面展示）
+     * 将游戏中的所有错词保存为一个错词卡
+     */
+    async saveMissedWordsToGlobal() {
+        console.log('💾 saveMissedWordsToGlobal 开始执行...');
+        try {
+            // 获取当前错词本中的所有单词
+            const vocabularyBook = this.vocabularyManager.getVocabularyBook();
+            console.log(`📚 获取到错词本，包含 ${vocabularyBook.length} 个单词:`, vocabularyBook);
+            
+            if (vocabularyBook.length === 0) {
+                console.log('📝 暂无错词需要保存');
+                return;
+            }
+            
+            // 确保错词管理器已加载
+            if (!window.missedWordsManager) {
+                console.warn('⚠️ 错词管理器未加载');
+                return;
+            }
+            
+            console.log('🔑 开始获取用户IP...');
+            await window.missedWordsManager.getUserIP();
+            console.log('✅ 用户IP获取成功:', window.missedWordsManager.userIP);
+            
+            // 生成错词卡名称（日期 + 时分秒），避免同名冲突且可读
+            const now = new Date();
+            const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+            const timeStr = `${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}${String(now.getSeconds()).padStart(2, '0')}`;
+            const cardName = `游戏错词_${dateStr}_${timeStr}`;
+            console.log('🏷️ 错词卡名称:', cardName);
+            
+            // 保存错词卡名称，供 showVocabularyBook() 使用
+            this.lastSavedCardName = cardName;
+            
+            // 获取现有的错词卡（仅用于日志/兼容旧逻辑）
+            const allMissedCards = await window.missedWordsManager.getMissedWords();
+            console.log('📋 所有错词卡:', allMissedCards.map(c => c.word));
+            
+            // 由于 cardName 已包含随机后缀，通常不存在同名卡
+            let existingCard = allMissedCards.find(card => card.word === cardName);
+            console.log('🔍 查找结果:', existingCard ? `找到现有错词卡: ${existingCard.word}` : '未找到现有错词卡');
+            
+            // 如果存在同名错词卡，获取其中的单词
+            let existingWords = [];
+            if (existingCard) {
+                try {
+                    existingWords = JSON.parse(existingCard.meaning);
+                } catch (e) {
+                    existingWords = [];
+                }
+            }
+            
+            // 合并单词，去重（以单词为key）
+            const wordMap = new Map();
+            
+            // 先添加已存在的单词
+            existingWords.forEach(w => {
+                if (w.word) {
+                    wordMap.set(w.word.toLowerCase(), w);
+                }
+            });
+            
+            // 添加新的错词，如果已存在则更新（增加错误次数）
+            vocabularyBook.forEach(word => {
+                const key = (word.word || word.original).toLowerCase();
+                const existing = wordMap.get(key);
+                
+                if (existing) {
+                    // 如果已存在，增加错误次数
+                    existing.errorCount = (existing.errorCount || 1) + 1;
+                } else {
+                    // 新单词
+                    wordMap.set(key, {
+                        word: word.word || word.original,
+                        phonetic: word.phonetic || '',
+                        meaning: word.meaning || '',
+                        errorCount: 1
+                    });
+                }
+            });
+            
+            // 转换为数组
+            const mergedWords = Array.from(wordMap.values());
+            
+            // 保存为错词卡（使用 SettingsManagerV2 的格式）
+            const allMissedWordsData = JSON.parse(
+                localStorage.getItem('wordTetris_missedWords') || '{}'
+            );
+            console.log('📦 当前 localStorage 中的所有错词卡 keys:', Object.keys(allMissedWordsData));
+            
+            const key = `${window.missedWordsManager.userIP}::${cardName.toLowerCase()}`;
+            console.log('🔑 生成的 key:', key);
+            console.log('🔍 检查 key 是否存在:', allMissedWordsData[key] ? '存在' : '不存在');
+            
+            const now2 = Date.now();
+            
+            if (allMissedWordsData[key]) {
+                // 更新现有错词卡
+                console.log('♻️ 更新现有错词卡...');
+                allMissedWordsData[key].meaning = JSON.stringify(mergedWords);
+                allMissedWordsData[key].lastUpdate = now2;
+                allMissedWordsData[key].count++;
+                console.log('✅ 更新完成，新的 count:', allMissedWordsData[key].count);
+            } else {
+                // 创建新错词卡
+                console.log('➕ 创建新错词卡...');
+                allMissedWordsData[key] = {
+                    ip: window.missedWordsManager.userIP,
+                    word: cardName,
+                    phonetic: `包含 ${mergedWords.length} 个单词`,
+                    meaning: JSON.stringify(mergedWords),
+                    count: 1,
+                    lastUpdate: now2
+                };
+            }
+            
+            localStorage.setItem('wordTetris_missedWords', JSON.stringify(allMissedWordsData));
+            console.log('💾 已写入 localStorage');
+            
+            console.log(`✅ 已保存错词卡"${cardName}"，包含 ${mergedWords.length} 个单词（去重后）`);
+        } catch (error) {
+            console.error('❌ 保存错词到全局管理器失败:', error);
+        }
+    }
 
     // 游戏主循环
     gameLoop() {
@@ -3842,4 +3855,12 @@ document.addEventListener('DOMContentLoaded', () => {
         game.resetGame();
         console.log('🔄 页面刷新，自动重置游戏');
     }, 100); // 稍微延迟确保初始化完成
+    
+    // 页面卸载时清除临时练习单词
+    window.addEventListener('beforeunload', () => {
+        if (localStorage.getItem('wordTetris_tempPracticeWords')) {
+            localStorage.removeItem('wordTetris_tempPracticeWords');
+            console.log('🗑️ 页面卸载，已清除临时练习单词');
+        }
+    });
 });

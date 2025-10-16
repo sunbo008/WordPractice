@@ -40,6 +40,17 @@ class VocabularyManagerV2 {
     // 加载词汇系统
     async loadVocabularySystem() {
         try {
+            // 优先检查是否有临时练习单词（来自错词复习页面）
+            const tempPracticeWords = localStorage.getItem('wordTetris_tempPracticeWords');
+            if (tempPracticeWords) {
+                console.log('🎯 检测到临时练习单词，加载错词复习模式...');
+                await this.loadTempPracticeWords(tempPracticeWords);
+                this.isLoaded = true;
+                console.log('✅ 临时练习单词加载成功');
+                console.log(`📊 总单词: ${this.allWords.length}个`);
+                return;
+            }
+            
             // 1. 加载配置文件
             await this.loadConfig();
             
@@ -64,6 +75,34 @@ class VocabularyManagerV2 {
         }
     }
     
+    /**
+     * 加载临时练习单词（来自错词复习页面）
+     */
+    async loadTempPracticeWords(tempWordsJson) {
+        try {
+            const words = JSON.parse(tempWordsJson);
+            console.log(`📝 加载临时练习单词: ${words.length} 个`);
+            
+            // 转换为游戏单词格式
+            this.allWords = words.map(w => ({
+                word: w.word || '',
+                phonetic: w.phonetic || '',
+                meaning: w.meaning || '',
+                difficulty: 1, // 默认难度
+                category: 'missed-words',
+                libraryId: 'temp-practice'
+            }));
+            
+            // 初始化单词池
+            this.initializeWordPool();
+            
+            console.log(`✅ 临时练习单词加载完成: ${this.allWords.length} 个单词`);
+        } catch (error) {
+            console.error('❌ 加载临时练习单词失败:', error);
+            throw error;
+        }
+    }
+    
     // 加载配置文件
     async loadConfig() {
         console.log('📋 使用运行时动态配置加载...');
@@ -79,20 +118,40 @@ class VocabularyManagerV2 {
     loadUserSettings() {
         try {
             const savedLibraries = localStorage.getItem('wordTetris_selectedLibraries');
+            
+            // 检查是否选择了错词本
+            const savedMissedWords = localStorage.getItem('wordTetris_selectedMissedWords');
+            const hasMissedWords = savedMissedWords && JSON.parse(savedMissedWords).length > 0;
+            
             if (savedLibraries) {
                 const libraries = JSON.parse(savedLibraries);
-                // 如果保存的配置为空数组，使用默认配置
+                // 如果保存的配置为空数组
                 if (Array.isArray(libraries) && libraries.length === 0) {
-                    console.warn('⚠️ 保存的配置为空，使用默认配置');
-                    this.currentConfig.enabledLibraries = [...this.wordsConfig.defaultConfig.enabledLibraries];
+                    // 检查是否选择了错词本
+                    if (hasMissedWords) {
+                        // 只选择了错词本，不加载普通课程
+                        this.currentConfig.enabledLibraries = [];
+                        console.log('⚙️ 用户只选择了错词本，不加载普通课程');
+                    } else {
+                        // 既没有普通课程也没有错词本，使用默认配置
+                        console.warn('⚠️ 保存的配置为空，使用默认配置');
+                        this.currentConfig.enabledLibraries = [...this.wordsConfig.defaultConfig.enabledLibraries];
+                    }
                 } else {
                     this.currentConfig.enabledLibraries = libraries;
                     console.log('⚙️ 用户词库选择加载成功:', libraries);
                 }
             } else {
-                // 使用默认配置
-                this.currentConfig.enabledLibraries = [...this.wordsConfig.defaultConfig.enabledLibraries];
-                console.log('⚙️ 使用默认配置:', this.currentConfig.enabledLibraries);
+                // 没有保存的配置
+                if (hasMissedWords) {
+                    // 只选择了错词本
+                    this.currentConfig.enabledLibraries = [];
+                    console.log('⚙️ 用户只选择了错词本，不加载普通课程');
+                } else {
+                    // 使用默认配置
+                    this.currentConfig.enabledLibraries = [...this.wordsConfig.defaultConfig.enabledLibraries];
+                    console.log('⚙️ 使用默认配置:', this.currentConfig.enabledLibraries);
+                }
             }
         } catch (error) {
             console.warn('⚠️ 用户设置加载失败，使用默认配置:', error);
@@ -114,8 +173,18 @@ class VocabularyManagerV2 {
     async loadEnabledLibraries() {
         const enabledIds = this.currentConfig.enabledLibraries;
         
-        // 如果没有启用的词库，抛出错误
+        // 检查是否选择了错词本
+        const savedMissedWords = localStorage.getItem('wordTetris_selectedMissedWords');
+        const hasMissedWords = savedMissedWords && JSON.parse(savedMissedWords).length > 0;
+        
+        // 如果没有启用的词库
         if (!enabledIds || enabledIds.length === 0) {
+            // 如果选择了错词本，允许继续（只使用错词本）
+            if (hasMissedWords) {
+                console.log('⚙️ 没有启用普通词库，将只使用错词本');
+                return;
+            }
+            // 如果也没有错词本，抛出错误
             throw new Error('未选择任何词库！请前往设置页面选择学习内容。');
         }
         
@@ -132,8 +201,14 @@ class VocabularyManagerV2 {
         
         await Promise.all(loadPromises);
         
-        // 如果没有成功加载任何词库，抛出错误
+        // 如果没有成功加载任何词库
         if (this.loadedLibraries.size === 0) {
+            // 如果选择了错词本，允许继续
+            if (hasMissedWords) {
+                console.log('⚙️ 普通词库加载失败，将只使用错词本');
+                return;
+            }
+            // 如果也没有错词本，抛出错误
             throw new Error('未能成功加载任何词库！请检查词库文件是否存在。');
         }
     }
@@ -249,6 +324,101 @@ class VocabularyManagerV2 {
     }
     
     /**
+     * 加载选中的错词
+     */
+    async loadSelectedMissedWords() {
+        try {
+            // 获取选中的错词列表（错词卡名称）
+            const selectedMissedWords = localStorage.getItem('wordTetris_selectedMissedWords');
+            console.log('🔍 检查选中的错词:', selectedMissedWords);
+            
+            if (!selectedMissedWords) {
+                console.log('📝 没有选中的错词');
+                return;
+            }
+            
+            const selectedCardNames = JSON.parse(selectedMissedWords);
+            console.log('🔍 解析后的错词卡名称:', selectedCardNames);
+            
+            if (!Array.isArray(selectedCardNames) || selectedCardNames.length === 0) {
+                console.log('📝 选中的错词卡列表为空');
+                return;
+            }
+            
+            // 获取所有错词数据
+            if (!window.missedWordsManager) {
+                console.error('❌ MissedWordsManager 未初始化');
+                return;
+            }
+            
+            console.log('🔍 开始获取错词数据...');
+            await window.missedWordsManager.getUserIP();
+            const allMissedCards = await window.missedWordsManager.getMissedWords();
+            console.log('🔍 所有错词卡:', allMissedCards);
+            
+            // 过滤出选中的错词卡
+            const selectedCards = allMissedCards.filter(card => 
+                selectedCardNames.includes(card.word)
+            );
+            
+            if (selectedCards.length === 0) {
+                console.log('📝 没有选中的错词需要加载');
+                return;
+            }
+            
+            console.log(`📝 开始加载 ${selectedCards.length} 个选中的错词卡`);
+            
+            // 将错词卡中的单词转换为游戏单词格式并添加到 allWords
+            const wordMap = new Map(this.allWords.map(w => [w.word.toLowerCase(), w]));
+            let addedCount = 0;
+            
+            selectedCards.forEach(card => {
+                try {
+                    // 解析错词卡中的单词数据
+                    let wordsInCard = [];
+                    try {
+                        // 尝试解析 JSON 格式
+                        wordsInCard = JSON.parse(card.meaning);
+                    } catch (e) {
+                        // 兼容旧格式：逗号分隔的单词列表
+                        const wordList = card.meaning.split(',').map(w => w.trim()).filter(w => w);
+                        wordsInCard = wordList.map(word => ({
+                            word: word,
+                            phonetic: '',
+                            meaning: ''
+                        }));
+                    }
+                    
+                    // 将每个单词添加到词汇表
+                    wordsInCard.forEach(wordData => {
+                        const wordLower = wordData.word.toLowerCase();
+                        if (!wordMap.has(wordLower)) {
+                            const wordObj = {
+                                word: wordData.word,
+                                phonetic: wordData.phonetic || '',
+                                meaning: wordData.meaning || '',
+                                difficulty: 2, // 错词默认难度为2
+                                source: 'missed-words',
+                                libraryId: `missed-words-${card.word}`
+                            };
+                            this.allWords.push(wordObj);
+                            wordMap.set(wordLower, wordObj);
+                            addedCount++;
+                        }
+                    });
+                } catch (error) {
+                    console.warn(`⚠️ 解析错词卡 "${card.word}" 失败:`, error);
+                }
+            });
+            
+            console.log(`✅ 成功加载 ${addedCount} 个单词（来自 ${selectedCards.length} 个错词卡）`);
+            
+        } catch (error) {
+            console.error('❌ 错词加载失败:', error);
+        }
+    }
+    
+    /**
      * 更新按难度分组的词表
      */
     updateWordsByDifficulty() {
@@ -280,6 +450,9 @@ class VocabularyManagerV2 {
         }
         
         await Promise.all(loadPromises);
+        
+        // 加载选中的错词
+        await this.loadSelectedMissedWords();
         
         // 验证难度分布
         this.validateDifficultyDistribution();

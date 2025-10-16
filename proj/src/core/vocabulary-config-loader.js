@@ -33,18 +33,29 @@ class VocabularyConfigLoader {
      */
     async loadConfig() {
         try {
-            console.log('🔄 开始加载词库配置...');
+            const totalStart = performance.now();
+            if (typeof debugLog !== 'undefined') {
+                debugLog.info('⏱️ [ConfigLoader] 开始加载词库配置...');
+            }
             this.showLoadingProgress('正在加载词库配置...');
             
             // 先加载索引文件
+            const manifestStart = performance.now();
             await this.loadManifest();
+            if (typeof debugLog !== 'undefined') {
+                debugLog.info(`⏱️ [ConfigLoader] 索引文件加载耗时: ${(performance.now() - manifestStart).toFixed(2)}ms`);
+            }
             
             // 并行扫描所有目录
+            const scanStart = performance.now();
             const [dailyPhonics, specialPractice, gradeBased] = await Promise.all([
                 this.scanDailyPhonics(),
                 this.scanSpecialPractice(),
                 this.scanGradeBased()
             ]);
+            if (typeof debugLog !== 'undefined') {
+                debugLog.info(`⏱️ [ConfigLoader] 并行扫描所有目录耗时: ${(performance.now() - scanStart).toFixed(2)}ms`);
+            }
             
             this.hideLoadingProgress();
             
@@ -90,6 +101,7 @@ class VocabularyConfigLoader {
                 }
             };
             
+            const totalTime = performance.now() - totalStart;
             console.log('✅ 配置加载完成:', {
                 dailyPhonics: dailyPhonics.length,
                 specialPractice: specialPractice.length,
@@ -98,6 +110,9 @@ class VocabularyConfigLoader {
             });
             
             console.log('📋 默认启用的课程:', this.config.defaultConfig.enabledLibraries);
+            if (typeof debugLog !== 'undefined') {
+                debugLog.success(`⏱️ [ConfigLoader] 总加载耗时: ${totalTime.toFixed(2)}ms`);
+            }
             
             return this.config;
             
@@ -114,8 +129,11 @@ class VocabularyConfigLoader {
      * 自动探测 day01.json 到 day50.json 的所有文件
      */
     async scanDailyPhonics() {
+        const startTime = performance.now();
         const directory = './words/daily-phonics';
-        console.log('🔍 扫描 daily-phonics 目录...');
+        if (typeof debugLog !== 'undefined') {
+            debugLog.info('⏱️ [ConfigLoader] 开始扫描 daily-phonics 目录...');
+        }
         
         // 使用索引文件或回退到探测模式
         const filesToCheck = this.manifest?.files?.['daily-phonics'] || 
@@ -124,16 +142,23 @@ class VocabularyConfigLoader {
         console.log(`  📋 将检查 ${filesToCheck.length} 个文件`);
         
         // 并行加载所有文件
+        const loadStart = performance.now();
         const loadPromises = filesToCheck.map(filename => 
             this.loadFileMetadata(directory, filename, 'daily')
         );
         
         const results = await Promise.all(loadPromises);
+        if (typeof debugLog !== 'undefined') {
+            debugLog.info(`⏱️ [ConfigLoader] 并行加载 daily-phonics 文件耗时: ${(performance.now() - loadStart).toFixed(2)}ms`);
+        }
         
         // 过滤掉加载失败的文件
         const validResults = results.filter(r => r !== null);
         
-        console.log(`✅ daily-phonics 加载完成: ${validResults.length}/${filesToCheck.length} 个文件`);
+        const totalTime = performance.now() - startTime;
+        if (typeof debugLog !== 'undefined') {
+            debugLog.success(`✅ daily-phonics 加载完成: ${validResults.length}/${filesToCheck.length} 个文件，总耗时: ${totalTime.toFixed(2)}ms`);
+        }
         return validResults.sort((a, b) => a.id.localeCompare(b.id));
     }
     

@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>错词复习</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/settings.css">
+    <style>
+        .unit-container { max-width: 1100px; margin: 30px auto; padding: 20px; background: #fff; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+        .unit-header { display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px; }
+        .title { font-size: 22px; font-weight: 700; }
+        .meta { color:#7f8c8d; }
+        .word-list { display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; margin-top: 10px; }
+        .word-item { background:#f8f9fa; border:1px solid #ecf0f1; border-radius:8px; padding:10px; }
+        .word-text { display:flex; align-items:center; gap:6px; }
+        .w { font-weight:700; }
+        .phon { color:#3498db; margin-left:6px; font-weight:400; }
+        .mean { color:#7f8c8d; font-size: 0.9em; }
+        .section-title { margin-top: 22px; font-size: 18px; font-weight: 700; }
+        .story-box { background:#fffaf1; border:1px solid #ffe3a3; border-radius:8px; padding:16px; line-height:1.7; }
+        .actions { display:flex; gap:10px; margin-top:12px; }
+        .btn { padding:8px 14px; border:none; border-radius:6px; cursor:pointer; }
+        .btn-primary { background:#3498db; color:#fff; }
+        .btn-secondary { background:#ecf0f1; }
+        .btn-success { background:#27ae60; color:#fff; }
+        .back { margin: 10px 0 0 0; display:inline-block; color:#3498db; text-decoration:none; }
+        /* 小喇叭按钮：仅比图标大一圈 */
+        .speak-btn { width: 22px; height: 22px; min-width:22px; min-height:22px; border-radius: 50%;
+            display:inline-flex; align-items:center; justify-content:center; border:1px solid #d9e2ea; background:#eef3f7; cursor:pointer; padding:0; }
+        .speak-btn span { font-size: 13px; line-height:1; }
+        .speak-btn:hover { background:#e2f2ff; }
+        .loading { text-align: center; padding: 60px 20px; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 50px; height: 50px; 
+            animation: spin 1s linear infinite; margin: 0 auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .empty { text-align: center; padding: 60px 20px; color: #95a5a6; }
+        .empty-icon { font-size: 4em; margin-bottom: 20px; }
+        .error-badge { background: #e74c3c; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.85em; margin-left: 8px; }
+    </style>
+</head>
+<body>
+    <div class="unit-container">
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p style="margin-top: 20px; color: #7f8c8d;">正在加载错词...</p>
+        </div>
+
+        <div id="content-area" style="display: none;">
+            <div class="unit-header">
+                <div>
+                    <div class="title" id="file-name">错词复习</div>
+                    <div class="meta" id="summary">正在加载...</div>
+                </div>
+                <a class="back" href="../settings.html">← 返回设置</a>
+            </div>
+
+            <div class="section-title">
+                单词列表
+                <span class="error-badge" id="error-count">错误 1 次</span>
+            </div>
+            <div class="actions" style="margin:6px 0 10px 0;">
+                <button class="btn btn-primary" id="play-all">▶️ 全部朗读</button>
+                <button class="btn" id="stop-all">⏹️ 停止</button>
+            </div>
+            <div id="word-list" class="word-list"></div>
+
+            <div class="actions" style="margin-top: 30px;">
+                <button class="btn btn-success" onclick="startPractice()">🎮 开始练习</button>
+                <button class="btn btn-secondary" onclick="exportWords()">📥 导出单词</button>
+            </div>
+        </div>
+
+        <div id="empty" class="empty" style="display: none;">
+            <div class="empty-icon">📝</div>
+            <p>错词数据未找到</p>
+        </div>
+    </div>
+
+    <script src="../src/utils/PhoneticFormatter.js"></script>
+    <script src="../src/utils/MissedWordsManager.js"></script>
+    <script src="../src/utils/TTSService.js"></script>
+    <script>
+        // 获取 URL 参数
+        const urlParams = new URLSearchParams(window.location.search);
+        const fileName = urlParams.get('file');
+        let currentWords = [];
+
+        async function loadMissedWords() {
+            const loading = document.getElementById('loading');
+            const contentArea = document.getElementById('content-area');
+            const empty = document.getElementById('empty');
+
+            if (!fileName) {
+                loading.style.display = 'none';
+                empty.style.display = 'block';
+                return;
+            }
+
+            try {
+                // 获取错词数据
+                const manager = window.missedWordsManager;
+                await manager.getUserIP();
+                const allWords = await manager.getMissedWords();
+
+                // 查找指定文件
+                const missedWord = allWords.find(w => w.word === fileName);
+
+                if (!missedWord) {
+                    loading.style.display = 'none';
+                    empty.style.display = 'block';
+                    return;
+                }
+
+                // 解析单词数据（从 meaning 字段）
+                try {
+                    currentWords = JSON.parse(missedWord.meaning);
+                } catch (e) {
+                    // 兼容旧格式：逗号分隔的单词列表
+                    const wordList = missedWord.meaning.split(',').map(w => w.trim()).filter(w => w);
+                    currentWords = wordList.map(word => ({
+                        word: word,
+                        phonetic: '',
+                        meaning: ''
+                    }));
+                }
+
+                // 更新页面标题
+                document.getElementById('file-name').textContent = fileName;
+                document.getElementById('summary').textContent = `${missedWord.phonetic} · ${currentWords.length} 个单词`;
+                document.getElementById('error-count').textContent = `错误 ${missedWord.count} 次`;
+
+                // 渲染单词卡片
+                const wordListContainer = document.getElementById('word-list');
+                wordListContainer.innerHTML = '';
+
+                currentWords.forEach((w, idx) => {
+                    const div = document.createElement('div');
+                    div.className = 'word-item';
+                    const formattedPhonetic = PhoneticFormatter.format(w.phonetic);
+                    div.innerHTML = `<div class="word-text">
+                        <button title="朗读" class="speak-btn" data-say="${w.word}"><span>🔊</span></button>
+                        <span class="w">${w.word}</span><span class="phon"> ${formattedPhonetic}</span>
+                    </div>
+                    <div class="mean">${w.meaning || ''}</div>`;
+                    
+                    const speakEl = div.querySelector('[data-say]');
+                    const speak = async () => {
+                        try {
+                            const tts = window.TTSService.getInstance();
+                            await tts.unlockAudioContext(true);
+                            await tts.speak(w.word, { showError: false });
+                        } catch (err) {
+                            console.error('朗读失败:', err);
+                        }
+                    };
+                    
+                    speakEl.addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        speak();
+                    });
+                    
+                    let hoverTimer = null;
+                    speakEl.addEventListener('mouseenter', () => {
+                        hoverTimer = setTimeout(speak, 120);
+                    });
+                    speakEl.addEventListener('mouseleave', () => {
+                        if (hoverTimer) {
+                            clearTimeout(hoverTimer);
+                            hoverTimer = null;
+                        }
+                    });
+                    
+                    div.querySelector('.w').addEventListener('click', async () => {
+                        try {
+                            const tts = window.TTSService.getInstance();
+                            await tts.unlockAudioContext(true);
+                            await tts.speak(w.word, { showError: false });
+                        } catch (err) {}
+                    });
+                    
+                    wordListContainer.appendChild(div);
+                });
+
+                // 全部朗读功能
+                let readAllController = null;
+                function createCancelController() {
+                    let cancelFn;
+                    const promise = new Promise(resolve => { cancelFn = resolve; });
+                    return { promise, cancel: () => cancelFn && cancelFn() };
+                }
+                
+                document.getElementById('play-all').onclick = async () => {
+                    if (window._readingAll) return;
+                    window._readingAll = true;
+                    readAllController = createCancelController();
+                    const tts = window.TTSService.getInstance();
+                    await tts.unlockAudioContext(true);
+                    
+                    for (const item of currentWords) {
+                        await Promise.race([
+                            tts.speak(item.word, { showError: false }),
+                            readAllController.promise
+                        ]);
+                        if (!window._readingAll) break;
+                        await Promise.race([
+                            new Promise(r => setTimeout(r, 150)),
+                            readAllController.promise
+                        ]);
+                        if (!window._readingAll) break;
+                    }
+                    window._readingAll = false;
+                };
+                
+                document.getElementById('stop-all').onclick = () => {
+                    try {
+                        window.TTSService.getInstance().stop();
+                    } catch (e) {}
+                    if (readAllController) {
+                        readAllController.cancel();
+                    }
+                    window._readingAll = false;
+                };
+
+                loading.style.display = 'none';
+                contentArea.style.display = 'block';
+
+            } catch (error) {
+                console.error('加载错词失败:', error);
+                loading.style.display = 'none';
+                empty.style.display = 'block';
+            }
+        }
+
+        function exportWords() {
+            if (currentWords.length === 0) {
+                alert('没有可导出的单词');
+                return;
+            }
+            
+            try {
+                // 创建文本内容
+                let content = '';
+                currentWords.forEach(word => {
+                    content += `${word.word}, ${word.phonetic}, ${word.meaning}\n`;
+                });
+                
+                // 创建下载
+                const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `${fileName}.txt`;
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error('导出失败:', error);
+                alert('导出失败');
+            }
+        }
+
+        function startPractice() {
+            if (currentWords.length === 0) {
+                alert('没有可练习的单词');
+                return;
+            }
+            
+            // 将当前错词保存到临时练习列表
+            try {
+                localStorage.setItem('wordTetris_tempPracticeWords', JSON.stringify(currentWords));
+                console.log('✅ 已保存', currentWords.length, '个错词到临时练习列表');
+                
+                // 跳转到游戏页面
+                window.location.href = '../index.html';
+            } catch (error) {
+                console.error('保存练习单词失败:', error);
+                alert('保存失败，请重试');
+            }
+        }
+
+        // 页面加载完成后加载数据
+        window.addEventListener('DOMContentLoaded', loadMissedWords);
+    </script>
+</body>
+</html>

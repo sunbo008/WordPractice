@@ -354,6 +354,7 @@
     </div>
     
     <!-- 引入 TTS 服务 -->
+    <script src="/src/utils/PhoneticFormatter.js"></script>
     <script src="/src/utils/TTSService.js"></script>
     
     <script>
@@ -415,7 +416,7 @@
                                 <span class="speaker-icon" onmouseenter="speakWord('${word.word}')" title="悬停朗读单词">🔊</span>
                             </div>
                             <div class="phonetic">
-                                ${word.phonetic}
+                                ${PhoneticFormatter.format(word.phonetic)}
                                 <span class="speaker-icon" onmouseenter="speakWord('${word.word}')" title="悬停朗读音标">🔊</span>
                             </div>
                             <div class="meaning">${word.meaning}</div>

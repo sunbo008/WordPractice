@@ -242,6 +242,9 @@
         }, true);
     </script>
     
+    <!-- 引入调试日志系统 -->
+    <script src="src/utils/DebugLogger-standalone.js"></script>
+    
     <!-- 引入音频缓存管理器 -->
     <script src="src/utils/AudioCacheManager.js?v=20251008" onerror="console.error('❌ AudioCacheManager.js 加载失败')"></script>
     
@@ -258,6 +261,10 @@
             }
         }, 100);
     </script>
+    
+    <!-- 引入错词管理器 -->
+    <script src="src/utils/MissedWordsManager.js?v=20251015" onerror="console.error('❌ MissedWordsManager.js 加载失败')"></script>
+    
     <script src="src/core/vocabulary-config-loader.js?v=20251009-2"></script>
     <script src="src/core/vocabulary-manager-v2.js?v=20251009-2"></script>
     <script src="src/core/WordTetrisGame.js?v=20251009-2"></script>
