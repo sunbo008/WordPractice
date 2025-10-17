@@ -8,7 +8,7 @@ class DebugLogger {
         this.storageKey = 'wordTetris_debugLogs';
         this.maxStoredLogs = 1000; // localStorage 中最多保存1000条日志
         
-        // 从 localStorage 加载历史日志
+        // 从 localStorage 加载历史日志（页面刷新时保留）
         this.loadHistoryFromStorage();
     }
     
@@ -17,18 +17,28 @@ class DebugLogger {
         
         // 如果有 DOM 元素，绑定控制按钮
         const toggleBtn = document.getElementById('toggleDebugBtn');
+        const copyBtn = document.getElementById('copyDebugBtn');
         const clearBtn = document.getElementById('clearDebugBtn');
         const exportBtn = document.getElementById('exportDebugBtn');
         const panel = document.getElementById('debugPanel');
         
         if (toggleBtn && panel) {
+            // 确保初始按钮文本与面板状态一致
+            const btnText = toggleBtn.querySelector('.btn-text');
+            if (btnText) {
+                btnText.textContent = panel.classList.contains('hidden') ? '显示' : '隐藏';
+            }
+            
             toggleBtn.addEventListener('click', () => {
                 panel.classList.toggle('hidden');
-                const btnText = toggleBtn.querySelector('.btn-text');
                 if (btnText) {
                     btnText.textContent = panel.classList.contains('hidden') ? '显示' : '隐藏';
                 }
             });
+        }
+        
+        if (copyBtn) {
+            copyBtn.addEventListener('click', () => this.copy());
         }
         
         if (clearBtn) {
@@ -186,6 +196,53 @@ class DebugLogger {
         }
         
         this.info('📝 日志已清空');
+    }
+    
+    copy() {
+        if (this.logHistory.length === 0) {
+            alert('没有日志可以复制');
+            return;
+        }
+        
+        // 生成日志文本
+        const logText = this.logHistory.map(entry => entry.fullMessage).join('\n');
+        
+        // 复制到剪贴板
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(logText).then(() => {
+                this.success(`✅ 日志已复制到剪贴板 (${this.logHistory.length} 条记录)`);
+            }).catch(err => {
+                this.error('❌ 复制失败: ' + err.message);
+                // 降级方案：使用旧的复制方法
+                this.fallbackCopy(logText);
+            });
+        } else {
+            // 直接使用降级方法
+            this.fallbackCopy(logText);
+        }
+    }
+    
+    fallbackCopy(text) {
+        // 创建临时文本区域
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        
+        try {
+            const success = document.execCommand('copy');
+            if (success) {
+                this.success(`✅ 日志已复制到剪贴板 (${this.logHistory.length} 条记录)`);
+            } else {
+                this.error('❌ 复制失败');
+            }
+        } catch (err) {
+            this.error('❌ 复制失败: ' + err.message);
+        }
+        
+        document.body.removeChild(textarea);
     }
     
     export() {

@@ -637,8 +637,8 @@ button:disabled {
     background: #2d2d2d;
     padding: 10px 15px;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    gap: 10px;
     border-bottom: 2px solid #3498db;
 }
 
@@ -646,11 +646,13 @@ button:disabled {
     margin: 0;
     color: #3498db;
     font-size: 16px;
+    text-align: center;
 }
 
 .debug-controls {
     display: flex;
     gap: 8px;
+    justify-content: center;
 }
 
 .debug-btn {

@@ -819,52 +819,69 @@ class TTSService {
             ttsLog.warning(`⚠️ TTSService: iOS 设备上 ${providerName} 可能无法播放（建议使用 Web Speech API）`);
         }
         
-        // 如果启用了缓存且提供了单词，尝试使用缓存
+        // 如果启用了缓存且提供了单词，尝试使用 R2 CDN 音频
         if (this.cacheEnabled && this.cacheManager && word) {
             try {
                 const providerKey = this._getProviderKey(providerName);
                 
-                // 1. 检查缓存是否存在
-                const hasCache = await this.cacheManager.hasCache(word, providerKey);
+                // 获取 R2 CDN URL（不检查是否存在，直接尝试播放）
+                const r2Url = this.cacheManager.getLocalFilePath(word, providerKey);
                 
-                if (hasCache) {
-                    // 2. 使用缓存播放
-                    const cachedUrl = await this.cacheManager.getCache(word, providerKey);
-                    if (cachedUrl) {
-                        ttsLog.info(`🎵 TTSService: 使用缓存播放: ${word} (${providerKey})`);
-                        return await this._playAudio(cachedUrl, volume, providerName);
+                // 判断是否是 R2 CDN URL（以 https:// 开头且包含 r2.dev）
+                if (r2Url.startsWith('https://') && r2Url.includes('.r2.dev/')) {
+                    ttsLog.info(`🎵 TTSService: 尝试使用 R2 CDN 音频: ${word} (${providerKey})`);
+                    ttsLog.info(`   URL: ${r2Url}`);
+                    
+                    const executingSpeakId = this._currentExecutingSpeakId;
+                    try {
+                        // 直接尝试播放，让浏览器处理 404
+                        return await this._playAudio(r2Url, volume, providerName, executingSpeakId);
+                    } catch (playError) {
+                        // R2 播放失败，降级到在线 API
+                        ttsLog.warning(`⚠️ TTSService: R2 CDN 播放失败，降级到在线 API: ${playError.message || playError}`);
+                        return await this._playAudio(url, volume, providerName, executingSpeakId);
                     }
-                }
-                
-                // 3. 没有缓存，尝试下载音频
-                ttsLog.info(`📥 TTSService: 尝试下载并缓存音频: ${word} (${providerKey})`);
-                
-                try {
-                    const audioBlob = await this.cacheManager.downloadAudio(url);
+                } else {
+                    // 不是 R2 CDN，检查本地文件
+                    const hasCache = await this.cacheManager.hasCache(word, providerKey);
                     
-                    // 4. 保存缓存（异步，不阻塞播放）
-                    this.cacheManager.saveCache(word, providerKey, audioBlob).catch(err => {
-                        ttsLog.warning(`⚠️ TTSService: 保存缓存失败: ${err.message || err}`);
-                    });
+                    // ⚠️ 异步操作后检查是否已被取消
+                    const executingSpeakId = this._currentExecutingSpeakId;
+                    if (executingSpeakId && this.cancelledSpeakIds.has(executingSpeakId)) {
+                        ttsLog.info(`⏹️ 朗读已被取消: "${word}" (ID: ${executingSpeakId})`);
+                        return;
+                    }
                     
-                    // 5. 使用 Blob URL 播放
-                    const blobUrl = URL.createObjectURL(audioBlob);
-                    return await this._playAudio(blobUrl, volume, providerName);
+                    if (hasCache) {
+                        // skipCheck=true 避免重复 HEAD 请求（hasCache 已经检查过了）
+                        const cachedUrl = await this.cacheManager.getCache(word, providerKey, true);
+                        
+                        // ⚠️ 再次检查是否已被取消
+                        if (executingSpeakId && this.cancelledSpeakIds.has(executingSpeakId)) {
+                            ttsLog.info(`⏹️ 朗读已被取消: "${word}" (ID: ${executingSpeakId})`);
+                            return;
+                        }
+                        
+                        if (cachedUrl) {
+                            ttsLog.info(`🎵 TTSService: 使用本地音频: ${word} (${providerKey})`);
+                            return await this._playAudio(cachedUrl, volume, providerName, executingSpeakId);
+                        }
+                    }
                     
-                } catch (downloadError) {
-                    // 下载失败（通常是 CORS 限制），降级到直接播放
-                    ttsLog.info(`ℹ️ TTSService: 无法缓存音频（${downloadError.message || 'CORS限制'}），直接播放: ${word} (${providerKey})`);
-                    return await this._playAudio(url, volume, providerName);
+                    // 没有缓存，使用在线 API
+                    return await this._playAudio(url, volume, providerName, executingSpeakId);
                 }
                 
             } catch (error) {
-                // 其他缓存操作失败，降级到直接播放
-                ttsLog.warning(`⚠️ TTSService: 缓存检查失败，降级到直接播放: ${error.message || error}`);
-                return await this._playAudio(url, volume, providerName);
+                // 检查失败，降级到直接播放
+                ttsLog.warning(`⚠️ TTSService: 音频处理失败，降级到在线 API: ${error.message || error}`);
+                const executingSpeakId = this._currentExecutingSpeakId;
+                return await this._playAudio(url, volume, providerName, executingSpeakId);
             }
         } else {
             // 未启用缓存或未提供单词，直接播放
-            return await this._playAudio(url, volume, providerName);
+            const executingSpeakId = this._currentExecutingSpeakId;
+            return await this._playAudio(url, volume, providerName, executingSpeakId);
         }
     }
     
@@ -885,70 +902,75 @@ class TTSService {
      * @param {string} audioUrl - 音频 URL（可以是在线 URL 或 Blob URL）
      * @param {number} volume - 音量 (0.0-1.0)
      * @param {string} providerName - 提供商名称（用于错误日志）
+     * @param {number|null} speakId - speak调用的ID（用于取消检查）
      * @returns {Promise<void>}
      */
-    _playAudio(audioUrl, volume, providerName) {
+    _playAudio(audioUrl, volume, providerName, speakId = null) {
         return new Promise((resolve, reject) => {
-            const audio = new Audio(audioUrl);
+            // 播放前检查是否已被取消
+            if (speakId && this.cancelledSpeakIds.has(speakId)) {
+                ttsLog.info(`⏹️ 音频播放已被取消 (ID: ${speakId})`);
+                resolve();
+                return;
+            }
+            
+            const audio = new Audio();
             audio.volume = volume; // 设置音量
+            audio.preload = 'auto'; // 预加载音频
             
             // 添加到活动音频列表（用于 stop()）
             this.activeAudios.push(audio);
             
-            audio.onended = () => {
-                // 播放完成后从列表移除
+            // 清理函数
+            const cleanup = () => {
                 const index = this.activeAudios.indexOf(audio);
                 if (index > -1) {
                     this.activeAudios.splice(index, 1);
                 }
-                
-                // 如果是 Blob URL，释放资源
                 if (audioUrl.startsWith('blob:')) {
                     URL.revokeObjectURL(audioUrl);
                 }
-                
+            };
+            
+            audio.onended = () => {
+                cleanup();
                 resolve();
             };
             
             audio.onerror = (e) => {
-                // 出错时从列表移除
-                const index = this.activeAudios.indexOf(audio);
-                if (index > -1) {
-                    this.activeAudios.splice(index, 1);
-                }
-                
-                // 如果是 Blob URL，释放资源
-                if (audioUrl.startsWith('blob:')) {
-                    URL.revokeObjectURL(audioUrl);
-                }
-                
+                cleanup();
                 reject(new Error(`${providerName} 音频加载失败`));
             };
             
-            audio.play().catch((error) => {
-                // 播放失败时从列表移除
-                const index = this.activeAudios.indexOf(audio);
-                if (index > -1) {
-                    this.activeAudios.splice(index, 1);
+            // 当有足够数据可以播放时立即开始播放
+            audio.oncanplaythrough = () => {
+                // 准备播放前再次检查是否已被取消
+                if (speakId && this.cancelledSpeakIds.has(speakId)) {
+                    ttsLog.info(`⏹️ 音频播放已被取消 (ID: ${speakId})`);
+                    cleanup();
+                    resolve();
+                    return;
                 }
                 
-                // 如果是 Blob URL，释放资源
-                if (audioUrl.startsWith('blob:')) {
-                    URL.revokeObjectURL(audioUrl);
-                }
-                
-                // iOS 特殊处理：如果是 NotAllowedError
-                if (error.name === 'NotAllowedError') {
-                    if (this.isIOS) {
-                        // iOS 设备：这是预期行为，因为我们优先使用 Web Speech API
-                        reject(new Error(`iOS 设备限制了 Audio 播放，请使用 Web Speech API`));
+                audio.play().catch((error) => {
+                    cleanup();
+                    
+                    // iOS 特殊处理：如果是 NotAllowedError
+                    if (error.name === 'NotAllowedError') {
+                        if (this.isIOS) {
+                            reject(new Error(`iOS 设备限制了 Audio 播放，请使用 Web Speech API`));
+                        } else {
+                            reject(new Error(`NotAllowedError: 浏览器阻止了音频播放`));
+                        }
                     } else {
-                        reject(new Error(`NotAllowedError: 浏览器阻止了音频播放`));
+                        reject(error);
                     }
-                } else {
-                    reject(error);
-                }
-            });
+                });
+            };
+            
+            // 设置音频源（这会触发加载）
+            audio.src = audioUrl;
+            audio.load(); // 显式开始加载
         });
     }
     
@@ -971,10 +993,18 @@ class TTSService {
             _isRetry = false // 内部参数：是否是重试调用
         } = options;
         
-        // 防止重复朗读 - 但允许强制停止旧的朗读
-        if (this.isSpeaking) {
-            this.stop(); // 停止旧的朗读
+        // 为当前 speak() 调用分配唯一 ID（提前分配，用于整个播放流程）
+        if (this.currentSpeakId >= Number.MAX_SAFE_INTEGER - 1) {
+            ttsLog.warning('⚠️ TTSService: speak ID 接近最大值，重置计数器');
+            this.currentSpeakId = 0;
+            this.cancelledSpeakIds.clear();
         }
+        const speakId = ++this.currentSpeakId;
+        this.activeSpeakIds.add(speakId);
+        ttsLog.info(`🆔 TTSService.speak() 分配 ID: ${speakId} (单词: "${word}")`);
+        
+        // 记录当前 speakId 到实例变量（供子方法使用）
+        this._currentExecutingSpeakId = speakId;
         
         // 如果还没有测试过提供商，先初始化
         if (!this.providerTested) {
@@ -982,40 +1012,51 @@ class TTSService {
         }
         
         // 优先命中本地缓存（例如你已下载的 {word}_youdao.mp3），避免走在线/语音合成
+        let localCacheChecked = false;
+        let hasLocalCache = false;
+        
         try {
             if (this.cacheEnabled && this.cacheManager) {
                 // 先检查有道本地缓存（与下载命名规则一致）
-                const hasLocalYoudao = await this.cacheManager.hasCache(word, 'youdao');
-                if (hasLocalYoudao) {
-                    const localUrl = await this.cacheManager.getCache(word, 'youdao');
-                    await this._playAudio(localUrl, volume, '有道智云 TTS(本地)');
-                    if (onSuccess) {
-                        onSuccess('有道智云 TTS(本地)', 0, null);
+                localCacheChecked = true;
+                hasLocalCache = await this.cacheManager.hasCache(word, 'youdao');
+                
+                // ⚠️ hasCache 异步操作后检查是否已被取消
+                if (this.cancelledSpeakIds.has(speakId)) {
+                    this.activeSpeakIds.delete(speakId);
+                    this.cancelledSpeakIds.delete(speakId);
+                    return;
+                }
+                
+                if (hasLocalCache) {
+                    this.isSpeaking = true; // 标记正在播放
+                    this.currentWord = word; // 记录当前单词
+                    
+                    try {
+                        // skipCheck=true 避免重复 HEAD 请求
+                        const localUrl = await this.cacheManager.getCache(word, 'youdao', true);
+                        await this._playAudio(localUrl, volume, '有道智云 TTS(本地)', speakId);
+                        
+                        if (onSuccess) {
+                            onSuccess('有道智云 TTS(本地)', 0, speakId);
+                        }
+                    } finally {
+                        // 无论成功、失败还是取消，都要清理状态
+                        this.activeSpeakIds.delete(speakId);
+                        this.isSpeaking = false;
                     }
                     return;
                 }
             }
         } catch (e) {
             // 本地检查异常则忽略，继续走正常提供商流程
+            ttsLog.warning(`⚠️ TTSService: 本地缓存检查失败: ${e.message || e}`);
         }
 
+        // 如果本地缓存检查完成但没有缓存，进入正常流程
         // 如果有可用的提供商，轮换使用
         if (this.availableProviders.length > 0) {
             this.isSpeaking = true;
-            
-            // 为当前 speak() 调用分配唯一 ID（用于取消令牌）
-            // 如果接近最大安全整数，重置计数器（实际上几乎不可能达到）
-            if (this.currentSpeakId >= Number.MAX_SAFE_INTEGER - 1) {
-                ttsLog.warning('⚠️ TTSService: speak ID 接近最大值，重置计数器');
-                this.currentSpeakId = 0;
-                // 清理所有旧的取消记录（活跃的调用早已完成）
-                this.cancelledSpeakIds.clear();
-            }
-            
-            const speakId = ++this.currentSpeakId;
-            this.activeSpeakIds.add(speakId); // 添加到活跃集合
-            ttsLog.info(`🆔 TTSService.speak() 分配 ID: ${speakId} (单词: "${word}")`);
-            
             this.currentWord = word; // 记录当前正在播放的单词
             
             // 记录播放开始时间（用于错误日志）

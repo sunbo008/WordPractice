@@ -17,12 +17,17 @@ Thumbs.db
 # 忽略日志文件
 *.log
 
+# 忽略测试文件
+proj/tests/*-test.html
+proj/tests/debug-logger-copy-test.html
+
 # 忽略图片生成工具的日志和记录
 proj/tools/generate_word_images.log
 proj/tools/generate_word_images_records.csv
 
 # 忽略node_modules（如果有Node.js项目）
 node_modules/
+package-lock.json
 
 # 忽略构建输出
 dist/
@@ -33,3 +38,8 @@ proj/words/words.csv
 
 # 生成的图像与日志（包含敏感密钥）
 proj/images/generated/
+
+# R2 配置文件（包含敏感凭证）
+.env
+.env.local
+.env.production

@@ -134,7 +134,12 @@ class WordTetrisGame {
         
         // 等待单词库加载完成
         let waitCount = 0;
+        let hasLoggedWait = false;
         while (!this.vocabularyManager.isLoaded) {
+            if (!hasLoggedWait) {
+                console.log('⏳ 等待单词库加载完成...');
+                hasLoggedWait = true;
+            }
             await new Promise(resolve => setTimeout(resolve, 100));
             waitCount++;
             if (waitCount > 100) { // 最多等待10秒
@@ -755,11 +760,17 @@ class WordTetrisGame {
                 this.gameState = 'stopped';
                 return;
             }
-            debugLog.info('⏳ 等待单词库加载...');
+            // 只在第一次等待时打印日志，避免日志刷屏
+            if (!this._waitingForVocabulary) {
+                this._waitingForVocabulary = true;
+                debugLog.info('⏳ 等待单词库加载...');
+            }
             setTimeout(() => this.waitForVocabularyAndStart(), 50);
             return;
         }
         
+        // 重置等待标志
+        this._waitingForVocabulary = false;
         debugLog.success('✅ 单词库已加载，开始游戏流程');
         // 先生成第一个单词
         this.generateNextWord();
@@ -802,6 +813,11 @@ class WordTetrisGame {
 
     resetGame(autoStart = false) {
         this.stopSpeaking(); // 重置时停止朗读
+        
+        // 清空调试日志（游戏重置时）
+        if (typeof debugLog !== 'undefined' && debugLog.clear) {
+            debugLog.clear();
+        }
         
         this.gameState = 'stopped';
         this.score = 0;
@@ -2893,12 +2909,21 @@ class WordTetrisGame {
             const word = (wordStr || (this.nextWord && this.nextWord.original) || '').toLowerCase();
             if (!word) { img.src = ''; return; }
             debugLog.info(`🖼️ 更新图片展示，目标单词: ${word}`);
+            
+            // 获取图片 URL（支持 R2 CDN）
+            const getImageUrl = (fileName) => {
+                if (typeof R2Config !== 'undefined' && R2Config.shouldUseR2()) {
+                    return R2Config.getImageUrl(`cache/${fileName}`);
+                }
+                return `./images/cache/${fileName}`;
+            };
+            
             // 先使用本地缓存（jpg → jpeg → png）
-            const localJpg = `./images/cache/${word}.jpeg`;
+            const localJpg = getImageUrl(`${word}.jpeg`);
             this.tryLoadImage(img, localJpg, '本地JPEG', () => {
-                const localJpeg = `./images/cache/${word}.jpg`;
+                const localJpeg = getImageUrl(`${word}.jpg`);
                 this.tryLoadImage(img, localJpeg, '本地JPG', () => {
-                    const localPng = `./images/cache/${word}.png`;
+                    const localPng = getImageUrl(`${word}.png`);
                     this.tryLoadImage(img, localPng, '本地PNG', () => {
                         // 在线兜底（多源级联，避免单一服务报错）
                         const sig = Math.floor(Math.random() * 1e6);

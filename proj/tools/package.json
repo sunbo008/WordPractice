@@ -1,0 +1,13 @@
+{
+  "name": "wordpractice-r2-tools",
+  "version": "1.0.0",
+  "description": "Cloudflare R2 资源上传工具",
+  "scripts": {
+    "upload": "node upload-to-r2.js"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.911.0",
+    "dotenv": "^16.0.0",
+    "mime-types": "^2.1.35"
+  }
+}

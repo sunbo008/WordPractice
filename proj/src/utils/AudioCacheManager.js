@@ -70,13 +70,18 @@ class AudioCacheManager {
         this.db = null;
         this.initialized = false;
         
+        // 加载 R2 配置
+        this.r2Config = typeof R2Config !== 'undefined' ? R2Config : null;
+        
         // 本地文件路径前缀（使用站点根路径，避免在 /tests 等子路径下相对路径解析到 tests/audio/）
         this.localAudioPath = '/audio/';
         
         // Blob URL 缓存（用于内存管理）
         this.blobUrlCache = new Map(); // key: "word_provider", value: blobUrl
         
-        audioCacheLog.info(`🗄️ AudioCacheManager: 检测到${this.isLocal ? '本地开发' : 'Vercel部署'}环境`);
+        const envType = this.r2Config && this.r2Config.shouldUseR2() ? 'R2 CDN' : 
+                       (this.isLocal ? '本地开发' : 'Vercel部署');
+        audioCacheLog.info(`🗄️ AudioCacheManager: 检测到${envType}环境`);
     }
     
     /**
@@ -181,28 +186,67 @@ class AudioCacheManager {
     }
     
     /**
-     * 获取本地文件路径
+     * 获取音频文件 URL（支持 R2 CDN）
      */
     getLocalFilePath(word, provider) {
-        return `${this.localAudioPath}${word.toLowerCase()}_${provider.toLowerCase()}.mp3`;
+        // 将空格替换为下划线（与上传脚本保持一致）
+        const normalizedWord = word.toLowerCase().replace(/\s+/g, ' ');
+        const fileName = `${normalizedWord}_${provider.toLowerCase()}.mp3`;
+        
+        // 如果配置了 R2 CDN，优先使用 R2
+        if (this.r2Config && this.r2Config.shouldUseR2()) {
+            const url = this.r2Config.getAudioUrl(fileName);
+            audioCacheLog.info(`🌐 [R2] 生成音频URL: ${url} (原单词: "${word}")`);
+            return url;
+        }
+        
+        // 否则使用本地路径
+        const localUrl = `${this.localAudioPath}${fileName}`;
+        audioCacheLog.info(`📁 [本地] 生成音频URL: ${localUrl}`);
+        return localUrl;
     }
     
     /**
-     * 检查本地文件是否存在
+     * 检查音频文件是否存在（本地文件或 R2 CDN）
      * @param {string} word - 单词
      * @param {string} provider - 提供商 (baidu/youdao/bing)
      * @returns {Promise<boolean>} 是否存在
      */
     async checkLocalFile(word, provider) {
-        if (!this.isLocal) {
-            return false;
-        }
-        
         try {
             const filePath = this.getLocalFilePath(word, provider);
-            const response = await fetch(filePath, { method: 'HEAD' });
-            return response.ok;
-        } catch {
+            audioCacheLog.info(`🔍 检查音频文件: ${word}_${provider} → ${filePath}`);
+            
+            // 添加5秒超时控制
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
+            
+            try {
+                const response = await fetch(filePath, { 
+                    method: 'HEAD',
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+                
+                audioCacheLog.info(`📊 HEAD 请求结果: status=${response.status}, ok=${response.ok}`);
+                
+                if (response.ok) {
+                    audioCacheLog.success(`✅ 音频文件存在: ${word}_${provider}`);
+                } else {
+                    audioCacheLog.warning(`❌ 音频文件不存在: ${word}_${provider} (HTTP ${response.status})`);
+                }
+                
+                return response.ok;
+            } catch (fetchError) {
+                clearTimeout(timeoutId);
+                if (fetchError.name === 'AbortError') {
+                    audioCacheLog.warning(`⏱️ HEAD 请求超时: ${word}_${provider}`);
+                    return false;
+                }
+                throw fetchError;
+            }
+        } catch (error) {
+            audioCacheLog.error(`❌ 检查音频文件失败: ${word}_${provider} → ${error.message || error}`);
             return false;
         }
     }
@@ -260,9 +304,10 @@ class AudioCacheManager {
      * 获取缓存音频（返回 Blob URL）
      * @param {string} word - 单词
      * @param {string} provider - 提供商 (baidu/youdao/bing)
+     * @param {boolean} skipCheck - 是否跳过文件检查（默认false）
      * @returns {Promise<string|null>} Blob URL 或 null
      */
-    async getCache(word, provider) {
+    async getCache(word, provider, skipCheck = false) {
         const cacheKey = this._getCacheKey(word, provider);
         
         // 1. 检查内存缓存
@@ -271,7 +316,15 @@ class AudioCacheManager {
             return this.blobUrlCache.get(cacheKey);
         }
         
-        // 2. 检查本地文件
+        // 2. 检查本地文件（如果 skipCheck=true，则跳过检查，直接返回路径）
+        if (skipCheck) {
+            // 跳过 HEAD 请求，直接返回本地文件路径
+            const filePath = this.getLocalFilePath(word, provider);
+            audioCacheLog.success(`📂 AudioCacheManager: 使用本地文件（跳过检查）: ${filePath}`);
+            return filePath;
+        }
+        
+        // 执行 HEAD 请求检查文件是否存在
         const hasLocalFile = await this.checkLocalFile(word, provider);
         if (hasLocalFile) {
             const filePath = this.getLocalFilePath(word, provider);

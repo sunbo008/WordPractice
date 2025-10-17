@@ -9,13 +9,17 @@ import os
 import json
 import time
 import requests
+import re
 from pathlib import Path
 from urllib.parse import quote
-from typing import Set, List, Dict
+from typing import Set, List, Dict, Any
 
 
 class WordAudioDownloader:
     """单词音频下载器"""
+    
+    # 单词匹配正则表达式（复用 scan_words.py 的逻辑）
+    WORD_PATTERN = re.compile(r"[A-Za-z]+(?:[-'][A-Za-z]+)*")
     
     def __init__(self):
         # 获取脚本所在目录的父目录（proj目录）
@@ -51,20 +55,49 @@ class WordAudioDownloader:
             json_files.append(json_file)
         return json_files
     
+    def extract_words_from_json_data(self, data: Any) -> Set[str]:
+        """递归地从 JSON 数据中收集所有词汇项（复用 scan_words.py 的逻辑）
+        
+        规则：
+        - 如果对象包含 'word' 键且值为字符串，则收集该值
+        - 递归遍历列表
+        - 忽略其他所有字符串值（ids、names、filenames、descriptions、categories 等）
+        - 过滤掉单字母标记
+        """
+        collected: Set[str] = set()
+        
+        if data is None:
+            return collected
+        
+        if isinstance(data, dict):
+            # 如果这个字典直接定义了一个单词项
+            if "word" in data and isinstance(data["word"], str):
+                w = data["word"].strip().lower()
+                if len(w) >= 2 and self.WORD_PATTERN.fullmatch(w.replace("'", "'") if True else w):
+                    collected.add(w)
+            # 递归到其他嵌套结构
+            for value in data.values():
+                if isinstance(value, (dict, list)):
+                    collected |= self.extract_words_from_json_data(value)
+            return collected
+        
+        if isinstance(data, list):
+            for item in data:
+                collected |= self.extract_words_from_json_data(item)
+            return collected
+        
+        # 忽略没有键上下文的原始字符串
+        return collected
+    
     def extract_words_from_json(self, json_file: Path) -> Set[str]:
-        """从 JSON 文件中提取单词列表"""
+        """从 JSON 文件中提取单词列表（使用 scan_words.py 的递归扫描逻辑）"""
         words = set()
         try:
             with open(json_file, 'r', encoding='utf-8') as f:
                 data = json.load(f)
-                
-            # 提取 words 数组中的单词
-            if 'words' in data and isinstance(data['words'], list):
-                for word_obj in data['words']:
-                    if isinstance(word_obj, dict) and 'word' in word_obj:
-                        word = word_obj['word'].strip().lower()
-                        if word:
-                            words.add(word)
+            
+            # 使用递归方法提取所有单词
+            words = self.extract_words_from_json_data(data)
         except Exception as e:
             print(f"  [警告] 解析文件失败 {json_file.name}: {e}")
         

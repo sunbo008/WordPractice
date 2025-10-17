@@ -4,7 +4,7 @@ export class DebugLogger {
         this.console = null;
         this.maxLines = 500; // 增加最大行数
         this.enabled = true;
-        this.logHistory = []; // 完整日志历史
+        this.logHistory = []; // 完整日志历史（页面刷新时自动清空）
     }
     
     init() {
@@ -12,6 +12,7 @@ export class DebugLogger {
         
         // 绑定控制按钮
         const toggleBtn = document.getElementById('toggleDebugBtn');
+        const copyBtn = document.getElementById('copyDebugBtn');
         const clearBtn = document.getElementById('clearDebugBtn');
         const exportBtn = document.getElementById('exportDebugBtn');
         const panel = document.getElementById('debugPanel');
@@ -21,6 +22,10 @@ export class DebugLogger {
                 panel.classList.toggle('hidden');
                 toggleBtn.textContent = panel.classList.contains('hidden') ? '显示' : '隐藏';
             });
+        }
+        
+        if (copyBtn) {
+            copyBtn.addEventListener('click', () => this.copy());
         }
         
         if (clearBtn) {
@@ -103,6 +108,44 @@ export class DebugLogger {
         }
         this.logHistory = [];
         this.info('📝 日志已清空');
+    }
+    
+    copy() {
+        if (this.logHistory.length === 0) {
+            alert('没有日志可以复制');
+            return;
+        }
+        
+        // 生成日志文本
+        const logText = this.logHistory.map(entry => entry.fullMessage).join('\n');
+        
+        // 复制到剪贴板
+        navigator.clipboard.writeText(logText).then(() => {
+            this.success(`✅ 日志已复制到剪贴板 (${this.logHistory.length} 条记录)`);
+        }).catch(err => {
+            this.error('❌ 复制失败: ' + err.message);
+            // 降级方案：使用旧的复制方法
+            this.fallbackCopy(logText);
+        });
+    }
+    
+    fallbackCopy(text) {
+        // 创建临时文本区域
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        
+        try {
+            document.execCommand('copy');
+            this.success(`✅ 日志已复制到剪贴板 (${this.logHistory.length} 条记录)`);
+        } catch (err) {
+            this.error('❌ 复制失败: ' + err.message);
+        }
+        
+        document.body.removeChild(textarea);
     }
     
     export() {
