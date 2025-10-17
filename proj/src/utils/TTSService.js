@@ -1410,8 +1410,20 @@ class TTSService {
                 this.activeSpeakIds.forEach(id => {
                     this.cancelledSpeakIds.add(id);
                 });
+                // ✅ 修复：清空活跃 ID 列表，避免内存泄漏
+                this.activeSpeakIds.clear();
             } else {
                 ttsLog.info(`   ℹ️ 没有活跃的 speak() 调用需要取消 [已取消ID: ${cancelledIds.length > 0 ? cancelledIds.join(', ') : '无'}]`);
+            }
+            
+            // 🔧 定期清理过期的已取消 ID（保留最近 20 个，避免内存泄漏）
+            // 不能立即清空，因为异步 speak() 可能还在检查 cancelledSpeakIds
+            if (this.cancelledSpeakIds.size > 20) {
+                // 找出最小的 20 个 ID 并删除
+                const sortedIds = Array.from(this.cancelledSpeakIds).sort((a, b) => a - b);
+                const idsToRemove = sortedIds.slice(0, sortedIds.length - 20);
+                idsToRemove.forEach(id => this.cancelledSpeakIds.delete(id));
+                ttsLog.info(`   🧹 清理 ${idsToRemove.length} 个过期的已取消 ID`);
             }
         } else {
             ttsLog.info(`   🔧 仅清理资源，不设置取消标志 [活跃ID: ${activeIds.length > 0 ? activeIds.join(', ') : '无'}]`);
