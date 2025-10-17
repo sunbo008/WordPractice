@@ -16,6 +16,7 @@ Thumbs.db
 
 # 忽略日志文件
 *.log
+proj/log.txt
 
 # 忽略测试文件
 proj/tests/*-test.html
