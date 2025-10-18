@@ -8,8 +8,10 @@ Thumbs.db
 *.tmp
 *.temp
 
-# 忽略编辑器配置文件
-.vscode/
+# 忽略编辑器配置文件（但保留共享的工作区设置）
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
 .idea/
 *.swp
 *.swo

@@ -1,3 +1,26 @@
 {
-    "claudeCodeChat.permissions.yoloMode": true
+  // 文件保存设置
+  "files.insertFinalNewline": false,
+  "files.trimFinalNewlines": false,
+  "files.trimTrailingWhitespace": false,
+  
+  // 编辑器设置
+  "editor.formatOnSave": false,
+  "editor.formatOnPaste": false,
+  "editor.formatOnType": false,
+  
+  // EditorConfig 支持
+  "editorconfig.enable": true,
+  
+  // Markdown 特定设置
+  "[markdown]": {
+    "files.insertFinalNewline": false,
+    "files.trimFinalNewlines": false,
+    "files.trimTrailingWhitespace": false,
+    "editor.formatOnSave": false
+  },
+  
+  // Git 设置
+  "git.autorefresh": true,
+  "git.autofetch": false
 }
