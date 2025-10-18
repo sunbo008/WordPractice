@@ -44,10 +44,34 @@
   Content-Type: application/javascript; charset=utf-8
 
 # ============================================
-# 词库 JSON：中期缓存（1 小时）
+# 词库 JSON：分层缓存策略
 # ============================================
-/words/*
+
+# daily-phonics 和其他静态词库：长期缓存（7 天）
+/words/daily-phonics/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=2592000, immutable
+  Content-Type: application/json; charset=utf-8
+  Access-Control-Allow-Origin: *
+
+/words/special-practice/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=2592000, immutable
+  Content-Type: application/json; charset=utf-8
+  Access-Control-Allow-Origin: *
+
+/words/grade*/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=2592000, immutable
+  Content-Type: application/json; charset=utf-8
+  Access-Control-Allow-Origin: *
+
+# 配置文件和动态内容：短期缓存（1 小时）
+/words/vocabulary-config.json
   Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+  Content-Type: application/json; charset=utf-8
+  Access-Control-Allow-Origin: *
+
+# 其他词库文件：中期缓存（1 天）
+/words/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
   Content-Type: application/json; charset=utf-8
   Access-Control-Allow-Origin: *
 
