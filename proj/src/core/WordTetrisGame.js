@@ -538,10 +538,10 @@ class WordTetrisGame {
         
         this.loadGameData();
         this.bindEvents();
-        this.updateUI();
+        await this.initExamStats(); // 【优化】先等待单词库加载和统计初始化
+        this.updateUI(); // 然后更新UI，此时 totalWords 已经是正确的值
         // 【修复】不在 init 中生成单词，让 startGame() 统一处理
         // this.generateNextWord(); 
-        await this.initExamStats(); // 等待初始化考试统计完成
         this.gameLoop();
         
         debugLog.success('✅ 游戏初始化完成');
