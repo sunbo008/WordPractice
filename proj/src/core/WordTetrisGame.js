@@ -38,7 +38,7 @@ class WordTetrisGame {
         // 考试统计系统
         this.hitWords = new Set(); // 正确命中的单词集合（去重）
         this.fallenWords = new Set(); // 下落的单词集合（去重，包括命中和未命中）
-        this.totalWords = 135; // 考试总单词量（从单词库获取）
+        this.totalWords = 0; // 考试总单词量（从单词库获取，初始为0）
         this.gameCompletionTriggered = false; // 【修复】防止重复触发游戏完成
         
         // 缓冲区状态
@@ -161,7 +161,7 @@ class WordTetrisGame {
             this.updateExamStats();
         } else {
             console.error('❌ 单词库未能成功加载，使用默认值');
-            this.totalWords = 135; // 使用默认值
+            this.totalWords = 0; // 单词库加载失败，保持为0
             this.updateExamStats();
         }
     }
