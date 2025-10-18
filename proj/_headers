@@ -1,0 +1,95 @@
+# Cloudflare Pages - HTTP Headers 配置
+# 文档：https://developers.cloudflare.com/pages/platform/headers/
+
+# ============================================
+# 主页：HTTP/2 Server Push + 缓存策略
+# ============================================
+/index.html
+  # 安全头
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  
+  # HTTP/2 Server Push（预加载关键资源）
+  Link: </css/styles.css?v=20251009-2>; rel=preload; as=style
+  Link: </src/utils/DebugLogger-standalone.js>; rel=preload; as=script
+  Link: </src/config/r2-config.js>; rel=preload; as=script
+  Link: </src/utils/AudioCacheManager.js?v=20251008>; rel=preload; as=script
+  Link: </src/utils/TTSService.js?v=20251008>; rel=preload; as=script
+  Link: </src/utils/MissedWordsManager.js?v=20251015>; rel=preload; as=script
+  Link: </src/core/vocabulary-config-loader.js?v=20251009-2>; rel=preload; as=script
+  Link: </src/core/vocabulary-manager-v2.js?v=20251009-2>; rel=preload; as=script
+  Link: </src/core/WordTetrisGame.js?v=20251009-2>; rel=preload; as=script
+  Link: </src/core/game-settings-integration.js?v=20251009-2>; rel=preload; as=script
+  Link: </words/vocabulary-config.json>; rel=preload; as=fetch; crossorigin
+  
+  # DNS 预连接（加速 R2 CDN 连接）
+  Link: <https://pub-b3f1546eda5148c98fd9298b9d66d7f6.r2.dev>; rel=preconnect; crossorigin
+  
+  # 缓存策略：HTML 短期缓存（1 小时）
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+
+# ============================================
+# CSS 文件：长期缓存（1 天）
+# ============================================
+/css/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+  Content-Type: text/css; charset=utf-8
+
+# ============================================
+# JavaScript 文件：长期缓存（1 天）
+# ============================================
+/src/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+  Content-Type: application/javascript; charset=utf-8
+
+# ============================================
+# 词库 JSON：中期缓存（1 小时）
+# ============================================
+/words/*
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+  Content-Type: application/json; charset=utf-8
+  Access-Control-Allow-Origin: *
+
+# ============================================
+# 音频文件：长期不可变缓存（1 周）
+# ============================================
+/audio/*
+  Cache-Control: public, max-age=604800, immutable
+  Content-Type: audio/mpeg
+  Access-Control-Allow-Origin: *
+
+# ============================================
+# 图片文件：长期不可变缓存（1 周）
+# ============================================
+/images/*
+  Cache-Control: public, max-age=604800, immutable
+  Access-Control-Allow-Origin: *
+
+/images/cache/*.jpg
+  Content-Type: image/jpeg
+
+/images/cache/*.jpeg
+  Content-Type: image/jpeg
+
+/images/cache/*.png
+  Content-Type: image/png
+
+/images/cache/*.webp
+  Content-Type: image/webp
+
+# ============================================
+# 设置页面
+# ============================================
+/settings.html
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+
+# ============================================
+# 通配符：所有其他资源
+# ============================================
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+
