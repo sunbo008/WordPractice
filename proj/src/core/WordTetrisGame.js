@@ -3004,9 +3004,21 @@ class WordTetrisGame {
             
             // 检测错误输入
             if (!isCorrect && currentInput.length > 0) {
-                // 显示血色红叉并清空输入
-                this.showErrorMark(currentWord, currentInput.length - 1);
-                this.clearInputWithAnimation();
+                // 找出错误的位置（最后一个字母）
+                const errorIndex = currentInput.length - 1;
+                
+                // 显示血色红叉
+                this.showErrorMark(currentWord, errorIndex);
+                
+                // 只删除最后一个错误字母，保留正确的前缀
+                const letterInput = document.getElementById('letterInput');
+                letterInput.value = currentInput.slice(0, -1);
+                
+                // 延迟后清除红叉并更新显示
+                setTimeout(() => {
+                    this.updateRealTimeDisplay();
+                }, 300);
+                
                 return;
             }
             
