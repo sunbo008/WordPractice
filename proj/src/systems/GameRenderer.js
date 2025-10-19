@@ -25,17 +25,8 @@ class GameRenderer {
         // 绘制下降单词
         this.drawFallingWords();
         
-        // 绘制爆炸效果
-        this.game.drawExplosions();
-        
-        // 绘制炮口火花
-        this.game.drawMuzzleFlashes();
-        
-        // 绘制中文翻译爆炸动画（在粒子之上）
-        this.game.drawMeaningExplosions();
-        
-        // 绘制错误标记
-        this.game.drawErrorMarks();
+        // 绘制爆炸特效系统（粒子爆炸、炮口火花、中文翻译动画、错误标记）
+        this.game.explosionSystem.render();
         
         // 绘制UI元素
         this.drawGameInfo();

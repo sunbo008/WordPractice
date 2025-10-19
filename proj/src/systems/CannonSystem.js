@@ -61,8 +61,8 @@ class CannonSystem {
         const muzzleX = this.cannon.x + Math.sin(this.cannon.angle) * muzzleDistance;
         const muzzleY = this.cannon.y - Math.cos(this.cannon.angle) * muzzleDistance;
         
-        // 创建炮口火花效果（委托给爆炸系统）
-        this.game.createMuzzleFlash(muzzleX, muzzleY, this.cannon.angle);
+        // 创建炮口火花效果
+        this.game.explosionSystem.createMuzzleFlash(muzzleX, muzzleY, this.cannon.angle);
         
         // 创建火球炮弹对象
         const bullet = {
@@ -189,11 +189,11 @@ class CannonSystem {
             this.game.fallingWords.splice(wordIndex, 1);
         }
         
-        // 创建爆炸效果（委托给爆炸系统）
-        this.game.createExplosion(word.x, word.y + word.height / 2, word.original.length);
+        // 创建爆炸效果
+        this.game.explosionSystem.createExplosion(word.x, word.y + word.height / 2, word.original.length);
         
-        // 创建中文翻译爆炸动画（委托给爆炸系统）
-        this.game.createMeaningExplosion(word.x, word.y + word.height / 2, word.meaning, word.original);
+        // 创建中文翻译爆炸动画
+        this.game.explosionSystem.createMeaningExplosion(word.x, word.y + word.height / 2, word.meaning, word.original);
         
         // 更新游戏统计
         this.game.hitWords.add(word.original.toLowerCase());
