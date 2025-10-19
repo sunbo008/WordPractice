@@ -9,36 +9,40 @@ const EBBINGHAUS_INTERVALS = [1, 2, 4, 8, 16, 31];
  */
 function calculateEbbinghausStatus(createTime, lastUpdate) {
     const now = Date.now();
+    
+    // 始终使用创建时间来计算复习天数
+    // 从创建日期（忽略具体时间）到当前日期的天数
     const createDate = new Date(createTime);
-    const lastUpdateDate = new Date(lastUpdate);
+    createDate.setHours(0, 0, 0, 0); // 重置到当天0点
     
-    // 计算从创建到现在过了多少天
-    const daysElapsed = Math.floor((now - createTime) / (1000 * 60 * 60 * 24));
+    const today = new Date(now);
+    today.setHours(0, 0, 0, 0); // 重置到今天0点
     
-    // 如果最后更新时间和创建时间相差很小（1小时内），说明是新建的，使用创建时间
-    // 如果相差较大，说明重新出错了，从最后更新时间重新计算
-    const baseTime = (lastUpdate - createTime) < (1000 * 60 * 60) ? createTime : lastUpdate;
-    const baseDays = Math.floor((now - baseTime) / (1000 * 60 * 60 * 24));
+    // 计算天数差（使用日期差而不是时间戳差，更准确）
+    const baseDays = Math.floor((today - createDate) / (1000 * 60 * 60 * 24));
+    const daysElapsed = baseDays; // 从创建到现在过了多少天
     
-    // 找到下一个应该复习的时间点
-    let nextReviewDay = null;
+    // 判断当前天数是否是复习日
     let needReview = false;
+    let nextReviewDay = null;
     let completed = false;
     
+    // 检查当前天数是否正好是某个复习时间点
+    if (EBBINGHAUS_INTERVALS.includes(baseDays)) {
+        needReview = true;
+    }
+    
+    // 找到下一个复习时间点
     for (let interval of EBBINGHAUS_INTERVALS) {
-        if (baseDays >= interval) {
-            needReview = true;
-            continue;
-        } else {
+        if (baseDays < interval) {
             nextReviewDay = interval;
             break;
         }
     }
     
     // 如果已经超过所有复习时间点，标记为已完成
-    if (nextReviewDay === null && baseDays >= EBBINGHAUS_INTERVALS[EBBINGHAUS_INTERVALS.length - 1]) {
+    if (nextReviewDay === null && baseDays > EBBINGHAUS_INTERVALS[EBBINGHAUS_INTERVALS.length - 1]) {
         completed = true;
-        needReview = false;
     }
     
     return {
