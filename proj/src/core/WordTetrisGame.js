@@ -1178,6 +1178,11 @@ class WordTetrisGame {
         this.bufferTimer = 0;
         this.resetBufferLights();
         
+        // 🆕 红灯开始闪烁时显示图片
+        if (this.nextWord) {
+            this.updateImageShowcase(this.nextWord.original);
+        }
+        
         // 挑战模式：在缓冲区倒数开始时就播放音频
         if (this.gameMode === 'challenge' && this.nextWord) {
             debugLog.info(`🔥 挑战模式 - 缓冲区倒数开始，立即播放音频: "${this.nextWord.original}"`);
@@ -1242,8 +1247,7 @@ class WordTetrisGame {
         this.fallingWords.push(fallingWord);
         debugLog.info(`✅ 单词已添加到 fallingWords，当前下落单词数: ${this.fallingWords.length}`);
         
-        // 同步展示当前单词的图片，确保与下落单词一致
-        this.updateImageShowcase(fallingWord.original);
+        // 图片已在红灯开始时显示，此处不再需要更新
         
         // 记录下落的单词（用于统计命中率）
         this.fallenWords.add(this.nextWord.original.toLowerCase());
