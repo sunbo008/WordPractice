@@ -78,6 +78,10 @@ class MissedWordsManager {
                 // 已存在，更新计数和时间
                 allMissedWords[key].count++;
                 allMissedWords[key].lastUpdate = now;
+                // 确保旧数据有 createTime（兼容性处理）
+                if (!allMissedWords[key].createTime) {
+                    allMissedWords[key].createTime = allMissedWords[key].lastUpdate || now;
+                }
             } else {
                 // 新增
                 allMissedWords[key] = {
@@ -86,7 +90,8 @@ class MissedWordsManager {
                     phonetic: wordData.phonetic || '',
                     meaning: wordData.meaning || '',
                     count: 1,
-                    lastUpdate: now
+                    createTime: now,      // 创建时间（永不改变）
+                    lastUpdate: now       // 最后更新时间
                 };
             }
             
@@ -167,6 +172,7 @@ class MissedWordsManager {
                     phonetic: data.phonetic || '',
                     meaning: data.meaning || '',
                     count: data.count || 1,
+                    createTime: data.createTime || data.lastUpdate || Date.now(),  // 创建时间（兼容旧数据）
                     lastUpdate: data.lastUpdate || Date.now()
                 }))
                 .sort((a, b) => b.lastUpdate - a.lastUpdate);

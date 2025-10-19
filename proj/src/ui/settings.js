@@ -1,3 +1,85 @@
+// 艾宾浩斯遗忘曲线复习时间点（天数）
+const EBBINGHAUS_INTERVALS = [1, 2, 4, 8, 16, 31];
+
+/**
+ * 计算艾宾浩斯复习状态
+ * @param {number} createTime - 创建时间戳
+ * @param {number} lastUpdate - 最后更新时间戳（用于判断是否重新学习）
+ * @returns {Object} { needReview: boolean, daysElapsed: number, nextReviewDay: number, completed: boolean }
+ */
+function calculateEbbinghausStatus(createTime, lastUpdate) {
+    const now = Date.now();
+    const createDate = new Date(createTime);
+    const lastUpdateDate = new Date(lastUpdate);
+    
+    // 计算从创建到现在过了多少天
+    const daysElapsed = Math.floor((now - createTime) / (1000 * 60 * 60 * 24));
+    
+    // 如果最后更新时间和创建时间相差很小（1小时内），说明是新建的，使用创建时间
+    // 如果相差较大，说明重新出错了，从最后更新时间重新计算
+    const baseTime = (lastUpdate - createTime) < (1000 * 60 * 60) ? createTime : lastUpdate;
+    const baseDays = Math.floor((now - baseTime) / (1000 * 60 * 60 * 24));
+    
+    // 找到下一个应该复习的时间点
+    let nextReviewDay = null;
+    let needReview = false;
+    let completed = false;
+    
+    for (let interval of EBBINGHAUS_INTERVALS) {
+        if (baseDays >= interval) {
+            needReview = true;
+            continue;
+        } else {
+            nextReviewDay = interval;
+            break;
+        }
+    }
+    
+    // 如果已经超过所有复习时间点，标记为已完成
+    if (nextReviewDay === null && baseDays >= EBBINGHAUS_INTERVALS[EBBINGHAUS_INTERVALS.length - 1]) {
+        completed = true;
+        needReview = false;
+    }
+    
+    return {
+        needReview,      // 是否需要复习（感叹号）
+        daysElapsed,     // 从创建到现在过了多少天
+        baseDays,        // 从基准时间（创建或最后更新）到现在过了多少天
+        nextReviewDay,   // 下一个复习时间点（第几天）
+        completed        // 是否完成所有复习周期
+    };
+}
+
+/**
+ * 获取艾宾浩斯状态的显示文本和图标
+ */
+function getEbbinghausDisplay(status) {
+    if (status.completed) {
+        return {
+            icon: '✅',
+            text: '已掌握',
+            cssClass: 'ebb-completed',
+            title: '已完成所有复习周期，掌握良好！'
+        };
+    }
+    
+    if (status.needReview) {
+        return {
+            icon: '❗',  // 感叹号 - 需要复习
+            text: `${status.baseDays}天`,
+            cssClass: 'ebb-need-review',
+            title: `⚠️ 需要复习！已过 ${status.baseDays} 天，建议立即复习`
+        };
+    }
+    
+    return {
+        icon: '⭕',  // 空圈 - 暂不需要
+        text: `${status.baseDays}天`,
+        cssClass: 'ebb-waiting',
+        title: `下次复习时间：第 ${status.nextReviewDay} 天（当前第 ${status.baseDays} 天）`
+    };
+}
+
 // 层级化设置页面管理器 v2.0
 class SettingsManagerV2 {
     constructor() {
@@ -654,6 +736,28 @@ class SettingsManagerV2 {
                 localStorage.getItem('wordTetris_missedWords') || '{}'
             );
             
+            // 数据迁移：为旧数据添加时间戳
+            let needsSave = false;
+            const now = Date.now();
+            Object.entries(allMissedWords).forEach(([key, data]) => {
+                if (!data.createTime || !data.lastUpdate) {
+                    needsSave = true;
+                    // 如果没有时间戳，使用当前时间
+                    if (!data.lastUpdate) {
+                        data.lastUpdate = now;
+                    }
+                    if (!data.createTime) {
+                        data.createTime = data.lastUpdate;
+                    }
+                }
+            });
+            
+            // 如果有数据需要迁移，保存回 localStorage
+            if (needsSave) {
+                localStorage.setItem('wordTetris_missedWords', JSON.stringify(allMissedWords));
+                console.log('✨ 已为旧错词数据添加时间戳');
+            }
+            
             // 筛选当前IP的错词
             this.missedWords = Object.entries(allMissedWords)
                 .filter(([key]) => key.startsWith(`${this.userIP}::`))
@@ -662,9 +766,23 @@ class SettingsManagerV2 {
                     phonetic: data.phonetic || '',
                     meaning: data.meaning || '',
                     count: data.count || 1,
+                    createTime: data.createTime || data.lastUpdate || Date.now(),  // 创建时间（兼容旧数据）
                     lastUpdate: data.lastUpdate || Date.now()
                 }))
-                .sort((a, b) => b.lastUpdate - a.lastUpdate); // 按最后更新时间倒序
+                .sort((a, b) => {
+                    // 计算艾宾浩斯状态
+                    const statusA = calculateEbbinghausStatus(a.createTime, a.lastUpdate);
+                    const statusB = calculateEbbinghausStatus(b.createTime, b.lastUpdate);
+                    
+                    // 优先级：需要复习 > 未到时间 > 已完成
+                    if (statusA.needReview && !statusB.needReview) return -1;
+                    if (!statusA.needReview && statusB.needReview) return 1;
+                    if (statusA.completed && !statusB.completed) return 1;
+                    if (!statusA.completed && statusB.completed) return -1;
+                    
+                    // 同状态下按最后更新时间排序
+                    return b.lastUpdate - a.lastUpdate;
+                }); // 按艾宾浩斯状态和更新时间排序
             
             console.log(`📝 加载了 ${this.missedWords.length} 个错词`);
         } catch (error) {
@@ -689,6 +807,10 @@ class SettingsManagerV2 {
                 // 已存在，更新计数和时间
                 allMissedWords[key].count++;
                 allMissedWords[key].lastUpdate = now;
+                // 确保旧数据有 createTime（兼容性处理）
+                if (!allMissedWords[key].createTime) {
+                    allMissedWords[key].createTime = allMissedWords[key].lastUpdate || now;
+                }
             } else {
                 // 新增
                 allMissedWords[key] = {
@@ -697,7 +819,8 @@ class SettingsManagerV2 {
                     phonetic: phonetic || '',
                     meaning: meaning || '',
                     count: 1,
-                    lastUpdate: now
+                    createTime: now,      // 创建时间（永不改变）
+                    lastUpdate: now       // 最后更新时间
                 };
             }
             
@@ -925,6 +1048,7 @@ class SettingsManagerV2 {
             if (this.expandedCategories.has('missed-words')) {
                 content.classList.remove('collapsed');
                 icon.classList.add('expanded');
+                content.style.maxHeight = 'none';  // 确保展开时没有高度限制
             } else {
                 content.classList.add('collapsed');
                 icon.classList.remove('expanded');
@@ -954,8 +1078,14 @@ class SettingsManagerV2 {
             card.setAttribute('data-word', word.word);
             
             // 格式化日期
-            const date = new Date(word.lastUpdate);
-            const dateStr = `${date.getMonth() + 1}/${date.getDate()}`;
+            const createDate = new Date(word.createTime);
+            const createDateStr = `${createDate.getMonth() + 1}/${createDate.getDate()}`;
+            const updateDate = new Date(word.lastUpdate);
+            const updateDateStr = `${updateDate.getMonth() + 1}/${updateDate.getDate()}`;
+            
+            // 计算艾宾浩斯复习状态
+            const ebbStatus = calculateEbbinghausStatus(word.createTime, word.lastUpdate);
+            const ebbDisplay = getEbbinghausDisplay(ebbStatus);
             
             card.innerHTML = `
                 <div class="subcategory-header">
@@ -965,7 +1095,12 @@ class SettingsManagerV2 {
                 <div class="subcategory-description">包含单词（点击学习按钮查看详情）</div>
                 <div class="subcategory-meta">
                     <span class="word-count">错误 ${word.count} 次</span>
-                    <span class="last-update">${dateStr}</span>
+                    <span class="ebbinghaus-status ${ebbDisplay.cssClass}" title="${ebbDisplay.title}">
+                        <span class="bulb-icon">${ebbDisplay.icon}</span>
+                        <span class="bulb-text">${ebbDisplay.text}</span>
+                    </span>
+                    <span class="create-time" title="创建时间">📅 ${createDateStr}</span>
+                    <span class="last-update" title="最后更新">${updateDateStr}</span>
                 </div>
                 <div class="subcategory-actions">
                     <button class="action-btn learn-btn" onclick="openMissedWordLesson(event, '${word.word}')">学习</button>
@@ -1187,7 +1322,21 @@ function clearMissedWords(event) {
     event.stopPropagation(); // 阻止事件冒泡，避免触发父元素的折叠/展开
     
     if (window.settingsManager) {
+        // 保存当前展开状态
+        const content = document.getElementById('missed-words-content');
+        const wasExpanded = content && !content.classList.contains('collapsed');
+        
         if (window.settingsManager.clearAllMissedWords()) {
+            // 恢复展开状态
+            if (wasExpanded) {
+                window.settingsManager.expandedCategories.add('missed-words');
+            } else {
+                window.settingsManager.expandedCategories.delete('missed-words');
+            }
+            
+            // 保存展开状态到 localStorage
+            window.settingsManager.saveUserSettings();
+            
             window.settingsManager.renderInterface();
             window.settingsManager.showStatus('已清空所有错词', 'success');
         }
@@ -1199,6 +1348,10 @@ function selectAllMissedWords(event) {
     event.stopPropagation(); // 阻止事件冒泡，避免触发父元素的折叠/展开
     
     if (window.settingsManager) {
+        // 保存当前展开状态
+        const content = document.getElementById('missed-words-content');
+        const wasExpanded = content && !content.classList.contains('collapsed');
+        
         const allMissedWordsIds = window.settingsManager.missedWords.map(w => w.word);
         
         // 检查是否已经全选
@@ -1220,6 +1373,16 @@ function selectAllMissedWords(event) {
             window.settingsManager.showStatus('已全选所有错词', 'success');
         }
         
+        // 恢复展开状态
+        if (wasExpanded) {
+            window.settingsManager.expandedCategories.add('missed-words');
+        } else {
+            window.settingsManager.expandedCategories.delete('missed-words');
+        }
+        
+        // 保存展开状态到 localStorage
+        window.settingsManager.saveUserSettings();
+        
         window.settingsManager.renderInterface();
     }
 }
@@ -1229,7 +1392,22 @@ function deleteMissedWord(event, word) {
     event.stopPropagation();
     if (window.settingsManager) {
         if (confirm(`确定要删除错词"${word}"吗？`)) {
+            // 删除前保存当前展开状态
+            const content = document.getElementById('missed-words-content');
+            const wasExpanded = content && !content.classList.contains('collapsed');
+            
             window.settingsManager.deleteMissedWord(word);
+            
+            // 恢复展开状态
+            if (wasExpanded) {
+                window.settingsManager.expandedCategories.add('missed-words');
+            } else {
+                window.settingsManager.expandedCategories.delete('missed-words');
+            }
+            
+            // 保存展开状态到 localStorage
+            window.settingsManager.saveUserSettings();
+            
             window.settingsManager.renderInterface();
             window.settingsManager.showStatus(`已删除错词: ${word}`, 'success');
         }
@@ -1279,12 +1457,42 @@ function toggleMissedWordsCategory() {
     
     const expand = content.classList.contains('collapsed');
     
+    // 动画：使用 max-height 过渡，结束后设置为 none 以自适应
     if (expand) {
         content.classList.remove('collapsed');
         icon.classList.add('expanded');
+        // 先清零再在下一帧设置目标高度
+        content.style.maxHeight = '0px';
+        requestAnimationFrame(() => {
+            const target = content.scrollHeight;
+            content.style.maxHeight = `${target}px`;
+        });
+        content.addEventListener('transitionend', function onEnd(e){
+            if (e.propertyName === 'max-height') {
+                content.style.maxHeight = 'none';
+                content.removeEventListener('transitionend', onEnd);
+            }
+        });
     } else {
+        // 从当前内容高度开始收起
+        const start = content.scrollHeight;
+        content.style.maxHeight = `${start}px`;
+        requestAnimationFrame(() => {
+            content.style.maxHeight = '0px';
+        });
         content.classList.add('collapsed');
         icon.classList.remove('expanded');
+    }
+
+    // 记录展开状态并保存到 localStorage
+    if (window.settingsManager) {
+        const set = window.settingsManager.expandedCategories;
+        if (expand) {
+            set.add('missed-words');
+        } else {
+            set.delete('missed-words');
+        }
+        window.settingsManager.saveUserSettings();
     }
 }
 
