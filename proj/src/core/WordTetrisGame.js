@@ -843,6 +843,12 @@ class WordTetrisGame {
         this.hideModals();
         this.updateExamStats(); // 更新考试统计显示
         
+        // 🆕 清空图片展示区
+        const img = document.getElementById('wordImage');
+        if (img) {
+            img.src = '';
+        }
+        
         // 如果指定自动开始，则在重置完成后自动开始游戏
         if (autoStart) {
             setTimeout(() => {
@@ -1932,9 +1938,10 @@ class WordTetrisGame {
         const missedWordsCount = this.vocabularyManager.getVocabularyStats().missedWords;
         
         if (missedWordsCount === 0) {
-            // 没有错词，关闭弹窗
-            console.log('✅ 没有错词，关闭游戏完成弹窗');
+            // 没有错词，结束游戏并重置
+            console.log('✅ 没有错词，结束游戏并重置到初始状态');
             this.hideModals();
+            this.resetGame(); // 重置游戏到初始状态
         } else {
             // 有错词，打开错词本
             console.log('📖 有错词，打开错词本');
