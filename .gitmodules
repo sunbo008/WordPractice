@@ -1,0 +1,3 @@
+[submodule "proj-cocos"]
+	path = proj-cocos
+	url = https://github.com/sunbo008/WordPractice-Cocos.git
