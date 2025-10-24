@@ -898,17 +898,25 @@ class SettingsManagerV2 {
             if (format === 'json') {
                 // JSON格式
                 const data = JSON.parse(content);
-                if (Array.isArray(data)) {
-                    data.forEach(item => {
-                        if (item.word) {
-                            words.push({
-                                word: item.word.trim(),
-                                phonetic: item.phonetic || '',
-                                meaning: item.meaning || ''
-                            });
-                        }
-                    });
-                }
+                
+                // 支持两种格式：
+                // 1. 直接数组: [{word, phonetic, meaning}, ...]
+                // 2. 包装格式: {words: [{word, phonetic, meaning}, ...]}
+                let wordArray = Array.isArray(data) ? data : (data.words || []);
+                
+                wordArray.forEach(item => {
+                    if (item.word) {
+                        // 清理音标：去除方括号 []
+                        let phonetic = item.phonetic || '';
+                        phonetic = phonetic.replace(/[\[\]]/g, '').trim();
+                        
+                        words.push({
+                            word: item.word.trim(),
+                            phonetic: phonetic,
+                            meaning: item.meaning || ''
+                        });
+                    }
+                });
             } else if (format === 'csv') {
                 // CSV格式（首行可能是标题）
                 const lines = content.split('\n').filter(line => line.trim());
