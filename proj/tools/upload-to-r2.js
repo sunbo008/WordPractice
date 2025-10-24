@@ -1,11 +1,17 @@
 /**
- * Cloudflare R2 资源上传脚本
+ * Cloudflare R2 资源上传脚本（带本地缓存优化）
  * 
  * 功能：
- * 1. 将 proj/images/cache/ 目录中的图片上传到 Cloudflare R2
+ * 1. 将 proj/images/cache/ 和 proj/audio/ 目录中的资源上传到 Cloudflare R2
  * 2. 保持原有目录结构
  * 3. 支持断点续传（跳过已上传文件）
- * 4. 显示上传进度
+ * 4. 本地缓存上传记录，避免频繁查询服务器
+ * 5. 显示上传进度
+ * 
+ * 优化特性：
+ * - 本地保存上传记录，大大减少 API 请求
+ * - 自动同步服务器状态（发现服务器已有但本地未记录的文件会补充记录）
+ * - 检测文件修改时间，自动重新上传变更的文件
  * 
  * 使用方法：
  * 1. 安装依赖：npm install
@@ -31,14 +37,114 @@ const config = {
     bucketName: process.env.R2_BUCKET_NAME || 'wordpractice-assets',
     
     // 上传目录配置（相对于项目根目录）
-    // 只上传 proj/images/cache 目录中的图片
+    // 上传图片和音频文件
     uploadDirs: [
-        { local: path.join(__dirname, '../images/cache'), remote: 'images/cache' }
+        { local: path.join(__dirname, '../images/cache'), remote: 'images/cache' },
+        { local: path.join(__dirname, '../audio'), remote: 'audio' }
     ],
+    
+    // 本地上传记录缓存文件
+    cacheFile: path.join(__dirname, '.upload-cache.json'),
     
     // 是否强制重新上传（false = 跳过已存在文件）
     forceUpload: process.env.FORCE_UPLOAD === 'true',
 };
+
+// ============================================
+// 上传记录缓存管理
+// ============================================
+
+class UploadCache {
+    constructor(cacheFile) {
+        this.cacheFile = cacheFile;
+        this.cache = this.load();
+        this.modified = false;
+    }
+    
+    /**
+     * 加载上传记录
+     */
+    load() {
+        if (fs.existsSync(this.cacheFile)) {
+            try {
+                const data = fs.readFileSync(this.cacheFile, 'utf-8');
+                const cache = JSON.parse(data);
+                console.log(`📋 加载上传记录: ${Object.keys(cache.files || {}).length} 个文件`);
+                return cache;
+            } catch (error) {
+                console.warn('⚠️  上传记录文件损坏，将创建新记录');
+                return this.createEmpty();
+            }
+        }
+        return this.createEmpty();
+    }
+    
+    /**
+     * 创建空记录
+     */
+    createEmpty() {
+        return {
+            version: '1.0',
+            lastUpdate: new Date().toISOString(),
+            files: {}
+        };
+    }
+    
+    /**
+     * 保存上传记录
+     */
+    save() {
+        if (!this.modified) {
+            return;
+        }
+        
+        this.cache.lastUpdate = new Date().toISOString();
+        fs.writeFileSync(this.cacheFile, JSON.stringify(this.cache, null, 2), 'utf-8');
+        console.log(`💾 已保存上传记录: ${Object.keys(this.cache.files).length} 个文件`);
+        this.modified = false;
+    }
+    
+    /**
+     * 检查文件是否已上传（基于本地记录）
+     */
+    isUploaded(remotePath, localStat) {
+        const record = this.cache.files[remotePath];
+        if (!record || !record.uploaded) {
+            return false;
+        }
+        
+        // 检查文件是否被修改（通过修改时间和大小）
+        if (record.size !== localStat.size || record.mtime !== localStat.mtimeMs) {
+            return false;
+        }
+        
+        return true;
+    }
+    
+    /**
+     * 标记文件已上传
+     */
+    markUploaded(remotePath, localStat) {
+        this.cache.files[remotePath] = {
+            uploaded: true,
+            size: localStat.size,
+            mtime: localStat.mtimeMs,
+            uploadedAt: new Date().toISOString()
+        };
+        this.modified = true;
+    }
+    
+    /**
+     * 获取统计信息
+     */
+    getStats() {
+        const files = Object.values(this.cache.files);
+        return {
+            total: files.length,
+            uploaded: files.filter(f => f.uploaded).length
+        };
+    }
+}
 
 // ============================================
 // 检查配置
@@ -148,19 +254,21 @@ function formatSize(bytes) {
 }
 
 // ============================================
-// 主上传逻辑
+// 主上传逻辑（优化版）
 // ============================================
 
-async function uploadDirectory(client, localDir, remotePrefix) {
+async function uploadDirectory(client, localDir, remotePrefix, uploadCache) {
     console.log(`\n📁 扫描目录: ${localDir}`);
     
     const files = getAllFiles(localDir);
     console.log(`✅ 找到 ${files.length} 个文件`);
     
     let uploaded = 0;
-    let skipped = 0;
+    let skippedCache = 0;  // 通过本地缓存跳过
+    let skippedServer = 0; // 通过服务器查询跳过
     let failed = 0;
     let totalSize = 0;
+    let apiCalls = 0;      // API 调用次数
     
     for (let i = 0; i < files.length; i++) {
         const localPath = files[i];
@@ -171,20 +279,42 @@ async function uploadDirectory(client, localDir, remotePrefix) {
         const fileSize = stat.size;
         
         try {
-            // 检查是否需要跳过
-            if (!config.forceUpload) {
-                const exists = await fileExistsInR2(client, config.bucketName, remotePath);
-                if (exists) {
-                    skipped++;
-                    console.log(`⏭️  [${i + 1}/${files.length}] 跳过已存在: ${remotePath}`);
-                    continue;
-                }
+            // 强制上传模式：直接上传所有文件
+            if (config.forceUpload) {
+                await uploadFile(client, config.bucketName, localPath, remotePath);
+                apiCalls++;
+                uploaded++;
+                totalSize += fileSize;
+                uploadCache.markUploaded(remotePath, stat);
+                console.log(`✅ [${i + 1}/${files.length}] 强制上传: ${remotePath} (${formatSize(fileSize)})`);
+                continue;
             }
             
-            // 上传文件
+            // 1. 先检查本地缓存
+            if (uploadCache.isUploaded(remotePath, stat)) {
+                skippedCache++;
+                console.log(`⚡ [${i + 1}/${files.length}] 缓存跳过: ${remotePath}`);
+                continue;
+            }
+            
+            // 2. 本地缓存没有记录，查询服务器
+            const existsInR2 = await fileExistsInR2(client, config.bucketName, remotePath);
+            apiCalls++;
+            
+            if (existsInR2) {
+                // 服务器已有文件，补充到本地缓存
+                skippedServer++;
+                uploadCache.markUploaded(remotePath, stat);
+                console.log(`🔄 [${i + 1}/${files.length}] 同步记录: ${remotePath}`);
+                continue;
+            }
+            
+            // 3. 文件不存在，执行上传
             await uploadFile(client, config.bucketName, localPath, remotePath);
+            apiCalls++;
             uploaded++;
             totalSize += fileSize;
+            uploadCache.markUploaded(remotePath, stat);
             console.log(`✅ [${i + 1}/${files.length}] 上传成功: ${remotePath} (${formatSize(fileSize)})`);
             
         } catch (error) {
@@ -193,11 +323,11 @@ async function uploadDirectory(client, localDir, remotePrefix) {
         }
     }
     
-    return { uploaded, skipped, failed, totalSize };
+    return { uploaded, skippedCache, skippedServer, failed, totalSize, apiCalls };
 }
 
 async function main() {
-    console.log('🚀 Cloudflare R2 资源上传工具\n');
+    console.log('🚀 Cloudflare R2 资源上传工具（优化版）\n');
     
     // 检查配置
     checkConfig();
@@ -206,6 +336,10 @@ async function main() {
     console.log(`   Account ID: ${config.accountId}`);
     console.log(`   Bucket: ${config.bucketName}`);
     console.log(`   强制重新上传: ${config.forceUpload ? '是' : '否'}`);
+    console.log(`   缓存文件: ${config.cacheFile}`);
+    
+    // 加载上传记录缓存
+    const uploadCache = new UploadCache(config.cacheFile);
     
     // 创建客户端
     const client = createR2Client();
@@ -214,9 +348,11 @@ async function main() {
     // 上传所有目录
     let totalStats = {
         uploaded: 0,
-        skipped: 0,
+        skippedCache: 0,
+        skippedServer: 0,
         failed: 0,
-        totalSize: 0
+        totalSize: 0,
+        apiCalls: 0
     };
     
     for (const dir of config.uploadDirs) {
@@ -225,20 +361,34 @@ async function main() {
             continue;
         }
         
-        const stats = await uploadDirectory(client, dir.local, dir.remote);
+        const stats = await uploadDirectory(client, dir.local, dir.remote, uploadCache);
         totalStats.uploaded += stats.uploaded;
-        totalStats.skipped += stats.skipped;
+        totalStats.skippedCache += stats.skippedCache;
+        totalStats.skippedServer += stats.skippedServer;
         totalStats.failed += stats.failed;
         totalStats.totalSize += stats.totalSize;
+        totalStats.apiCalls += stats.apiCalls;
     }
+    
+    // 保存上传记录
+    uploadCache.save();
     
     // 显示统计
     console.log('\n' + '='.repeat(50));
     console.log('📊 上传统计：');
     console.log(`   ✅ 上传成功: ${totalStats.uploaded} 个文件`);
-    console.log(`   ⏭️  跳过: ${totalStats.skipped} 个文件`);
+    console.log(`   ⚡ 缓存跳过: ${totalStats.skippedCache} 个文件`);
+    console.log(`   🔄 同步记录: ${totalStats.skippedServer} 个文件`);
     console.log(`   ❌ 失败: ${totalStats.failed} 个文件`);
     console.log(`   📦 总大小: ${formatSize(totalStats.totalSize)}`);
+    console.log(`   🌐 API 调用: ${totalStats.apiCalls} 次`);
+    
+    const totalFiles = totalStats.uploaded + totalStats.skippedCache + totalStats.skippedServer + totalStats.failed;
+    const savedCalls = totalFiles - totalStats.apiCalls;
+    if (savedCalls > 0) {
+        console.log(`   ⚡ 节省请求: ${savedCalls} 次 (通过本地缓存)`);
+    }
+    
     console.log('='.repeat(50));
     
     if (totalStats.failed > 0) {
@@ -258,4 +408,3 @@ main().catch(error => {
     console.error('❌ 上传过程出错：', error);
     process.exit(1);
 });
-

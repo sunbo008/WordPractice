@@ -1,0 +1,19 @@
+将下面英文单词按照‘单词内容举例’格式，生成以当前日期时间小时分钟秒钟命名的json文件到 proj\words\MissedWords
+文件名举例：2025-10-22-221816.json
+单词内容举例：
+{
+ "words": [
+    {
+      "word": "see",
+      "phonetic": "[siː]",
+      "meaning": "看见",
+      "difficulty": 1
+    },
+    {
+      "word": "tree",
+      "phonetic": "[triː]",
+      "meaning": "树",
+      "difficulty": 1
+    }
+ ]
+}

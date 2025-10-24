@@ -39,8 +39,14 @@ build/
 # 忽略生成的 CSV 词表
 proj/words/words.csv
 
+# 忽略错词目录
+proj/words/MissedWords
+
 # 生成的图像与日志（包含敏感密钥）
 proj/images/generated/
+
+# 忽略音频文件（文件较大，使用 CDN）
+proj/audio/*.mp3
 
 # R2 配置文件（包含敏感凭证）
 .env
