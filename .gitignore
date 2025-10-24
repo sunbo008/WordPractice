@@ -28,6 +28,9 @@ proj/tests/debug-logger-copy-test.html
 proj/tools/generate_word_images.log
 proj/tools/generate_word_images_records.csv
 
+# 忽略 R2 上传缓存记录
+proj/tools/.upload-cache.json
+
 # 忽略node_modules（如果有Node.js项目）
 node_modules/
 package-lock.json

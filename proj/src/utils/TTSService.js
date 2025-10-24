@@ -827,17 +827,22 @@ class TTSService {
                 // 获取 R2 CDN URL（不检查是否存在，直接尝试播放）
                 const r2Url = this.cacheManager.getLocalFilePath(word, providerKey);
                 
-                // 判断是否是 R2 CDN URL（以 https:// 开头且包含 r2.dev）
-                if (r2Url.startsWith('https://') && r2Url.includes('.r2.dev/')) {
-                    ttsLog.info(`🎵 TTSService: 尝试使用 R2 CDN 音频: ${word} (${providerKey})`);
+                // 判断是否是 R2 CDN URL（以 https:// 开头且包含 r2.dev 或配置的 CDN 域名）
+                const isR2Url = r2Url.startsWith('https://') && 
+                               (r2Url.includes('.r2.dev/') || 
+                                (this.cacheManager.r2Config && this.cacheManager.r2Config.R2_CDN_BASE_URL && 
+                                 r2Url.includes(this.cacheManager.r2Config.R2_CDN_BASE_URL)));
+                
+                if (isR2Url) {
+                    ttsLog.info(`🎵 TTSService: 优先使用 R2 CDN 音频: ${word} (${providerKey})`);
                     ttsLog.info(`   URL: ${r2Url}`);
                     
                     const executingSpeakId = this._currentExecutingSpeakId;
                     try {
-                        // 直接尝试播放，让浏览器处理 404
-                        return await this._playAudio(r2Url, volume, providerName, executingSpeakId);
+                        // 优先尝试播放 R2 CDN 音频
+                        return await this._playAudio(r2Url, volume, `R2 CDN (${providerName})`, executingSpeakId);
                     } catch (playError) {
-                        // R2 播放失败，降级到在线 API
+                        // R2 播放失败（可能 404 或网络问题），降级到在线 API
                         ttsLog.warning(`⚠️ TTSService: R2 CDN 播放失败，降级到在线 API: ${playError.message || playError}`);
                         return await this._playAudio(url, volume, providerName, executingSpeakId);
                     }

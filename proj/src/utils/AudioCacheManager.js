@@ -260,14 +260,22 @@ class AudioCacheManager {
     async hasCache(word, provider) {
         const cacheKey = this._getCacheKey(word, provider);
         
-        // 1. 检查本地文件
+        // 1. 优先检查 R2 CDN（如果配置了）
+        if (this.r2Config && this.r2Config.shouldUseR2()) {
+            // R2 CDN 模式：假设文件存在（由上传脚本保证）
+            // 避免每次都 HEAD 请求，提升性能
+            audioCacheLog.info(`🌐 AudioCacheManager: 使用 R2 CDN 模式，假设文件存在: ${word}_${provider}.mp3`);
+            return true;
+        }
+        
+        // 2. 检查本地文件（本地开发模式）
         const hasLocalFile = await this.checkLocalFile(word, provider);
         if (hasLocalFile) {
             audioCacheLog.info(`✅ AudioCacheManager: 找到本地文件: ${word}_${provider}.mp3`);
             return true;
         }
         
-        // 2. 检查 IndexedDB
+        // 3. 检查 IndexedDB
         if (!this.initialized) {
             return false;
         }
