@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,6 +14,7 @@
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             color: white;
         }
+
         .test-result {
             background: rgba(255, 255, 255, 0.1);
             padding: 15px;
@@ -20,16 +22,20 @@
             border-radius: 8px;
             border-left: 4px solid #ffd700;
         }
+
         .test-result.success {
             border-left-color: #4CAF50;
         }
+
         .test-result.error {
             border-left-color: #f44336;
         }
+
         .test-result h3 {
             margin: 0 0 10px 0;
             color: #ffd700;
         }
+
         button {
             background: #4CAF50;
             color: white;
@@ -40,14 +46,16 @@
             cursor: pointer;
             margin: 10px 5px;
         }
+
         button:hover {
             background: #45a049;
         }
     </style>
 </head>
+
 <body>
     <h1>🧪 Word Tetris 结构测试</h1>
-    
+
     <div class="test-result">
         <h3>测试说明</h3>
         <p>此页面用于验证新的目录结构是否正确配置</p>
@@ -55,9 +63,14 @@
 
     <button onclick="runTests()">运行所有测试</button>
     <button onclick="window.location.href='index.html'">进入游戏</button>
-    <button onclick="window.location.href='tests/tts-service-test.html'" style="background: #9C27B0;">🎤 TTS 服务测试</button>
-    <button onclick="window.location.href='tests/ios-compatibility-test.html'" style="background: #FF9800;">🍎 iOS 兼容性测试</button>
-    <button onclick="window.location.href='tests/test-loading-performance.html'" style="background: #667eea;">⚡ 加载性能测试</button>
+    <button onclick="window.location.href='tests/tts-service-test.html'" style="background: #9C27B0;">🎤 TTS
+        服务测试</button>
+    <button onclick="window.location.href='tests/ios-compatibility-test.html'" style="background: #FF9800;">🍎 iOS
+        兼容性测试</button>
+    <button onclick="window.location.href='tests/test-loading-performance.html'" style="background: #667eea;">⚡
+        加载性能测试</button>
+    <button onclick="window.location.href='tools/diagnose-missed-words.html'" style="background: #e74c3c;">🔍
+        错词卡诊断工具</button>
 
     <div id="results"></div>
 
@@ -97,14 +110,14 @@
             const allTests = document.querySelectorAll('.test-result');
             const successCount = document.querySelectorAll('.test-result.success').length;
             const totalCount = allTests.length - 1; // 减去说明
-            
+
             const summary = document.createElement('div');
             summary.className = successCount === totalCount ? 'test-result success' : 'test-result error';
             summary.innerHTML = `
                 <h3>测试总结</h3>
                 <p>通过: ${successCount} / ${totalCount}</p>
-                ${successCount === totalCount ? 
-                    '<p>✅ 所有测试通过！新目录结构配置正确。</p>' : 
+                ${successCount === totalCount ?
+                    '<p>✅ 所有测试通过！新目录结构配置正确。</p>' :
                     '<p>❌ 部分测试失败，请检查文件路径和Junction链接。</p>'
                 }
             `;
@@ -142,5 +155,5 @@
         }
     </script>
 </body>
-</html>
 
+</html>

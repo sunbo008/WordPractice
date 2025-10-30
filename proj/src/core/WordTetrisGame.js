@@ -2018,10 +2018,6 @@ class WordTetrisGame {
                 return;
             }
             
-            console.log('🔑 开始获取用户IP...');
-            await window.missedWordsManager.getUserIP();
-            console.log('✅ 用户IP获取成功:', window.missedWordsManager.userIP);
-            
             // 生成错词卡名称（日期 + 时分秒），避免同名冲突且可读
             const now = new Date();
             const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
@@ -2082,13 +2078,26 @@ class WordTetrisGame {
             // 转换为数组
             const mergedWords = Array.from(wordMap.values());
             
-            // 保存为错词卡（使用 SettingsManagerV2 的格式）
+            // 保存为错词卡（不使用IP）
             const allMissedWordsData = JSON.parse(
                 localStorage.getItem('wordTetris_missedWords') || '{}'
             );
             console.log('📦 当前 localStorage 中的所有错词卡 keys:', Object.keys(allMissedWordsData));
             
-            const key = `${window.missedWordsManager.userIP}::${cardName.toLowerCase()}`;
+            // 检测存储空间（不阻止保存，仅警告）
+            try {
+                const testKey = '__storage_test__';
+                localStorage.setItem(testKey, 'test');
+                localStorage.removeItem(testKey);
+            } catch (e) {
+                if (e.name === 'QuotaExceededError') {
+                    console.warn('⚠️ 存储空间可能不足，但继续尝试保存错词卡');
+                    // 不阻止保存，避免游戏数据丢失
+                }
+            }
+            
+            // 生成key：直接使用错词卡名称（小写），不使用IP
+            const key = cardName.toLowerCase();
             console.log('🔑 生成的 key:', key);
             console.log('🔍 检查 key 是否存在:', allMissedWordsData[key] ? '存在' : '不存在');
             
@@ -2102,14 +2111,14 @@ class WordTetrisGame {
                 allMissedWordsData[key].count++;
                 console.log('✅ 更新完成，新的 count:', allMissedWordsData[key].count);
             } else {
-                // 创建新错词卡
+                // 创建新错词卡（不使用IP）
                 console.log('➕ 创建新错词卡...');
                 allMissedWordsData[key] = {
-                    ip: window.missedWordsManager.userIP,
                     word: cardName,
                     phonetic: `包含 ${mergedWords.length} 个单词`,
                     meaning: JSON.stringify(mergedWords),
                     count: 1,
+                    createTime: now2,
                     lastUpdate: now2
                 };
             }
@@ -2119,7 +2128,12 @@ class WordTetrisGame {
             
             console.log(`✅ 已保存错词卡"${cardName}"，包含 ${mergedWords.length} 个单词（去重后）`);
         } catch (error) {
-            console.error('❌ 保存错词到全局管理器失败:', error);
+            if (error.name === 'QuotaExceededError') {
+                console.error('❌ 存储空间不足，无法保存错词卡');
+                alert('⚠️ 存储空间不足，错词卡保存失败。请前往设置页面清理或导出错词数据。');
+            } else {
+                console.error('❌ 保存错词到全局管理器失败:', error);
+            }
         }
     }
 

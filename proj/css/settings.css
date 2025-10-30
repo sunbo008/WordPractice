@@ -742,6 +742,42 @@ body {
     transform: scale(1.05);
 }
 
+/* 存储信息显示 */
+.storage-info {
+    font-size: 0.85em;
+    color: #555;
+    padding: 6px 12px;
+    background: #f8f9fa;
+    border-radius: 5px;
+    border: 1px solid #dee2e6;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+    cursor: help;
+}
+
+.storage-info.low-space {
+    background: #fff3cd;
+    border-color: #ffc107;
+    color: #856404;
+}
+
+.storage-info.critical-space {
+    background: #f8d7da;
+    border-color: #dc3545;
+    color: #721c24;
+    font-weight: bold;
+    animation: pulse-warning 2s infinite;
+}
+
+@keyframes pulse-warning {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.8;
+    }
+}
+
 /* 错词卡片特殊样式 */
 .missed-word-card {
     border-color: #ffcccc;

@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>错词卡诊断工具</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            color: #555;
+            margin-top: 20px;
+        }
+
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            border: 1px solid #dee2e6;
+        }
+
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+
+        button.danger {
+            background: #f44336;
+        }
+
+        button.danger:hover {
+            background: #da190b;
+        }
+
+        .data-item {
+            margin: 5px 0;
+            padding: 8px;
+            background: #f8f9fa;
+            border-left: 3px solid #4CAF50;
+        }
+
+        .data-item.mismatch {
+            border-left-color: #f44336;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #4CAF50;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 错词卡诊断工具</h1>
+
+    <div class="container">
+        <h2>1. 当前IP状态</h2>
+        <div id="ip-status"></div>
+        <button onclick="checkIP()">重新检测IP</button>
+    </div>
+
+    <div class="container">
+        <h2>2. localStorage 数据检查</h2>
+        <div id="storage-status"></div>
+        <button onclick="checkStorage()">检查存储数据</button>
+    </div>
+
+    <div class="container">
+        <h2>3. 错词卡数据详情</h2>
+        <div id="words-detail"></div>
+        <button onclick="analyzeWords()">分析错词数据</button>
+    </div>
+
+    <div class="container">
+        <h2>4. IP匹配分析</h2>
+        <div id="ip-match"></div>
+        <button onclick="analyzeIPMatch()">检查IP匹配</button>
+    </div>
+
+    <div class="container">
+        <h2>5. 修复工具</h2>
+        <div id="fix-tools"></div>
+        <button onclick="fixIPMismatch()">修复IP不匹配问题</button>
+        <button class="danger" onclick="showClearWarning()">清空所有错词数据</button>
+    </div>
+
+    <script src="../src/utils/MissedWordsManager.js"></script>
+    <script>
+        let currentIP = null;
+
+        async function checkIP() {
+            const statusDiv = document.getElementById('ip-status');
+            statusDiv.innerHTML = '<div class="status info">正在检测IP...</div>';
+
+            try {
+                // 使用与 settings.js 相同的方法
+                const apis = [
+                    'https://api.ipify.org?format=json',
+                    'https://api.ip.sb/ip',
+                    'https://ipapi.co/json/'
+                ];
+
+                let ip = null;
+                for (const api of apis) {
+                    try {
+                        const response = await fetch(api);
+                        if (response.ok) {
+                            const data = await response.json();
+                            ip = data.ip || data;
+                            break;
+                        }
+                    } catch (err) {
+                        continue;
+                    }
+                }
+
+                if (!ip) {
+                    // 降级方案
+                    if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+                        ip = 'localhost';
+                    } else {
+                        ip = `unknown-${Date.now()}`;
+                    }
+                    statusDiv.innerHTML = `
+                        <div class="status error">❌ IP获取失败，使用降级方案</div>
+                        <div class="status warning">⚠️ 当前IP标识: <strong>${ip}</strong></div>
+                        <p>这可能导致错词卡不显示，因为每次都会生成不同的临时标识。</p>
+                    `;
+                } else {
+                    statusDiv.innerHTML = `
+                        <div class="status success">✅ IP获取成功</div>
+                        <div class="data-item">当前IP: <strong>${ip}</strong></div>
+                    `;
+                }
+
+                currentIP = ip;
+
+                // 检查是否有旧的IP标识
+                const allMissedWords = JSON.parse(localStorage.getItem('wordTetris_missedWords') || '{}');
+                const allIPs = new Set();
+                Object.keys(allMissedWords).forEach(key => {
+                    const ipMatch = key.match(/^(.+?)::/);
+                    if (ipMatch) {
+                        allIPs.add(ipMatch[1]);
+                    }
+                });
+
+                if (allIPs.size > 0) {
+                    statusDiv.innerHTML += `
+                        <div class="status info">📊 存储中的IP标识:</div>
+                        <ul>
+                            ${Array.from(allIPs).map(ip => `<li>${ip}</li>`).join('')}
+                        </ul>
+                    `;
+                }
+
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="status error">❌ 检测失败: ${error.message}</div>`;
+            }
+        }
+
+        function checkStorage() {
+            const statusDiv = document.getElementById('storage-status');
+
+            try {
+                const data = localStorage.getItem('wordTetris_missedWords');
+                if (!data) {
+                    statusDiv.innerHTML = '<div class="status error">❌ localStorage 中没有错词数据</div>';
+                    return;
+                }
+
+                const parsed = JSON.parse(data);
+                const keys = Object.keys(parsed);
+
+                statusDiv.innerHTML = `
+                    <div class="status success">✅ 找到错词数据</div>
+                    <div class="data-item">错词卡总数: <strong>${keys.length}</strong></div>
+                    <div class="data-item">数据大小: <strong>${(data.length / 1024).toFixed(2)} KB</strong></div>
+                    <details>
+                        <summary>查看原始数据</summary>
+                        <pre>${JSON.stringify(parsed, null, 2)}</pre>
+                    </details>
+                `;
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="status error">❌ 读取失败: ${error.message}</div>`;
+            }
+        }
+
+        function analyzeWords() {
+            const detailDiv = document.getElementById('words-detail');
+
+            try {
+                const allMissedWords = JSON.parse(localStorage.getItem('wordTetris_missedWords') || '{}');
+
+                if (Object.keys(allMissedWords).length === 0) {
+                    detailDiv.innerHTML = '<div class="status warning">⚠️ 没有错词数据</div>';
+                    return;
+                }
+
+                const wordsByIP = {};
+                Object.entries(allMissedWords).forEach(([key, data]) => {
+                    const ipMatch = key.match(/^(.+?)::/);
+                    const ip = ipMatch ? ipMatch[1] : 'unknown';
+
+                    if (!wordsByIP[ip]) {
+                        wordsByIP[ip] = [];
+                    }
+                    wordsByIP[ip].push({
+                        key,
+                        word: data.word,
+                        count: data.count || 1,
+                        createTime: data.createTime ? new Date(data.createTime).toLocaleString() : '未知',
+                        lastUpdate: data.lastUpdate ? new Date(data.lastUpdate).toLocaleString() : '未知'
+                    });
+                });
+
+                let html = '<table><tr><th>IP标识</th><th>错词卡数量</th><th>详情</th></tr>';
+
+                Object.entries(wordsByIP).forEach(([ip, words]) => {
+                    html += `<tr>
+                        <td><strong>${ip}</strong></td>
+                        <td>${words.length}</td>
+                        <td>
+                            <details>
+                                <summary>查看 ${words.length} 个错词卡</summary>
+                                <ul>
+                                    ${words.map(w => `<li>${w.word} (错误${w.count}次, 创建于${w.createTime})</li>`).join('')}
+                                </ul>
+                            </details>
+                        </td>
+                    </tr>`;
+                });
+
+                html += '</table>';
+
+                detailDiv.innerHTML = html;
+
+            } catch (error) {
+                detailDiv.innerHTML = `<div class="status error">❌ 分析失败: ${error.message}</div>`;
+            }
+        }
+
+        async function analyzeIPMatch() {
+            const matchDiv = document.getElementById('ip-match');
+            matchDiv.innerHTML = '<div class="status info">正在分析IP匹配...</div>';
+
+            if (!currentIP) {
+                await checkIP();
+            }
+
+            try {
+                const allMissedWords = JSON.parse(localStorage.getItem('wordTetris_missedWords') || '{}');
+                const keys = Object.keys(allMissedWords);
+
+                if (keys.length === 0) {
+                    matchDiv.innerHTML = '<div class="status warning">⚠️ 没有错词数据可分析</div>';
+                    return;
+                }
+
+                const matched = keys.filter(key => key.startsWith(`${currentIP}::`));
+                const unmatched = keys.filter(key => !key.startsWith(`${currentIP}::`));
+
+                let html = '';
+
+                if (matched.length > 0) {
+                    html += `<div class="status success">✅ 匹配的错词卡: ${matched.length} 个</div>`;
+                } else {
+                    html += `<div class="status error">❌ 没有匹配的错词卡！</div>`;
+                }
+
+                if (unmatched.length > 0) {
+                    html += `<div class="status warning">⚠️ 不匹配的错词卡: ${unmatched.length} 个</div>`;
+
+                    const unmatchedIPs = {};
+                    unmatched.forEach(key => {
+                        const ipMatch = key.match(/^(.+?)::/);
+                        const ip = ipMatch ? ipMatch[1] : 'unknown';
+                        if (!unmatchedIPs[ip]) {
+                            unmatchedIPs[ip] = [];
+                        }
+                        unmatchedIPs[ip].push(key);
+                    });
+
+                    html += '<p><strong>不匹配的IP标识:</strong></p><ul>';
+                    Object.entries(unmatchedIPs).forEach(([ip, keys]) => {
+                        html += `<li>${ip}: ${keys.length} 个错词卡</li>`;
+                    });
+                    html += '</ul>';
+
+                    html += '<div class="status info">💡 这可能是导致错词卡不显示的原因。如果IP发生了变化，可以使用修复工具将所有错词卡迁移到当前IP。</div>';
+                }
+
+                matchDiv.innerHTML = html;
+
+            } catch (error) {
+                matchDiv.innerHTML = `<div class="status error">❌ 分析失败: ${error.message}</div>`;
+            }
+        }
+
+        async function fixIPMismatch() {
+            if (!currentIP) {
+                await checkIP();
+            }
+
+            if (!confirm('确定要将所有错词卡迁移到当前IP吗？这会将所有错词卡都关联到当前IP标识。')) {
+                return;
+            }
+
+            try {
+                const allMissedWords = JSON.parse(localStorage.getItem('wordTetris_missedWords') || '{}');
+                const fixed = {};
+                let migratedCount = 0;
+
+                Object.entries(allMissedWords).forEach(([oldKey, data]) => {
+                    // 提取单词名称
+                    const wordMatch = oldKey.match(/::(.+)$/);
+                    if (wordMatch) {
+                        const word = wordMatch[1];
+                        const newKey = `${currentIP}::${word}`;
+
+                        // 如果新key已存在，合并数据
+                        if (fixed[newKey]) {
+                            fixed[newKey].count += (data.count || 1);
+                            fixed[newKey].lastUpdate = Math.max(fixed[newKey].lastUpdate || 0, data.lastUpdate || 0);
+                            if (!fixed[newKey].createTime && data.createTime) {
+                                fixed[newKey].createTime = data.createTime;
+                            }
+                        } else {
+                            fixed[newKey] = {
+                                ...data,
+                                ip: currentIP
+                            };
+                            migratedCount++;
+                        }
+                    }
+                });
+
+                localStorage.setItem('wordTetris_missedWords', JSON.stringify(fixed));
+
+                document.getElementById('fix-tools').innerHTML = `
+                    <div class="status success">✅ 修复完成！</div>
+                    <div class="data-item">已迁移 ${migratedCount} 个错词卡到当前IP: ${currentIP}</div>
+                    <p>请刷新设置页面查看错词卡。</p>
+                `;
+
+                // 重新分析
+                setTimeout(() => {
+                    analyzeIPMatch();
+                    analyzeWords();
+                }, 500);
+
+            } catch (error) {
+                document.getElementById('fix-tools').innerHTML = `<div class="status error">❌ 修复失败: ${error.message}</div>`;
+            }
+        }
+
+        function showClearWarning() {
+            if (confirm('⚠️ 警告：这将清空所有错词数据，此操作不可恢复！\n\n确定要继续吗？')) {
+                if (confirm('最后确认：真的要清空所有错词数据吗？')) {
+                    localStorage.removeItem('wordTetris_missedWords');
+                    document.getElementById('fix-tools').innerHTML = '<div class="status warning">⚠️ 已清空所有错词数据</div>';
+                    checkStorage();
+                    analyzeWords();
+                }
+            }
+        }
+
+        // 页面加载时自动执行检查
+        window.addEventListener('DOMContentLoaded', () => {
+            checkIP();
+            checkStorage();
+            analyzeWords();
+            setTimeout(() => analyzeIPMatch(), 1000);
+        });
+    </script>
+</body>
+</html>
+
