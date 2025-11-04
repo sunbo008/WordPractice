@@ -586,6 +586,23 @@ class WordTetrisGame {
         document.getElementById('reviewVocabBtn').addEventListener('click', () => this.handleReviewVocabBtn());
         document.getElementById('viewVocabBtn').addEventListener('click', () => this.showVocabularyBook());
         
+        // 弹窗关闭按钮事件
+        const gameOverModal = document.getElementById('gameOverModal');
+        const gameOverCloseBtn = gameOverModal.querySelector('.close-btn');
+        if (gameOverCloseBtn) {
+            gameOverCloseBtn.addEventListener('click', () => {
+                this.closeGameOverModal();
+            });
+        }
+        
+        const levelUpModal = document.getElementById('levelUpModal');
+        const levelUpCloseBtn = levelUpModal.querySelector('.close-btn');
+        if (levelUpCloseBtn) {
+            levelUpCloseBtn.addEventListener('click', () => {
+                this.closeLevelUpModal();
+            });
+        }
+        
         // 输入框事件
         const letterInput = document.getElementById('letterInput');
         letterInput.addEventListener('keypress', (e) => {
@@ -1964,6 +1981,38 @@ class WordTetrisGame {
     hideModals() {
         document.getElementById('gameOverModal').style.display = 'none';
         document.getElementById('levelUpModal').style.display = 'none';
+    }
+    
+    /**
+     * 关闭游戏结束弹窗并重置游戏状态
+     */
+    closeGameOverModal() {
+        document.getElementById('gameOverModal').style.display = 'none';
+        // 重置游戏状态为 stopped，这样按钮状态会正确更新
+        this.gameState = 'stopped';
+        this.updateButtons();
+    }
+    
+    /**
+     * 关闭等级提升弹窗并恢复游戏
+     */
+    closeLevelUpModal() {
+        // 清除自动关闭定时器
+        if (this.levelUpAutoCloseTimer) {
+            clearTimeout(this.levelUpAutoCloseTimer);
+            this.levelUpAutoCloseTimer = null;
+        }
+        
+        // 清除倒计时定时器
+        if (this.levelUpCountdownTimer) {
+            clearInterval(this.levelUpCountdownTimer);
+            this.levelUpCountdownTimer = null;
+        }
+        
+        document.getElementById('levelUpModal').style.display = 'none';
+        // 恢复游戏状态
+        this.gameState = 'playing';
+        this.updateButtons();
     }
 
 
