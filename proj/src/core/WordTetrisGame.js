@@ -876,8 +876,7 @@ class WordTetrisGame {
     }
 
     restartGame() {
-        this.hideModals();
-        this.resetGame();
+        this.closeAndResetGame();
         this.startGame();
     }
 
@@ -1957,8 +1956,7 @@ class WordTetrisGame {
         if (missedWordsCount === 0) {
             // 没有错词，结束游戏并重置
             console.log('✅ 没有错词，结束游戏并重置到初始状态');
-            this.hideModals();
-            this.resetGame(); // 重置游戏到初始状态
+            this.closeAndResetGame();
         } else {
             // 有错词，打开错词本
             console.log('📖 有错词，打开错词本');
@@ -1984,13 +1982,19 @@ class WordTetrisGame {
     }
     
     /**
-     * 关闭游戏结束弹窗并重置游戏状态
+     * 关闭弹窗并重置游戏（通用方法）
+     * 用于游戏结束后需要重置的场景
+     */
+    closeAndResetGame() {
+        this.hideModals();
+        this.resetGame();
+    }
+    
+    /**
+     * 关闭游戏结束弹窗（× 按钮）
      */
     closeGameOverModal() {
-        document.getElementById('gameOverModal').style.display = 'none';
-        // 重置游戏状态为 stopped，这样按钮状态会正确更新
-        this.gameState = 'stopped';
-        this.updateButtons();
+        this.closeAndResetGame();
     }
     
     /**
