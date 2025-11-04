@@ -229,8 +229,8 @@ class CannonSystem {
         // 清空输入
         this.game.clearInput();
         
-        // 检查升级
-        if (this.game.score >= this.game.targetScore) {
+        // 检查升级（如果游戏已完成，则不触发升级）
+        if (this.game.score >= this.game.targetScore && !this.game.checkAllWordsCompleted()) {
             this.game.levelUp();
             return;
         }
