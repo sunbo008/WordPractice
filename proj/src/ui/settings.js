@@ -1018,19 +1018,9 @@ class SettingsManagerV2 {
                     lastUpdate: data.lastUpdate || Date.now()
                 }))
                 .sort((a, b) => {
-                    // 计算艾宾浩斯状态
-                    const statusA = calculateEbbinghausStatus(a.createTime, a.lastUpdate);
-                    const statusB = calculateEbbinghausStatus(b.createTime, b.lastUpdate);
-
-                    // 优先级：需要复习 > 未到时间 > 已完成
-                    if (statusA.needReview && !statusB.needReview) return -1;
-                    if (!statusA.needReview && statusB.needReview) return 1;
-                    if (statusA.completed && !statusB.completed) return 1;
-                    if (!statusA.completed && statusB.completed) return -1;
-
-                    // 同状态下按最后更新时间排序
-                    return b.lastUpdate - a.lastUpdate;
-                }); // 按艾宾浩斯状态和更新时间排序
+                    // 按生成时间倒序排序（最新的在前）
+                    return b.createTime - a.createTime;
+                }); // 按生成时间倒序排序
 
             console.log(`📝 加载了 ${this.missedWords.length} 个错词（所有本地错词）`);
         } catch (error) {
