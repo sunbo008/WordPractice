@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Word Tetris - 词库设置</title>
-    <link rel="stylesheet" href="css/settings.css">
+    <link rel="stylesheet" href="css/settings.css?v=1.2.7">
 </head>
 <body>
     <div class="settings-container">
@@ -156,7 +156,26 @@
                     </div>
                 </div>
 
-                <!-- 分类4: 错词复习 -->
+                <!-- 分类4: 课外书阅读 -->
+                <div class="category-section">
+                    <div class="category-header" onclick="toggleCategory('extracurricular-books')">
+                        <div class="category-title">
+                            <span class="category-icon">📚</span>
+                            <span class="category-name">课外书阅读</span>
+                            <span class="category-desc">经典英文原版书籍分级阅读</span>
+                        </div>
+                        <div class="category-controls">
+                            <span class="selected-count" id="extracurricular-books-count">0/0</span>
+                            <button class="select-all-btn" onclick="selectAllInCategory(event, 'extracurricular-books')">全选</button>
+                            <span class="expand-icon">▼</span>
+                        </div>
+                    </div>
+                    <div class="category-content collapsed" id="extracurricular-books-content">
+                        <!-- 动态生成书籍系列和章节 -->
+                    </div>
+                </div>
+
+                <!-- 分类5: 错词复习 -->
                 <div class="category-section" id="missed-words-section">
                     <div class="category-header" onclick="toggleMissedWordsCategory()">
                         <div class="category-title">
@@ -192,10 +211,10 @@
         <div id="status-message" class="status-message"></div>
     </div>
 
-    <script src="/src/utils/DebugLogger-standalone.js"></script>
+    <script src="/src/utils/DebugLogger-standalone.js?v=20251107"></script>
     <script src="/src/utils/MissedWordsManager.js?v=20251015"></script>
-    <script src="/src/core/vocabulary-config-loader.js?v=20251009-2"></script>
+    <script src="/src/core/vocabulary-config-loader.js?v=20251107-extbooks-debug"></script>
     <script src="/src/core/vocabulary-manager-v2.js?v=20251009-2"></script>
-    <script src="/src/ui/settings.js?v=20251009-2"></script>
+    <script src="/src/ui/settings.js?v=20251107-extbooks6"></script>
 </body>
 </html>

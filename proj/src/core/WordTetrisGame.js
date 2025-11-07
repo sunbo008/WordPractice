@@ -796,9 +796,10 @@ class WordTetrisGame {
     resetGame(autoStart = false) {
         this.stopSpeaking(); // 重置时停止朗读
         
-        // 清空调试日志（游戏重置时）
-        if (typeof debugLog !== 'undefined' && debugLog.clear) {
-            debugLog.clear();
+        // 不再自动清空日志，让用户可以查看历史调试信息
+        // 日志会在超过存储限制时自动清理旧记录
+        if (typeof debugLog !== 'undefined') {
+            debugLog.info('🔄 游戏重置');
         }
         
         this.gameState = 'stopped';

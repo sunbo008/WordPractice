@@ -48,10 +48,11 @@ class VocabularyConfigLoader {
             
             // 并行扫描所有目录
             const scanStart = performance.now();
-            const [dailyPhonics, specialPractice, gradeBased] = await Promise.all([
+            const [dailyPhonics, specialPractice, gradeBased, extracurricularBooks] = await Promise.all([
                 this.scanDailyPhonics(),
                 this.scanSpecialPractice(),
-                this.scanGradeBased()
+                this.scanGradeBased(),
+                this.scanExtracurricularBooks()
             ]);
             if (typeof debugLog !== 'undefined') {
                 debugLog.info(`⏱️ [ConfigLoader] 并行扫描所有目录耗时: ${(performance.now() - scanStart).toFixed(2)}ms`);
@@ -90,6 +91,13 @@ class VocabularyConfigLoader {
                         description: "小学、初中、高中各年级学期词汇",
                         icon: "🎓",
                         subcategories: gradeBased
+                    },
+                    {
+                        id: "extracurricular-books",
+                        name: "课外书阅读",
+                        description: "经典英文原版书籍分级阅读",
+                        icon: "📚",
+                        subcategories: extracurricularBooks
                     }
                 ],
                 defaultConfig: {
@@ -102,12 +110,15 @@ class VocabularyConfigLoader {
             };
             
             const totalTime = performance.now() - totalStart;
-            console.log('✅ 配置加载完成:', {
+            const stats = {
                 dailyPhonics: dailyPhonics.length,
                 specialPractice: specialPractice.length,
                 gradeBased: this.countGradeItems(gradeBased),
+                extracurricularBooks: this.countGradeItems(extracurricularBooks),
                 defaultEnabled: this.config.defaultConfig.enabledLibraries.length
-            });
+            };
+            console.log('✅ 配置加载完成:', stats);
+            console.log(`📚 课外书章节数: ${stats.extracurricularBooks}`);
             
             console.log('📋 默认启用的课程:', this.config.defaultConfig.enabledLibraries);
             if (typeof debugLog !== 'undefined') {
@@ -277,15 +288,157 @@ class VocabularyConfigLoader {
     }
     
     /**
+     * 扫描 extracurricular-books 目录（课外书）
+     * 自动探测书籍系列和章节文件
+     */
+    async scanExtracurricularBooks() {
+        try {
+            console.log('🔍 扫描 extracurricular-books 目录...');
+            if (typeof debugLog !== 'undefined') {
+                debugLog.info('🔍 [ConfigLoader] 开始扫描 extracurricular-books 目录...');
+            }
+        
+        const bookSeriesStructure = {
+            'magic-tree-house': {
+                id: 'magic-tree-house',
+                name: '神奇树屋系列 (Magic Tree House)',
+                description: '适合初级英语学习者的冒险故事',
+                books: [
+                    { num: 1, name: 'Dinosaurs Before Dark', chapters: 10 },
+                    { num: 2, name: 'The Knight at Dawn', chapters: 10 },
+                    { num: 3, name: 'Mummies in the Morning', chapters: 10 },
+                    { num: 4, name: 'Pirates Past Noon', chapters: 10 }
+                ]
+            },
+            'harry-potter': {
+                id: 'harry-potter',
+                name: '哈利·波特系列 (Harry Potter)',
+                description: '经典魔法世界冒险',
+                books: [
+                    { num: 1, name: 'Philosopher\'s Stone', cnName: '魔法石', chapters: 17 },
+                    { num: 2, name: 'Chamber of Secrets', cnName: '密室', chapters: 18 }
+                ]
+            },
+            'oxford-reading-tree': {
+                id: 'oxford-reading-tree',
+                name: '牛津阅读树 (Oxford Reading Tree)',
+                description: '系统化分级阅读教材',
+                stages: [
+                    { stage: 1, books: 6 },
+                    { stage: 2, books: 6 },
+                    { stage: 3, books: 6 }
+                ]
+            }
+        };
+        
+        const subcategories = [];
+        
+        for (const [seriesKey, seriesInfo] of Object.entries(bookSeriesStructure)) {
+            const loadPromises = [];
+            
+            if (seriesInfo.books) {
+                // 处理图书-章节结构（神奇树屋、哈利波特）
+                for (const book of seriesInfo.books) {
+                    for (let chapter = 1; chapter <= book.chapters; chapter++) {
+                        const fileId = `book${String(book.num).padStart(2, '0')}-ch${String(chapter).padStart(2, '0')}`;
+                        loadPromises.push(
+                            this.loadFileMetadata(
+                                `./words/extracurricular-books/${seriesKey}`,
+                                fileId,
+                                'extracurricular',
+                                book.num,           // gradeNum -> book number
+                                chapter,            // term -> chapter number
+                                150,                // defaultWords
+                                book.cnName,        // unit -> 中文书名
+                                book.name           // bookName -> 英文书名
+                            )
+                        );
+                    }
+                }
+            } else if (seriesInfo.stages) {
+                // 处理分级-图书结构（牛津阅读树）
+                for (const stage of seriesInfo.stages) {
+                    for (let bookNum = 1; bookNum <= stage.books; bookNum++) {
+                        const fileId = `stage${stage.stage}-book${bookNum}`;
+                        loadPromises.push(
+                            this.loadFileMetadata(
+                                `./words/extracurricular-books/${seriesKey}`,
+                                fileId,
+                                'extracurricular-ort',
+                                stage.stage,
+                                bookNum,
+                                30
+                            )
+                        );
+                    }
+                }
+            }
+            
+            const results = await Promise.all(loadPromises);
+            const items = results.filter(r => r !== null);
+            
+            // 调试日志（同时输出到 console 和 debugLog）
+            const loadMsg = `  📖 ${seriesInfo.name}: 尝试加载 ${loadPromises.length} 个文件，成功 ${items.length} 个`;
+            console.log(loadMsg);
+            if (typeof debugLog !== 'undefined') {
+                debugLog.info(loadMsg);
+            }
+            
+            // 只有在找到至少一个文件时才添加这个系列
+            if (items.length > 0) {
+                subcategories.push({
+                    id: seriesInfo.id,
+                    name: seriesInfo.name,
+                    description: seriesInfo.description,
+                    items: items
+                });
+                const successMsg = `  ✓ ${seriesInfo.name}: 发现 ${items.length} 个章节`;
+                console.log(successMsg);
+                if (typeof debugLog !== 'undefined') {
+                    debugLog.success(successMsg);
+                }
+            } else {
+                const warnMsg = `  ⚠️ ${seriesInfo.name}: 未找到任何文件`;
+                console.log(warnMsg);
+                if (typeof debugLog !== 'undefined') {
+                    debugLog.warning(warnMsg);
+                }
+            }
+        }
+        
+            const finalMsg = `✅ extracurricular-books 扫描完成，发现 ${subcategories.length} 个系列`;
+            console.log(finalMsg);
+            if (typeof debugLog !== 'undefined') {
+                debugLog.success(finalMsg);
+            }
+            return subcategories;
+        } catch (error) {
+            console.error('❌ extracurricular-books 扫描失败:', error);
+            console.error('错误堆栈:', error.stack);
+            if (typeof debugLog !== 'undefined') {
+                debugLog.error(`❌ extracurricular-books 扫描失败: ${error.message}`);
+                debugLog.error(`错误堆栈: ${error.stack}`);
+            }
+            return []; // 返回空数组，不影响其他功能
+        }
+    }
+    
+    /**
      * 加载单个文件的元数据（只获取 metadata，不加载完整单词数据）
      */
-    async loadFileMetadata(directory, filename, type = 'daily', gradeNum = null, term = null, defaultWords = 0, unit = null) {
+    async loadFileMetadata(directory, filename, type = 'daily', gradeNum = null, term = null, defaultWords = 0, unit = null, bookName = null) {
         const filepath = `${directory}/${filename}.json`;
         
         try {
             // 直接获取数据（不用 HEAD 预检）
             const response = await fetch(filepath);
-            if (!response.ok) return null;
+            if (!response.ok) {
+                // 只对非 404 错误记录日志（404 是预期的，因为我们在探测文件）
+                if (response.status !== 404 && type === 'extracurricular') {
+                    console.warn(`⚠️ 加载文件失败 [${response.status}]: ${filepath}`);
+                }
+                return null;
+            }
             
             const data = await response.json();
             const metadata = data.metadata || {};
@@ -321,6 +474,44 @@ class VocabularyConfigLoader {
                     name: metadata.name || gradeName,
                     filename: filepath.replace('./words/', ''),
                     description: metadata.description || `${gradeName}必学词汇`,
+                    wordCount: metadata.wordCount || metadata.totalWords || defaultWords,
+                    difficulty: metadata.difficulty || 'beginner',
+                    recommended: true
+                };
+            } else if (type === 'extracurricular') {
+                // 课外书章节（神奇树屋、哈利波特等）
+                // unit = 中文书名, bookName = 英文书名
+                const cnName = unit || '';
+                const enName = bookName || '';
+                let displayName = '';
+                if (cnName && enName) {
+                    displayName = `${cnName}/${enName}`;
+                } else if (enName) {
+                    displayName = enName;
+                } else if (cnName) {
+                    displayName = cnName;
+                } else {
+                    displayName = `Book ${gradeNum}`;
+                }
+                
+                const chapterName = metadata.name || `第${gradeNum}本《${displayName}》- 第${term}章`;
+                console.log(`  ✅ 成功加载: ${chapterName} (${filepath})`);
+                return {
+                    id: metadata.id || filename,
+                    name: chapterName,
+                    filename: filepath.replace('./words/', ''),
+                    description: metadata.description || metadata.chapterTitle || `Chapter ${term}`,
+                    wordCount: metadata.wordCount || metadata.totalWords || defaultWords,
+                    difficulty: metadata.difficulty || 'beginner',
+                    recommended: true
+                };
+            } else if (type === 'extracurricular-ort') {
+                // 牛津阅读树
+                return {
+                    id: metadata.id || filename,
+                    name: metadata.name || `Stage ${gradeNum} - Book ${term}`,
+                    filename: filepath.replace('./words/', ''),
+                    description: metadata.description || metadata.title || '',
                     wordCount: metadata.wordCount || metadata.totalWords || defaultWords,
                     difficulty: metadata.difficulty || 'beginner',
                     recommended: true

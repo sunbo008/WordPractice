@@ -7,6 +7,7 @@ class DebugLogger {
         this.logHistory = [];
         this.storageKey = 'wordTetris_debugLogs';
         this.maxStoredLogs = 1000; // localStorage 中最多保存1000条日志
+        this.maxStorageSize = 1 * 1024 * 1024; // 最大存储 1MB
         this.passwordHash = 'ff313b13fc7bfbfc9427ed13a085020a'; // 3轮MD5后的哈希值
         this.isAuthenticated = false; // 是否已通过验证
         
@@ -111,15 +112,51 @@ class DebugLogger {
     }
     
     /**
-     * 保存日志到 localStorage
+     * 保存日志到 localStorage（带大小检查）
      */
     saveHistoryToStorage() {
         try {
             // 只保存最近的 maxStoredLogs 条日志
-            const logsToSave = this.logHistory.slice(-this.maxStoredLogs);
-            localStorage.setItem(this.storageKey, JSON.stringify(logsToSave));
+            let logsToSave = this.logHistory.slice(-this.maxStoredLogs);
+            let jsonString = JSON.stringify(logsToSave);
+            
+            // 检查存储大小（UTF-16 编码，每个字符 2 字节）
+            const sizeInBytes = jsonString.length * 2;
+            
+            // 如果超过 1MB，自动清理旧日志直到小于 800KB（留20%余量）
+            if (sizeInBytes > this.maxStorageSize) {
+                console.warn(`⚠️ 日志存储超过限制 (${(sizeInBytes / 1024 / 1024).toFixed(2)}MB)，自动清理旧日志...`);
+                const targetSize = this.maxStorageSize * 0.8; // 目标 800KB
+                
+                // 逐步删除旧日志直到达到目标大小
+                while (logsToSave.length > 100 && jsonString.length * 2 > targetSize) {
+                    // 每次删除最旧的 10% 日志
+                    const deleteCount = Math.max(10, Math.floor(logsToSave.length * 0.1));
+                    logsToSave = logsToSave.slice(deleteCount);
+                    jsonString = JSON.stringify(logsToSave);
+                }
+                
+                // 更新内存中的日志（同步清理）
+                this.logHistory = logsToSave;
+                const finalSize = jsonString.length * 2;
+                console.log(`✅ 日志清理完成，保留 ${logsToSave.length} 条，大小: ${(finalSize / 1024).toFixed(2)}KB`);
+            }
+            
+            localStorage.setItem(this.storageKey, jsonString);
         } catch (error) {
-            console.error('❌ 保存历史日志失败:', error);
+            if (error.name === 'QuotaExceededError') {
+                console.error('❌ localStorage 空间不足，强制清理旧日志');
+                // 强制清理，只保留最近 200 条
+                const logsToSave = this.logHistory.slice(-200);
+                this.logHistory = logsToSave;
+                try {
+                    localStorage.setItem(this.storageKey, JSON.stringify(logsToSave));
+                } catch (e) {
+                    console.error('❌ 即使清理后仍然保存失败:', e);
+                }
+            } else {
+                console.error('❌ 保存历史日志失败:', error);
+            }
         }
     }
     

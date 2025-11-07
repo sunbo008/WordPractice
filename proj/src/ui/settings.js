@@ -367,6 +367,9 @@ class SettingsManagerV2 {
                 this.renderSpecialPractice(category);
             } else if (category.id === 'grade-based') {
                 this.renderGradeBased(category);
+            } else if (category.id === 'extracurricular-books') {
+                // 使用专门的课外书渲染逻辑
+                this.renderExtracurricularBooks(category);
             }
         });
 
@@ -376,7 +379,7 @@ class SettingsManagerV2 {
 
     applyExpandState() {
         // 顶层分类
-        ['daily-phonics', 'special-practice', 'grade-based'].forEach(id => {
+        ['daily-phonics', 'special-practice', 'grade-based', 'extracurricular-books'].forEach(id => {
             const content = document.getElementById(`${id}-content`);
             if (!content) return;
             const header = content.previousElementSibling;
@@ -513,6 +516,10 @@ class SettingsManagerV2 {
     async renderGradeBased(category) {
         for (const gradeLevel of category.subcategories) {
             const grid = document.getElementById(`${gradeLevel.id}-grid`);
+            if (!grid) {
+                console.warn(`⚠️ 找不到元素: ${gradeLevel.id}-grid，跳过渲染`);
+                continue;
+            }
             grid.innerHTML = '';
 
             let selectedCount = 0;
@@ -559,22 +566,133 @@ class SettingsManagerV2 {
         this.updateGradeBasedCount();
     }
 
+    async renderExtracurricularBooks(category) {
+        console.log('🎨 开始渲染课外书分类:', category);
+        if (typeof debugLog !== 'undefined') {
+            debugLog.info(`🎨 开始渲染课外书: ${category.subcategories.length} 个系列`);
+        }
+        
+        const container = document.getElementById('extracurricular-books-content');
+        if (!container) {
+            console.warn('⚠️ 找不到 extracurricular-books-content 容器');
+            if (typeof debugLog !== 'undefined') {
+                debugLog.error('⚠️ 找不到 extracurricular-books-content 容器');
+            }
+            return;
+        }
+
+        // 清空容器
+        container.innerHTML = '';
+        console.log('📦 课外书容器已清空，开始生成内容');
+
+        // 为每个书籍系列生成 HTML 结构
+        for (const bookSeries of category.subcategories) {
+            // 创建书籍系列分组
+            const groupDiv = document.createElement('div');
+            groupDiv.className = 'grade-group extracurricular-books-group';
+            
+            let selectedCount = 0;
+            for (const chapter of bookSeries.items) {
+                if (this.selectedLibraries.has(chapter.id)) selectedCount++;
+            }
+
+            groupDiv.innerHTML = `
+                <div class="grade-group-header" onclick="toggleGradeGroup('${bookSeries.id}')">
+                    <span class="grade-icon">📚</span>
+                    <span class="grade-name">${bookSeries.name}</span>
+                    <span class="grade-count" id="${bookSeries.id}-count">${selectedCount}/${bookSeries.items.length}</span>
+                    <button class="select-all-btn" onclick="selectAllInGrade(event, '${bookSeries.id}')">全选</button>
+                    <span class="expand-icon">▶</span>
+                </div>
+                <div class="grade-group-content collapsed" id="${bookSeries.id}-grid">
+                    <!-- 章节将动态生成 -->
+                </div>
+            `;
+
+            container.appendChild(groupDiv);
+
+            // 渲染章节
+            const grid = document.getElementById(`${bookSeries.id}-grid`);
+            for (const chapter of bookSeries.items) {
+                const isSelected = this.selectedLibraries.has(chapter.id);
+                const fileExists = await this.checkFileExists(`./words/${chapter.filename}`);
+
+                const item = document.createElement('div');
+                item.className = `subcategory-item extracurricular-item ${isSelected ? 'selected' : ''} ${!fileExists ? 'file-missing' : ''}`;
+                item.dataset.id = chapter.id;
+
+                item.innerHTML = `
+                    <div class="subcategory-header">
+                        <span class="subcategory-title extracurricular-title">${chapter.name}</span>
+                        ${!fileExists ? '<span class="file-status missing">❌ 未实现</span>' : ''}
+                    </div>
+                    <div class="subcategory-description extracurricular-description">${chapter.description}</div>
+                    <div class="subcategory-meta">
+                        <span class="word-count">${chapter.wordCount} 个单词</span>
+                        <span class="difficulty-badge difficulty-${chapter.difficulty}">
+                            ${this.getDifficultyName(chapter.difficulty)}
+                        </span>
+                    </div>
+                    <div class="subcategory-actions">
+                        <button class="action-btn learn-btn" ${!fileExists ? 'disabled' : ''} onclick="openLesson(event, '${chapter.id}')">📖 学习</button>
+                        <button class="action-btn select-btn" ${!fileExists ? 'disabled' : ''} onclick="event.stopPropagation(); window.settingsManager.toggleSelection('${chapter.id}', 'extracurricular-books')">
+                            ${isSelected ? '✓ 已选' : '选择'}
+                        </button>
+                    </div>
+                `;
+
+                grid.appendChild(item);
+            }
+        }
+
+        // 更新总计数
+        this.updateGradeBasedCount();
+        
+        console.log('✅ 课外书渲染完成');
+        if (typeof debugLog !== 'undefined') {
+            debugLog.success('✅ 课外书渲染完成');
+        }
+    }
+
     updateGradeBasedCount() {
         const gradeCategory = this.config.categories.find(c => c.id === 'grade-based');
-        let totalSelected = 0;
-        let totalItems = 0;
+        if (gradeCategory) {
+            let totalSelected = 0;
+            let totalItems = 0;
 
-        gradeCategory.subcategories.forEach(gradeLevel => {
-            gradeLevel.items.forEach(term => {
-                totalItems++;
-                if (this.selectedLibraries.has(term.id)) {
-                    totalSelected++;
-                }
+            gradeCategory.subcategories.forEach(gradeLevel => {
+                gradeLevel.items.forEach(term => {
+                    totalItems++;
+                    if (this.selectedLibraries.has(term.id)) {
+                        totalSelected++;
+                    }
+                });
             });
-        });
 
-        document.getElementById('grade-based-count').textContent =
-            `${totalSelected}/${totalItems}`;
+            document.getElementById('grade-based-count').textContent =
+                `${totalSelected}/${totalItems}`;
+        }
+        
+        // 也更新课外书分类的计数
+        const booksCategory = this.config.categories.find(c => c.id === 'extracurricular-books');
+        if (booksCategory) {
+            let totalSelected = 0;
+            let totalItems = 0;
+
+            booksCategory.subcategories.forEach(bookSeries => {
+                bookSeries.items.forEach(chapter => {
+                    totalItems++;
+                    if (this.selectedLibraries.has(chapter.id)) {
+                        totalSelected++;
+                    }
+                });
+            });
+
+            const countElement = document.getElementById('extracurricular-books-count');
+            if (countElement) {
+                countElement.textContent = `${totalSelected}/${totalItems}`;
+            }
+        }
     }
 
     toggleSelection(id, categoryId) {
@@ -612,7 +730,7 @@ class SettingsManagerV2 {
         const category = this.config.categories.find(c => c.id === categoryId);
         if (!category) return;
 
-        if (categoryId === 'grade-based') {
+        if (categoryId === 'grade-based' || categoryId === 'extracurricular-books') {
             this.updateGradeBasedCount();
             // 更新每个年级组的计数
             category.subcategories.forEach(gradeLevel => {
@@ -1595,13 +1713,22 @@ function applyAndStart() {
 // 打开学习页面
 function openLesson(event, lessonId) {
     event.stopPropagation();
+    
+    // 检查是否是课外书课程（根据ID前缀判断）
+    if (lessonId.startsWith('mth-') || lessonId.startsWith('hp-') || lessonId.startsWith('ort-')) {
+        // 课外书使用单元学习模板（与年级分类相同的模板）
+        window.location.href = `./study/unit-lesson-template.html?lesson=${lessonId}`;
+        return;
+    }
+    
     // 对按年级单元的课程使用新的单元模板
     if (/^grade\d+-term\d+-unit\d+$/i.test(lessonId)) {
         window.location.href = `./study/unit-lesson-template.html?lesson=${lessonId}`;
         return;
     }
+    
     // 默认回退到自然拼读模板
-    window.location.href = `./study/phonics-lesson-template.html?lesson=${lessonId}`;
+    window.location.href = `./study/phonics-lesson-template.html?v=20251107-extbooks&lesson=${lessonId}`;
 }
 
 // ========== 错词管理全局函数 ==========

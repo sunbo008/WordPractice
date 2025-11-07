@@ -63,6 +63,21 @@
         const lessonId = qs('lesson');
 
         function inferPath(id){
+            // 课外书路径映射
+            if (id.startsWith('mth-')) {
+                // 神奇树屋系列：mth-book01-ch01 -> extracurricular-books/magic-tree-house/book01-ch01.json
+                const bookChapter = id.replace('mth-', '');
+                return `/words/extracurricular-books/magic-tree-house/${bookChapter}.json`;
+            } else if (id.startsWith('hp-')) {
+                // 哈利波特系列：hp-book01-ch01 -> extracurricular-books/harry-potter/book01-ch01.json
+                const bookChapter = id.replace('hp-', '');
+                return `/words/extracurricular-books/harry-potter/${bookChapter}.json`;
+            } else if (id.startsWith('ort-')) {
+                // 牛津阅读树系列：ort-stage1-book1 -> extracurricular-books/oxford-reading-tree/stage1-book1.json
+                const stageBook = id.replace('ort-', '');
+                return `/words/extracurricular-books/oxford-reading-tree/${stageBook}.json`;
+            }
+            
             // 默认按小学路径加载；将来可根据前缀扩展 middle/high
             return `/words/grade-based/primary/${id}.json`;
         }
