@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extracurricular Reading</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/settings.css">
+    <style>
+        .unit-container { max-width: 1100px; margin: 30px auto; padding: 20px; background: #fff; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+        .unit-header { display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px; }
+        .title { font-size: 22px; font-weight: 700; }
+        .meta { color:#7f8c8d; }
+        .word-list { display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; margin-top: 10px; }
+        .word-item { background:#f8f9fa; border:1px solid #ecf0f1; border-radius:8px; padding:10px; }
+        .word-text { display:flex; align-items:center; gap:6px; }
+        .w { font-weight:700; }
+        .phon { color:#3498db; margin-left:6px; font-weight:400; }
+        .mean { color:#7f8c8d; font-size: 0.9em; }
+        .section-title { margin-top: 22px; font-size: 18px; font-weight: 700; }
+        .story-box { background:#fffaf1; border:1px solid #ffe3a3; border-radius:8px; padding:16px; line-height:1.7; }
+        .actions { display:flex; gap:10px; margin-top:12px; }
+        .btn { padding:8px 14px; border:none; border-radius:6px; cursor:pointer; }
+        .btn-primary { background:#3498db; color:#fff; }
+        .btn-secondary { background:#ecf0f1; }
+        .back { margin: 10px 0 0 0; display:inline-block; color:#3498db; text-decoration:none; }
+        /* 小喇叭按钮：仅比图标大一圈 */
+        .speak-btn { width: 22px; height: 22px; min-width:22px; min-height:22px; border-radius: 50%;
+            display:inline-flex; align-items:center; justify-content:center; border:1px solid #d9e2ea; background:#eef3f7; cursor:pointer; padding:0; }
+        .speak-btn span { font-size: 13px; line-height:1; }
+        .speak-btn:hover { background:#e2f2ff; }
+    </style>
+</head>
+<body>
+    <div class="unit-container">
+        <div class="unit-header">
+            <div>
+                <div class="title" id="unit-title">Unit</div>
+                <div class="meta" id="unit-meta"></div>
+            </div>
+            <a class="back" href="../settings.html">← Back to settings</a>
+        </div>
+
+        <div class="section-title">Core Words</div>
+        <div class="actions" style="margin:6px 0 10px 0;">
+            <button class="btn btn-primary" id="play-all">▶️ Read All</button>
+            <button class="btn" id="stop-all">⏹️ Stop</button>
+        </div>
+        <div id="words" class="word-list"></div>
+
+        <div class="section-title">Mini Story</div>
+        <div id="story" class="story-box"></div>
+        <div class="actions">
+            <button class="btn btn-primary" id="play-story">🔊 Play Story</button>
+            <button class="btn btn-secondary" id="copy-story">📋 Copy Story</button>
+        </div>
+    </div>
+
+    <script src="../src/utils/PhoneticFormatter.js"></script>
+    <script src="../src/utils/TTSService.js"></script>
+    <script>
+        function qs(name){ const u=new URL(location.href); return u.searchParams.get(name)||''; }
+        const lessonId = qs('lesson');
+
+        function inferPath(id){
+            // 课外书路径映射
+            if (id.startsWith('mth-')) {
+                // 神奇树屋系列：mth-book01-ch01 -> extracurricular-books/magic-tree-house/book01-ch01.json
+                const bookChapter = id.replace('mth-', '');
+                return `/words/extracurricular-books/magic-tree-house/${bookChapter}.json`;
+            } else if (id.startsWith('hp-')) {
+                // 哈利波特系列：hp-book01-ch01 -> extracurricular-books/harry-potter/book01-ch01.json
+                const bookChapter = id.replace('hp-', '');
+                return `/words/extracurricular-books/harry-potter/${bookChapter}.json`;
+            } else if (id.startsWith('ort-')) {
+                // 牛津阅读树系列：ort-stage1-book1 -> extracurricular-books/oxford-reading-tree/stage1-book1.json
+                const stageBook = id.replace('ort-', '');
+                return `/words/extracurricular-books/oxford-reading-tree/${stageBook}.json`;
+            }
+            
+            // 默认按小学路径加载；将来可根据前缀扩展 middle/high
+            return `/words/grade-based/primary/${id}.json`;
+        }
+
+        function oxfordComma(arr){
+            if(arr.length<=2) return arr.join(' and ');
+            return arr.slice(0,-1).join(', ') + ', and ' + arr[arr.length-1];
+        }
+
+        function chunk(arr, size){
+            const out=[]; for(let i=0;i<arr.length;i+=size){ out.push(arr.slice(i, i+size)); } return out;
+        }
+
+        function buildStory(words){
+            const ws = words.map(w=>w.word);
+            if(ws.length===0) return '';
+            const parts = chunk(ws, Math.ceil(ws.length/3));
+            const s1 = `Today we are learning these words: ${oxfordComma(parts[0])}.`;
+            const s2 = parts[1] ? `In class I can see ${oxfordComma(parts[1])}.` : '';
+            const s3 = parts[2] ? `I use or talk about ${oxfordComma(parts[2])}.` : '';
+            return [s1,s2,s3].filter(Boolean).join(' ');
+        }
+
+        async function main(){
+            const path = inferPath(lessonId);
+            try{
+                const res = await fetch(path);
+                if(!res.ok) throw new Error('not found');
+                const data = await res.json();
+                document.getElementById('unit-title').textContent = data.metadata?.name || lessonId;
+                document.getElementById('unit-meta').textContent = (data.metadata?.description||'') + ` · ${data.words.length} words`;
+
+                const wordsEl = document.getElementById('words');
+                data.words.forEach((w, idx)=>{
+                    const div = document.createElement('div');
+                    div.className='word-item';
+                    const formattedPhonetic = PhoneticFormatter.format(w.phonetic);
+                    div.innerHTML = `<div class="word-text">
+                        <button title="Read" class="speak-btn" data-say="${w.word}"><span>🔊</span></button>
+                        <span class="w">${w.word}</span><span class="phon"> ${formattedPhonetic}</span>
+                    </div>
+                    <div class="mean">${w.meaning||''}</div>`;
+                    const speakEl = div.querySelector('[data-say]');
+                    const speak = async ()=>{
+                        try{ const tts = window.TTSService.getInstance(); await tts.unlockAudioContext(true); await tts.speak(w.word, { showError:false }); }catch(err){}
+                    };
+                    speakEl.addEventListener('click', async (e)=>{ e.stopPropagation(); speak(); });
+                    let hoverTimer = null;
+                    speakEl.addEventListener('mouseenter', ()=>{ hoverTimer = setTimeout(speak, 120); });
+                    speakEl.addEventListener('mouseleave', ()=>{ if (hoverTimer) { clearTimeout(hoverTimer); hoverTimer = null; } });
+                    div.querySelector('.w').addEventListener('click', async ()=>{ try{ const tts = window.TTSService.getInstance(); await tts.unlockAudioContext(true); await tts.speak(w.word, { showError:false }); }catch(err){} });
+                    wordsEl.appendChild(div);
+                });
+
+                // 优先使用 JSON 中提供的 story，否则自动生成
+                const story = data.metadata?.story || buildStory(data.words);
+                document.getElementById('story').textContent = story;
+
+                document.getElementById('play-story').onclick = async ()=>{
+                    if(window.TTSService){
+                        const tts = window.TTSService.getInstance();
+                        await tts.unlockAudioContext(true);
+                        await tts.speak(story, { showError:false });
+                    }
+                };
+                document.getElementById('copy-story').onclick = async ()=>{
+                    try{ await navigator.clipboard.writeText(story); }catch(e){}
+                };
+                // --- Read All with cancellable controller ---
+                let readAllController = null;
+                function createCancelController(){
+                    let cancelFn;
+                    const promise = new Promise(resolve => { cancelFn = resolve; });
+                    return { promise, cancel: () => cancelFn && cancelFn() };
+                }
+                document.getElementById('play-all').onclick = async ()=>{
+                    if (window._readingAll) return; // prevent concurrent
+                    window._readingAll = true;
+                    readAllController = createCancelController();
+                    const tts = window.TTSService.getInstance();
+                    await tts.unlockAudioContext(true);
+                    for (const item of data.words) {
+                        // speak or cancel, whichever happens first
+                        await Promise.race([
+                            tts.speak(item.word, { showError:false }),
+                            readAllController.promise
+                        ]);
+                        if (!window._readingAll) break;
+                        await Promise.race([
+                            new Promise(r=>setTimeout(r,150)),
+                            readAllController.promise
+                        ]);
+                        if (!window._readingAll) break;
+                    }
+                    window._readingAll = false;
+                };
+                document.getElementById('stop-all').onclick = ()=>{
+                    try{ window.TTSService.getInstance().stop(); }catch(e){}
+                    if (readAllController) { readAllController.cancel(); }
+                    window._readingAll = false;
+                };
+            }catch(err){
+                alert(`加载课程失败：课程文件未找到: ${path}`);
+            }
+        }
+        main();
+    </script>
+</body>
+</html>
+
+
+

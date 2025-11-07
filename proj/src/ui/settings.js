@@ -1716,8 +1716,8 @@ function openLesson(event, lessonId) {
     
     // 检查是否是课外书课程（根据ID前缀判断）
     if (lessonId.startsWith('mth-') || lessonId.startsWith('hp-') || lessonId.startsWith('ort-')) {
-        // 课外书使用单元学习模板（与年级分类相同的模板）
-        window.location.href = `./study/unit-lesson-template.html?lesson=${lessonId}`;
+        // 课外书使用专用的课外书学习模板
+        window.location.href = `./study/extracurricular-lesson-template.html?lesson=${lessonId}`;
         return;
     }
     

@@ -10,15 +10,102 @@
     "series": "Magic Tree House",
     "category": "extracurricular-books",
     "difficulty": "beginner",
-    "wordCount": 30,
+    "wordCount": 80,
     "recommendedAge": "6-9",
-    "lastUpdated": "2025-11-07"
+    "lastUpdated": "2025-11-07",
+    
+    "chapterSummary": {
+      "brief": "Jack and Annie discover a mysterious tree house filled with books in the woods near Frog Creek. This marks the beginning of their magical adventures.",
+      "setting": "Woods near Frog Creek, Pennsylvania",
+      "mainCharacters": ["Jack (8.5 years old)", "Annie (7 years old)"],
+      "keyThemes": ["Discovery", "Curiosity", "Sibling Adventure"]
+    },
+    
+    "story": "Jack and Annie were walking home when Annie thought she saw a monster. Jack didn't believe her, but followed her into the woods anyway. There, they discovered something amazing - the tallest tree house they had ever seen, perched high in an old oak tree. The tree house was filled with books. Annie wanted to climb up right away, but Jack was cautious about going into something that didn't belong to them. Finally, curiosity got the better of him, and he climbed up too. This discovery would change their lives forever, leading them on incredible adventures through time and space."
   },
   "words": [
     {
-      "word": "monster",
-      "phonetic": "[ˈmɑːnstər]",
-      "meaning": "怪物",
+      "word": "all",
+      "phonetic": "[ɔːl]",
+      "meaning": "全部的，所有的",
+      "difficulty": 1
+    },
+    {
+      "word": "almost",
+      "phonetic": "[ˈɔːlməʊst]",
+      "meaning": "几乎，差不多",
+      "difficulty": 2
+    },
+    {
+      "word": "alone",
+      "phonetic": "[əˈləʊn]",
+      "meaning": "独自地，单独",
+      "difficulty": 2
+    },
+    {
+      "word": "Annie",
+      "phonetic": "[ˈæni]",
+      "meaning": "安妮（人名）",
+      "difficulty": 1
+    },
+    {
+      "word": "asked",
+      "phonetic": "[ɑːskt]",
+      "meaning": "问，询问（ask的过去式）",
+      "difficulty": 1
+    },
+    {
+      "word": "belongs",
+      "phonetic": "[bɪˈlɒŋz]",
+      "meaning": "属于",
+      "difficulty": 2
+    },
+    {
+      "word": "better",
+      "phonetic": "[ˈbetə(r)]",
+      "meaning": "更好的",
+      "difficulty": 1
+    },
+    {
+      "word": "between",
+      "phonetic": "[bɪˈtwiːn]",
+      "meaning": "在...之间",
+      "difficulty": 2
+    },
+    {
+      "word": "books",
+      "phonetic": "[bʊks]",
+      "meaning": "书（复数）",
+      "difficulty": 1
+    },
+    {
+      "word": "branches",
+      "phonetic": "[ˈbrɑːntʃɪz]",
+      "meaning": "树枝（复数）",
+      "difficulty": 2
+    },
+    {
+      "word": "built",
+      "phonetic": "[bɪlt]",
+      "meaning": "建造（build的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "called",
+      "phonetic": "[kɔːld]",
+      "meaning": "叫，称呼（call的过去式）",
+      "difficulty": 1
+    },
+    {
+      "word": "climbing",
+      "phonetic": "[ˈklaɪmɪŋ]",
+      "meaning": "攀爬",
+      "difficulty": 2
+    },
+    {
+      "word": "coming",
+      "phonetic": "[ˈkʌmɪŋ]",
+      "meaning": "来，到来",
       "difficulty": 1
     },
     {
@@ -28,117 +115,279 @@
       "difficulty": 2
     },
     {
+      "word": "dark",
+      "phonetic": "[dɑːk]",
+      "meaning": "黑暗的",
+      "difficulty": 1
+    },
+    {
+      "word": "disappeared",
+      "phonetic": "[ˌdɪsəˈpɪəd]",
+      "meaning": "消失了",
+      "difficulty": 3
+    },
+    {
+      "word": "ever",
+      "phonetic": "[ˈevə(r)]",
+      "meaning": "曾经",
+      "difficulty": 1
+    },
+    {
+      "word": "filled",
+      "phonetic": "[fɪld]",
+      "meaning": "充满的",
+      "difficulty": 2
+    },
+    {
+      "word": "glasses",
+      "phonetic": "[ˈɡlɑːsɪz]",
+      "meaning": "眼镜",
+      "difficulty": 1
+    },
+    {
+      "word": "going",
+      "phonetic": "[ˈɡəʊɪŋ]",
+      "meaning": "去，进行",
+      "difficulty": 1
+    },
+    {
+      "word": "golden",
+      "phonetic": "[ˈɡəʊldən]",
+      "meaning": "金色的",
+      "difficulty": 2
+    },
+    {
+      "word": "gripped",
+      "phonetic": "[ɡrɪpt]",
+      "meaning": "抓紧，握紧",
+      "difficulty": 2
+    },
+    {
+      "word": "groaned",
+      "phonetic": "[ɡrəʊnd]",
+      "meaning": "呻吟，抱怨",
+      "difficulty": 3
+    },
+    {
+      "word": "half",
+      "phonetic": "[hɑːf]",
+      "meaning": "一半",
+      "difficulty": 1
+    },
+    {
+      "word": "headed",
+      "phonetic": "[ˈhedɪd]",
+      "meaning": "朝...前进",
+      "difficulty": 2
+    },
+    {
+      "word": "highest",
+      "phonetic": "[ˈhaɪɪst]",
+      "meaning": "最高的",
+      "difficulty": 2
+    },
+    {
+      "word": "inside",
+      "phonetic": "[ɪnˈsaɪd]",
+      "meaning": "在里面",
+      "difficulty": 1
+    },
+    {
+      "word": "into",
+      "phonetic": "[ˈɪntə]",
+      "meaning": "进入",
+      "difficulty": 1
+    },
+    {
+      "word": "Jack",
+      "phonetic": "[dʒæk]",
+      "meaning": "杰克（人名）",
+      "difficulty": 1
+    },
+    {
+      "word": "just",
+      "phonetic": "[dʒʌst]",
+      "meaning": "只是，刚刚",
+      "difficulty": 1
+    },
+    {
+      "word": "kept",
+      "phonetic": "[kept]",
+      "meaning": "保持（keep的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "know",
+      "phonetic": "[nəʊ]",
+      "meaning": "知道",
+      "difficulty": 1
+    },
+    {
+      "word": "ladder",
+      "phonetic": "[ˈlædə(r)]",
+      "meaning": "梯子",
+      "difficulty": 2
+    },
+    {
+      "word": "liked",
+      "phonetic": "[laɪkt]",
+      "meaning": "喜欢（like的过去式）",
+      "difficulty": 1
+    },
+    {
+      "word": "lit",
+      "phonetic": "[lɪt]",
+      "meaning": "照亮（light的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "longest",
+      "phonetic": "[ˈlɒŋɡɪst]",
+      "meaning": "最长的",
+      "difficulty": 2
+    },
+    {
+      "word": "looked",
+      "phonetic": "[lʊkt]",
+      "meaning": "看（look的过去式）",
+      "difficulty": 1
+    },
+    {
+      "word": "loved",
+      "phonetic": "[lʌvd]",
+      "meaning": "喜爱（love的过去式）",
+      "difficulty": 1
+    },
+    {
+      "word": "minute",
+      "phonetic": "[ˈmɪnɪt]",
+      "meaning": "分钟",
+      "difficulty": 1
+    },
+    {
+      "word": "moment",
+      "phonetic": "[ˈməʊmənt]",
+      "meaning": "片刻，瞬间",
+      "difficulty": 2
+    },
+    {
+      "word": "monster",
+      "phonetic": "[ˈmɒnstə(r)]",
+      "meaning": "怪物",
+      "difficulty": 2
+    },
+    {
+      "word": "must",
+      "phonetic": "[mʌst]",
+      "meaning": "必须",
+      "difficulty": 1
+    },
+    {
+      "word": "never",
+      "phonetic": "[ˈnevə(r)]",
+      "meaning": "从不",
+      "difficulty": 1
+    },
+    {
+      "word": "oak",
+      "phonetic": "[əʊk]",
+      "meaning": "橡树",
+      "difficulty": 2
+    },
+    {
+      "word": "oh",
+      "phonetic": "[əʊ]",
+      "meaning": "哦（感叹词）",
+      "difficulty": 1
+    },
+    {
+      "word": "out",
+      "phonetic": "[aʊt]",
+      "meaning": "出去，在外面",
+      "difficulty": 1
+    },
+    {
+      "word": "Pennsylvania",
+      "phonetic": "[ˌpensɪlˈveɪniə]",
+      "meaning": "宾夕法尼亚州",
+      "difficulty": 4
+    },
+    {
+      "word": "pointing",
+      "phonetic": "[ˈpɔɪntɪŋ]",
+      "meaning": "指向",
+      "difficulty": 2
+    },
+    {
+      "word": "poked",
+      "phonetic": "[pəʊkt]",
+      "meaning": "戳，伸出",
+      "difficulty": 2
+    },
+    {
       "word": "pretend",
       "phonetic": "[prɪˈtend]",
       "meaning": "假装",
       "difficulty": 2
     },
     {
-      "word": "woods",
-      "phonetic": "[wʊdz]",
-      "meaning": "树林",
+      "word": "pushed",
+      "phonetic": "[pʊʃt]",
+      "meaning": "推（push的过去式）",
       "difficulty": 1
     },
     {
-      "word": "disappeared",
-      "phonetic": "[ˌdɪsəˈpɪrd]",
-      "meaning": "消失",
+      "word": "race",
+      "phonetic": "[reɪs]",
+      "meaning": "赛跑，比赛",
       "difficulty": 2
+    },
+    {
+      "word": "raced",
+      "phonetic": "[reɪst]",
+      "meaning": "赛跑（race的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "ran",
+      "phonetic": "[ræn]",
+      "meaning": "跑（run的过去式）",
+      "difficulty": 1
+    },
+    {
+      "word": "real",
+      "phonetic": "[ˈriːəl]",
+      "meaning": "真实的",
+      "difficulty": 1
+    },
+    {
+      "word": "rope",
+      "phonetic": "[rəʊp]",
+      "meaning": "绳子",
+      "difficulty": 2
+    },
+    {
+      "word": "said",
+      "phonetic": "[sed]",
+      "meaning": "说（say的过去式）",
+      "difficulty": 1
+    },
+    {
+      "word": "seen",
+      "phonetic": "[siːn]",
+      "meaning": "看见（see的过去分词）",
+      "difficulty": 1
     },
     {
       "word": "shouted",
       "phonetic": "[ˈʃaʊtɪd]",
       "meaning": "喊叫",
-      "difficulty": 1
-    },
-    {
-      "word": "groaned",
-      "phonetic": "[ɡroʊnd]",
-      "meaning": "呻吟",
       "difficulty": 2
     },
     {
-      "word": "golden",
-      "phonetic": "[ˈɡoʊldən]",
-      "meaning": "金色的",
-      "difficulty": 1
-    },
-    {
-      "word": "afternoon",
-      "phonetic": "[ˌæftərˈnuːn]",
-      "meaning": "下午",
-      "difficulty": 1
-    },
-    {
-      "word": "oak",
-      "phonetic": "[oʊk]",
-      "meaning": "橡树",
-      "difficulty": 2
-    },
-    {
-      "word": "pointing",
-      "phonetic": "[ˈpɔɪntɪŋ]",
-      "meaning": "指向",
-      "difficulty": 1
-    },
-    {
-      "word": "rope",
-      "phonetic": "[roʊp]",
-      "meaning": "绳子",
-      "difficulty": 1
-    },
-    {
-      "word": "ladder",
-      "phonetic": "[ˈlædər]",
-      "meaning": "梯子",
-      "difficulty": 1
-    },
-    {
-      "word": "whispered",
-      "phonetic": "[ˈwɪspərd]",
-      "meaning": "低语",
-      "difficulty": 2
-    },
-    {
-      "word": "tucked",
-      "phonetic": "[tʌkt]",
-      "meaning": "隐藏",
-      "difficulty": 2
-    },
-    {
-      "word": "branches",
-      "phonetic": "[ˈbræntʃɪz]",
-      "meaning": "树枝",
-      "difficulty": 1
-    },
-    {
-      "word": "highest",
-      "phonetic": "[ˈhaɪɪst]",
-      "meaning": "最高的",
-      "difficulty": 1
-    },
-    {
-      "word": "built",
-      "phonetic": "[bɪlt]",
-      "meaning": "建造",
-      "difficulty": 1
-    },
-    {
-      "word": "belongs",
-      "phonetic": "[bɪˈlɔːŋz]",
-      "meaning": "属于",
-      "difficulty": 2
-    },
-    {
-      "word": "teeny",
-      "phonetic": "[ˈtiːni]",
-      "meaning": "极小的",
-      "difficulty": 2
-    },
-    {
-      "word": "climbing",
-      "phonetic": "[ˈklaɪmɪŋ]",
-      "meaning": "攀爬",
+      "word": "sides",
+      "phonetic": "[saɪdz]",
+      "meaning": "边，侧面（复数）",
       "difficulty": 1
     },
     {
@@ -148,53 +397,112 @@
       "difficulty": 2
     },
     {
-      "word": "moment",
-      "phonetic": "[ˈmoʊmənt]",
-      "meaning": "时刻",
+      "word": "sky",
+      "phonetic": "[skaɪ]",
+      "meaning": "天空",
       "difficulty": 1
     },
     {
-      "word": "poked",
-      "phonetic": "[poʊkt]",
-      "meaning": "戳",
+      "word": "spending",
+      "phonetic": "[ˈspendɪŋ]",
+      "meaning": "花费（时间）",
       "difficulty": 2
     },
     {
-      "word": "window",
-      "phonetic": "[ˈwɪndoʊ]",
-      "meaning": "窗户",
+      "word": "standing",
+      "phonetic": "[ˈstændɪŋ]",
+      "meaning": "站立",
       "difficulty": 1
     },
     {
-      "word": "filled",
-      "phonetic": "[fɪld]",
-      "meaning": "充满",
+      "word": "started",
+      "phonetic": "[ˈstɑːtɪd]",
+      "meaning": "开始（start的过去式）",
       "difficulty": 1
     },
     {
-      "word": "glasses",
-      "phonetic": "[ˈɡlæsɪz]",
-      "meaning": "眼镜",
-      "difficulty": 1
-    },
-    {
-      "word": "gripped",
-      "phonetic": "[ɡrɪpt]",
-      "meaning": "握紧",
+      "word": "stuff",
+      "phonetic": "[stʌf]",
+      "meaning": "东西",
       "difficulty": 2
     },
     {
-      "word": "sides",
-      "phonetic": "[saɪdz]",
-      "meaning": "边",
+      "word": "teeny",
+      "phonetic": "[ˈtiːni]",
+      "meaning": "极小的",
+      "difficulty": 2
+    },
+    {
+      "word": "things",
+      "phonetic": "[θɪŋz]",
+      "meaning": "东西（复数）",
       "difficulty": 1
     },
     {
-      "word": "real",
-      "phonetic": "[riːl]",
-      "meaning": "真实的",
+      "word": "trees",
+      "phonetic": "[triːz]",
+      "meaning": "树（复数）",
+      "difficulty": 1
+    },
+    {
+      "word": "tucked",
+      "phonetic": "[tʌkt]",
+      "meaning": "塞进，藏入",
+      "difficulty": 2
+    },
+    {
+      "word": "up",
+      "phonetic": "[ʌp]",
+      "meaning": "向上",
+      "difficulty": 1
+    },
+    {
+      "word": "waited",
+      "phonetic": "[ˈweɪtɪd]",
+      "meaning": "等待（wait的过去式）",
+      "difficulty": 1
+    },
+    {
+      "word": "watch",
+      "phonetic": "[wɒtʃ]",
+      "meaning": "观看，注意",
+      "difficulty": 1
+    },
+    {
+      "word": "way",
+      "phonetic": "[weɪ]",
+      "meaning": "路，方式",
+      "difficulty": 1
+    },
+    {
+      "word": "whispered",
+      "phonetic": "[ˈwɪspəd]",
+      "meaning": "低语，耳语",
+      "difficulty": 2
+    },
+    {
+      "word": "woods",
+      "phonetic": "[wʊdz]",
+      "meaning": "树林",
+      "difficulty": 2
+    },
+    {
+      "word": "world",
+      "phonetic": "[wɜːld]",
+      "meaning": "世界",
+      "difficulty": 1
+    },
+    {
+      "word": "wow",
+      "phonetic": "[waʊ]",
+      "meaning": "哇（感叹词）",
+      "difficulty": 1
+    },
+    {
+      "word": "yeah",
+      "phonetic": "[jeə]",
+      "meaning": "是的（口语）",
       "difficulty": 1
     }
   ]
 }
-

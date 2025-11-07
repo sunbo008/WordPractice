@@ -41,6 +41,7 @@ build/
 
 # 忽略生成的 CSV 词表
 proj/words/words.csv
+proj/words/GLOBAL_VOCABULARY.csv
 
 # 忽略错词目录
 proj/words/MissedWords
