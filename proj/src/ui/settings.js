@@ -395,7 +395,7 @@ class SettingsManagerV2 {
                 content.style.maxHeight = '0px';
             }
         });
-        // 年级组
+        // 年级组（按年级分类）
         ['primary-school', 'middle-school', 'high-school'].forEach(id => {
             const content = document.getElementById(`${id}-grid`);
             if (!content) return;
@@ -411,6 +411,25 @@ class SettingsManagerV2 {
                 icon && icon.classList.remove('expanded');
                 content.style.maxHeight = '0px';
             }
+        });
+        
+        // 书系列（课外书阅读）- 恢复动态书系列的展开状态
+        this.expandedGradeGroups.forEach(id => {
+            // 跳过已经处理过的年级组
+            if (['primary-school', 'middle-school', 'high-school'].includes(id)) {
+                return;
+            }
+            
+            // 处理书系列（如 magic-tree-house, harry-potter, oxford-reading-tree）
+            const content = document.getElementById(`${id}-grid`);
+            if (!content) return;
+            
+            const header = content.previousElementSibling;
+            const icon = header?.querySelector('.expand-icon');
+            
+            content.classList.remove('collapsed');
+            if (icon) icon.classList.add('expanded');
+            content.style.maxHeight = 'none';
         });
     }
 
@@ -601,7 +620,7 @@ class SettingsManagerV2 {
                     <span class="grade-icon">📚</span>
                     <span class="grade-name">${bookSeries.name}</span>
                     <span class="grade-count" id="${bookSeries.id}-count">${selectedCount}/${bookSeries.items.length}</span>
-                    <button class="select-all-btn" onclick="selectAllInGrade(event, '${bookSeries.id}')">全选</button>
+                    <button class="select-all-btn" onclick="selectAllInBookSeries(event, '${bookSeries.id}')">全选</button>
                     <span class="expand-icon">▶</span>
                 </div>
                 <div class="grade-group-content collapsed" id="${bookSeries.id}-grid">
@@ -1629,6 +1648,104 @@ function toggleGradeGroup(gradeId) {
     }
 }
 
+// ============================================
+// 辅助函数层：纯数据操作，不涉及UI渲染
+// ============================================
+
+/**
+ * 辅助函数：检查章节列表是否全部已选
+ * @param {Array} chapters - 章节列表
+ * @returns {boolean} true=全部已选，false=未全部选中
+ */
+function areAllChaptersSelected(chapters) {
+    if (!window.settingsManager || !chapters || chapters.length === 0) {
+        return false;
+    }
+    
+    return chapters.every(chapter =>
+        window.settingsManager.selectedLibraries.has(chapter.id)
+    );
+}
+
+/**
+ * 辅助函数：切换章节列表的选中状态
+ * @param {Array} chapters - 章节列表
+ * @param {boolean} shouldSelect - true=全选，false=取消全选
+ * @returns {number} 受影响的章节数量
+ */
+function toggleChaptersSelection(chapters, shouldSelect) {
+    if (!window.settingsManager || !chapters) return 0;
+    
+    let count = 0;
+    chapters.forEach(chapter => {
+        if (shouldSelect) {
+            if (!window.settingsManager.selectedLibraries.has(chapter.id)) {
+                window.settingsManager.selectedLibraries.add(chapter.id);
+                count++;
+            }
+        } else {
+            if (window.settingsManager.selectedLibraries.has(chapter.id)) {
+                window.settingsManager.selectedLibraries.delete(chapter.id);
+                count++;
+            }
+        }
+    });
+    
+    return count;
+}
+
+// ============================================
+// 公开函数层：处理UI交互和界面渲染
+// ============================================
+
+/**
+ * 课外书阅读顶级全选：全选/取消所有书系列的所有章节
+ */
+function selectAllExtracurricularBooks(event) {
+    event.stopPropagation();
+
+    if (!window.settingsManager) return;
+
+    const extracurricularCategory = window.settingsManager.config.categories.find(
+        c => c.id === 'extracurricular-books'
+    );
+    
+    if (!extracurricularCategory) {
+        console.warn('未找到课外书分类');
+        return;
+    }
+
+    // 收集所有章节
+    const allChapters = [];
+    extracurricularCategory.subcategories.forEach(bookSeries => {
+        allChapters.push(...bookSeries.items);
+    });
+
+    if (allChapters.length === 0) {
+        window.settingsManager.showStatus('暂无课外书章节', 'warning');
+        return;
+    }
+
+    // 检查是否全部已选（使用辅助函数）
+    const allSelected = areAllChaptersSelected(allChapters);
+
+    // 切换选中状态（使用辅助函数，只操作数据，不渲染）
+    const affectedCount = toggleChaptersSelection(allChapters, !allSelected);
+
+    // 统一渲染一次
+    window.settingsManager.renderInterface();
+    
+    // 显示状态提示
+    if (affectedCount > 0) {
+        window.settingsManager.showStatus(
+            allSelected 
+                ? `已取消全选课外书（${affectedCount} 章）` 
+                : `已全选课外书（${affectedCount} 章）`,
+            'info'
+        );
+    }
+}
+
 function selectAllInCategory(event, categoryId) {
     event.stopPropagation();
 
@@ -1658,34 +1775,92 @@ function selectAllInCategory(event, categoryId) {
     );
 }
 
+/**
+ * 单个书系列全选：全选/取消该系列的所有章节
+ * @param {Event} event - 点击事件
+ * @param {string} bookSeriesId - 书系列ID（如 'magic-tree-house', 'harry-potter', 'oxford-reading-tree'）
+ */
+function selectAllInBookSeries(event, bookSeriesId) {
+    event.stopPropagation();
+
+    if (!window.settingsManager) return;
+
+    // 在课外书分类中查找书系列
+    const extracurricularCategory = window.settingsManager.config.categories.find(
+        c => c.id === 'extracurricular-books'
+    );
+    
+    if (!extracurricularCategory) {
+        console.warn('未找到课外书分类');
+        return;
+    }
+
+    const bookSeries = extracurricularCategory.subcategories.find(
+        series => series.id === bookSeriesId
+    );
+    
+    if (!bookSeries) {
+        console.warn('未找到书系列:', bookSeriesId);
+        return;
+    }
+
+    // 检查是否全部已选（使用辅助函数）
+    const allSelected = areAllChaptersSelected(bookSeries.items);
+
+    // 切换选中状态（使用辅助函数，只操作数据，不渲染）
+    const affectedCount = toggleChaptersSelection(bookSeries.items, !allSelected);
+
+    // 统一渲染一次
+    window.settingsManager.renderInterface();
+    
+    // 显示状态提示
+    if (affectedCount > 0) {
+        window.settingsManager.showStatus(
+            allSelected 
+                ? `已取消全选《${bookSeries.name}》（${affectedCount} 章）` 
+                : `已全选《${bookSeries.name}》（${affectedCount} 章）`,
+            'info'
+        );
+    }
+}
+
 function selectAllInGrade(event, gradeId) {
     event.stopPropagation();
 
     if (!window.settingsManager) return;
 
-    const gradeCategory = window.settingsManager.config.categories.find(c => c.id === 'grade-based');
+    const gradeCategory = window.settingsManager.config.categories.find(
+        c => c.id === 'grade-based'
+    );
+    
+    if (!gradeCategory) {
+        console.warn('未找到按年级分类');
+        return;
+    }
+    
     const gradeLevel = gradeCategory.subcategories.find(g => g.id === gradeId);
-    if (!gradeLevel) return;
+    
+    if (!gradeLevel) {
+        console.warn('未找到年级:', gradeId);
+        return;
+    }
 
-    // 检查是否全部已选
-    const allSelected = gradeLevel.items.every(item =>
-        window.settingsManager.selectedLibraries.has(item.id)
-    );
+    // 检查是否全部已选（使用辅助函数）
+    const allSelected = areAllChaptersSelected(gradeLevel.items);
 
-    // 如果全部已选，则取消全选；否则全选
-    gradeLevel.items.forEach(item => {
-        if (allSelected) {
-            window.settingsManager.selectedLibraries.delete(item.id);
-        } else {
-            window.settingsManager.selectedLibraries.add(item.id);
-        }
-    });
+    // 切换选中状态（使用辅助函数，只操作数据，不渲染）
+    const affectedCount = toggleChaptersSelection(gradeLevel.items, !allSelected);
 
+    // 统一渲染一次
     window.settingsManager.renderInterface();
-    window.settingsManager.showStatus(
-        allSelected ? '已取消全选' : '已全选该年级',
-        'info'
-    );
+    
+    // 显示状态提示
+    if (affectedCount > 0) {
+        window.settingsManager.showStatus(
+            allSelected ? '已取消全选该年级' : '已全选该年级',
+            'info'
+        );
+    }
 }
 
 function goBack() {
