@@ -1746,13 +1746,54 @@ function selectAllExtracurricularBooks(event) {
     }
 }
 
-function selectAllInCategory(event, categoryId) {
-    event.stopPropagation();
-
+/**
+ * 处理三层结构的全选（分类 → 子分类 → 具体项）
+ * 用于：按年级分类、课外书阅读等
+ * @param {Object} category - 分类对象
+ */
+function handleThreeLevelSelection(category) {
     if (!window.settingsManager) return;
 
-    const category = window.settingsManager.config.categories.find(c => c.id === categoryId);
-    if (!category) return;
+    // 收集所有具体项（从所有子分类的items中）
+    const allItems = [];
+    category.subcategories.forEach(sub => {
+        if (sub.items && Array.isArray(sub.items)) {
+            allItems.push(...sub.items);
+        }
+    });
+
+    if (allItems.length === 0) {
+        window.settingsManager.showStatus(`暂无${category.name}项目`, 'warning');
+        return;
+    }
+
+    // 检查是否全部已选（使用辅助函数）
+    const allSelected = areAllChaptersSelected(allItems);
+
+    // 切换选中状态（使用辅助函数，只操作数据，不渲染）
+    const affectedCount = toggleChaptersSelection(allItems, !allSelected);
+
+    // 统一渲染一次
+    window.settingsManager.renderInterface();
+    
+    // 显示状态提示
+    if (affectedCount > 0) {
+        window.settingsManager.showStatus(
+            allSelected 
+                ? `已取消全选${category.name}（${affectedCount} 项）` 
+                : `已全选${category.name}（${affectedCount} 项）`,
+            'info'
+        );
+    }
+}
+
+/**
+ * 处理二层结构的全选（分类 → 子分类）
+ * 用于：按天学习、专项练习等
+ * @param {Object} category - 分类对象
+ */
+function handleTwoLevelSelection(category) {
+    if (!window.settingsManager) return;
 
     // 检查是否全部已选
     const allSelected = category.subcategories.every(sub =>
@@ -1770,9 +1811,41 @@ function selectAllInCategory(event, categoryId) {
 
     window.settingsManager.renderInterface();
     window.settingsManager.showStatus(
-        allSelected ? '已取消全选' : '已全选该分类',
+        allSelected ? `已取消全选${category.name}` : `已全选${category.name}`,
         'info'
     );
+}
+
+/**
+ * 高阶通用全选函数：根据分类结构类型自动选择处理策略
+ * 支持二层结构（分类→子分类）和三层结构（分类→子分类→具体项）
+ * @param {Event} event - 点击事件
+ * @param {string} categoryId - 分类ID
+ */
+function selectAllInCategory(event, categoryId) {
+    event.stopPropagation();
+
+    if (!window.settingsManager) return;
+
+    const category = window.settingsManager.config.categories.find(c => c.id === categoryId);
+    
+    if (!category) {
+        console.warn('未找到分类:', categoryId);
+        return;
+    }
+
+    // 🎯 核心：根据配置的结构类型自动分发处理
+    switch (category.structureType) {
+        case 'THREE_LEVEL':
+            handleThreeLevelSelection(category);
+            break;
+        case 'TWO_LEVEL':
+            handleTwoLevelSelection(category);
+            break;
+        default:
+            console.warn('未知的结构类型:', category.structureType, '- 使用二层结构处理');
+            handleTwoLevelSelection(category);
+    }
 }
 
 /**

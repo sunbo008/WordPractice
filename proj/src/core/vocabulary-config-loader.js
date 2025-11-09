@@ -76,6 +76,7 @@ class VocabularyConfigLoader {
                         name: "按天学习音标",
                         description: "15天音标学习计划，系统掌握基础音标",
                         icon: "📅",
+                        structureType: "TWO_LEVEL",
                         subcategories: dailyPhonics
                     },
                     {
@@ -83,6 +84,7 @@ class VocabularyConfigLoader {
                         name: "专项强化练习",
                         description: "针对重点音标进行强化训练",
                         icon: "🎯",
+                        structureType: "TWO_LEVEL",
                         subcategories: specialPractice
                     },
                     {
@@ -90,6 +92,7 @@ class VocabularyConfigLoader {
                         name: "按年级分类",
                         description: "小学、初中、高中各年级学期词汇",
                         icon: "🎓",
+                        structureType: "THREE_LEVEL",
                         subcategories: gradeBased
                     },
                     {
@@ -97,6 +100,7 @@ class VocabularyConfigLoader {
                         name: "课外书阅读",
                         description: "经典英文原版书籍分级阅读",
                         icon: "📚",
+                        structureType: "THREE_LEVEL",
                         subcategories: extracurricularBooks
                     }
                 ],
