@@ -619,9 +619,9 @@ class WordTetrisGame {
                 this.ttsService.unlockAudioContext(true).catch(() => {}); // silent = true
             }
             
-            // 空格键放弃单词
-            if (e.code === 'Space' && this.gameState === 'playing') {
-                e.preventDefault(); // 防止页面滚动
+            // ESC键放弃单词（原来是空格键）
+            if (e.code === 'Escape' && this.gameState === 'playing') {
+                e.preventDefault();
                 this.giveUpCurrentWord();
                 return;
             }
