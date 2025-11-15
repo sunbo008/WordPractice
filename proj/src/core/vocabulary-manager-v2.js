@@ -699,9 +699,11 @@ class VocabularyManagerV2 {
 
         console.log(`📝 抽取单词: ${selectedWord.word} (剩余: ${this.wordPool.length})`);
 
-        // 模式控制：挑战模式去掉全部字母，否则随机1-2个
+        // 模式控制：挑战模式去掉全部字母（不包括空格），否则随机1-2个
         const mode = (localStorage.getItem('wordTetris_gameMode') === 'challenge') ? 'challenge' : 'casual';
-        const missingCount = mode === 'challenge' ? selectedWord.word.length : (Math.random() < 0.5 ? 1 : 2);
+        // 挑战模式：计算非空格字符的数量
+        const nonSpaceCount = selectedWord.word.replace(/ /g, '').length;
+        const missingCount = mode === 'challenge' ? nonSpaceCount : (Math.random() < 0.5 ? 1 : 2);
         let missingIndices = this.generateMissingIndices(selectedWord.word, missingCount);
 
         return {
@@ -760,9 +762,11 @@ class VocabularyManagerV2 {
         this.usedWords.add(selectedWord.word);
         this.addToRecentWords(selectedWord.word);
 
-        // 模式控制：挑战模式去掉全部字母，否则随机1-2个
+        // 模式控制：挑战模式去掉全部字母（不包括空格），否则随机1-2个
         const mode = (localStorage.getItem('wordTetris_gameMode') === 'challenge') ? 'challenge' : 'casual';
-        const missingCount = mode === 'challenge' ? selectedWord.word.length : (Math.random() < 0.5 ? 1 : 2);
+        // 挑战模式：计算非空格字符的数量
+        const nonSpaceCount = selectedWord.word.replace(/ /g, '').length;
+        const missingCount = mode === 'challenge' ? nonSpaceCount : (Math.random() < 0.5 ? 1 : 2);
         let missingIndices = this.generateMissingIndices(selectedWord.word, missingCount);
 
         return {
@@ -784,13 +788,23 @@ class VocabularyManagerV2 {
     generateMissingIndices(word, missingCount) {
         const indices = [];
         const wordLength = word.length;
-
-        if (missingCount >= wordLength) {
-            return Array.from({ length: wordLength }, (_, i) => i);
+        
+        // 找出所有非空格字符的索引
+        const validIndices = [];
+        for (let i = 0; i < wordLength; i++) {
+            if (word[i] !== ' ') {
+                validIndices.push(i);
+            }
         }
-
+        
+        // 如果有效字符数小于需要缺失的数量，返回所有有效字符索引
+        if (missingCount >= validIndices.length) {
+            return validIndices.sort((a, b) => a - b);
+        }
+        
+        // 从有效索引中随机选择
         while (indices.length < missingCount) {
-            const randomIndex = Math.floor(Math.random() * wordLength);
+            const randomIndex = validIndices[Math.floor(Math.random() * validIndices.length)];
             if (!indices.includes(randomIndex)) {
                 indices.push(randomIndex);
             }

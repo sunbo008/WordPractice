@@ -619,6 +619,11 @@ class WordTetrisGame {
                 this.ttsService.unlockAudioContext(true).catch(() => {}); // silent = true
             }
             
+            // 阻止空格键的默认页面滚动行为
+            if (e.code === 'Space') {
+                e.preventDefault();
+            }
+            
             // ESC键放弃单词（原来是空格键）
             if (e.code === 'Escape' && this.gameState === 'playing') {
                 e.preventDefault();

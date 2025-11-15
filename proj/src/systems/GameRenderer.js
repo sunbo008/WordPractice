@@ -134,10 +134,15 @@ class GameRenderer {
                 const char = text[i];
                 const charIndex = startCharIndex + i;
                 
-                if (char === '_') {
+                if (char === ' ') {
+                    // 空格：只留空间，不绘制任何内容
+                    currentX += this.ctx.measureText(' ').width;
+                } else if (char === '_') {
+                    // 下划线：绘制自定义下划线
                     this.drawCustomUnderscore(currentX, y);
                     currentX += this.getCustomUnderscoreWidth();
                 } else {
+                    // 普通字母
                     // 检查是否是重音音节的字母
                     if (stressPositions.includes(charIndex)) {
                         this.ctx.fillStyle = '#ff4444'; // 重音音节用红色
@@ -156,10 +161,15 @@ class GameRenderer {
                 const char = text[i];
                 const charIndex = startCharIndex + i;
                 
-                if (char === '_') {
+                if (char === ' ') {
+                    // 空格：只留空间，不绘制任何内容
+                    currentX += this.ctx.measureText(' ').width;
+                } else if (char === '_') {
+                    // 下划线：绘制自定义下划线
                     this.drawCustomUnderscore(currentX, y);
                     currentX += this.getCustomUnderscoreWidth();
                 } else {
+                    // 普通字母
                     // 检查是否是重音音节的字母
                     if (stressPositions.includes(charIndex)) {
                         this.ctx.fillStyle = '#ff4444'; // 重音音节用红色
@@ -205,6 +215,8 @@ class GameRenderer {
             const char = text[i];
             if (char === '_') {
                 totalWidth += this.getCustomUnderscoreWidth();
+            } else if (char === ' ') {
+                totalWidth += this.ctx.measureText(' ').width;
             } else {
                 totalWidth += this.ctx.measureText(char).width;
             }
