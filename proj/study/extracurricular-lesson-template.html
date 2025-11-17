@@ -45,6 +45,7 @@
         <div class="actions" style="margin:6px 0 10px 0;">
             <button class="btn btn-primary" id="play-all">▶️ Read All</button>
             <button class="btn" id="stop-all">⏹️ Stop</button>
+            <button class="btn btn-primary" id="start-practice">🎮 Start Practice</button>
         </div>
         <div id="words" class="word-list"></div>
 
@@ -76,6 +77,9 @@
                 // 牛津阅读树系列：ort-stage1-book1 -> extracurricular-books/oxford-reading-tree/stage1-book1.json
                 const stageBook = id.replace('ort-', '');
                 return `/words/extracurricular-books/oxford-reading-tree/${stageBook}.json`;
+            } else if (id.startsWith('fg-')) {
+                // Fly Guy系列：fg-book01 -> extracurricular-books/fly-guy/fg-book01.json
+                return `/words/extracurricular-books/fly-guy/${id}.json`;
             }
             
             // 默认按小学路径加载；将来可根据前缀扩展 middle/high
@@ -178,6 +182,13 @@
                     try{ window.TTSService.getInstance().stop(); }catch(e){}
                     if (readAllController) { readAllController.cancel(); }
                     window._readingAll = false;
+                };
+
+                // 开始练习按钮 - 跳转到游戏页面
+                document.getElementById('start-practice').onclick = ()=>{
+                    // 保存当前课程到localStorage，然后跳转到游戏页面
+                    localStorage.setItem('wordTetris_selectedLibraries', JSON.stringify([lessonId]));
+                    window.location.href = '../index.html';
                 };
             }catch(err){
                 alert(`加载课程失败：课程文件未找到: ${path}`);

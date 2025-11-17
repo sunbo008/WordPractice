@@ -1,0 +1,278 @@
+{
+  "metadata": {
+    "id": "fg-book01",
+    "name": "Fly Guy #1：《Hi! Fly Guy》",
+    "description": "你好！苍蝇小子",
+    "bookTitle": "Hi! Fly Guy",
+    "bookNumber": 1,
+    "series": "Fly Guy",
+    "category": "extracurricular-books",
+    "difficulty": "beginner",
+    "wordCount": 42,
+    "recommendedAge": "5-8",
+    "lastUpdated": "2025-11-17",
+    
+    "bookSummary": {
+      "brief": "Buzz捕获了一只聪明的苍蝇作为宠物，并参加宠物展",
+      "setting": "Buzz的家和宠物展",
+      "mainCharacters": ["Buzz (小男孩)", "Fly Guy (苍蝇)"],
+      "keyThemes": ["友谊", "宠物", "独特性"]
+    },
+    
+    "story": "A boy named Buzz wanted a pet for The Amazing Pet Show. He caught a fly in a jar. Everyone said flies can't be pets, they are pests! But this fly was special - he was very smart and could say Buzz's name. The fly also did fancy flying tricks. When the judges saw this, they were amazed. The fly knew his jar and flew back into it. The judges said, 'This fly is a pet!' Buzz named him Fly Guy. And so began a beautiful friendship between a boy and his fly."
+  },
+  "words": [
+    {
+      "word": "flying",
+      "phonetic": "[ˈflaɪɪŋ]",
+      "meaning": "飞行（fly的现在分词）",
+      "difficulty": 1
+    },
+    {
+      "word": "walking",
+      "phonetic": "[ˈwɔːkɪŋ]",
+      "meaning": "走路（walk的现在分词）",
+      "difficulty": 1
+    },
+    {
+      "word": "something",
+      "phonetic": "[ˈsʌmθɪŋ]",
+      "meaning": "某物，某事",
+      "difficulty": 1
+    },
+    {
+      "word": "eat",
+      "phonetic": "[iːt]",
+      "meaning": "吃",
+      "difficulty": 1
+    },
+    {
+      "word": "slimy",
+      "phonetic": "[ˈslaɪmi]",
+      "meaning": "黏糊糊的",
+      "difficulty": 2
+    },
+    {
+      "word": "catch",
+      "phonetic": "[kætʃ]",
+      "meaning": "捕捉",
+      "difficulty": 1
+    },
+    {
+      "word": "amazing",
+      "phonetic": "[əˈmeɪzɪŋ]",
+      "meaning": "令人惊奇的",
+      "difficulty": 2
+    },
+    {
+      "word": "caught",
+      "phonetic": "[kɔːt]",
+      "meaning": "捕捉（catch的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "jar",
+      "phonetic": "[dʒɑː(r)]",
+      "meaning": "罐子",
+      "difficulty": 1
+    },
+    {
+      "word": "wanted",
+      "phonetic": "[ˈwɒntɪd]",
+      "meaning": "想要（want的过去式）",
+      "difficulty": 1
+    },
+    {
+      "word": "stomped",
+      "phonetic": "[stɒmpt]",
+      "meaning": "跺脚（stomp的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "buzz",
+      "phonetic": "[bʌz]",
+      "meaning": "嗡嗡声；巴兹（人名）",
+      "difficulty": 1
+    },
+    {
+      "word": "surprised",
+      "phonetic": "[səˈpraɪzd]",
+      "meaning": "惊讶的",
+      "difficulty": 2
+    },
+    {
+      "word": "smartest",
+      "phonetic": "[ˈsmɑːtɪst]",
+      "meaning": "最聪明的",
+      "difficulty": 2
+    },
+    {
+      "word": "opened",
+      "phonetic": "[ˈəʊpənd]",
+      "meaning": "打开（open的过去式）",
+      "difficulty": 1
+    },
+    {
+      "word": "flew",
+      "phonetic": "[fluː]",
+      "meaning": "飞（fly的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "flies",
+      "phonetic": "[flaɪz]",
+      "meaning": "苍蝇（复数）",
+      "difficulty": 1
+    },
+    {
+      "word": "pets",
+      "phonetic": "[pets]",
+      "meaning": "宠物（复数）",
+      "difficulty": 1
+    },
+    {
+      "word": "pests",
+      "phonetic": "[pests]",
+      "meaning": "害虫（复数）",
+      "difficulty": 2
+    },
+    {
+      "word": "swatter",
+      "phonetic": "[ˈswɒtə(r)]",
+      "meaning": "苍蝇拍",
+      "difficulty": 2
+    },
+    {
+      "word": "cried",
+      "phonetic": "[kraɪd]",
+      "meaning": "哭喊（cry的过去式）",
+      "difficulty": 1
+    },
+    {
+      "word": "came",
+      "phonetic": "[keɪm]",
+      "meaning": "来（come的过去式）",
+      "difficulty": 1
+    },
+    {
+      "word": "rescue",
+      "phonetic": "[ˈreskjuː]",
+      "meaning": "救援",
+      "difficulty": 2
+    },
+    {
+      "word": "needs",
+      "phonetic": "[niːdz]",
+      "meaning": "需要",
+      "difficulty": 1
+    },
+    {
+      "word": "guy",
+      "phonetic": "[ɡaɪ]",
+      "meaning": "家伙",
+      "difficulty": 1
+    },
+    {
+      "word": "gave",
+      "phonetic": "[ɡeɪv]",
+      "meaning": "给（give的过去式）",
+      "difficulty": 1
+    },
+    {
+      "word": "judges",
+      "phonetic": "[ˈdʒʌdʒɪz]",
+      "meaning": "评委（复数）",
+      "difficulty": 2
+    },
+    {
+      "word": "laughed",
+      "phonetic": "[lɑːft]",
+      "meaning": "笑（laugh的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "shoo",
+      "phonetic": "[ʃuː]",
+      "meaning": "嘘（驱赶动物的声音）",
+      "difficulty": 1
+    },
+    {
+      "word": "idea",
+      "phonetic": "[aɪˈdɪə]",
+      "meaning": "主意，想法",
+      "difficulty": 2
+    },
+    {
+      "word": "fancy",
+      "phonetic": "[ˈfænsi]",
+      "meaning": "花哨的，奇特的",
+      "difficulty": 2
+    },
+    {
+      "word": "tricks",
+      "phonetic": "[trɪks]",
+      "meaning": "把戏，特技（复数）",
+      "difficulty": 2
+    },
+    {
+      "word": "amazed",
+      "phonetic": "[əˈmeɪzd]",
+      "meaning": "惊讶的",
+      "difficulty": 2
+    },
+    {
+      "word": "knows",
+      "phonetic": "[nəʊz]",
+      "meaning": "知道（know的第三人称单数）",
+      "difficulty": 1
+    },
+    {
+      "word": "high",
+      "phonetic": "[haɪ]",
+      "meaning": "高的",
+      "difficulty": 1
+    },
+    {
+      "word": "dived",
+      "phonetic": "[daɪvd]",
+      "meaning": "跳水，俯冲（dive的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "down",
+      "phonetic": "[daʊn]",
+      "meaning": "向下",
+      "difficulty": 1
+    },
+    {
+      "word": "began",
+      "phonetic": "[bɪˈɡæn]",
+      "meaning": "开始（begin的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "beautiful",
+      "phonetic": "[ˈbjuːtɪfl]",
+      "meaning": "美丽的",
+      "difficulty": 2
+    },
+    {
+      "word": "friendship",
+      "phonetic": "[ˈfrendʃɪp]",
+      "meaning": "友谊",
+      "difficulty": 2
+    },
+    {
+      "word": "listen",
+      "phonetic": "[ˈlɪsn]",
+      "meaning": "听",
+      "difficulty": 1
+    },
+    {
+      "word": "say",
+      "phonetic": "[seɪ]",
+      "meaning": "说",
+      "difficulty": 1
+    }
+  ]
+}

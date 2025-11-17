@@ -442,6 +442,16 @@ body {
     color: #e74c3c;
 }
 
+/* 蓝思等级徽章 */
+.lexile-badge {
+    display: inline-block;
+    padding: 2px 6px;
+    margin-left: 8px;
+    color: #1976d2;
+    font-size: 15px;
+    font-weight: bold;
+}
+
 /* 操作按钮 */
 .subcategory-actions {
     display: flex;
@@ -1049,6 +1059,12 @@ body {
 .extracurricular-books-group .grade-name {
     font-size: 15px;
     font-weight: 500;
+    flex: none;  /* 取消flex拉伸，让蓝思等级紧跟 */
+}
+
+/* 课外书计数器 - 靠右对齐 */
+.extracurricular-books-group .grade-count {
+    margin-left: auto;
 }
 
 /* 课外书系列图标 */

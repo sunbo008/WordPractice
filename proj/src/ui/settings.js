@@ -615,10 +615,12 @@ class SettingsManagerV2 {
                 if (this.selectedLibraries.has(chapter.id)) selectedCount++;
             }
 
+            const lexileBadge = bookSeries.lexileLevel ? `<span class="lexile-badge">${bookSeries.lexileLevel}</span>` : '';
             groupDiv.innerHTML = `
                 <div class="grade-group-header" onclick="toggleGradeGroup('${bookSeries.id}')">
                     <span class="grade-icon">📚</span>
                     <span class="grade-name">${bookSeries.name}</span>
+                    ${lexileBadge}
                     <span class="grade-count" id="${bookSeries.id}-count">${selectedCount}/${bookSeries.items.length}</span>
                     <button class="select-all-btn" onclick="selectAllInBookSeries(event, '${bookSeries.id}')">全选</button>
                     <span class="expand-icon">▶</span>
@@ -1963,7 +1965,7 @@ function openLesson(event, lessonId) {
     event.stopPropagation();
     
     // 检查是否是课外书课程（根据ID前缀判断）
-    if (lessonId.startsWith('mth-') || lessonId.startsWith('hp-') || lessonId.startsWith('ort-')) {
+    if (lessonId.startsWith('mth-') || lessonId.startsWith('hp-') || lessonId.startsWith('ort-') || lessonId.startsWith('fg-')) {
         // 课外书使用专用的课外书学习模板
         window.location.href = `./study/extracurricular-lesson-template.html?lesson=${lessonId}`;
         return;

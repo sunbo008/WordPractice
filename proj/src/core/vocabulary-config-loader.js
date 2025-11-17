@@ -303,10 +303,52 @@ class VocabularyConfigLoader {
             }
         
         const bookSeriesStructure = {
+            'fly-guy': {
+                id: 'fly-guy',
+                name: 'Fly Guy 系列',
+                description: '适合低龄儿童的趣味绘本（5-8岁）',
+                lexileLevel: '200L-400L',
+                priority: 1,
+                type: 'simple-book',
+                prefix: 'fg',
+                books: [
+                    { num: 1, name: 'Hi! Fly Guy', cnName: '你好！苍蝇小子' },
+                    { num: 2, name: 'Super Fly Guy', cnName: '超级苍蝇小子' },
+                    { num: 3, name: 'Shoo, Fly Guy!', cnName: '走开，苍蝇小子！' },
+                    { num: 4, name: 'There Was an Old Lady Who Swallowed Fly Guy', cnName: '吞掉苍蝇小子的老太太' },
+                    { num: 5, name: 'Fly High, Fly Guy!', cnName: '飞高点，苍蝇小子！' },
+                    { num: 6, name: 'Hooray for Fly Guy!', cnName: '苍蝇小子万岁！' },
+                    { num: 7, name: 'I Spy Fly Guy!', cnName: '我发现苍蝇小子了！' },
+                    { num: 8, name: 'Fly Guy Meets Fly Girl!', cnName: '苍蝇小子遇见苍蝇女孩！' },
+                    { num: 9, name: 'Buzz Boy and Fly Guy', cnName: '巴兹男孩和苍蝇小子' },
+                    { num: 10, name: 'Fly Guy vs. the Flyswatter!', cnName: '苍蝇小子大战苍蝇拍！' },
+                    { num: 11, name: 'Ride, Fly Guy, Ride!', cnName: '骑吧，苍蝇小子，骑吧！' },
+                    { num: 12, name: 'Fly Guy and the Frankenfly', cnName: '苍蝇小子与科学怪蝇' },
+                    { num: 13, name: 'Night Fright', cnName: '夜惊' },
+                    { num: 14, name: 'Fly Guy and the Alienzz', cnName: '苍蝇小子与外星人' },
+                    { num: 15, name: 'Fly Guy\'s Ninja Christmas', cnName: '苍蝇小子的忍者圣诞节' }
+                ]
+            },
+            'oxford-reading-tree': {
+                id: 'oxford-reading-tree',
+                name: '牛津阅读树 (Oxford Reading Tree)',
+                description: '系统化分级阅读教材（6-10岁）',
+                lexileLevel: '100L-500L',
+                priority: 2,
+                type: 'stage-book',
+                stages: [
+                    { stage: 1, books: 6 },
+                    { stage: 2, books: 6 },
+                    { stage: 3, books: 6 }
+                ]
+            },
             'magic-tree-house': {
                 id: 'magic-tree-house',
                 name: '神奇树屋系列 (Magic Tree House)',
-                description: '适合初级英语学习者的冒险故事',
+                description: '适合初级英语学习者的冒险故事（7-11岁）',
+                lexileLevel: '300L-600L',
+                priority: 3,
+                type: 'book-chapter',
                 books: [
                     { num: 1, name: 'Dinosaurs Before Dark', chapters: 10 },
                     { num: 2, name: 'The Knight at Dawn', chapters: 10 },
@@ -317,20 +359,13 @@ class VocabularyConfigLoader {
             'harry-potter': {
                 id: 'harry-potter',
                 name: '哈利·波特系列 (Harry Potter)',
-                description: '经典魔法世界冒险',
+                description: '经典魔法世界冒险（10-15岁）',
+                lexileLevel: '880L-1030L',
+                priority: 4,
+                type: 'book-chapter',
                 books: [
                     { num: 1, name: 'Philosopher\'s Stone', cnName: '魔法石', chapters: 17 },
                     { num: 2, name: 'Chamber of Secrets', cnName: '密室', chapters: 18 }
-                ]
-            },
-            'oxford-reading-tree': {
-                id: 'oxford-reading-tree',
-                name: '牛津阅读树 (Oxford Reading Tree)',
-                description: '系统化分级阅读教材',
-                stages: [
-                    { stage: 1, books: 6 },
-                    { stage: 2, books: 6 },
-                    { stage: 3, books: 6 }
                 ]
             }
         };
@@ -340,7 +375,25 @@ class VocabularyConfigLoader {
         for (const [seriesKey, seriesInfo] of Object.entries(bookSeriesStructure)) {
             const loadPromises = [];
             
-            if (seriesInfo.books) {
+            if (seriesInfo.type === 'simple-book') {
+                // 处理简单图书结构（Fly Guy）- 2层：系列 → 书籍
+                const prefix = seriesInfo.prefix || '';
+                for (const book of seriesInfo.books) {
+                    const fileId = prefix ? `${prefix}-book${String(book.num).padStart(2, '0')}` : `book${String(book.num).padStart(2, '0')}`;
+                    loadPromises.push(
+                        this.loadFileMetadata(
+                            `./words/extracurricular-books/${seriesKey}`,
+                            fileId,
+                            'extracurricular-simple',
+                            book.num,           // gradeNum -> book number
+                            0,                  // term -> 0 (无章节)
+                            50,                 // defaultWords (绘本较少)
+                            book.cnName,        // unit -> 中文书名
+                            book.name           // bookName -> 英文书名
+                        )
+                    );
+                }
+            } else if (seriesInfo.type === 'book-chapter' && seriesInfo.books) {
                 // 处理图书-章节结构（神奇树屋、哈利波特）
                 for (const book of seriesInfo.books) {
                     for (let chapter = 1; chapter <= book.chapters; chapter++) {
@@ -359,7 +412,7 @@ class VocabularyConfigLoader {
                         );
                     }
                 }
-            } else if (seriesInfo.stages) {
+            } else if (seriesInfo.type === 'stage-book' && seriesInfo.stages) {
                 // 处理分级-图书结构（牛津阅读树）
                 for (const stage of seriesInfo.stages) {
                     for (let bookNum = 1; bookNum <= stage.books; bookNum++) {
@@ -381,6 +434,41 @@ class VocabularyConfigLoader {
             const results = await Promise.all(loadPromises);
             const items = results.filter(r => r !== null);
             
+            // 系列内排序（按编号）
+            items.sort((a, b) => {
+                // 提取book编号和chapter编号进行比较
+                const aMatch = a.id.match(/book(\d+)(?:-ch(\d+))?/);
+                const bMatch = b.id.match(/book(\d+)(?:-ch(\d+))?/);
+                
+                if (aMatch && bMatch) {
+                    const aBook = parseInt(aMatch[1]);
+                    const bBook = parseInt(bMatch[1]);
+                    const aChapter = aMatch[2] ? parseInt(aMatch[2]) : 0;
+                    const bChapter = bMatch[2] ? parseInt(bMatch[2]) : 0;
+                    
+                    // 先按书籍编号，再按章节编号
+                    if (aBook !== bBook) return aBook - bBook;
+                    return aChapter - bChapter;
+                }
+                
+                // 如果是stage类型（牛津阅读树）
+                const aStageMatch = a.id.match(/stage(\d+)-book(\d+)/);
+                const bStageMatch = b.id.match(/stage(\d+)-book(\d+)/);
+                
+                if (aStageMatch && bStageMatch) {
+                    const aStage = parseInt(aStageMatch[1]);
+                    const bStage = parseInt(bStageMatch[1]);
+                    const aBook = parseInt(aStageMatch[2]);
+                    const bBook = parseInt(bStageMatch[2]);
+                    
+                    // 先按阶段，再按书籍
+                    if (aStage !== bStage) return aStage - bStage;
+                    return aBook - bBook;
+                }
+                
+                return 0;
+            });
+            
             // 调试日志（同时输出到 console 和 debugLog）
             const loadMsg = `  📖 ${seriesInfo.name}: 尝试加载 ${loadPromises.length} 个文件，成功 ${items.length} 个`;
             console.log(loadMsg);
@@ -394,6 +482,8 @@ class VocabularyConfigLoader {
                     id: seriesInfo.id,
                     name: seriesInfo.name,
                     description: seriesInfo.description,
+                    lexileLevel: seriesInfo.lexileLevel || '',
+                    priority: seriesInfo.priority || 999,
                     items: items
                 });
                 const successMsg = `  ✓ ${seriesInfo.name}: 发现 ${items.length} 个章节`;
@@ -409,6 +499,9 @@ class VocabularyConfigLoader {
                 }
             }
         }
+        
+            // 系列间排序（按优先级，数字越小越靠前）
+            subcategories.sort((a, b) => a.priority - b.priority);
         
             const finalMsg = `✅ extracurricular-books 扫描完成，发现 ${subcategories.length} 个系列`;
             console.log(finalMsg);
@@ -516,6 +609,31 @@ class VocabularyConfigLoader {
                     name: metadata.name || `Stage ${gradeNum} - Book ${term}`,
                     filename: filepath.replace('./words/', ''),
                     description: metadata.description || metadata.title || '',
+                    wordCount: metadata.wordCount || metadata.totalWords || defaultWords,
+                    difficulty: metadata.difficulty || 'beginner',
+                    recommended: true
+                };
+            } else if (type === 'extracurricular-simple') {
+                // Fly Guy 系列（2层结构：系列 → 书籍，无章节）
+                const cnName = unit || '';
+                const enName = bookName || '';
+                let displayName = '';
+                if (cnName && enName) {
+                    displayName = `${cnName} / ${enName}`;
+                } else if (enName) {
+                    displayName = enName;
+                } else if (cnName) {
+                    displayName = cnName;
+                } else {
+                    displayName = `Book ${gradeNum}`;
+                }
+                
+                console.log(`  ✅ 成功加载: ${displayName} (${filepath})`);
+                return {
+                    id: metadata.id || filename,
+                    name: metadata.name || displayName,
+                    filename: filepath.replace('./words/', ''),
+                    description: metadata.description || '',
                     wordCount: metadata.wordCount || metadata.totalWords || defaultWords,
                     difficulty: metadata.difficulty || 'beginner',
                     recommended: true
