@@ -1,0 +1,177 @@
+{
+  "metadata": {
+    "id": "fg-book12",
+    "name": "Fly Guy #12：《There's A Fly Guy in My Soup》",
+    "description": "我的汤里有苍蝇小子",
+    "bookTitle": "There's A Fly Guy in My Soup",
+    "bookNumber": 12,
+    "series": "Fly Guy",
+    "category": "extracurricular-books",
+    "difficulty": "beginner",
+    "wordCount": 25,
+    "recommendedAge": "5-8",
+    "lastUpdated": "2025-11-18",
+    
+    "bookSummary": {
+      "brief": "Buzz一家长途旅行后入住酒店，Fly Guy不能进餐厅，在外面找不到食物。他闻到香味进入餐厅，把汤碗当成浴缸洗澡，结果引发了一场混乱，最后大家一起去游泳池洗澡",
+      "setting": "酒店和餐厅",
+      "mainCharacters": ["Buzz (小男孩)", "Fly Guy (苍蝇)", "Mom (妈妈)", "Dad (爸爸)"],
+      "keyThemes": ["旅行", "餐厅", "误会", "幽默"]
+    },
+    
+    "story": "One day, Fly Guy went with Buzz, Mom, and Dad on a long trip. They drove until dinnertime and stopped at a hotel. Buzz loved hotels and thought the room was cool. It was time for dinner at the restaurant downstairs, but Fly Guy couldn't go there. Buzz said Fly Guy could eat outside. Fly Guy flew outside and found a trash can, a puddle, a sticky spot, and the biggest slimiest garbage can ever, but he didn't find anything he wanted to eat. Then Fly Guy smelled something wonderful and followed the smell. He found where he wanted to eat! Fly Guy needed to wash before dinner. He spied a small round bathtub with warm brown water - perfect! Fly Guy jumped in and washed his face, hands, armpits, and between his toes. But Fly Guy's bathtub was picked up and carried to another room! It was set down on a table in front of a lady. The lady screamed 'Waiter! There's a fly in my soup!' The waiter grabbed Fly Guy's bathtub and threw it into another lady's soup. That lady jumped up and the soup went flying onto a gentleman's head! Everyone jumped up and everyone's soup went flying. Everyone needed a bath. 'Last one in the pool is a rotten egg!' yelled Buzz!"
+  },
+  "words": [
+    {
+      "word": "dinnertime",
+      "phonetic": "[ˈdɪnərtaɪm]",
+      "meaning": "晚餐时间",
+      "difficulty": 1
+    },
+    {
+      "word": "hotel",
+      "phonetic": "[hoʊˈtel]",
+      "meaning": "酒店",
+      "difficulty": 1
+    },
+    {
+      "word": "yay",
+      "phonetic": "[jeɪ]",
+      "meaning": "耶（表示高兴）",
+      "difficulty": 1
+    },
+    {
+      "word": "restaurant",
+      "phonetic": "[ˈrestrɑːnt]",
+      "meaning": "餐厅",
+      "difficulty": 2
+    },
+    {
+      "word": "downstairs",
+      "phonetic": "[ˌdaʊnˈsterz]",
+      "meaning": "楼下",
+      "difficulty": 2
+    },
+    {
+      "word": "trash",
+      "phonetic": "[træʃ]",
+      "meaning": "垃圾",
+      "difficulty": 1
+    },
+    {
+      "word": "puddle",
+      "phonetic": "[ˈpʌdl]",
+      "meaning": "水坑",
+      "difficulty": 2
+    },
+    {
+      "word": "sticky",
+      "phonetic": "[ˈstɪki]",
+      "meaning": "黏的",
+      "difficulty": 2
+    },
+    {
+      "word": "spot",
+      "phonetic": "[spɑːt]",
+      "meaning": "地点，斑点",
+      "difficulty": 1
+    },
+    {
+      "word": "biggest",
+      "phonetic": "[ˈbɪɡɪst]",
+      "meaning": "最大的",
+      "difficulty": 1
+    },
+    {
+      "word": "slimiest",
+      "phonetic": "[ˈslaɪmiɪst]",
+      "meaning": "最黏的",
+      "difficulty": 2
+    },
+    {
+      "word": "smelled",
+      "phonetic": "[smeld]",
+      "meaning": "闻到（smell的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "wonderful",
+      "phonetic": "[ˈwʌndərfl]",
+      "meaning": "美妙的",
+      "difficulty": 2
+    },
+    {
+      "word": "followed",
+      "phonetic": "[ˈfɑːloʊd]",
+      "meaning": "跟随（follow的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "smell",
+      "phonetic": "[smel]",
+      "meaning": "气味",
+      "difficulty": 1
+    },
+    {
+      "word": "wash",
+      "phonetic": "[wɑːʃ]",
+      "meaning": "洗",
+      "difficulty": 1
+    },
+    {
+      "word": "round",
+      "phonetic": "[raʊnd]",
+      "meaning": "圆的",
+      "difficulty": 1
+    },
+    {
+      "word": "bathtub",
+      "phonetic": "[ˈbæθtʌb]",
+      "meaning": "浴缸",
+      "difficulty": 2
+    },
+    {
+      "word": "perfect",
+      "phonetic": "[ˈpɜːrfɪkt]",
+      "meaning": "完美的",
+      "difficulty": 2
+    },
+    {
+      "word": "jumped",
+      "phonetic": "[dʒʌmpt]",
+      "meaning": "跳（jump的过去式）",
+      "difficulty": 1
+    },
+    {
+      "word": "hands",
+      "phonetic": "[hændz]",
+      "meaning": "手（复数）",
+      "difficulty": 1
+    },
+    {
+      "word": "armpits",
+      "phonetic": "[ˈɑːrmpɪts]",
+      "meaning": "腋窝（复数）",
+      "difficulty": 2
+    },
+    {
+      "word": "toes",
+      "phonetic": "[toʊz]",
+      "meaning": "脚趾（复数）",
+      "difficulty": 1
+    },
+    {
+      "word": "screamed",
+      "phonetic": "[skriːmd]",
+      "meaning": "尖叫（scream的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "waiter",
+      "phonetic": "[ˈweɪtər]",
+      "meaning": "服务员",
+      "difficulty": 2
+    }
+  ]
+}
+

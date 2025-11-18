@@ -1,0 +1,147 @@
+{
+  "metadata": {
+    "id": "fg-book10",
+    "name": "Fly Guy #10：《Fly Guy vs. The Flyswatter》",
+    "description": "苍蝇小子大战苍蝇拍",
+    "bookTitle": "Fly Guy vs. The Flyswatter",
+    "bookNumber": 10,
+    "series": "Fly Guy",
+    "category": "extracurricular-books",
+    "difficulty": "beginner",
+    "wordCount": 20,
+    "recommendedAge": "5-8",
+    "lastUpdated": "2025-11-18",
+    
+    "bookSummary": {
+      "brief": "Fly Guy无意中跟随Buzz去了学校，然后和班级一起去苍蝇拍工厂实地考察，在Super Swatter 6000追击下勇敢救出了小苍蝇",
+      "setting": "学校和苍蝇拍工厂",
+      "mainCharacters": ["Buzz (小男孩)", "Fly Guy (苍蝇)", "Fred the Fly (工厂吉祥物)"],
+      "keyThemes": ["勇气", "救援", "实地考察", "对抗"]
+    },
+    
+    "story": "One day, Fly Guy was eating breakfast in Buzz's backpack. Buzz grabbed his backpack and went to school. At school, Fly Guy flew out. The teacher said they were going on a field trip to tour a factory. Buzz told Fly Guy to ride in his pocket. The class rode the bus to the factory. A tour guide led the class inside to a flyswatter museum. She showed them where they make flyswatters and gave each student one. Fred the Fly came to tell them more. Fred said flies play in slime, eat garbage, and are nasty! Fly Guy got mad. Fred shouted they need the Super Swatter 6000 - the flyswatter of the future! They brought out a tiny fly in a jar and released it. The Super Swatter started swatting. Fly Guy flew to save the little fly and took it to an open window, flying past Fred and the machines. The Super Swatter kept swatting everything! Fred yelled to stop and ended all factory tours. Back at school, everyone agreed Fly Guy was a hero!"
+  },
+  "words": [
+    {
+      "word": "vs",
+      "phonetic": "[ˈvɜːrsəs]",
+      "meaning": "对抗（versus的缩写）",
+      "difficulty": 2
+    },
+    {
+      "word": "breakfast",
+      "phonetic": "[ˈbrekfəst]",
+      "meaning": "早餐",
+      "difficulty": 1
+    },
+    {
+      "word": "backpack",
+      "phonetic": "[ˈbækpæk]",
+      "meaning": "背包",
+      "difficulty": 1
+    },
+    {
+      "word": "field",
+      "phonetic": "[fiːld]",
+      "meaning": "田野；实地",
+      "difficulty": 1
+    },
+    {
+      "word": "factory",
+      "phonetic": "[ˈfæktəri]",
+      "meaning": "工厂",
+      "difficulty": 2
+    },
+    {
+      "word": "rode",
+      "phonetic": "[roʊd]",
+      "meaning": "骑，乘坐（ride的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "arrived",
+      "phonetic": "[əˈraɪvd]",
+      "meaning": "到达（arrive的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "guide",
+      "phonetic": "[ɡaɪd]",
+      "meaning": "导游，向导",
+      "difficulty": 2
+    },
+    {
+      "word": "each",
+      "phonetic": "[iːtʃ]",
+      "meaning": "每个",
+      "difficulty": 1
+    },
+    {
+      "word": "tell",
+      "phonetic": "[tel]",
+      "meaning": "告诉",
+      "difficulty": 1
+    },
+    {
+      "word": "boys",
+      "phonetic": "[bɔɪz]",
+      "meaning": "男孩们",
+      "difficulty": 1
+    },
+    {
+      "word": "girls",
+      "phonetic": "[ɡɜːrlz]",
+      "meaning": "女孩们",
+      "difficulty": 1
+    },
+    {
+      "word": "slime",
+      "phonetic": "[slaɪm]",
+      "meaning": "黏液",
+      "difficulty": 2
+    },
+    {
+      "word": "nodded",
+      "phonetic": "[ˈnɑːdɪd]",
+      "meaning": "点头（nod的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "smiled",
+      "phonetic": "[smaɪld]",
+      "meaning": "微笑（smile的过去式）",
+      "difficulty": 1
+    },
+    {
+      "word": "nasty",
+      "phonetic": "[ˈnæsti]",
+      "meaning": "讨厌的",
+      "difficulty": 2
+    },
+    {
+      "word": "future",
+      "phonetic": "[ˈfjuːtʃər]",
+      "meaning": "未来",
+      "difficulty": 2
+    },
+    {
+      "word": "tiny",
+      "phonetic": "[ˈtaɪni]",
+      "meaning": "微小的",
+      "difficulty": 1
+    },
+    {
+      "word": "release",
+      "phonetic": "[rɪˈliːs]",
+      "meaning": "释放",
+      "difficulty": 2
+    },
+    {
+      "word": "swatting",
+      "phonetic": "[ˈswɑːtɪŋ]",
+      "meaning": "拍打（swat的现在分词）",
+      "difficulty": 2
+    }
+  ]
+}
+

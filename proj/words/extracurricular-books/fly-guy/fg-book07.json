@@ -1,0 +1,189 @@
+{
+  "metadata": {
+    "id": "fg-book07",
+    "name": "Fly Guy #7：《I Spy Fly Guy!》",
+    "description": "我发现苍蝇小子了！",
+    "bookTitle": "I Spy Fly Guy!",
+    "bookNumber": 7,
+    "series": "Fly Guy",
+    "category": "extracurricular-books",
+    "difficulty": "beginner",
+    "wordCount": 27,
+    "recommendedAge": "5-8",
+    "lastUpdated": "2025-11-18",
+    
+    "bookSummary": {
+      "brief": "Buzz和Fly Guy玩捉迷藏，Fly Guy藏在垃圾桶里被垃圾车带走了，Buzz到垃圾场找到了他",
+      "setting": "家、花园和城镇垃圾场",
+      "mainCharacters": ["Buzz (小男孩)", "Fly Guy (苍蝇)"],
+      "keyThemes": ["游戏", "寻找", "友谊", "坚持"]
+    },
+    
+    "story": "Buzz and Fly Guy went outside to play hide-and-seek. Fly Guy always hid in the garbage can because he liked to eat while Buzz looked for him. Buzz found him easily and then hid in the garden shed. Fly Guy found a way in. When it was Fly Guy's turn to hide again, he hid in the garbage can. But the garbageman came and dumped the garbage into the truck and drove away! Buzz's dad followed the truck to the town dump. Buzz ran into the dump looking for Fly Guy. A zillion flies answered his call, making it hard to find Fly Guy. Buzz spied flies hiding, eating, and landing, but none were Fly Guy. Buzz was sad and kicked cans. Then he remembered they were still playing a game and gave up. He heard a voice from above - it was Fly Guy! I spy Fly Guy!"
+  },
+  "words": [
+    {
+      "word": "outside",
+      "phonetic": "[ˌaʊtˈsaɪd]",
+      "meaning": "外面",
+      "difficulty": 1
+    },
+    {
+      "word": "hide-and-seek",
+      "phonetic": "[ˈhaɪd ən siːk]",
+      "meaning": "捉迷藏",
+      "difficulty": 2
+    },
+    {
+      "word": "hid",
+      "phonetic": "[hɪd]",
+      "meaning": "藏（hide的过去式）",
+      "difficulty": 1
+    },
+    {
+      "word": "always",
+      "phonetic": "[ˈɔːlweɪz]",
+      "meaning": "总是",
+      "difficulty": 1
+    },
+    {
+      "word": "garden",
+      "phonetic": "[ˈɡɑːrdn]",
+      "meaning": "花园",
+      "difficulty": 1
+    },
+    {
+      "word": "shed",
+      "phonetic": "[ʃed]",
+      "meaning": "棚子",
+      "difficulty": 2
+    },
+    {
+      "word": "garbageman",
+      "phonetic": "[ˈɡɑːrbɪdʒmæn]",
+      "meaning": "垃圾清运工",
+      "difficulty": 2
+    },
+    {
+      "word": "dumped",
+      "phonetic": "[dʌmpt]",
+      "meaning": "倾倒（dump的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "truck",
+      "phonetic": "[trʌk]",
+      "meaning": "卡车",
+      "difficulty": 1
+    },
+    {
+      "word": "follow",
+      "phonetic": "[ˈfɑːloʊ]",
+      "meaning": "跟随",
+      "difficulty": 2
+    },
+    {
+      "word": "town",
+      "phonetic": "[taʊn]",
+      "meaning": "城镇",
+      "difficulty": 1
+    },
+    {
+      "word": "dump",
+      "phonetic": "[dʌmp]",
+      "meaning": "垃圾场",
+      "difficulty": 2
+    },
+    {
+      "word": "answer",
+      "phonetic": "[ˈænsər]",
+      "meaning": "回答",
+      "difficulty": 2
+    },
+    {
+      "word": "zillion",
+      "phonetic": "[ˈzɪljən]",
+      "meaning": "无数的",
+      "difficulty": 3
+    },
+    {
+      "word": "find",
+      "phonetic": "[faɪnd]",
+      "meaning": "找到",
+      "difficulty": 1
+    },
+    {
+      "word": "spied",
+      "phonetic": "[spaɪd]",
+      "meaning": "看见（spy的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "hiding",
+      "phonetic": "[ˈhaɪdɪŋ]",
+      "meaning": "躲藏（hide的现在分词）",
+      "difficulty": 1
+    },
+    {
+      "word": "eating",
+      "phonetic": "[ˈiːtɪŋ]",
+      "meaning": "吃（eat的现在分词）",
+      "difficulty": 1
+    },
+    {
+      "word": "boinked",
+      "phonetic": "[bɔɪŋkt]",
+      "meaning": "撞击（boink的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "bit",
+      "phonetic": "[bɪt]",
+      "meaning": "咬（bite的过去式）",
+      "difficulty": 1
+    },
+    {
+      "word": "landing",
+      "phonetic": "[ˈlændɪŋ]",
+      "meaning": "降落（land的现在分词）",
+      "difficulty": 2
+    },
+    {
+      "word": "forever",
+      "phonetic": "[fərˈevər]",
+      "meaning": "永远",
+      "difficulty": 2
+    },
+    {
+      "word": "remembered",
+      "phonetic": "[rɪˈmembərd]",
+      "meaning": "记起（remember的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "playing",
+      "phonetic": "[ˈpleɪɪŋ]",
+      "meaning": "玩（play的现在分词）",
+      "difficulty": 1
+    },
+    {
+      "word": "give",
+      "phonetic": "[ɡɪv]",
+      "meaning": "给予，放弃",
+      "difficulty": 1
+    },
+    {
+      "word": "heard",
+      "phonetic": "[hɜːrd]",
+      "meaning": "听见（hear的过去式）",
+      "difficulty": 1
+    },
+    {
+      "word": "above",
+      "phonetic": "[əˈbʌv]",
+      "meaning": "在上面",
+      "difficulty": 2
+    }
+  ]
+}
+

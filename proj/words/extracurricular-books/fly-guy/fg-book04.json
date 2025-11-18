@@ -1,0 +1,117 @@
+{
+  "metadata": {
+    "id": "fg-book04",
+    "name": "Fly Guy #4：《There Was An Old Lady Who Swallowed Fly Guy》",
+    "description": "吞下苍蝇小子的老奶奶",
+    "bookTitle": "There Was An Old Lady Who Swallowed Fly Guy",
+    "bookNumber": 4,
+    "series": "Fly Guy",
+    "category": "extracurricular-books",
+    "difficulty": "beginner",
+    "wordCount": 15,
+    "recommendedAge": "5-8",
+    "lastUpdated": "2025-11-18",
+    
+    "bookSummary": {
+      "brief": "Buzz带Fly Guy去看望奶奶，奶奶不小心吞下了Fly Guy，然后为了抓住他而吞下越来越大的动物",
+      "setting": "奶奶的家",
+      "mainCharacters": ["Buzz (小男孩)", "Fly Guy (苍蝇)", "Grandma (奶奶)"],
+      "keyThemes": ["家庭", "意外", "解决问题", "幽默"]
+    },
+    
+    "story": "Buzz went to visit his grandma with Fly Guy. Grandma was happy to see Buzz and ran to hug him. But when Buzz wanted to introduce his pet, Grandma accidentally swallowed Fly Guy! Fly Guy went down a deep dark hole and came to a wet place at the bottom. He wanted to leave and started up the hole. But then Grandma swallowed a spider to catch Fly Guy, then a bird to catch the spider, a cat to catch the bird, a dog to catch the cat, a goat to catch the dog, and a cow to catch the goat! Just as Grandma was about to swallow a horse, Fly Guy cried for Buzz. Out came Fly Guy and all the animals. Everyone lived happily ever after!"
+  },
+  "words": [
+    {
+      "word": "visit",
+      "phonetic": "[ˈvɪzɪt]",
+      "meaning": "拜访",
+      "difficulty": 2
+    },
+    {
+      "word": "hug",
+      "phonetic": "[hʌɡ]",
+      "meaning": "拥抱",
+      "difficulty": 1
+    },
+    {
+      "word": "want",
+      "phonetic": "[wɑːnt]",
+      "meaning": "想要",
+      "difficulty": 1
+    },
+    {
+      "word": "swallowed",
+      "phonetic": "[ˈswɑːloʊd]",
+      "meaning": "吞下（swallow的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "deep",
+      "phonetic": "[diːp]",
+      "meaning": "深的",
+      "difficulty": 1
+    },
+    {
+      "word": "hole",
+      "phonetic": "[hoʊl]",
+      "meaning": "洞",
+      "difficulty": 1
+    },
+    {
+      "word": "bottom",
+      "phonetic": "[ˈbɑːtəm]",
+      "meaning": "底部",
+      "difficulty": 2
+    },
+    {
+      "word": "while",
+      "phonetic": "[waɪl]",
+      "meaning": "一会儿",
+      "difficulty": 2
+    },
+    {
+      "word": "leave",
+      "phonetic": "[liːv]",
+      "meaning": "离开",
+      "difficulty": 1
+    },
+    {
+      "word": "spider",
+      "phonetic": "[ˈspaɪdər]",
+      "meaning": "蜘蛛",
+      "difficulty": 2
+    },
+    {
+      "word": "goat",
+      "phonetic": "[ɡoʊt]",
+      "meaning": "山羊",
+      "difficulty": 1
+    },
+    {
+      "word": "cow",
+      "phonetic": "[kaʊ]",
+      "meaning": "奶牛",
+      "difficulty": 1
+    },
+    {
+      "word": "happily",
+      "phonetic": "[ˈhæpɪli]",
+      "meaning": "幸福地",
+      "difficulty": 2
+    },
+    {
+      "word": "after",
+      "phonetic": "[ˈæftər]",
+      "meaning": "之后",
+      "difficulty": 1
+    },
+    {
+      "word": "course",
+      "phonetic": "[kɔːrs]",
+      "meaning": "当然",
+      "difficulty": 2
+    }
+  ]
+}
+

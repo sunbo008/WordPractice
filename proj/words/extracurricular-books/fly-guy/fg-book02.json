@@ -1,0 +1,219 @@
+{
+  "metadata": {
+    "id": "fg-book02",
+    "name": "Fly Guy #2：《Super Fly Guy》",
+    "description": "超级苍蝇小子",
+    "bookTitle": "Super Fly Guy",
+    "bookNumber": 2,
+    "series": "Fly Guy",
+    "category": "extracurricular-books",
+    "difficulty": "beginner",
+    "wordCount": 32,
+    "recommendedAge": "5-8",
+    "lastUpdated": "2025-11-18",
+    
+    "bookSummary": {
+      "brief": "Fly Guy跟随Buzz去学校，在食堂引发了一场混乱，但最终成为了拯救好厨师Roz的英雄",
+      "setting": "Buzz的学校和食堂",
+      "mainCharacters": ["Buzz (小男孩)", "Fly Guy (苍蝇)", "Roz (好厨师)", "Miss Muzzle (坏厨师)"],
+      "keyThemes": ["学校生活", "友谊", "正义", "帮助他人"]
+    },
+    
+    "story": "Fly Guy went to school with Buzz and learned about reading, phonics, and art. At lunchtime, Fly Guy loved the lunchroom - the dirty dishes and garbage cans. He met the lunch lady Roz, who was very kind and fed him chicken bones and fish heads in sour milk. But Roz's boss fired her because flies were in the lunchroom. The new lunch lady Miss Muzzle made terrible burnt food. Everyone missed Roz. Buzz made a plan - Fly Guy went back and bothered Miss Muzzle until she made a mess and got fired. Then Roz came back, and everyone was happy again. Fly Guy became a super hero!"
+  },
+  "words": [
+    {
+      "word": "named",
+      "phonetic": "[neɪmd]",
+      "meaning": "命名（name的过去式）",
+      "difficulty": 1
+    },
+    {
+      "word": "learned",
+      "phonetic": "[lɜːrnd]",
+      "meaning": "学习（learn的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "reading",
+      "phonetic": "[ˈriːdɪŋ]",
+      "meaning": "阅读",
+      "difficulty": 1
+    },
+    {
+      "word": "phonics",
+      "phonetic": "[ˈfɑːnɪks]",
+      "meaning": "自然拼读法",
+      "difficulty": 3
+    },
+    {
+      "word": "art",
+      "phonetic": "[ɑːrt]",
+      "meaning": "艺术，美术",
+      "difficulty": 1
+    },
+    {
+      "word": "lunchtime",
+      "phonetic": "[ˈlʌntʃtaɪm]",
+      "meaning": "午餐时间",
+      "difficulty": 1
+    },
+    {
+      "word": "lunchroom",
+      "phonetic": "[ˈlʌntʃruːm]",
+      "meaning": "食堂",
+      "difficulty": 2
+    },
+    {
+      "word": "dirty",
+      "phonetic": "[ˈdɜːrti]",
+      "meaning": "脏的",
+      "difficulty": 1
+    },
+    {
+      "word": "dishes",
+      "phonetic": "[ˈdɪʃɪz]",
+      "meaning": "盘子（复数）",
+      "difficulty": 1
+    },
+    {
+      "word": "garbage",
+      "phonetic": "[ˈɡɑːrbɪdʒ]",
+      "meaning": "垃圾",
+      "difficulty": 2
+    },
+    {
+      "word": "cans",
+      "phonetic": "[kænz]",
+      "meaning": "罐子（复数）",
+      "difficulty": 1
+    },
+    {
+      "word": "lady",
+      "phonetic": "[ˈleɪdi]",
+      "meaning": "女士",
+      "difficulty": 1
+    },
+    {
+      "word": "fed",
+      "phonetic": "[fed]",
+      "meaning": "喂养（feed的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "bones",
+      "phonetic": "[boʊnz]",
+      "meaning": "骨头（复数）",
+      "difficulty": 1
+    },
+    {
+      "word": "heads",
+      "phonetic": "[hedz]",
+      "meaning": "头（复数）",
+      "difficulty": 1
+    },
+    {
+      "word": "boss",
+      "phonetic": "[bɔːs]",
+      "meaning": "老板",
+      "difficulty": 2
+    },
+    {
+      "word": "children",
+      "phonetic": "[ˈtʃɪldrən]",
+      "meaning": "孩子们",
+      "difficulty": 1
+    },
+    {
+      "word": "full",
+      "phonetic": "[fʊl]",
+      "meaning": "满的",
+      "difficulty": 1
+    },
+    {
+      "word": "fired",
+      "phonetic": "[ˈfaɪərd]",
+      "meaning": "解雇（fire的过去式）",
+      "difficulty": 3
+    },
+    {
+      "word": "gone",
+      "phonetic": "[ɡɔːn]",
+      "meaning": "离开了（go的过去分词）",
+      "difficulty": 2
+    },
+    {
+      "word": "burnt",
+      "phonetic": "[bɜːrnt]",
+      "meaning": "烧焦的（burn的过去分词）",
+      "difficulty": 2
+    },
+    {
+      "word": "peas",
+      "phonetic": "[piːz]",
+      "meaning": "豌豆（复数）",
+      "difficulty": 1
+    },
+    {
+      "word": "turnips",
+      "phonetic": "[ˈtɜːrnɪps]",
+      "meaning": "萝卜（复数）",
+      "difficulty": 2
+    },
+    {
+      "word": "ate",
+      "phonetic": "[eɪt]",
+      "meaning": "吃（eat的过去式）",
+      "difficulty": 1
+    },
+    {
+      "word": "anything",
+      "phonetic": "[ˈeniθɪŋ]",
+      "meaning": "任何东西",
+      "difficulty": 1
+    },
+    {
+      "word": "missed",
+      "phonetic": "[mɪst]",
+      "meaning": "想念；没打中（miss的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "plan",
+      "phonetic": "[plæn]",
+      "meaning": "计划",
+      "difficulty": 2
+    },
+    {
+      "word": "grabbed",
+      "phonetic": "[ɡræbd]",
+      "meaning": "抓住（grab的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "swung",
+      "phonetic": "[swʌŋ]",
+      "meaning": "挥动（swing的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "mess",
+      "phonetic": "[mes]",
+      "meaning": "混乱，脏乱",
+      "difficulty": 2
+    },
+    {
+      "word": "special",
+      "phonetic": "[ˈspeʃl]",
+      "meaning": "特别的",
+      "difficulty": 2
+    },
+    {
+      "word": "super",
+      "phonetic": "[ˈsuːpər]",
+      "meaning": "超级的",
+      "difficulty": 1
+    }
+  ]
+}
+

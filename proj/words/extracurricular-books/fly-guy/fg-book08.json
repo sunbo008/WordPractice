@@ -1,0 +1,93 @@
+{
+  "metadata": {
+    "id": "fg-book08",
+    "name": "Fly Guy #8：《Fly Guy Meets Fly Girl》",
+    "description": "苍蝇小子遇见苍蝇女孩",
+    "bookTitle": "Fly Guy Meets Fly Girl",
+    "bookNumber": 8,
+    "series": "Fly Guy",
+    "category": "extracurricular-books",
+    "difficulty": "beginner",
+    "wordCount": 11,
+    "recommendedAge": "5-8",
+    "lastUpdated": "2025-11-18",
+    
+    "bookSummary": {
+      "brief": "Buzz和Fly Guy遇到了Liz和她的宠物Fly Girl，两只苍蝇用苍蝇语言交流，成为了好朋友",
+      "setting": "户外和秋千上",
+      "mainCharacters": ["Buzz (小男孩)", "Fly Guy (苍蝇)", "Liz (女孩)", "Fly Girl (苍蝇)"],
+      "keyThemes": ["友谊", "相遇", "交流", "共同点"]
+    },
+    
+    "story": "One day, Buzz and Fly Guy were bored and decided to do something fun. They went for a walk and played chase. A girl was running with a fly chasing her. Buzz told her flies aren't pests, they are pets. The girl said she knew - the fly was her pet Fly Girl! Buzz showed that Fly Guy could do tricks and eat gross stuff. The girl said Fly Girl could do tricks too and eat grosser stuff! Both flies could say their owners' names. Buzz and Liz went to play on the swings. Fly Guy and Fly Girl sat side by side and talked in fly talk. Fly Guy said 'You are nice' and Fly Girl said 'You are nice, too.' They talked and talked, then both said 'Let's be friends.' That was fun! Fly Guy has a new friend!"
+  },
+  "words": [
+    {
+      "word": "chase",
+      "phonetic": "[tʃeɪs]",
+      "meaning": "追逐",
+      "difficulty": 2
+    },
+    {
+      "word": "running",
+      "phonetic": "[ˈrʌnɪŋ]",
+      "meaning": "跑（run的现在分词）",
+      "difficulty": 1
+    },
+    {
+      "word": "chasing",
+      "phonetic": "[ˈtʃeɪsɪŋ]",
+      "meaning": "追逐（chase的现在分词）",
+      "difficulty": 2
+    },
+    {
+      "word": "worry",
+      "phonetic": "[ˈwʌri]",
+      "meaning": "担心",
+      "difficulty": 2
+    },
+    {
+      "word": "gross",
+      "phonetic": "[ɡroʊs]",
+      "meaning": "恶心的",
+      "difficulty": 2
+    },
+    {
+      "word": "grosser",
+      "phonetic": "[ˈɡroʊsər]",
+      "meaning": "更恶心的（gross的比较级）",
+      "difficulty": 2
+    },
+    {
+      "word": "swings",
+      "phonetic": "[swɪŋz]",
+      "meaning": "秋千（复数）",
+      "difficulty": 1
+    },
+    {
+      "word": "side",
+      "phonetic": "[saɪd]",
+      "meaning": "旁边",
+      "difficulty": 1
+    },
+    {
+      "word": "talk",
+      "phonetic": "[tɔːk]",
+      "meaning": "说话",
+      "difficulty": 1
+    },
+    {
+      "word": "talked",
+      "phonetic": "[tɔːkt]",
+      "meaning": "说话（talk的过去式）",
+      "difficulty": 1
+    },
+    {
+      "word": "meets",
+      "phonetic": "[miːts]",
+      "meaning": "遇见（meet的第三人称单数）",
+      "difficulty": 1
+    }
+  ]
+}
+

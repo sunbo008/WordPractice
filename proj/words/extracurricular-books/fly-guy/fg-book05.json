@@ -1,0 +1,117 @@
+{
+  "metadata": {
+    "id": "fg-book05",
+    "name": "Fly Guy #5：《Fly High, Fly Guy!》",
+    "description": "飞高点，苍蝇小子！",
+    "bookTitle": "Fly High, Fly Guy!",
+    "bookNumber": 5,
+    "series": "Fly Guy",
+    "category": "extracurricular-books",
+    "difficulty": "beginner",
+    "wordCount": 15,
+    "recommendedAge": "5-8",
+    "lastUpdated": "2025-11-18",
+    
+    "bookSummary": {
+      "brief": "Buzz一家开车旅行时迷路了，Fly Guy飞到高空用他的超级眼睛找到回家的路，拯救了全家",
+      "setting": "公路旅行途中和各个景点",
+      "mainCharacters": ["Buzz (小男孩)", "Fly Guy (苍蝇)", "Mom (妈妈)", "Dad (爸爸)"],
+      "keyThemes": ["旅行", "冒险", "迷路", "解决问题", "家庭"]
+    },
+    
+    "story": "Buzz's family wanted to take a road trip. Mom and Dad said Fly Guy was too little and might get lost, so he should stay home. But Fly Guy secretly hid in the trunk! When they stopped for a picnic, Fly Guy flew out. They drove to the beach, art museum, and fun park. Every time, Mom and Dad asked if Fly Guy was lost, but Buzz found him. When it was time to go home, they drove and drove but got lost. Buzz had an idea - Fly high, Fly Guy! Fly Guy flew high into the sky and used his super fly eyes to spy their house. He led the way home and saved the day!"
+  },
+  "words": [
+    {
+      "word": "trip",
+      "phonetic": "[trɪp]",
+      "meaning": "旅行",
+      "difficulty": 1
+    },
+    {
+      "word": "might",
+      "phonetic": "[maɪt]",
+      "meaning": "可能",
+      "difficulty": 2
+    },
+    {
+      "word": "stays",
+      "phonetic": "[steɪz]",
+      "meaning": "停留（stay的第三人称单数）",
+      "difficulty": 1
+    },
+    {
+      "word": "shut",
+      "phonetic": "[ʃʌt]",
+      "meaning": "关闭",
+      "difficulty": 1
+    },
+    {
+      "word": "trunk",
+      "phonetic": "[trʌŋk]",
+      "meaning": "后备箱",
+      "difficulty": 2
+    },
+    {
+      "word": "hit",
+      "phonetic": "[hɪt]",
+      "meaning": "出发；打",
+      "difficulty": 1
+    },
+    {
+      "word": "drove",
+      "phonetic": "[droʊv]",
+      "meaning": "驾驶（drive的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "stopped",
+      "phonetic": "[stɑːpt]",
+      "meaning": "停止（stop的过去式）",
+      "difficulty": 1
+    },
+    {
+      "word": "lose",
+      "phonetic": "[luːz]",
+      "meaning": "失去，丢失",
+      "difficulty": 1
+    },
+    {
+      "word": "beach",
+      "phonetic": "[biːtʃ]",
+      "meaning": "海滩",
+      "difficulty": 1
+    },
+    {
+      "word": "museum",
+      "phonetic": "[mjuˈziːəm]",
+      "meaning": "博物馆",
+      "difficulty": 2
+    },
+    {
+      "word": "led",
+      "phonetic": "[led]",
+      "meaning": "引领（lead的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "saved",
+      "phonetic": "[seɪvd]",
+      "meaning": "拯救（save的过去式）",
+      "difficulty": 1
+    },
+    {
+      "word": "spy",
+      "phonetic": "[spaɪ]",
+      "meaning": "侦察，看见",
+      "difficulty": 2
+    },
+    {
+      "word": "eyes",
+      "phonetic": "[aɪz]",
+      "meaning": "眼睛（复数）",
+      "difficulty": 1
+    }
+  ]
+}
+

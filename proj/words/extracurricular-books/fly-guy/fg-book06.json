@@ -1,0 +1,189 @@
+{
+  "metadata": {
+    "id": "fg-book06",
+    "name": "Fly Guy #6：《Hooray for Fly Guy!》",
+    "description": "为苍蝇小子欢呼！",
+    "bookTitle": "Hooray for Fly Guy!",
+    "bookNumber": 6,
+    "series": "Fly Guy",
+    "category": "extracurricular-books",
+    "difficulty": "beginner",
+    "wordCount": 27,
+    "recommendedAge": "5-8",
+    "lastUpdated": "2025-11-18",
+    
+    "bookSummary": {
+      "brief": "Fly Guy加入Buzz的橄榄球队，在关键时刻执行秘密战术，帮助球队赢得比赛",
+      "setting": "橄榄球比赛现场",
+      "mainCharacters": ["Buzz (小男孩)", "Fly Guy (苍蝇)", "Coach (教练)"],
+      "keyThemes": ["团队合作", "体育竞技", "证明自己", "友谊"]
+    },
+    
+    "story": "Fly Guy went with Buzz to play football. Coach said they needed one more player for the big game. Buzz suggested Fly Guy could play, but Coach laughed and said flies can't play football. Fly Guy showed his kick, but Coach still said no. Before the big game, Buzz made a helmet for Fly Guy and they practiced - jumping jacks, a secret play, and a touchdown dance. At the game, a new player joined, but got hurt. The other team was ahead with one second left. Coach let Fly Guy play since the game seemed lost. Buzz and Fly Guy executed their secret play - when the other team's quarterback dropped the ball, Buzz picked it up, ran, and scored! They did their touchdown dance and won the game. Hooray for Fly Guy!"
+  },
+  "words": [
+    {
+      "word": "coach",
+      "phonetic": "[koʊtʃ]",
+      "meaning": "教练",
+      "difficulty": 2
+    },
+    {
+      "word": "need",
+      "phonetic": "[niːd]",
+      "meaning": "需要",
+      "difficulty": 1
+    },
+    {
+      "word": "player",
+      "phonetic": "[ˈpleɪər]",
+      "meaning": "球员，运动员",
+      "difficulty": 2
+    },
+    {
+      "word": "kicked",
+      "phonetic": "[kɪkt]",
+      "meaning": "踢（kick的过去式）",
+      "difficulty": 1
+    },
+    {
+      "word": "helmet",
+      "phonetic": "[ˈhelmɪt]",
+      "meaning": "头盔",
+      "difficulty": 2
+    },
+    {
+      "word": "jumping",
+      "phonetic": "[ˈdʒʌmpɪŋ]",
+      "meaning": "跳跃（jump的现在分词）",
+      "difficulty": 1
+    },
+    {
+      "word": "jacks",
+      "phonetic": "[dʒæks]",
+      "meaning": "开合跳（jumping jacks）",
+      "difficulty": 2
+    },
+    {
+      "word": "planned",
+      "phonetic": "[plænd]",
+      "meaning": "计划（plan的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "secret",
+      "phonetic": "[ˈsiːkrət]",
+      "meaning": "秘密的",
+      "difficulty": 2
+    },
+    {
+      "word": "touchdown",
+      "phonetic": "[ˈtʌtʃdaʊn]",
+      "meaning": "触地得分",
+      "difficulty": 3
+    },
+    {
+      "word": "dance",
+      "phonetic": "[dæns]",
+      "meaning": "舞蹈",
+      "difficulty": 1
+    },
+    {
+      "word": "joined",
+      "phonetic": "[dʒɔɪnd]",
+      "meaning": "加入（join的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "bench",
+      "phonetic": "[bentʃ]",
+      "meaning": "长凳，替补席",
+      "difficulty": 2
+    },
+    {
+      "word": "scored",
+      "phonetic": "[skɔːrd]",
+      "meaning": "得分（score的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "cheered",
+      "phonetic": "[tʃɪrd]",
+      "meaning": "欢呼（cheer的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "worried",
+      "phonetic": "[ˈwʌrid]",
+      "meaning": "担心的",
+      "difficulty": 2
+    },
+    {
+      "word": "finally",
+      "phonetic": "[ˈfaɪnəli]",
+      "meaning": "最终",
+      "difficulty": 2
+    },
+    {
+      "word": "second",
+      "phonetic": "[ˈsekənd]",
+      "meaning": "秒",
+      "difficulty": 1
+    },
+    {
+      "word": "ahead",
+      "phonetic": "[əˈhed]",
+      "meaning": "领先",
+      "difficulty": 2
+    },
+    {
+      "word": "anyway",
+      "phonetic": "[ˈeniweɪ]",
+      "meaning": "无论如何",
+      "difficulty": 2
+    },
+    {
+      "word": "line",
+      "phonetic": "[laɪn]",
+      "meaning": "线，阵线",
+      "difficulty": 1
+    },
+    {
+      "word": "snapped",
+      "phonetic": "[snæpt]",
+      "meaning": "快速传球（snap的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "quarterback",
+      "phonetic": "[ˈkwɔːrtərbæk]",
+      "meaning": "四分卫",
+      "difficulty": 3
+    },
+    {
+      "word": "dropped",
+      "phonetic": "[drɑːpt]",
+      "meaning": "掉落（drop的过去式）",
+      "difficulty": 1
+    },
+    {
+      "word": "picked",
+      "phonetic": "[pɪkt]",
+      "meaning": "捡起（pick的过去式）",
+      "difficulty": 1
+    },
+    {
+      "word": "won",
+      "phonetic": "[wʌn]",
+      "meaning": "赢得（win的过去式）",
+      "difficulty": 1
+    },
+    {
+      "word": "hooray",
+      "phonetic": "[hʊˈreɪ]",
+      "meaning": "万岁，好哇",
+      "difficulty": 1
+    }
+  ]
+}
+

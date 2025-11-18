@@ -1,0 +1,87 @@
+{
+  "metadata": {
+    "id": "fg-book14",
+    "name": "Fly Guy #14：《Fly Guy's Amazing Tricks》",
+    "description": "苍蝇小子的惊人绝技",
+    "bookTitle": "Fly Guy's Amazing Tricks",
+    "bookNumber": 14,
+    "series": "Fly Guy",
+    "category": "extracurricular-books",
+    "difficulty": "beginner",
+    "wordCount": 10,
+    "recommendedAge": "5-8",
+    "lastUpdated": "2025-11-18",
+    
+    "bookSummary": {
+      "brief": "Fly Guy学会了新的惊人绝技并在马戏团表演。在晚餐时，Fly Guy表演了这些绝技引起混乱。后来Buzz教Fly Guy只在听到NOW这个词时表演。当一个大孩子欺负Buzz时，他喊了NOW，Fly Guy的绝技吓跑了这个坏孩子",
+      "setting": "家和户外",
+      "mainCharacters": ["Buzz (小男孩)", "Fly Guy (苍蝇)", "大孩子"],
+      "keyThemes": ["技巧", "训练", "保护", "友谊"]
+    },
+    
+    "story": "Buzz's friends came to see The Amazing Fly Guy Circus. Buzz said 'Get ready for Fly Guy's amazing new tricks!' Fly Guy did The Backstroke, The Dizzy Doozie, and The Big Booger. Then it was time for supper and all friends went home. At the dinner table, Buzz said Fly Guy learned new tricks. Fly Guy did The Backstroke in Mom's milk. Buzz cried 'Stop, Fly Guy!' but Fly Guy didn't hear him. Then Fly Guy did The Dizzy Doozie around Dad's head. Buzz cried 'Stop!' but Fly Guy didn't hear. Fly Guy did The Big Booger and Buzz caught him. 'Let's clean up this mess,' said Buzz. Outside, Buzz had an idea - 'Do your tricks only when you hear the word NOW.' A big kid walked by and laughed, 'Are you talking to a bug? Do you have bug brains? Bug got your tongue?' Buzz didn't answer. The kid yelled 'Answer me! NOW!' Fly Guy heard 'NOW!' and did all three tricks. The kid bumped into a garbage can and a zillion angry flies chased him away. Buzz said 'Fly Guy, here's a new trick for you - High Fivezzz!'"
+  },
+  "words": [
+    {
+      "word": "circus",
+      "phonetic": "[ˈsɜːrkəs]",
+      "meaning": "马戏团",
+      "difficulty": 2
+    },
+    {
+      "word": "backstroke",
+      "phonetic": "[ˈbækstroʊk]",
+      "meaning": "仰泳",
+      "difficulty": 3
+    },
+    {
+      "word": "dizzy",
+      "phonetic": "[ˈdɪzi]",
+      "meaning": "眩晕的",
+      "difficulty": 2
+    },
+    {
+      "word": "doozie",
+      "phonetic": "[ˈduːzi]",
+      "meaning": "厉害的东西（俚语）",
+      "difficulty": 3
+    },
+    {
+      "word": "booger",
+      "phonetic": "[ˈbuːɡər]",
+      "meaning": "鼻屎（俚语）",
+      "difficulty": 2
+    },
+    {
+      "word": "supper",
+      "phonetic": "[ˈsʌpər]",
+      "meaning": "晚餐",
+      "difficulty": 1
+    },
+    {
+      "word": "talking",
+      "phonetic": "[ˈtɔːkɪŋ]",
+      "meaning": "说话（talk的现在分词）",
+      "difficulty": 1
+    },
+    {
+      "word": "brains",
+      "phonetic": "[breɪnz]",
+      "meaning": "大脑（复数）",
+      "difficulty": 1
+    },
+    {
+      "word": "tongue",
+      "phonetic": "[tʌŋ]",
+      "meaning": "舌头",
+      "difficulty": 1
+    },
+    {
+      "word": "bumped",
+      "phonetic": "[bʌmpt]",
+      "meaning": "撞到（bump的过去式）",
+      "difficulty": 2
+    }
+  ]
+}
+

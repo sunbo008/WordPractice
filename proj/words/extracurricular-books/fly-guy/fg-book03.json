@@ -1,0 +1,153 @@
+{
+  "metadata": {
+    "id": "fg-book03",
+    "name": "Fly Guy #3：《Shoo, Fly Guy!》",
+    "description": "嘘，苍蝇小子！",
+    "bookTitle": "Shoo, Fly Guy!",
+    "bookNumber": 3,
+    "series": "Fly Guy",
+    "category": "extracurricular-books",
+    "difficulty": "beginner",
+    "wordCount": 21,
+    "recommendedAge": "5-8",
+    "lastUpdated": "2025-11-18",
+    
+    "bookSummary": {
+      "brief": "Fly Guy独自出去寻找食物，经历了一系列被驱赶的冒险，最终找到了Buzz的野餐和他最爱的Shoo Fly Pie",
+      "setting": "城市街道和野餐地点",
+      "mainCharacters": ["Buzz (小男孩)", "Fly Guy (苍蝇)"],
+      "keyThemes": ["冒险", "坚持", "回家", "食物"]
+    },
+    
+    "story": "Buzz played with Fly Guy and made him a glass house. Fly Guy's favorite food was brown, oozy, lumpy, and smelly. One day Fly Guy went flying by himself. When he came home, Buzz was gone - they went on a picnic. Fly Guy was hungry and flew off to find food. He tried a hamburger, but a boy shooed him away. He tried pizza, but a girl yelled at him. He tried bones, but a dog growled. He tried roadkill, but a bird squawked. Fly Guy was very hungry, tired, and lost. He flew on and on until he saw something brown, oozy, lumpy, and smelly - it was Buzz's picnic with Shoo Fly Pie! Fly Guy was very happy!"
+  },
+  "words": [
+    {
+      "word": "made",
+      "phonetic": "[meɪd]",
+      "meaning": "制作（make的过去式）",
+      "difficulty": 1
+    },
+    {
+      "word": "glass",
+      "phonetic": "[ɡlæs]",
+      "meaning": "玻璃",
+      "difficulty": 1
+    },
+    {
+      "word": "favorite",
+      "phonetic": "[ˈfeɪvərɪt]",
+      "meaning": "最喜欢的",
+      "difficulty": 2
+    },
+    {
+      "word": "oozy",
+      "phonetic": "[ˈuːzi]",
+      "meaning": "渗出的，流质的",
+      "difficulty": 2
+    },
+    {
+      "word": "lumpy",
+      "phonetic": "[ˈlʌmpi]",
+      "meaning": "块状的",
+      "difficulty": 2
+    },
+    {
+      "word": "smelly",
+      "phonetic": "[ˈsmeli]",
+      "meaning": "有臭味的",
+      "difficulty": 2
+    },
+    {
+      "word": "himself",
+      "phonetic": "[hɪmˈself]",
+      "meaning": "他自己",
+      "difficulty": 1
+    },
+    {
+      "word": "picnic",
+      "phonetic": "[ˈpɪknɪk]",
+      "meaning": "野餐",
+      "difficulty": 2
+    },
+    {
+      "word": "off",
+      "phonetic": "[ɔːf]",
+      "meaning": "离开",
+      "difficulty": 1
+    },
+    {
+      "word": "until",
+      "phonetic": "[ənˈtɪl]",
+      "meaning": "直到",
+      "difficulty": 2
+    },
+    {
+      "word": "enough",
+      "phonetic": "[ɪˈnʌf]",
+      "meaning": "足够的",
+      "difficulty": 2
+    },
+    {
+      "word": "else",
+      "phonetic": "[els]",
+      "meaning": "其他的",
+      "difficulty": 1
+    },
+    {
+      "word": "yelled",
+      "phonetic": "[jeld]",
+      "meaning": "大叫（yell的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "growled",
+      "phonetic": "[ɡraʊld]",
+      "meaning": "咆哮（growl的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "those",
+      "phonetic": "[ðoʊz]",
+      "meaning": "那些",
+      "difficulty": 1
+    },
+    {
+      "word": "squawked",
+      "phonetic": "[skwɔːkt]",
+      "meaning": "发出刺耳叫声（squawk的过去式）",
+      "difficulty": 3
+    },
+    {
+      "word": "roadkill",
+      "phonetic": "[ˈroʊdkɪl]",
+      "meaning": "路上被撞死的动物",
+      "difficulty": 3
+    },
+    {
+      "word": "lost",
+      "phonetic": "[lɔːst]",
+      "meaning": "迷路的",
+      "difficulty": 1
+    },
+    {
+      "word": "found",
+      "phonetic": "[faʊnd]",
+      "meaning": "找到（find的过去式）",
+      "difficulty": 1
+    },
+    {
+      "word": "pie",
+      "phonetic": "[paɪ]",
+      "meaning": "馅饼",
+      "difficulty": 1
+    },
+    {
+      "word": "wants",
+      "phonetic": "[wɑːnts]",
+      "meaning": "想要（want的第三人称单数）",
+      "difficulty": 1
+    }
+  ]
+}
+

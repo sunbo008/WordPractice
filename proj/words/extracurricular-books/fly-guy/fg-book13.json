@@ -1,0 +1,111 @@
+{
+  "metadata": {
+    "id": "fg-book13",
+    "name": "Fly Guy #13：《Fly Guy and the Frankenfly》",
+    "description": "苍蝇小子与弗兰肯苍蝇",
+    "bookTitle": "Fly Guy and the Frankenfly",
+    "bookNumber": 13,
+    "series": "Fly Guy",
+    "category": "extracurricular-books",
+    "difficulty": "beginner",
+    "wordCount": 14,
+    "recommendedAge": "5-8",
+    "lastUpdated": "2025-11-18",
+    
+    "bookSummary": {
+      "brief": "在一个黑暗的暴风雨之夜，Buzz和Fly Guy一起玩。Buzz做完拼图和画画后去睡觉，Fly Guy说他也要做东西。Buzz做了一个噩梦，梦见Fly Guy在实验室里制造了一个巨大的弗兰肯苍蝇怪物。早上醒来发现Fly Guy在桌子上睡着了，原来他整晚都在画一幅Buzz和他自己的画",
+      "setting": "Buzz的房间",
+      "mainCharacters": ["Buzz (小男孩)", "Fly Guy (苍蝇)", "Frankenfly (梦中的怪物)"],
+      "keyThemes": ["噩梦", "友谊", "创作", "惊喜"]
+    },
+    
+    "story": "It was a dark and stormy night. Buzz and Fly Guy were playing. Buzz made puzzles for both of them, then a drawing for both of them. Finally, Buzz said it's time for bed. Fly Guy said he would make something too. As Buzz fell asleep, he wondered what Fly Guy was making. Late that night, a strange light woke up Buzz. Fly Guy was making something in his laboratory - he was making a monster! Fly Guy turned on the power and the monster sat up. Buzz cried 'It's Frankenfly!' Frankenfly heard Buzz, stood up, walked to the bed and picked up Buzz. Fly Guy yelled and shut off the power. Frankenfly dropped Buzz and fell onto the bed. Buzz fell out of bed and woke up - it was morning! 'Wow! That was a bad dream,' said Buzz. Fly Guy was not in his bed - he was asleep on the desk. 'Did you make something last night?' asked Buzz. Fly Guy pointed to a piece of paper - it was a painting of Buzz and Fly Guy! 'How did you paint this? My brushes are too big for you.' Buzz said, 'We are the BEST best friends ever!'"
+  },
+  "words": [
+    {
+      "word": "stormy",
+      "phonetic": "[ˈstɔːrmi]",
+      "meaning": "暴风雨的",
+      "difficulty": 2
+    },
+    {
+      "word": "puzzles",
+      "phonetic": "[ˈpʌzlz]",
+      "meaning": "拼图（复数）",
+      "difficulty": 2
+    },
+    {
+      "word": "both",
+      "phonetic": "[boʊθ]",
+      "meaning": "两者都",
+      "difficulty": 1
+    },
+    {
+      "word": "drawing",
+      "phonetic": "[ˈdrɔːɪŋ]",
+      "meaning": "画画",
+      "difficulty": 1
+    },
+    {
+      "word": "wondered",
+      "phonetic": "[ˈwʌndərd]",
+      "meaning": "想知道（wonder的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "late",
+      "phonetic": "[leɪt]",
+      "meaning": "晚的",
+      "difficulty": 1
+    },
+    {
+      "word": "strange",
+      "phonetic": "[streɪndʒ]",
+      "meaning": "奇怪的",
+      "difficulty": 2
+    },
+    {
+      "word": "laboratory",
+      "phonetic": "[ˈlæbrətɔːri]",
+      "meaning": "实验室",
+      "difficulty": 3
+    },
+    {
+      "word": "power",
+      "phonetic": "[ˈpaʊər]",
+      "meaning": "电源，力量",
+      "difficulty": 2
+    },
+    {
+      "word": "sat",
+      "phonetic": "[sæt]",
+      "meaning": "坐（sit的过去式）",
+      "difficulty": 1
+    },
+    {
+      "word": "walked",
+      "phonetic": "[wɔːkt]",
+      "meaning": "走（walk的过去式）",
+      "difficulty": 1
+    },
+    {
+      "word": "fell",
+      "phonetic": "[fel]",
+      "meaning": "掉落（fall的过去式）",
+      "difficulty": 1
+    },
+    {
+      "word": "dream",
+      "phonetic": "[driːm]",
+      "meaning": "梦",
+      "difficulty": 1
+    },
+    {
+      "word": "pointed",
+      "phonetic": "[ˈpɔɪntɪd]",
+      "meaning": "指向（point的过去式）",
+      "difficulty": 2
+    }
+  ]
+}
+

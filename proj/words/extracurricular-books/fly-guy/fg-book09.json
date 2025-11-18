@@ -1,0 +1,153 @@
+{
+  "metadata": {
+    "id": "fg-book09",
+    "name": "Fly Guy #9：《Buzz Boy and Fly Guy》",
+    "description": "巴兹男孩和苍蝇小子",
+    "bookTitle": "Buzz Boy and Fly Guy",
+    "bookNumber": 9,
+    "series": "Fly Guy",
+    "category": "extracurricular-books",
+    "difficulty": "beginner",
+    "wordCount": 21,
+    "recommendedAge": "5-8",
+    "lastUpdated": "2025-11-18",
+    
+    "bookSummary": {
+      "brief": "Buzz创作了一本漫画书，讲述了超级英雄Buzz Boy和Fly Guy的冒险故事，他们救出家人，打败海盗，还和龙成为了朋友",
+      "setting": "漫画书中的冒险世界",
+      "mainCharacters": ["Buzz (小男孩)", "Fly Guy (苍蝇)", "Buzz Boy (超级英雄)", "Dragon (龙)"],
+      "keyThemes": ["创造力", "冒险", "超级英雄", "友谊", "想象力"]
+    },
+    
+    "story": "One night, Buzz made a comic book about superheroes. He read it to Fly Guy. The story was about Buzz Boy who shrunk to the same size as Fly Guy. Buzz Boy got bad news - Fly Guy couldn't come on the adventure. Pirates took their house to a dragon cave on an island far away. Buzz Boy saw a sleeping dragon. With his super strength, Buzz Boy turned the dragon around. The dragon woke up and shot fire outside. They ran to the beach and found their house on a pirate ship. Fly Guy used his super skeleton key to unlock the door - they were at the top of the pirate ship! They made friends with the dragon and let him join their team as Dragon Dude! Fly Guy loved the superhero story and wanted to read it again!"
+  },
+  "words": [
+    {
+      "word": "superheroes",
+      "phonetic": "[ˈsuːpərhɪroʊz]",
+      "meaning": "超级英雄（复数）",
+      "difficulty": 3
+    },
+    {
+      "word": "adventures",
+      "phonetic": "[ədˈventʃərz]",
+      "meaning": "冒险（复数）",
+      "difficulty": 2
+    },
+    {
+      "word": "size",
+      "phonetic": "[saɪz]",
+      "meaning": "大小",
+      "difficulty": 1
+    },
+    {
+      "word": "news",
+      "phonetic": "[nuːz]",
+      "meaning": "新闻，消息",
+      "difficulty": 1
+    },
+    {
+      "word": "dragon",
+      "phonetic": "[ˈdræɡən]",
+      "meaning": "龙",
+      "difficulty": 2
+    },
+    {
+      "word": "cave",
+      "phonetic": "[keɪv]",
+      "meaning": "洞穴",
+      "difficulty": 2
+    },
+    {
+      "word": "pirate",
+      "phonetic": "[ˈpaɪrət]",
+      "meaning": "海盗",
+      "difficulty": 2
+    },
+    {
+      "word": "guards",
+      "phonetic": "[ɡɑːrdz]",
+      "meaning": "守卫（复数）",
+      "difficulty": 2
+    },
+    {
+      "word": "island",
+      "phonetic": "[ˈaɪlənd]",
+      "meaning": "岛屿",
+      "difficulty": 2
+    },
+    {
+      "word": "far",
+      "phonetic": "[fɑːr]",
+      "meaning": "远的",
+      "difficulty": 1
+    },
+    {
+      "word": "sleeping",
+      "phonetic": "[ˈsliːpɪŋ]",
+      "meaning": "睡觉的",
+      "difficulty": 1
+    },
+    {
+      "word": "asleep",
+      "phonetic": "[əˈsliːp]",
+      "meaning": "睡着的",
+      "difficulty": 2
+    },
+    {
+      "word": "strength",
+      "phonetic": "[streŋθ]",
+      "meaning": "力量",
+      "difficulty": 2
+    },
+    {
+      "word": "turned",
+      "phonetic": "[tɜːrnd]",
+      "meaning": "转动（turn的过去式）",
+      "difficulty": 1
+    },
+    {
+      "word": "woke",
+      "phonetic": "[woʊk]",
+      "meaning": "醒来（wake的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "shot",
+      "phonetic": "[ʃɑːt]",
+      "meaning": "射击（shoot的过去式）",
+      "difficulty": 1
+    },
+    {
+      "word": "fire",
+      "phonetic": "[ˈfaɪər]",
+      "meaning": "火",
+      "difficulty": 1
+    },
+    {
+      "word": "skeleton",
+      "phonetic": "[ˈskelɪtn]",
+      "meaning": "骨架",
+      "difficulty": 3
+    },
+    {
+      "word": "unlocked",
+      "phonetic": "[ʌnˈlɑːkt]",
+      "meaning": "打开（unlock的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "yikes",
+      "phonetic": "[jaɪks]",
+      "meaning": "哎呀（表示惊讶）",
+      "difficulty": 1
+    },
+    {
+      "word": "dude",
+      "phonetic": "[duːd]",
+      "meaning": "家伙",
+      "difficulty": 1
+    }
+  ]
+}
+

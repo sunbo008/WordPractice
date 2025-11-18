@@ -1,0 +1,165 @@
+{
+  "metadata": {
+    "id": "fg-book15",
+    "name": "Fly Guy #15：《Prince Fly Guy》",
+    "description": "王子苍蝇小子",
+    "bookTitle": "Prince Fly Guy",
+    "bookNumber": 15,
+    "series": "Fly Guy",
+    "category": "extracurricular-books",
+    "difficulty": "beginner",
+    "wordCount": 23,
+    "recommendedAge": "5-8",
+    "lastUpdated": "2025-11-18",
+    
+    "bookSummary": {
+      "brief": "Buzz要写童话故事作为家庭作业，Fly Guy帮助他创作。在故事中，Fly Guy扮演英俊的王子，飞到黑暗城堡，救出美丽的公主，击败了巨人，最后他们幸福地生活在一起",
+      "setting": "家里和童话故事世界",
+      "mainCharacters": ["Buzz (小男孩)", "Fly Guy (苍蝇/王子)", "公主", "巨人"],
+      "keyThemes": ["创作", "童话", "想象力", "冒险"]
+    },
+    
+    "story": "One night, Buzz said he has homework to do - he has to write a fairy tale. He asked Fly Guy to help. Buzz started with 'Once upon a time there was an ugly troll.' Fly Guy didn't like that. Buzz tried 'a smelly pig herder.' No? 'What about a handsome prince?' Yes! The handsome prince walked to the dark castle. Maybe instead of walking, he rode? No! He flew to the dark castle! At the dark castle, the handsome prince ate cold porridge. What if he kissed a frog? No! He rescued a beautiful princess. But a giant lived in the dark castle. The giant chased the handsome prince and the beautiful princess. He knocked them down to the ground. The princess threw her crown and it hit the giant on the nose. The giant fell down and ran away. The prince and the princess flew home. They made matching crowns and lived happily ever after. The end! Buzz liked his fairy tale and wanted to write another one about a hairy dwarf!"
+  },
+  "words": [
+    {
+      "word": "prince",
+      "phonetic": "[prɪns]",
+      "meaning": "王子",
+      "difficulty": 2
+    },
+    {
+      "word": "homework",
+      "phonetic": "[ˈhoʊmwɜːrk]",
+      "meaning": "家庭作业",
+      "difficulty": 1
+    },
+    {
+      "word": "write",
+      "phonetic": "[raɪt]",
+      "meaning": "写",
+      "difficulty": 1
+    },
+    {
+      "word": "fairy",
+      "phonetic": "[ˈferi]",
+      "meaning": "仙女，童话",
+      "difficulty": 2
+    },
+    {
+      "word": "tale",
+      "phonetic": "[teɪl]",
+      "meaning": "故事",
+      "difficulty": 2
+    },
+    {
+      "word": "sound",
+      "phonetic": "[saʊnd]",
+      "meaning": "听起来",
+      "difficulty": 1
+    },
+    {
+      "word": "upon",
+      "phonetic": "[əˈpɑːn]",
+      "meaning": "在……之上",
+      "difficulty": 2
+    },
+    {
+      "word": "ugly",
+      "phonetic": "[ˈʌɡli]",
+      "meaning": "丑陋的",
+      "difficulty": 1
+    },
+    {
+      "word": "troll",
+      "phonetic": "[troʊl]",
+      "meaning": "巨魔",
+      "difficulty": 2
+    },
+    {
+      "word": "herder",
+      "phonetic": "[ˈhɜːrdər]",
+      "meaning": "牧人",
+      "difficulty": 2
+    },
+    {
+      "word": "handsome",
+      "phonetic": "[ˈhænsəm]",
+      "meaning": "英俊的",
+      "difficulty": 2
+    },
+    {
+      "word": "castle",
+      "phonetic": "[ˈkæsl]",
+      "meaning": "城堡",
+      "difficulty": 2
+    },
+    {
+      "word": "instead",
+      "phonetic": "[ɪnˈsted]",
+      "meaning": "代替",
+      "difficulty": 2
+    },
+    {
+      "word": "porridge",
+      "phonetic": "[ˈpɔːrɪdʒ]",
+      "meaning": "粥",
+      "difficulty": 2
+    },
+    {
+      "word": "kissed",
+      "phonetic": "[kɪst]",
+      "meaning": "亲吻（kiss的过去式）",
+      "difficulty": 1
+    },
+    {
+      "word": "rescued",
+      "phonetic": "[ˈreskjuːd]",
+      "meaning": "救援（rescue的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "princess",
+      "phonetic": "[ˈprɪnses]",
+      "meaning": "公主",
+      "difficulty": 2
+    },
+    {
+      "word": "giant",
+      "phonetic": "[ˈdʒaɪənt]",
+      "meaning": "巨人",
+      "difficulty": 2
+    },
+    {
+      "word": "lived",
+      "phonetic": "[lɪvd]",
+      "meaning": "居住（live的过去式）",
+      "difficulty": 1
+    },
+    {
+      "word": "knocked",
+      "phonetic": "[nɑːkt]",
+      "meaning": "敲打（knock的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "ground",
+      "phonetic": "[ɡraʊnd]",
+      "meaning": "地面",
+      "difficulty": 1
+    },
+    {
+      "word": "threw",
+      "phonetic": "[θruː]",
+      "meaning": "扔（throw的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "crown",
+      "phonetic": "[kraʊn]",
+      "meaning": "王冠",
+      "difficulty": 2
+    }
+  ]
+}
+

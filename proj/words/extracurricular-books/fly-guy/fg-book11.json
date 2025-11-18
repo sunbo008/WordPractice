@@ -1,0 +1,165 @@
+{
+  "metadata": {
+    "id": "fg-book11",
+    "name": "Fly Guy #11：《Ride, Fly Guy, Ride!》",
+    "description": "骑行吧，苍蝇小子！",
+    "bookTitle": "Ride, Fly Guy, Ride!",
+    "bookNumber": 11,
+    "series": "Fly Guy",
+    "category": "extracurricular-books",
+    "difficulty": "beginner",
+    "wordCount": 23,
+    "recommendedAge": "5-8",
+    "lastUpdated": "2025-11-18",
+    
+    "bookSummary": {
+      "brief": "Buzz和爸爸开车兜风，Fly Guy被风吹出窗外，经历了一场疯狂的追逐冒险，从卡车到船到火车到飞机再到火箭，最终安全回到Buzz身边",
+      "setting": "汽车、卡车、船、火车、飞机、火箭",
+      "mainCharacters": ["Buzz (小男孩)", "Fly Guy (苍蝇)", "Dad (爸爸)"],
+      "keyThemes": ["冒险", "追逐", "交通工具", "团聚"]
+    },
+    
+    "story": "One day, Dad asked who wants to go for a ride. Buzz and Fly Guy said yes! Everyone buckled up and they hit the road with the windows down. Buzz stuck his hand out and pretended it was flying. Suddenly, wind blew in the car and carried Fly Guy out into a passing truck! Buzz cried 'Follow that truck!' Meanwhile, Fly Guy tumbled into the truck driver's mouth. The driver spit Fly Guy out the window and into a passing motorboat. Buzz cried 'Follow that boat!' On the boat, Fly Guy saw a bug on a hook and jumped into a passing train. On the train, Fly Guy surprised a sleepy elephant who blew him onto an airplane! The pilot turned on the wipers. Then a rocket roared up from the ground. Buzz and Dad landed and worried if Fly Guy would survive. But Fly Guy was safe - the rocket didn't take him to space! They were reunited!"
+  },
+  "words": [
+    {
+      "word": "ride",
+      "phonetic": "[raɪd]",
+      "meaning": "骑行，乘坐",
+      "difficulty": 1
+    },
+    {
+      "word": "buckle",
+      "phonetic": "[ˈbʌkl]",
+      "meaning": "扣紧，系好",
+      "difficulty": 2
+    },
+    {
+      "word": "windows",
+      "phonetic": "[ˈwɪndoʊz]",
+      "meaning": "窗户（复数）",
+      "difficulty": 1
+    },
+    {
+      "word": "oops",
+      "phonetic": "[uːps]",
+      "meaning": "哎呀（表示惊讶）",
+      "difficulty": 1
+    },
+    {
+      "word": "air",
+      "phonetic": "[er]",
+      "meaning": "空气",
+      "difficulty": 1
+    },
+    {
+      "word": "stuck",
+      "phonetic": "[stʌk]",
+      "meaning": "伸出（stick的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "pretended",
+      "phonetic": "[prɪˈtendɪd]",
+      "meaning": "假装（pretend的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "suddenly",
+      "phonetic": "[ˈsʌdənli]",
+      "meaning": "突然地",
+      "difficulty": 2
+    },
+    {
+      "word": "wind",
+      "phonetic": "[wɪnd]",
+      "meaning": "风",
+      "difficulty": 1
+    },
+    {
+      "word": "blew",
+      "phonetic": "[bluː]",
+      "meaning": "吹（blow的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "carried",
+      "phonetic": "[ˈkærid]",
+      "meaning": "携带（carry的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "passing",
+      "phonetic": "[ˈpæsɪŋ]",
+      "meaning": "经过的",
+      "difficulty": 2
+    },
+    {
+      "word": "meanwhile",
+      "phonetic": "[ˈmiːnwaɪl]",
+      "meaning": "与此同时",
+      "difficulty": 2
+    },
+    {
+      "word": "tumbled",
+      "phonetic": "[ˈtʌmbld]",
+      "meaning": "翻滚（tumble的过去式）",
+      "difficulty": 2
+    },
+    {
+      "word": "spit",
+      "phonetic": "[spɪt]",
+      "meaning": "吐出",
+      "difficulty": 2
+    },
+    {
+      "word": "motorboat",
+      "phonetic": "[ˈmoʊtərboʊt]",
+      "meaning": "摩托艇",
+      "difficulty": 2
+    },
+    {
+      "word": "bug",
+      "phonetic": "[bʌɡ]",
+      "meaning": "虫子",
+      "difficulty": 1
+    },
+    {
+      "word": "hook",
+      "phonetic": "[hʊk]",
+      "meaning": "钩子",
+      "difficulty": 1
+    },
+    {
+      "word": "sleepy",
+      "phonetic": "[ˈsliːpi]",
+      "meaning": "困倦的",
+      "difficulty": 1
+    },
+    {
+      "word": "airplane",
+      "phonetic": "[ˈerpleɪn]",
+      "meaning": "飞机",
+      "difficulty": 1
+    },
+    {
+      "word": "pilot",
+      "phonetic": "[ˈpaɪlət]",
+      "meaning": "飞行员",
+      "difficulty": 2
+    },
+    {
+      "word": "wipers",
+      "phonetic": "[ˈwaɪpərz]",
+      "meaning": "雨刷（复数）",
+      "difficulty": 2
+    },
+    {
+      "word": "rocket",
+      "phonetic": "[ˈrɑːkɪt]",
+      "meaning": "火箭",
+      "difficulty": 2
+    }
+  ]
+}
+
