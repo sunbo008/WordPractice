@@ -638,8 +638,8 @@ class WordTetrisGame {
             //     return;
             // }
             
-            // 字母和连字符输入处理（游戏进行中）
-            if (this.gameState === 'playing' && e.key.match(/^[a-zA-Z-]$/)) {
+            // 字母、连字符和句点输入处理（游戏进行中）
+            if (this.gameState === 'playing' && e.key.match(/^[a-zA-Z.\-]$/)) {
                 e.preventDefault();
                 this.handleCharacterInput(e.key.toLowerCase());
                 return;
@@ -660,9 +660,9 @@ class WordTetrisGame {
             }
         });
         
-        // 只允许输入字母和连字符，并实时更新显示
+        // 只允许输入字母、连字符和句点，并实时更新显示
         letterInput.addEventListener('input', (e) => {
-            e.target.value = e.target.value.replace(/[^a-zA-Z-]/g, '').toLowerCase();
+            e.target.value = e.target.value.replace(/[^a-zA-Z.\-]/g, '').toLowerCase();
             this.updateRealTimeDisplay();
         });
     }
