@@ -8,18 +8,18 @@ class CertificationPage {
         this.certSystem = new CertificationSystem();
         this.testMode = false; // 测试模式：跳过解锁和冷却检查
         this.badgeMap = {
-            'phonics': { file: 'phonics-badge.svg', name: '音标大师' },
-            'grade3': { file: 'grade3-badge.svg', name: '三年级' },
-            'grade4': { file: 'grade4-badge.svg', name: '四年级' },
-            'grade5': { file: 'grade5-badge.svg', name: '五年级' },
-            'grade6': { file: 'grade6-badge.svg', name: '六年级' },
-            'flyGuy': { file: 'flyguy-badge.svg', name: 'Fly Guy' },
-            'magicTreeHouse': { file: 'treehouse-badge.svg', name: '神奇树屋' },
-            'dragonBall': { file: 'dragonball-badge.svg', name: '七龙珠' },
-            'harryPotter': { file: 'harrypotter-badge.svg', name: '哈利波特' },
-            'middleSchool': { file: 'middle-badge.svg', name: '初中' },
-            'highSchool': { file: 'high-badge.svg', name: '高中' },
-            'cet4': { file: 'cet4-badge.svg', name: '四级' }
+            'phonics': { file: 'phonics-badge.svg', name: '音标大师', encourage: '我们一起见证了你的成长，努力必然有回报，加油！！！' },
+            'grade3': { file: 'grade3-badge.svg', name: '三年级', encourage: '迈出第一步，你已经很棒了！继续前进！' },
+            'grade4': { file: 'grade4-badge.svg', name: '四年级', encourage: '稳步提升中，你的坚持让人敬佩！' },
+            'grade5': { file: 'grade5-badge.svg', name: '五年级', encourage: '积累的力量正在显现，胜利就在前方！' },
+            'grade6': { file: 'grade6-badge.svg', name: '六年级', encourage: '小学词汇全部掌握！你已准备好迎接新挑战！' },
+            'flyGuy': { file: 'flyguy-badge.svg', name: 'Fly Guy', encourage: '阅读的快乐你已体会到了，继续翱翔吧！' },
+            'magicTreeHouse': { file: 'treehouse-badge.svg', name: '神奇树屋', encourage: '穿越时空的冒险者，你的词汇量突飞猛进！' },
+            'dragonBall': { file: 'dragonball-badge.svg', name: '七龙珠', encourage: '集齐七龙珠的勇士，没有什么能阻挡你！' },
+            'harryPotter': { file: 'harrypotter-badge.svg', name: '哈利波特', encourage: '魔法世界的探索者，你的英语已经非常出色！' },
+            'middleSchool': { file: 'middle-badge.svg', name: '初中', encourage: '初中词汇已拿下，你的努力值得骄傲！' },
+            'highSchool': { file: 'high-badge.svg', name: '高中', encourage: '高中词汇全部掌握，大学之门为你敞开！' },
+            'cet4': { file: 'cet4-badge.svg', name: '四级', encourage: '四级词汇已征服，你已是真正的英语高手！' }
         };
     }
 
@@ -271,7 +271,7 @@ class CertificationPage {
                 const starHtml = showStar ? '<span class="badge-hall-star">⭐</span>' : '';
                 
                 const tooltip = earned 
-                    ? `🏅 ${info.name}\n解锁于: ${formatDate(earnedAt)}${showStar ? '\n🌟 全满分成就！' : ''}` 
+                    ? `🏅 ${info.name}\n${info.encourage}\n\n解锁于: ${formatDate(earnedAt)}${showStar ? '\n🌟 全满分成就！' : ''}` 
                     : `🔒 ${info.name}\n未解锁`;
                 const passedBadgeHtml = earned ? '<span class="badge-hall-passed">🏅</span>' : '';
                 return `
