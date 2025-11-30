@@ -166,7 +166,7 @@ class CertificationPage {
     /**
      * 显示考试确认弹窗
      */
-    _showExamModal(series, majorLevel, minorLevel) {
+    async _showExamModal(series, majorLevel, minorLevel) {
         const modal = document.getElementById('examModal');
         const levelNameEl = document.getElementById('modalLevelName');
         const examScopeEl = document.getElementById('modalExamScope');
@@ -180,13 +180,23 @@ class CertificationPage {
         // 获取考试信息
         const examInfo = this.certSystem.getExamInfo(series, majorLevel, minorLevel);
         examScopeEl.textContent = examInfo.scope;
-        // wordCount=0 表示加载全部单词
-        if (examInfo.wordCount === 0) {
-            // 从 scope 中提取数量描述（如果有的话）
-            const match = examInfo.scope.match(/（[约]?(\d+)个）/);
-            wordCountEl.textContent = match ? `全部 ~${match[1]} 个单词` : '全部单词';
-        } else {
-            wordCountEl.textContent = `${examInfo.wordCount} 个单词`;
+        
+        // 动态计算单词数量（去重后）
+        wordCountEl.textContent = '计算中...';
+        modal.classList.add('show'); // 先显示模态框
+        
+        try {
+            // 获取 ExamIntegration 实例
+            const examIntegration = window.examIntegration;
+            if (examIntegration) {
+                const wordCount = await examIntegration.getExamWordCount(series, majorLevel, minorLevel);
+                wordCountEl.textContent = wordCount > 0 ? `${wordCount} 个单词` : '全部单词';
+            } else {
+                wordCountEl.textContent = '全部单词';
+            }
+        } catch (e) {
+            console.error('计算单词数量失败:', e);
+            wordCountEl.textContent = '全部单词';
         }
         
         // 存储当前选择
@@ -197,8 +207,6 @@ class CertificationPage {
             this._hideExamModal();
             this.startExam(series, majorLevel, minorLevel);
         };
-        
-        modal.classList.add('show');
     }
     
     /**

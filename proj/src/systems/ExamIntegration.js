@@ -512,6 +512,29 @@ class ExamIntegration {
             console.log('🔄 已恢复原始词库');
         }
     }
+    
+    /**
+     * 预计算考试词库的单词数量（去重后）
+     * @param {string} series - 系列名称
+     * @param {string} majorLevel - 大级别
+     * @param {string} minorLevel - 小级别
+     * @returns {Promise<number>} 去重后的单词数量
+     */
+    async getExamWordCount(series, majorLevel, minorLevel) {
+        try {
+            const examFiles = await this.getExamVocabularyFiles(series, majorLevel, minorLevel);
+            if (examFiles.length === 0) {
+                return 0;
+            }
+            
+            const examWords = await this.loadWordsFromFiles(examFiles);
+            const uniqueWords = this._deduplicateWords(examWords);
+            return uniqueWords.length;
+        } catch (e) {
+            console.error('❌ 预计算单词数量失败:', e);
+            return 0;
+        }
+    }
 
     /**
      * 考试结束处理
