@@ -222,6 +222,19 @@ class CertificationPage {
         earnedBadges.forEach(b => {
             earnedMap[b.id] = b.earnedAt;
         });
+        
+        // 测试模式：test=2 时开启所有徽章
+        const urlParams = new URLSearchParams(window.location.search);
+        const isTestMode = urlParams.get('test') === '2';
+        if (isTestMode) {
+            const allBadgeIds = Object.keys(this.badgeMap);
+            const testTime = Date.now();
+            allBadgeIds.forEach(id => {
+                if (!earnedMap[id]) {
+                    earnedMap[id] = testTime;
+                }
+            });
+        }
 
         // 基础系列
         const basicBadges = ['phonics', 'grade3', 'grade4', 'grade5', 'grade6'];
@@ -252,9 +265,9 @@ class CertificationPage {
                 const earned = !!earnedAt;
                 const filePrefix = earned ? info.file : info.file.replace('.svg', '-gray.svg');
                 
-                // 检查是否显示亮星
+                // 检查是否显示亮星（测试模式下全部显示亮星）
                 const seriesInfo = getBadgeSeriesInfo(id);
-                const showStar = seriesInfo && this.certSystem.shouldShowStar(seriesInfo.series, seriesInfo.major);
+                const showStar = isTestMode || (seriesInfo && this.certSystem.shouldShowStar(seriesInfo.series, seriesInfo.major));
                 const starHtml = showStar ? '<span class="badge-hall-star">⭐</span>' : '';
                 
                 const tooltip = earned 
