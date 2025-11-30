@@ -12,6 +12,7 @@ class ExamIntegration {
         this.examConfig = null;
         this.game = null;
         this.previousGameMode = null; // 保存考试前的游戏模式
+        this.testMode = false; // 测试模式：跳过解锁和冷却检查
     }
 
     /**
@@ -41,6 +42,13 @@ class ExamIntegration {
      */
     checkExamModeFromUrl() {
         const params = new URLSearchParams(window.location.search);
+        
+        // 检查测试模式
+        this.testMode = params.get('test') === '1';
+        if (this.testMode) {
+            console.log('🧪 考试测试模式已启用 - 跳过解锁和冷却检查');
+        }
+        
         if (params.get('mode') === 'exam') {
             const series = params.get('series');
             const major = params.get('major');
@@ -79,11 +87,15 @@ class ExamIntegration {
             return false;
         }
 
-        // 检查是否可以开始考试
-        const canStart = this.certSystem.canStartExam(series, majorLevel, minorLevel);
-        if (!canStart.allowed) {
-            alert(canStart.reason);
-            return false;
+        // 检查是否可以开始考试（测试模式下跳过）
+        if (!this.testMode) {
+            const canStart = this.certSystem.canStartExam(series, majorLevel, minorLevel);
+            if (!canStart.allowed) {
+                alert(canStart.reason);
+                return false;
+            }
+        } else {
+            console.log('🧪 测试模式：跳过考试解锁和冷却检查');
         }
 
         // 🔥 考试必须使用挑战模式
@@ -188,18 +200,15 @@ class ExamIntegration {
         const examInfo = this.certSystem.getExamInfo(series, majorLevel, minorLevel);
         const targetWordCount = examInfo.wordCount;
         
-        console.log(`📊 考试配置: ${examInfo.scope}, 目标单词数: ${targetWordCount}`);
+        // wordCount=0 表示加载全部单词
+        const loadAllWords = targetWordCount === 0;
+        console.log(`📊 考试配置: ${examInfo.scope}, 目标单词数: ${loadAllWords ? '全部' : targetWordCount}`);
         
         // 获取词库管理器（从 game 实例获取）
         const vm = this.game?.vocabularyManager;
         
         if (!vm) {
             console.warn('⚠️ 词库管理器未找到');
-            return;
-        }
-        
-        if (targetWordCount === 0) {
-            console.warn('⚠️ 考试词库尚未配置 (wordCount = 0)');
             return;
         }
         
@@ -215,7 +224,9 @@ class ExamIntegration {
         if (!examFiles || examFiles.length === 0) {
             console.warn('⚠️ 未找到对应的考试词库文件，使用当前词库');
             // 回退到旧逻辑：从当前词库随机选取
-            this._applyWordCountLimit(vm, targetWordCount);
+            if (!loadAllWords) {
+                this._applyWordCountLimit(vm, targetWordCount);
+            }
             return;
         }
         
@@ -236,11 +247,17 @@ class ExamIntegration {
         const uniqueWords = this._deduplicateWords(examWords);
         console.log(`🔄 去重后: ${uniqueWords.length} 个单词`);
         
-        // 打乱并限制数量
+        // 打乱单词顺序
         const shuffled = [...uniqueWords].sort(() => Math.random() - 0.5);
-        vm.allWords = shuffled.slice(0, Math.min(targetWordCount, shuffled.length));
         
-        console.log(`✂️ 考试单词数量: ${vm.allWords.length}/${uniqueWords.length}`);
+        // wordCount=0 时加载全部，否则限制数量
+        if (loadAllWords || targetWordCount >= shuffled.length) {
+            vm.allWords = shuffled;
+            console.log(`📚 考试单词: 全部 ${vm.allWords.length} 个`);
+        } else {
+            vm.allWords = shuffled.slice(0, targetWordCount);
+            console.log(`✂️ 考试单词数量: ${vm.allWords.length}/${uniqueWords.length}`);
+        }
         
         // 重新初始化单词池
         vm.initializeWordPool();

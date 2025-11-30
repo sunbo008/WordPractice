@@ -30,13 +30,15 @@ class CertificationSystem {
                     complexSounds: '复合音'
                 },
                 // 考试信息配置
+                // 词库统计: 短元音60 + 长元音45 + 双元音60 + 辅音45 + 复合音15 ≈ 225个单词（去重后）
+                // wordCount 设为 0 表示加载全部单词，不做数量限制
                 examInfo: {
-                    shortVowels: { scope: '/æ/, /e/, /ɪ/, /ɒ/, /ʌ/ 相关单词', wordCount: 30 },
-                    longVowels: { scope: '/iː/, /uː/, /ɑː/, /ɔː/, /ɜː/ 相关单词', wordCount: 30 },
-                    diphthongs: { scope: '/eɪ/, /aɪ/, /ɔɪ/, /əʊ/, /aʊ/ 等双元音单词', wordCount: 35 },
-                    consonants: { scope: '/p/, /b/, /t/, /d/, /k/, /g/ 等辅音单词', wordCount: 40 },
-                    complexSounds: { scope: '/tʃ/, /dʒ/, /ʃ/, /θ/, /ð/ 等复合音单词', wordCount: 35 },
-                    finalExam: { scope: '全部音标综合测试', wordCount: 50 }
+                    shortVowels: { scope: '/æ/, /e/, /ɪ/, /ɒ/, /ʌ/, /ʊ/ 相关单词（约60个）', wordCount: 0 },
+                    longVowels: { scope: '/iː/, /uː/, /ɜː/, /ə/ 相关单词（约45个）', wordCount: 0 },
+                    diphthongs: { scope: '/eɪ/, /aɪ/, /ɔɪ/, /əʊ/, /aʊ/, /ɪə/, /eə/, /ʊə/ 等双元音单词（约60个）', wordCount: 0 },
+                    consonants: { scope: '/p/, /b/, /t/, /d/, /k/, /g/, /f/, /v/ 等辅音单词（约45个）', wordCount: 0 },
+                    complexSounds: { scope: '/tʃ/, /dʒ/, /ʃ/, /ʒ/, /θ/, /ð/ 等复合音单词（约15个）', wordCount: 0 },
+                    finalExam: { scope: '全部音标综合测试（约225个）', wordCount: 0 }
                 }
             },
             

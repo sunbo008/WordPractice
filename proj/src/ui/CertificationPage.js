@@ -6,6 +6,7 @@
 class CertificationPage {
     constructor() {
         this.certSystem = new CertificationSystem();
+        this.testMode = false; // 测试模式：跳过解锁和冷却检查
         this.badgeMap = {
             'phonics': { file: 'phonics-badge.svg', name: '音标大师' },
             'grade3': { file: 'grade3-badge.svg', name: '三年级' },
@@ -26,6 +27,9 @@ class CertificationPage {
      * 初始化页面
      */
     init() {
+        // 检查测试模式参数: ?test=1
+        this._checkTestMode();
+        
         this.renderBadgeHall();
         this.renderSkillTree();
         this.updateStats();
@@ -38,6 +42,59 @@ class CertificationPage {
         
         // 定时刷新冷却时间显示
         setInterval(() => this.renderSkillTree(), 60000); // 每分钟刷新一次
+    }
+    
+    /**
+     * 检查是否启用测试模式
+     * URL 参数: ?test=1
+     */
+    _checkTestMode() {
+        const params = new URLSearchParams(window.location.search);
+        this.testMode = params.get('test') === '1';
+        
+        if (this.testMode) {
+            console.log('🧪 测试模式已启用 - 跳过解锁和冷却检查');
+            this._showTestModeIndicator();
+        }
+    }
+    
+    /**
+     * 显示测试模式指示器
+     */
+    _showTestModeIndicator() {
+        const indicator = document.createElement('div');
+        indicator.id = 'testModeIndicator';
+        indicator.innerHTML = `
+            <div style="
+                position: fixed;
+                top: 10px;
+                left: 50%;
+                transform: translateX(-50%);
+                padding: 8px 20px;
+                background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+                border: 2px solid #ffd700;
+                border-radius: 20px;
+                color: white;
+                font-weight: bold;
+                font-size: 14px;
+                z-index: 9999;
+                box-shadow: 0 4px 15px rgba(255, 107, 107, 0.5);
+                animation: pulse-test 1.5s ease-in-out infinite;
+            ">
+                🧪 测试模式 - 所有考试可直接进入
+            </div>
+        `;
+        
+        // 添加动画样式
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse-test {
+                0%, 100% { transform: translateX(-50%) scale(1); }
+                50% { transform: translateX(-50%) scale(1.05); }
+            }
+        `;
+        document.head.appendChild(style);
+        document.body.appendChild(indicator);
     }
     
     /**
@@ -123,7 +180,14 @@ class CertificationPage {
         // 获取考试信息
         const examInfo = this.certSystem.getExamInfo(series, majorLevel, minorLevel);
         examScopeEl.textContent = examInfo.scope;
-        wordCountEl.textContent = examInfo.wordCount > 0 ? `${examInfo.wordCount} 个单词` : '待配置';
+        // wordCount=0 表示加载全部单词
+        if (examInfo.wordCount === 0) {
+            // 从 scope 中提取数量描述（如果有的话）
+            const match = examInfo.scope.match(/（[约]?(\d+)个）/);
+            wordCountEl.textContent = match ? `全部 ~${match[1]} 个单词` : '全部单词';
+        } else {
+            wordCountEl.textContent = `${examInfo.wordCount} 个单词`;
+        }
         
         // 存储当前选择
         this._pendingExam = { series, majorLevel, minorLevel };
@@ -757,7 +821,8 @@ class CertificationPage {
         // 绑定小级别点击事件（所有树状结构）
         document.querySelectorAll('.tree-node.sub-node').forEach(node => {
             node.addEventListener('click', () => {
-                if (node.classList.contains('locked')) return;
+                // 测试模式下忽略锁定状态
+                if (!this.testMode && node.classList.contains('locked')) return;
                 // 移除 completed 检查，允许重复挑战
                 
                 const series = node.dataset.series;
@@ -765,6 +830,12 @@ class CertificationPage {
                 const minor = node.dataset.minor || null;
                 
                 // 直接使用当前点击的级别
+                // 测试模式下跳过检查
+                if (this.testMode) {
+                    this._showExamModal(series, major, minor);
+                    return;
+                }
+                
                 const canStart = this.certSystem.canStartExam(series, major, minor);
                 if (canStart.allowed) {
                     this._showExamModal(series, major, minor);
@@ -777,16 +848,25 @@ class CertificationPage {
         // 绑定所有主节点点击（总考）
         document.querySelectorAll('.tree-node.main-node').forEach(node => {
             node.addEventListener('click', () => {
-                // 锁定状态不可点击
-                if (node.classList.contains('locked')) return;
-                // 进行中状态（小级别未全部通过）不可点击总考
-                if (node.classList.contains('in-progress')) return;
+                // 测试模式下忽略锁定和进行中状态
+                if (!this.testMode) {
+                    // 锁定状态不可点击
+                    if (node.classList.contains('locked')) return;
+                    // 进行中状态（小级别未全部通过）不可点击总考
+                    if (node.classList.contains('in-progress')) return;
+                }
                 
                 const series = node.dataset.series;
                 const major = node.dataset.major || null;
                 const minor = node.dataset.minor || 'finalExam';
                 
                 if (series) {
+                    // 测试模式下跳过检查
+                    if (this.testMode) {
+                        this._showExamModal(series, major, minor);
+                        return;
+                    }
+                    
                     const canStart = this.certSystem.canStartExam(series, major, minor);
                     if (canStart.allowed) {
                         this._showExamModal(series, major, minor);
@@ -915,7 +995,14 @@ class CertificationPage {
         sessionStorage.setItem('currentExam', JSON.stringify(examInfo));
         
         // 跳转到游戏页面进行考试
-        window.location.href = `index.html?mode=exam&series=${series}&major=${majorLevel || ''}&minor=${minorLevel || ''}`;
+        let url = `index.html?mode=exam&series=${series}&major=${majorLevel || ''}&minor=${minorLevel || ''}`;
+        
+        // 测试模式下传递 test 参数
+        if (this.testMode) {
+            url += '&test=1';
+        }
+        
+        window.location.href = url;
     }
 
 
