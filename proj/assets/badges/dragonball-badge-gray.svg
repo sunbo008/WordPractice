@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120">
+  <defs>
+    <linearGradient id="grayShieldDragon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4a4a4a"/>
+      <stop offset="50%" style="stop-color:#2a2a2a"/>
+      <stop offset="100%" style="stop-color:#4a4a4a"/>
+    </linearGradient>
+  </defs>
+  
+  <path d="M50 5 L90 20 L90 55 Q90 85 50 110 Q10 85 10 55 L10 20 Z" 
+        fill="url(#grayShieldDragon)" stroke="#666" stroke-width="3"/>
+  
+  <circle cx="50" cy="42" r="18" fill="#555" stroke="#666" stroke-width="2"/>
+  <circle cx="50" cy="42" r="3" fill="#777"/>
+  <circle cx="44" cy="36" r="2" fill="#777"/>
+  <circle cx="56" cy="36" r="2" fill="#777"/>
+  <circle cx="44" cy="48" r="2" fill="#777"/>
+  <circle cx="56" cy="48" r="2" fill="#777"/>
+  
+  <text x="50" y="80" text-anchor="middle" font-family="Georgia, serif" font-size="9" fill="#888" font-weight="bold">DRAGON</text>
+  <text x="50" y="92" text-anchor="middle" font-family="Georgia, serif" font-size="9" fill="#888" font-weight="bold">BALL</text>
+</svg>
+

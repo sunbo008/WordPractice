@@ -1,0 +1,50 @@
+{
+  "version": "1.0",
+  "description": "音标分类词库映射 - 用于考级系统",
+  "categories": {
+    "shortVowels": {
+      "name": "短元音",
+      "phonemes": ["/æ/", "/e/", "/ɪ/", "/ɒ/", "/ʌ/"],
+      "description": "短元音音标：/æ/ /e/ /ɪ/ /ɒ/ /ʌ/",
+      "sources": [
+        "special-practice/ae-practice.json",
+        "special-practice/e-practice.json"
+      ],
+      "dailyPhonics": ["day01", "day02", "day03", "day04", "day05"]
+    },
+    "longVowels": {
+      "name": "长元音",
+      "phonemes": ["/iː/", "/uː/", "/ɑː/", "/ɔː/", "/ɜː/"],
+      "description": "长元音音标：/iː/ /uː/ /ɑː/ /ɔː/ /ɜː/",
+      "sources": [],
+      "dailyPhonics": ["day06", "day07", "day08", "day09", "day10"]
+    },
+    "diphthongs": {
+      "name": "双元音",
+      "phonemes": ["/eɪ/", "/aɪ/", "/ɔɪ/", "/əʊ/", "/aʊ/", "/ɪə/", "/eə/", "/ʊə/"],
+      "description": "双元音音标：/eɪ/ /aɪ/ /ɔɪ/ /əʊ/ /aʊ/ /ɪə/ /eə/ /ʊə/",
+      "sources": [],
+      "dailyPhonics": ["day11", "day12", "day13", "day14", "day15"]
+    },
+    "consonants": {
+      "name": "辅音",
+      "phonemes": ["/p/", "/b/", "/t/", "/d/", "/k/", "/g/", "/f/", "/v/", "/s/", "/z/", "/m/", "/n/", "/l/", "/r/", "/h/", "/w/", "/j/"],
+      "description": "基础辅音音标",
+      "sources": [],
+      "dailyPhonics": ["day17", "day18", "day19", "day20", "day22", "day23", "day24", "day25"]
+    },
+    "complexSounds": {
+      "name": "复合音",
+      "phonemes": ["/tʃ/", "/dʒ/", "/ʃ/", "/ʒ/", "/θ/", "/ð/", "/ŋ/"],
+      "description": "复合音和特殊音标：/tʃ/ /dʒ/ /ʃ/ /ʒ/ /θ/ /ð/ /ŋ/",
+      "sources": [],
+      "dailyPhonics": ["day28", "day29", "day30", "day32", "day33", "day34", "day35"]
+    }
+  },
+  "examConfig": {
+    "wordsPerExam": 20,
+    "minWordsRequired": 15,
+    "passThreshold": 90
+  }
+}
+

@@ -458,14 +458,47 @@ button:disabled {
 
 
 /* 游戏说明 */
+.game-instructions .instructions-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 5px 10px;
+}
+
+.game-instructions .qrcode-img {
+    width: 90px;
+    height: auto;
+    flex-shrink: 0;
+}
+
+.game-instructions .game-intro {
+    flex: 0 1 auto;
+    min-width: 0;
+    margin-left: 3px;
+}
+
+.game-instructions .game-intro h4 {
+    margin: 0 0 6px 0;
+    font-size: 0.85em;
+    color: #ffd700;
+    text-align: left;
+}
+
 .game-instructions ul {
     list-style: none;
     padding-left: 0;
+    margin: 0;
 }
 
 .game-instructions li {
-    padding: 5px 0;
+    padding: 2px 0;
+    font-size: 0.75em;
     border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.game-instructions li:last-child {
+    border-bottom: none;
 }
 
 .game-instructions li:before {

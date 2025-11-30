@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>荣誉殿堂 - Word Tetris</title>
+    <link rel="stylesheet" href="css/certification.css?v=20251130c">
+    <link rel="stylesheet" href="css/badge.css?v=20251130c">
+</head>
+<body>
+    <!-- 返回按钮 -->
+    <button class="back-btn" onclick="location.href='index.html'">← 返回主页</button>
+
+    <div class="certification-container">
+        <!-- 页面标题 -->
+        <header class="page-header">
+            <h1 class="page-title">荣誉殿堂</h1>
+            <p class="page-subtitle">通过考验，点亮徽章，成为词汇大师</p>
+        </header>
+
+        <!-- 徽章悬挂区 -->
+        <section class="badge-hall" id="badgeHall">
+            <h2 class="badge-hall-title">徽章悬挂区</h2>
+            <!-- 徽章将通过 JS 动态渲染 -->
+        </section>
+
+        <!-- 我的成长 -->
+        <section class="skill-tree-section">
+            <h2 class="skill-tree-title">我的成长</h2>
+            <div class="skill-tree" id="skillTree">
+                <!-- 技能树将通过 JS 动态渲染 -->
+            </div>
+        </section>
+
+        <!-- 进度统计 -->
+        <div class="progress-stats" id="progressStats">
+            <div class="stat-item">
+                <div class="stat-value" id="badgeCount">0</div>
+                <div class="stat-label">已获徽章</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="levelsPassed">0</div>
+                <div class="stat-label">已通过级别</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="totalAttempts">0</div>
+                <div class="stat-label">考试次数</div>
+            </div>
+        </div>
+        
+        <!-- 数据管理 -->
+        <div class="data-management">
+            <button class="data-btn export-btn" id="exportBtn" title="导出数据到本地文件">
+                📤 导出数据
+            </button>
+            <button class="data-btn import-btn" id="importBtn" title="从本地文件导入数据">
+                📥 导入数据
+            </button>
+        </div>
+    </div>
+
+    <!-- 引入考级系统模块 -->
+    <script src="src/utils/CertificationStorage.js?v=20251130c"></script>
+    <script src="src/systems/CertificationSystem.js?v=20251130c"></script>
+    <script src="src/ui/CertificationPage.js?v=20251130d"></script>
+</body>
+</html>
+

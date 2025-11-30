@@ -1,0 +1,232 @@
+/**
+ * 徽章区样式 - 欧洲古老家族徽章风格
+ */
+
+/* 主页徽章区 */
+.badge-area {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 1000;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.badge-area:hover {
+    transform: scale(1.05);
+}
+
+.badge-area-container {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    border: 2px solid #c9a227;
+    border-radius: 12px;
+    padding: 12px 16px;
+    min-width: 120px;
+    box-shadow: 
+        0 4px 15px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 215, 0, 0.1);
+}
+
+/* 无徽章状态 - 挑衅手势 */
+.badge-area-empty {
+    text-align: center;
+}
+
+.challenge-icon {
+    font-size: 36px;
+    animation: pulse-challenge 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-challenge {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+}
+
+.challenge-text {
+    color: #ff6b6b;
+    font-size: 14px;
+    font-weight: bold;
+    margin-top: 4px;
+    text-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+    animation: glow-text 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes glow-text {
+    0% { text-shadow: 0 0 5px rgba(255, 107, 107, 0.3); }
+    100% { text-shadow: 0 0 15px rgba(255, 107, 107, 0.8); }
+}
+
+.badge-area-hint {
+    color: #8a8a9a;
+    font-size: 11px;
+    margin-top: 6px;
+}
+
+/* 有徽章状态 */
+.badge-area-earned {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.badge-thumbnails {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 150px;
+}
+
+.badge-thumbnail {
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    border: 1px solid #c9a227;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s ease;
+}
+
+.badge-thumbnail:hover {
+    transform: scale(1.2);
+}
+
+.badge-count-text {
+    color: #c9a227;
+    font-size: 12px;
+    margin-top: 6px;
+}
+
+/* 徽章基础样式 */
+.badge {
+    width: 80px;
+    height: 100px;
+    position: relative;
+    display: inline-block;
+}
+
+.badge-icon {
+    width: 100%;
+    height: 100%;
+}
+
+/* 灰色徽章（未获得） */
+.badge-gray {
+    filter: grayscale(100%) brightness(0.6);
+    opacity: 0.6;
+}
+
+/* 彩色徽章（已获得） */
+.badge-earned {
+    filter: none;
+    animation: badge-shine 3s ease-in-out infinite;
+}
+
+@keyframes badge-shine {
+    0%, 100% { 
+        filter: drop-shadow(0 0 5px rgba(201, 162, 39, 0.3)); 
+    }
+    50% { 
+        filter: drop-shadow(0 0 15px rgba(201, 162, 39, 0.6)); 
+    }
+}
+
+/* 徽章获得动画 */
+@keyframes badge-unlock {
+    0% {
+        transform: scale(0) rotate(-180deg);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.3) rotate(10deg);
+    }
+    70% {
+        transform: scale(0.9) rotate(-5deg);
+    }
+    100% {
+        transform: scale(1) rotate(0);
+        opacity: 1;
+    }
+}
+
+.badge-unlocking {
+    animation: badge-unlock 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+}
+
+/* 徽章悬挂区 */
+.badge-display-area {
+    background: linear-gradient(180deg, #0a0a1a 0%, #1a1a2e 100%);
+    border: 3px solid #c9a227;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.5),
+        inset 0 2px 0 rgba(255, 215, 0, 0.1);
+}
+
+.badge-display-title {
+    color: #c9a227;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 16px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    letter-spacing: 2px;
+}
+
+.badge-display-row {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.badge-display-label {
+    color: #8a8a9a;
+    font-size: 12px;
+    text-align: left;
+    width: 100%;
+    margin-bottom: 8px;
+    padding-left: 10px;
+    border-left: 3px solid #c9a227;
+}
+
+/* 徽章项 */
+.badge-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.3s ease;
+}
+
+.badge-item:hover {
+    transform: translateY(-5px);
+}
+
+.badge-item-name {
+    color: #aaa;
+    font-size: 11px;
+    margin-top: 4px;
+    text-align: center;
+}
+
+.badge-item.earned .badge-item-name {
+    color: #c9a227;
+}
+
+/* 锁定状态 */
+.badge-locked {
+    position: relative;
+}
+
+.badge-locked::after {
+    content: '🔒';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    opacity: 0.8;
+}
+

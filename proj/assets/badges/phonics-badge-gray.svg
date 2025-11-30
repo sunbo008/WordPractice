@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120">
+  <defs>
+    <linearGradient id="grayShield" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4a4a4a"/>
+      <stop offset="50%" style="stop-color:#2a2a2a"/>
+      <stop offset="100%" style="stop-color:#4a4a4a"/>
+    </linearGradient>
+    <linearGradient id="grayBorder" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#888"/>
+      <stop offset="50%" style="stop-color:#666"/>
+      <stop offset="100%" style="stop-color:#888"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- 盾牌主体 -->
+  <path d="M50 5 L90 20 L90 55 Q90 85 50 110 Q10 85 10 55 L10 20 Z" 
+        fill="url(#grayShield)" stroke="url(#grayBorder)" stroke-width="3"/>
+  
+  <!-- 装饰横条 -->
+  <rect x="15" y="70" width="70" height="4" fill="url(#grayBorder)" rx="2"/>
+  
+  <!-- 音标符号 -->
+  <text x="50" y="50" text-anchor="middle" font-family="Georgia, serif" font-size="24" fill="#888" font-style="italic">/æ/</text>
+  
+  <!-- 底部文字 -->
+  <text x="50" y="88" text-anchor="middle" font-family="Georgia, serif" font-size="8" fill="#666" letter-spacing="1">MASTER OF</text>
+  <text x="50" y="98" text-anchor="middle" font-family="Georgia, serif" font-size="8" fill="#666" letter-spacing="1">SOUNDS</text>
+  
+  <!-- 丝带装饰 -->
+  <path d="M35 110 L40 115 L50 110 L60 115 L65 110" stroke="#666" stroke-width="2" fill="none"/>
+</svg>
+

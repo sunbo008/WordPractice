@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120">
+  <defs>
+    <linearGradient id="dragonballShield" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ff8c00"/>
+      <stop offset="50%" style="stop-color:#cc6600"/>
+      <stop offset="100%" style="stop-color:#ff8c00"/>
+    </linearGradient>
+    <linearGradient id="goldBorderDragon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffd700"/>
+      <stop offset="50%" style="stop-color:#c9a227"/>
+      <stop offset="100%" style="stop-color:#ffd700"/>
+    </linearGradient>
+    <radialGradient id="dragonball" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#ffff00"/>
+      <stop offset="100%" style="stop-color:#ff8c00"/>
+    </radialGradient>
+  </defs>
+  
+  <path d="M50 5 L90 20 L90 55 Q90 85 50 110 Q10 85 10 55 L10 20 Z" 
+        fill="url(#dragonballShield)" stroke="url(#goldBorderDragon)" stroke-width="3"/>
+  
+  <!-- 龙珠图案 -->
+  <circle cx="50" cy="42" r="18" fill="url(#dragonball)" stroke="#cc6600" stroke-width="2"/>
+  <circle cx="50" cy="42" r="3" fill="#ff4500"/>
+  <circle cx="44" cy="36" r="2" fill="#ff4500"/>
+  <circle cx="56" cy="36" r="2" fill="#ff4500"/>
+  <circle cx="44" cy="48" r="2" fill="#ff4500"/>
+  <circle cx="56" cy="48" r="2" fill="#ff4500"/>
+  
+  <text x="50" y="80" text-anchor="middle" font-family="Georgia, serif" font-size="9" fill="#ffd700" font-weight="bold">DRAGON</text>
+  <text x="50" y="92" text-anchor="middle" font-family="Georgia, serif" font-size="9" fill="#ffd700" font-weight="bold">BALL</text>
+</svg>
+

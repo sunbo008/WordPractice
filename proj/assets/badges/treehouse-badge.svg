@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120">
+  <defs>
+    <linearGradient id="treehouseShield" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2d5a2d"/>
+      <stop offset="50%" style="stop-color:#1a3a1a"/>
+      <stop offset="100%" style="stop-color:#2d5a2d"/>
+    </linearGradient>
+    <linearGradient id="brownBorder" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8b5a2b"/>
+      <stop offset="50%" style="stop-color:#654321"/>
+      <stop offset="100%" style="stop-color:#8b5a2b"/>
+    </linearGradient>
+  </defs>
+  
+  <path d="M50 5 L90 20 L90 55 Q90 85 50 110 Q10 85 10 55 L10 20 Z" 
+        fill="url(#treehouseShield)" stroke="url(#brownBorder)" stroke-width="3"/>
+  
+  <!-- 树屋图案 -->
+  <rect x="45" y="45" width="10" height="25" fill="#654321"/>
+  <polygon points="50,20 35,45 65,45" fill="#228b22"/>
+  <rect x="40" y="35" width="20" height="15" fill="#8b4513"/>
+  <rect x="46" y="40" width="8" height="10" fill="#ffd700"/>
+  
+  <text x="50" y="80" text-anchor="middle" font-family="Georgia, serif" font-size="8" fill="#8b5a2b" font-weight="bold">MAGIC TREE</text>
+  <text x="50" y="92" text-anchor="middle" font-family="Georgia, serif" font-size="8" fill="#8b5a2b" font-weight="bold">HOUSE</text>
+</svg>
+

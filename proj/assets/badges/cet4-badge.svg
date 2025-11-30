@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120">
+  <defs>
+    <linearGradient id="cet4Shield" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8b1a1a"/>
+      <stop offset="50%" style="stop-color:#5a0d0d"/>
+      <stop offset="100%" style="stop-color:#8b1a1a"/>
+    </linearGradient>
+    <linearGradient id="goldBorderCET4" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffd700"/>
+      <stop offset="50%" style="stop-color:#c9a227"/>
+      <stop offset="100%" style="stop-color:#ffd700"/>
+    </linearGradient>
+  </defs>
+  
+  <path d="M50 5 L90 20 L90 55 Q90 85 50 110 Q10 85 10 55 L10 20 Z" 
+        fill="url(#cet4Shield)" stroke="url(#goldBorderCET4)" stroke-width="3"/>
+  
+  <!-- 学位帽 -->
+  <polygon points="50,25 25,40 50,50 75,40" fill="#333"/>
+  <rect x="45" y="18" width="10" height="8" fill="#333"/>
+  <circle cx="50" cy="18" r="5" fill="#ffd700"/>
+  <line x1="50" y1="23" x2="65" y2="35" stroke="#ffd700" stroke-width="2"/>
+  <circle cx="67" cy="37" r="3" fill="#ffd700"/>
+  
+  <text x="50" y="72" text-anchor="middle" font-family="Georgia, serif" font-size="16" fill="#ffd700" font-weight="bold">CET-4</text>
+  <text x="50" y="90" text-anchor="middle" font-family="Georgia, serif" font-size="8" fill="#c9a227">COLLEGE ENGLISH</text>
+  <text x="50" y="100" text-anchor="middle" font-family="Georgia, serif" font-size="8" fill="#c9a227">TEST BAND 4</text>
+</svg>
+

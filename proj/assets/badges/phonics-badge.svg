@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120">
+  <defs>
+    <linearGradient id="phonicsShield" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a3a6e"/>
+      <stop offset="50%" style="stop-color:#0d2240"/>
+      <stop offset="100%" style="stop-color:#1a3a6e"/>
+    </linearGradient>
+    <linearGradient id="goldBorder" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffd700"/>
+      <stop offset="50%" style="stop-color:#c9a227"/>
+      <stop offset="100%" style="stop-color:#ffd700"/>
+    </linearGradient>
+    <filter id="innerShadow">
+      <feOffset dx="0" dy="2"/>
+      <feGaussianBlur stdDeviation="2" result="offset-blur"/>
+      <feComposite operator="out" in="SourceGraphic" in2="offset-blur" result="inverse"/>
+      <feFlood flood-color="black" flood-opacity="0.3" result="color"/>
+      <feComposite operator="in" in="color" in2="inverse" result="shadow"/>
+      <feComposite operator="over" in="shadow" in2="SourceGraphic"/>
+    </filter>
+  </defs>
+  
+  <!-- 盾牌主体 -->
+  <path d="M50 5 L90 20 L90 55 Q90 85 50 110 Q10 85 10 55 L10 20 Z" 
+        fill="url(#phonicsShield)" stroke="url(#goldBorder)" stroke-width="3" filter="url(#innerShadow)"/>
+  
+  <!-- 装饰横条 -->
+  <rect x="15" y="70" width="70" height="4" fill="url(#goldBorder)" rx="2"/>
+  
+  <!-- 音标符号 -->
+  <text x="50" y="50" text-anchor="middle" font-family="Georgia, serif" font-size="24" fill="#ffd700" font-style="italic">/æ/</text>
+  
+  <!-- 底部文字 -->
+  <text x="50" y="88" text-anchor="middle" font-family="Georgia, serif" font-size="8" fill="#c9a227" letter-spacing="1">MASTER OF</text>
+  <text x="50" y="98" text-anchor="middle" font-family="Georgia, serif" font-size="8" fill="#c9a227" letter-spacing="1">SOUNDS</text>
+  
+  <!-- 丝带装饰 -->
+  <path d="M35 110 L40 115 L50 110 L60 115 L65 110" stroke="#c9a227" stroke-width="2" fill="none"/>
+</svg>
+

@@ -1,0 +1,29 @@
+{
+  "title": "常见动词词组测试",
+  "description": "测试带空格的词组显示效果",
+  "version": "1.0",
+  "words": [
+    {"word": "give up", "phonetic": "[ɡɪv ʌp]", "meaning": "放弃", "difficulty": 2},
+    {"word": "wake up", "phonetic": "[weɪk ʌp]", "meaning": "醒来", "difficulty": 2},
+    {"word": "get up", "phonetic": "[ɡet ʌp]", "meaning": "起床", "difficulty": 2},
+    {"word": "sit down", "phonetic": "[sɪt daʊn]", "meaning": "坐下", "difficulty": 2},
+    {"word": "stand up", "phonetic": "[stænd ʌp]", "meaning": "站起来", "difficulty": 2},
+    {"word": "come in", "phonetic": "[kʌm ɪn]", "meaning": "进来", "difficulty": 2},
+    {"word": "go out", "phonetic": "[ɡəʊ aʊt]", "meaning": "出去", "difficulty": 2},
+    {"word": "put on", "phonetic": "[pʊt ɒn]", "meaning": "穿上", "difficulty": 2},
+    {"word": "take off", "phonetic": "[teɪk ɒf]", "meaning": "脱下", "difficulty": 2},
+    {"word": "look at", "phonetic": "[lʊk æt]", "meaning": "看", "difficulty": 2},
+    {"word": "listen to", "phonetic": "[ˈlɪsn tuː]", "meaning": "听", "difficulty": 2},
+    {"word": "turn on", "phonetic": "[tɜːn ɒn]", "meaning": "打开", "difficulty": 2},
+    {"word": "turn off", "phonetic": "[tɜːn ɒf]", "meaning": "关闭", "difficulty": 2},
+    {"word": "pick up", "phonetic": "[pɪk ʌp]", "meaning": "捡起", "difficulty": 2},
+    {"word": "put down", "phonetic": "[pʊt daʊn]", "meaning": "放下", "difficulty": 2}
+  ]
+}
+
+
+
+
+
+
+

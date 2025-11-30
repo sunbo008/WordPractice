@@ -1195,6 +1195,13 @@ class WordTetrisGame {
         // 更新错词本显示
         this.updateVocabularyList();
         
+        // 检查是否在考试模式
+        if (window.examIntegration && window.examIntegration.isInExamMode()) {
+            debugLog.info('📝 考试模式完成，提交考试结果');
+            window.examIntegration.onExamComplete(hitPercentage);
+            return; // 考试模式不显示普通完成弹窗
+        }
+        
         gameOverModal.style.display = 'block';
         debugLog.success('📊 游戏完成弹窗已显示');
     }
@@ -2209,6 +2216,13 @@ class WordTetrisGame {
 // 游戏初始化
 document.addEventListener('DOMContentLoaded', () => {
     const game = new WordTetrisGame();
+    
+    // 初始化考试集成模块
+    if (typeof ExamIntegration !== 'undefined') {
+        window.examIntegration = new ExamIntegration();
+        window.examIntegration.init(game);
+        console.log('📝 考试集成模块已初始化');
+    }
     
     // 页面加载时自动重置游戏
     setTimeout(() => {
