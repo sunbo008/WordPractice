@@ -17,8 +17,9 @@ class ExamIntegration {
 
     /**
      * 初始化考试集成
+     * @returns {Promise<boolean>} 返回是否进入了考试模式
      */
-    init(game) {
+    async init(game) {
         this.game = game;
         
         if (typeof CertificationStorage !== 'undefined' && typeof CertificationSystem !== 'undefined') {
@@ -30,17 +31,21 @@ class ExamIntegration {
             this.badgeArea = window.badgeArea;
         }
         
+        // 🔧 修复：需要 await 考试模式初始化，确保词库加载完成后再继续
         // 检查 URL 参数是否有考试模式
-        this.checkExamModeFromUrl();
+        const urlExamStarted = await this.checkExamModeFromUrl();
         
         // 检查 sessionStorage 是否有待进行的考试
-        this.checkPendingExam();
+        const pendingExamStarted = await this.checkPendingExam();
+        
+        return urlExamStarted || pendingExamStarted;
     }
 
     /**
      * 从 URL 参数检查考试模式
+     * @returns {Promise<boolean>} 返回是否启动了考试模式
      */
-    checkExamModeFromUrl() {
+    async checkExamModeFromUrl() {
         const params = new URLSearchParams(window.location.search);
         
         // 检查测试模式
@@ -55,27 +60,33 @@ class ExamIntegration {
             const minor = params.get('minor');
             
             if (series) {
-                this.startExamMode(series, major, minor);
+                // 🔧 修复：await 考试模式启动，确保词库加载完成
+                await this.startExamMode(series, major, minor);
+                return true;
             }
         }
+        return false;
     }
 
     /**
      * 检查待进行的考试
+     * @returns {Promise<boolean>} 返回是否启动了考试模式
      */
-    checkPendingExam() {
+    async checkPendingExam() {
         const pending = sessionStorage.getItem('currentExam');
         if (pending) {
             try {
                 const examInfo = JSON.parse(pending);
                 // 清除待处理状态
                 sessionStorage.removeItem('currentExam');
-                // 启动考试模式
-                this.startExamMode(examInfo.series, examInfo.majorLevel, examInfo.minorLevel);
+                // 🔧 修复：await 考试模式启动，确保词库加载完成
+                await this.startExamMode(examInfo.series, examInfo.majorLevel, examInfo.minorLevel);
+                return true;
             } catch (e) {
                 console.error('解析考试信息失败:', e);
             }
         }
+        return false;
     }
 
     /**

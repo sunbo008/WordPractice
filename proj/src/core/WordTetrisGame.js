@@ -503,8 +503,10 @@ class WordTetrisGame {
         
         this.loadGameData();
         this.bindEvents();
-        await this.initExamStats(); // 【优化】先等待单词库加载和统计初始化
-        this.updateUI(); // 然后更新UI，此时 totalWords 已经是正确的值
+        // 【修复】不在这里调用 initExamStats()
+        // 考试模式下，需要等考试词库加载完成后再初始化统计
+        // initExamStats() 会在 DOMContentLoaded 中，考试集成初始化完成后调用
+        this.updateUI();
         // 【修复】不在 init 中生成单词，让 startGame() 统一处理
         // this.generateNextWord(); 
         this.gameLoop();
@@ -2214,21 +2216,31 @@ class WordTetrisGame {
 }
 
 // 游戏初始化
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const game = new WordTetrisGame();
     
     // 初始化考试集成模块
+    let isExamMode = false;
     if (typeof ExamIntegration !== 'undefined') {
         window.examIntegration = new ExamIntegration();
-        window.examIntegration.init(game);
-        console.log('📝 考试集成模块已初始化');
+        // 🔧 修复：await 考试集成初始化，确保考试词库加载完成后再初始化统计
+        isExamMode = await window.examIntegration.init(game);
+        console.log('📝 考试集成模块已初始化', isExamMode ? '(考试模式)' : '(普通模式)');
     }
     
-    // 页面加载时自动重置游戏
-    setTimeout(() => {
-        game.resetGame();
-        console.log('🔄 页面刷新，自动重置游戏');
-    }, 100); // 稍微延迟确保初始化完成
+    // 🔧 修复：考试词库加载完成后，再初始化统计
+    // 这样可以确保 totalWords 使用的是正确的词库数量
+    await game.initExamStats();
+    console.log('📊 考试统计已初始化');
+    
+    // 页面加载时自动重置游戏（只在非考试模式下）
+    // 考试模式下，startExamMode 已经调用了 startGame()
+    if (!isExamMode) {
+        setTimeout(() => {
+            game.resetGame();
+            console.log('🔄 页面刷新，自动重置游戏');
+        }, 100); // 稍微延迟确保初始化完成
+    }
     
     // 页面卸载时清除临时练习单词
     window.addEventListener('beforeunload', () => {
