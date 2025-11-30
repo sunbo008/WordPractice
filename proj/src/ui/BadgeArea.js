@@ -35,8 +35,24 @@ class BadgeArea {
         // 渲染内容
         this.render();
         
-        // 插入到页面
-        document.body.appendChild(this.container);
+        // 插入到 game-header 内部最左边
+        const gameHeader = document.querySelector('.game-header');
+        if (gameHeader) {
+            // 包装原有标题内容
+            if (!gameHeader.querySelector('.header-content')) {
+                const headerContent = document.createElement('div');
+                headerContent.className = 'header-content';
+                while (gameHeader.firstChild) {
+                    headerContent.appendChild(gameHeader.firstChild);
+                }
+                gameHeader.appendChild(headerContent);
+            }
+            // 插入徽章区到最前面
+            gameHeader.insertBefore(this.container, gameHeader.firstChild);
+        } else {
+            // 回退方案
+            document.body.appendChild(this.container);
+        }
         
         this.initialized = true;
     }

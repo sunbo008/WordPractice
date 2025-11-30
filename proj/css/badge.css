@@ -4,10 +4,7 @@
 
 /* 主页徽章区 */
 .badge-area {
-    position: fixed;
-    top: 10px;
-    left: 10px;
-    z-index: 1000;
+    flex-shrink: 0;
     cursor: pointer;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
