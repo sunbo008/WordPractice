@@ -53,27 +53,27 @@ class CertificationSystem {
                     grade5: { name: '五年级', term1: '上学期', term2: '下学期' },
                     grade6: { name: '六年级', term1: '上学期', term2: '下学期' }
                 },
-                // 考试信息配置
+                // 考试信息配置 - wordCount=0 表示加载全部单词
                 examInfo: {
                     grade3: {
-                        term1: { scope: '三年级上学期 Unit 1-6', wordCount: 60 },
-                        term2: { scope: '三年级下学期 Unit 1-6', wordCount: 60 },
-                        finalExam: { scope: '三年级全册综合测试', wordCount: 80 }
+                        term1: { scope: '三年级上学期 Unit 1-6（约71个）', wordCount: 0 },
+                        term2: { scope: '三年级下学期 Unit 1-6（约69个）', wordCount: 0 },
+                        finalExam: { scope: '三年级全册综合测试（约140个）', wordCount: 0 }
                     },
                     grade4: {
-                        term1: { scope: '四年级上学期 Unit 1-6', wordCount: 70 },
-                        term2: { scope: '四年级下学期 Unit 1-6', wordCount: 70 },
-                        finalExam: { scope: '四年级全册综合测试', wordCount: 90 }
+                        term1: { scope: '四年级上学期 Unit 1-6（约143个）', wordCount: 0 },
+                        term2: { scope: '四年级下学期 Unit 1-6（约83个）', wordCount: 0 },
+                        finalExam: { scope: '四年级全册综合测试（约226个）', wordCount: 0 }
                     },
                     grade5: {
-                        term1: { scope: '五年级上学期 Unit 1-6', wordCount: 80 },
-                        term2: { scope: '五年级下学期 Unit 1-6', wordCount: 80 },
-                        finalExam: { scope: '五年级全册综合测试', wordCount: 100 }
+                        term1: { scope: '五年级上学期 Unit 1-6（约83个）', wordCount: 0 },
+                        term2: { scope: '五年级下学期 Unit 1-6（约82个）', wordCount: 0 },
+                        finalExam: { scope: '五年级全册综合测试（约165个）', wordCount: 0 }
                     },
                     grade6: {
-                        term1: { scope: '六年级上学期 Unit 1-6', wordCount: 85 },
-                        term2: { scope: '六年级下学期 Unit 1-4', wordCount: 60 },
-                        finalExam: { scope: '六年级全册综合测试', wordCount: 100 }
+                        term1: { scope: '六年级上学期 Unit 1-6（约70个）', wordCount: 0 },
+                        term2: { scope: '六年级下学期 Unit 1-4（约52个）', wordCount: 0 },
+                        finalExam: { scope: '六年级全册综合测试（约122个）', wordCount: 0 }
                     }
                 }
             },
@@ -89,12 +89,13 @@ class CertificationSystem {
                     harryPotter: { name: '哈利波特', subLevels: [] }
                 },
                 // 考试信息配置
+                // 考试信息配置 - wordCount=0 表示加载全部单词
                 examInfo: {
                     flyGuy: {
-                        book1to5: { scope: 'Fly Guy 第1-5册词汇', wordCount: 50 },
-                        book6to10: { scope: 'Fly Guy 第6-10册词汇', wordCount: 50 },
-                        book11to15: { scope: 'Fly Guy 第11-15册词汇', wordCount: 50 },
-                        finalExam: { scope: 'Fly Guy 全系列综合测试', wordCount: 80 }
+                        book1to5: { scope: 'Fly Guy 第1-5册词汇（约125个）', wordCount: 0 },
+                        book6to10: { scope: 'Fly Guy 第6-10册词汇（约106个）', wordCount: 0 },
+                        book11to15: { scope: 'Fly Guy 第11-15册词汇（约95个）', wordCount: 0 },
+                        finalExam: { scope: 'Fly Guy 全系列综合测试（约326个）', wordCount: 0 }
                     },
                     magicTreeHouse: { finalExam: { scope: '神奇树屋词汇（待配置）', wordCount: 0 } },
                     dragonBall: { finalExam: { scope: '七龙珠词汇（待配置）', wordCount: 0 } },
