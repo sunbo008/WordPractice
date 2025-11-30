@@ -2186,7 +2186,55 @@ function openMissedWordLesson(event, fileName) {
     window.location.href = `./study/missed-words-lesson.html?file=${encodeURIComponent(fileName)}`;
 }
 
+// ========================================
+// 主题切换功能
+// ========================================
+
+/**
+ * 选择主题
+ * @param {string} themeId - 主题ID: 'default', 'cyberpunk', 'doraemon', 'batman'
+ */
+function selectTheme(themeId) {
+    // 更新 body 类名
+    document.body.className = 'theme-' + themeId;
+    
+    // 保存到 localStorage
+    localStorage.setItem('wordTetris_selectedTheme', themeId);
+    
+    // 更新主题卡片选中状态
+    updateThemeCardSelection(themeId);
+    
+    console.log('🎨 主题已切换为:', themeId);
+}
+
+/**
+ * 更新主题卡片的选中状态
+ * @param {string} selectedTheme - 当前选中的主题ID
+ */
+function updateThemeCardSelection(selectedTheme) {
+    const cards = document.querySelectorAll('.theme-card');
+    cards.forEach(card => {
+        const cardTheme = card.getAttribute('data-theme');
+        if (cardTheme === selectedTheme) {
+            card.classList.add('selected');
+        } else {
+            card.classList.remove('selected');
+        }
+    });
+}
+
+/**
+ * 初始化主题选择状态
+ */
+function initThemeSelection() {
+    const savedTheme = localStorage.getItem('wordTetris_selectedTheme') || 'default';
+    updateThemeCardSelection(savedTheme);
+}
+
 // 页面加载完成后初始化
 document.addEventListener('DOMContentLoaded', () => {
     window.settingsManager = new SettingsManagerV2();
+    
+    // 初始化主题选择状态
+    initThemeSelection();
 });

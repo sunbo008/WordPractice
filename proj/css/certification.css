@@ -1,5 +1,5 @@
 /**
- * 考级页面样式
+ * 荣誉殿堂页面样式
  */
 
 * {
@@ -10,10 +10,11 @@
 
 body {
     font-family: 'Georgia', 'Times New Roman', serif;
-    background: linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 50%, #0f0f20 100%);
+    background: linear-gradient(135deg, var(--theme-bg-primary, #0a0a1a) 0%, var(--theme-bg-secondary, #1a1a2e) 100%);
     min-height: 100vh;
-    color: #e0e0e0;
+    color: var(--theme-text-primary, #e0e0e0);
     overflow-x: hidden;
+    transition: background 0.3s ease, color 0.3s ease;
 }
 
 /* 页面容器 */
@@ -27,15 +28,17 @@ body {
 .page-header {
     text-align: center;
     padding: 30px 0;
-    border-bottom: 2px solid #c9a227;
+    border-bottom: 2px solid var(--theme-gold, #c9a227);
     margin-bottom: 30px;
+    transition: border-color 0.3s ease;
 }
 
 .page-title {
     font-size: 36px;
-    color: #c9a227;
-    text-shadow: 0 0 20px rgba(201, 162, 39, 0.3);
+    color: var(--theme-gold, #c9a227);
+    text-shadow: 0 0 20px var(--theme-glow, rgba(201, 162, 39, 0.3));
     letter-spacing: 4px;
+    transition: color 0.3s ease, text-shadow 0.3s ease;
 }
 
 .page-title::before,
@@ -45,9 +48,10 @@ body {
 }
 
 .page-subtitle {
-    color: #8a8a9a;
+    color: var(--theme-text-secondary, #8a8a9a);
     margin-top: 10px;
     font-style: italic;
+    transition: color 0.3s ease;
 }
 
 /* 返回按钮 */
@@ -56,10 +60,10 @@ body {
     top: 20px;
     left: 20px;
     padding: 10px 20px;
-    background: linear-gradient(135deg, #2a2a4a, #1a1a3a);
-    border: 2px solid #c9a227;
+    background: var(--theme-panel-bg-solid, linear-gradient(135deg, #2a2a4a, #1a1a3a));
+    border: 2px solid var(--theme-gold, #c9a227);
     border-radius: 8px;
-    color: #c9a227;
+    color: var(--theme-gold, #c9a227);
     font-size: 14px;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -67,28 +71,30 @@ body {
 }
 
 .back-btn:hover {
-    background: linear-gradient(135deg, #3a3a5a, #2a2a4a);
+    background: var(--theme-panel-bg, rgba(255,255,255,0.1));
     transform: translateX(-5px);
 }
 
 /* 徽章悬挂区 */
 .badge-hall {
-    background: linear-gradient(180deg, #0a0a1a 0%, #1a1a2e 100%);
-    border: 3px solid #c9a227;
+    background: var(--theme-panel-bg, linear-gradient(180deg, #0a0a1a 0%, #1a1a2e 100%));
+    border: 3px solid var(--theme-gold, #c9a227);
     border-radius: 16px;
     padding: 25px;
     margin-bottom: 30px;
     box-shadow: 
-        0 8px 32px rgba(0, 0, 0, 0.5),
-        inset 0 2px 0 rgba(255, 215, 0, 0.1);
+        0 8px 32px var(--theme-shadow, rgba(0, 0, 0, 0.5)),
+        inset 0 2px 0 var(--theme-glow, rgba(255, 215, 0, 0.1));
+    transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .badge-hall-title {
     text-align: center;
-    color: #c9a227;
+    color: var(--theme-gold, #c9a227);
     font-size: 20px;
     margin-bottom: 20px;
     letter-spacing: 2px;
+    transition: color 0.3s ease;
 }
 
 .badge-hall-title::before,
@@ -102,11 +108,12 @@ body {
 }
 
 .badge-section-label {
-    color: #8a8a9a;
+    color: var(--theme-text-secondary, #8a8a9a);
     font-size: 13px;
     margin-bottom: 10px;
     padding-left: 12px;
-    border-left: 3px solid #c9a227;
+    border-left: 3px solid var(--theme-gold, #c9a227);
+    transition: color 0.3s ease, border-color 0.3s ease;
 }
 
 .badge-row {
@@ -138,30 +145,33 @@ body {
 }
 
 .badge-slot-name {
-    color: #666;
+    color: var(--theme-text-secondary, #666);
     font-size: 11px;
     margin-top: 5px;
     text-align: center;
+    transition: color 0.3s ease;
 }
 
 .badge-slot.earned .badge-slot-name {
-    color: #c9a227;
+    color: var(--theme-gold, #c9a227);
 }
 
 /* 我的成长 */
 .skill-tree-section {
-    background: linear-gradient(180deg, #0f0f20 0%, #1a1a2e 100%);
-    border: 2px solid #4a4a6a;
+    background: var(--theme-panel-bg, linear-gradient(180deg, #0f0f20 0%, #1a1a2e 100%));
+    border: 2px solid var(--theme-panel-border, #4a4a6a);
     border-radius: 16px;
     padding: 25px;
     margin-bottom: 30px;
+    transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .skill-tree-title {
     text-align: center;
-    color: #e0e0e0;
+    color: var(--theme-text-primary, #e0e0e0);
     font-size: 18px;
     margin-bottom: 20px;
+    transition: color 0.3s ease;
 }
 
 .skill-tree-title::before {
@@ -207,8 +217,8 @@ body {
     align-items: center;
     gap: 10px;
     padding: 12px 20px;
-    background: linear-gradient(135deg, #2a2a4a, #1a1a3a);
-    border: 2px solid #4a4a6a;
+    background: var(--theme-panel-bg-solid, linear-gradient(135deg, #2a2a4a, #1a1a3a));
+    border: 2px solid var(--theme-panel-border, #4a4a6a);
     border-radius: 10px;
     min-width: 140px;
     cursor: default;
@@ -226,8 +236,10 @@ body {
 }
 
 .tree-node.main-node.locked {
-    opacity: 0.5;
+    opacity: 0.7;
     cursor: not-allowed;
+    filter: grayscale(30%);
+    border-style: dashed;
 }
 
 /* 主节点进行中状态（小级别未全部通过） */
@@ -323,15 +335,15 @@ body {
     left: 50%;
     transform: translateX(-50%);
     padding: 8px 12px;
-    background: linear-gradient(135deg, #1a1a2e, #2a2a4a);
-    border: 1px solid #4a4a6a;
+    background: var(--theme-panel-bg-solid, linear-gradient(135deg, #1a1a2e, #2a2a4a));
+    border: 1px solid var(--theme-panel-border, #4a4a6a);
     border-radius: 8px;
     font-size: 12px;
-    color: #e0e0e0;
+    color: var(--theme-text-primary, #e0e0e0);
     white-space: pre-line;
     z-index: 1000;
     margin-bottom: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 12px var(--theme-shadow, rgba(0, 0, 0, 0.4));
     pointer-events: none;
     min-width: 160px;
     text-align: center;
@@ -345,7 +357,7 @@ body {
     left: 50%;
     transform: translateX(-50%);
     border: 6px solid transparent;
-    border-top-color: #4a4a6a;
+    border-top-color: var(--theme-panel-border, #4a4a6a);
     margin-bottom: 2px;
     z-index: 1001;
 }
@@ -371,7 +383,8 @@ body {
 
 .tree-node .node-name {
     font-size: 14px;
-    color: #e0e0e0;
+    color: var(--theme-text-primary, #e0e0e0);
+    transition: color 0.3s ease;
 }
 
 .tree-node .node-status-icon {
@@ -381,8 +394,9 @@ body {
 
 .tree-node .node-score {
     font-size: 11px;
-    color: #c9a227;
+    color: var(--theme-gold, #c9a227);
     margin-left: 5px;
+    transition: color 0.3s ease;
 }
 
 /* 子节点区域 */
@@ -402,10 +416,11 @@ body {
 .tree-connector {
     width: 20px;
     height: 36px;
-    border-left: 2px solid #4a4a6a;
-    border-bottom: 2px solid #4a4a6a;
+    border-left: 2px solid var(--theme-panel-border, #4a4a6a);
+    border-bottom: 2px solid var(--theme-panel-border, #4a4a6a);
     border-bottom-left-radius: 8px;
     margin-right: 8px;
+    transition: border-color 0.3s ease;
 }
 
 .tree-connector.last {
@@ -418,8 +433,8 @@ body {
     align-items: center;
     gap: 8px;
     padding: 8px 15px;
-    background: linear-gradient(135deg, #252540, #1a1a30);
-    border: 1px solid #3a3a5a;
+    background: var(--theme-panel-bg, linear-gradient(135deg, #252540, #1a1a30));
+    border: 1px solid var(--theme-panel-border, #3a3a5a);
     border-radius: 8px;
     min-width: 100px;
     cursor: pointer;
@@ -428,7 +443,7 @@ body {
 }
 
 .tree-node.sub-node:hover:not(.locked) {
-    border-color: #c9a227;
+    border-color: var(--theme-gold, #c9a227);
     transform: translateX(3px);
 }
 
@@ -456,15 +471,15 @@ body {
     left: 50%;
     transform: translateX(-50%);
     padding: 8px 12px;
-    background: linear-gradient(135deg, #1a1a2e, #2a2a4a);
-    border: 1px solid #4a4a6a;
+    background: var(--theme-panel-bg-solid, linear-gradient(135deg, #1a1a2e, #2a2a4a));
+    border: 1px solid var(--theme-panel-border, #4a4a6a);
     border-radius: 8px;
     font-size: 12px;
-    color: #e0e0e0;
+    color: var(--theme-text-primary, #e0e0e0);
     white-space: pre-line;
     z-index: 1000;
     margin-bottom: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 12px var(--theme-shadow, rgba(0, 0, 0, 0.4));
     pointer-events: none;
     min-width: 140px;
     text-align: center;
@@ -478,7 +493,7 @@ body {
     left: 50%;
     transform: translateX(-50%);
     border: 6px solid transparent;
-    border-top-color: #4a4a6a;
+    border-top-color: var(--theme-panel-border, #4a4a6a);
     margin-bottom: 2px;
     z-index: 1001;
 }
@@ -489,8 +504,10 @@ body {
 }
 
 .tree-node.sub-node.locked {
-    opacity: 0.4;
+    opacity: 0.65;
     cursor: not-allowed;
+    filter: grayscale(30%);
+    border-style: dashed;
 }
 
 .tree-node.sub-node .node-name {
@@ -509,8 +526,8 @@ body {
 
 /* ========== 旧样式保留 ========== */
 .level-section {
-    background: linear-gradient(135deg, #1a1a2e, #0f0f20);
-    border: 2px solid #4a4a6a;
+    background: var(--theme-panel-bg-solid, linear-gradient(135deg, #1a1a2e, #0f0f20));
+    border: 2px solid var(--theme-panel-border, #4a4a6a);
     border-radius: 12px;
     padding: 15px;
     min-width: 200px;
@@ -519,12 +536,12 @@ body {
 }
 
 .level-section.completed {
-    border-color: #4ade80;
+    border-color: var(--theme-success, #4ade80);
 }
 
 .level-section.current {
-    border-color: #4a9ecc;
-    box-shadow: 0 0 15px rgba(74, 158, 204, 0.3);
+    border-color: var(--theme-accent, #4a9ecc);
+    box-shadow: 0 0 15px var(--theme-glow, rgba(74, 158, 204, 0.3));
 }
 
 .level-section.locked {
@@ -537,7 +554,7 @@ body {
     align-items: center;
     gap: 8px;
     padding-bottom: 10px;
-    border-bottom: 1px solid #3a3a5a;
+    border-bottom: 1px solid var(--theme-panel-border, #3a3a5a);
     margin-bottom: 10px;
 }
 
@@ -549,7 +566,7 @@ body {
     flex: 1;
     font-size: 15px;
     font-weight: bold;
-    color: #e0e0e0;
+    color: var(--theme-text-primary, #e0e0e0);
 }
 
 .level-badge {
@@ -567,14 +584,14 @@ body {
     align-items: center;
     gap: 8px;
     padding: 8px 12px;
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--theme-panel-bg, rgba(255, 255, 255, 0.05));
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .sub-level:hover:not(.locked):not(.completed) {
-    background: rgba(74, 158, 204, 0.2);
+    background: var(--theme-glow, rgba(74, 158, 204, 0.2));
     transform: translateX(3px);
 }
 
@@ -583,27 +600,29 @@ body {
 }
 
 .sub-level.current {
-    background: rgba(74, 158, 204, 0.15);
-    border: 1px solid rgba(74, 158, 204, 0.4);
+    background: var(--theme-glow, rgba(74, 158, 204, 0.15));
+    border: 1px solid var(--theme-panel-border, rgba(74, 158, 204, 0.4));
 }
 
 .sub-level.locked {
-    opacity: 0.4;
+    opacity: 0.6;
     cursor: not-allowed;
+    filter: grayscale(20%);
 }
 
 .sub-level-name {
     flex: 1;
     font-size: 13px;
-    color: #c0c0c0;
+    color: var(--theme-text-secondary, #c0c0c0);
+    transition: color 0.3s ease;
 }
 
 .sub-level.completed .sub-level-name {
-    color: #4ade80;
+    color: var(--theme-success, #4ade80);
 }
 
 .sub-level.current .sub-level-name {
-    color: #4a9ecc;
+    color: var(--theme-accent, #4a9ecc);
 }
 
 .sub-level-status {
@@ -612,15 +631,16 @@ body {
 
 .sub-level-score {
     font-size: 11px;
-    color: #c9a227;
-    background: rgba(201, 162, 39, 0.15);
+    color: var(--theme-gold, #c9a227);
+    background: var(--theme-glow, rgba(201, 162, 39, 0.15));
     padding: 2px 6px;
     border-radius: 4px;
+    transition: color 0.3s ease, background 0.3s ease;
 }
 
 .locked-hint {
     text-align: center;
-    color: #666;
+    color: var(--theme-text-secondary, #666);
     font-size: 12px;
     padding: 10px;
 }
@@ -632,8 +652,8 @@ body {
     flex-direction: column;
     align-items: center;
     padding: 15px 25px;
-    background: linear-gradient(135deg, #2a2a4a, #1a1a3a);
-    border: 2px solid #4a4a6a;
+    background: var(--theme-panel-bg-solid, linear-gradient(135deg, #2a2a4a, #1a1a3a));
+    border: 2px solid var(--theme-panel-border, #4a4a6a);
     border-radius: 12px;
     min-width: 120px;
     cursor: pointer;
@@ -642,17 +662,17 @@ body {
 
 .tree-node:hover {
     transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 5px 15px var(--theme-shadow, rgba(0, 0, 0, 0.3));
 }
 
 .tree-node.completed {
-    border-color: #c9a227;
+    border-color: var(--theme-gold, #c9a227);
     background: linear-gradient(135deg, #2a3a2a, #1a2a1a);
 }
 
 .tree-node.current {
-    border-color: #4a9ecc;
-    box-shadow: 0 0 15px rgba(74, 158, 204, 0.4);
+    border-color: var(--theme-accent, #4a9ecc);
+    box-shadow: 0 0 15px var(--theme-glow, rgba(74, 158, 204, 0.4));
     animation: pulse-current 2s ease-in-out infinite;
 }
 
@@ -662,8 +682,10 @@ body {
 }
 
 .tree-node.locked {
-    opacity: 0.5;
+    opacity: 0.7;
     cursor: not-allowed;
+    filter: grayscale(30%);
+    border-style: dashed;
 }
 
 .tree-node.locked:hover {
@@ -678,13 +700,15 @@ body {
 .node-name {
     font-size: 13px;
     text-align: center;
-    color: #e0e0e0;
+    color: var(--theme-text-primary, #e0e0e0);
+    transition: color 0.3s ease;
 }
 
 .node-status {
     font-size: 11px;
     margin-top: 5px;
-    color: #8a8a9a;
+    color: var(--theme-text-secondary, #8a8a9a);
+    transition: color 0.3s ease;
 }
 
 .tree-node.completed .node-status {
@@ -694,13 +718,14 @@ body {
 /* 连接箭头 - 纵向 */
 .tree-arrow {
     font-size: 24px;
-    color: #4a4a6a;
+    color: var(--theme-panel-border, #4a4a6a);
     line-height: 1;
     padding: 5px 0;
+    transition: color 0.3s ease;
 }
 
 .tree-arrow.active {
-    color: #c9a227;
+    color: var(--theme-gold, #c9a227);
 }
 
 /* 分叉连接线 */
@@ -714,11 +739,12 @@ body {
 .branch-connector-line {
     width: 2px;
     height: 20px;
-    background: #4a4a6a;
+    background: var(--theme-panel-border, #4a4a6a);
+    transition: background 0.3s ease;
 }
 
 .branch-connector-line.active {
-    background: #c9a227;
+    background: var(--theme-gold, #c9a227);
 }
 
 .branch-connector-fork {
@@ -737,21 +763,23 @@ body {
 .branch-connector-horizontal {
     width: 100px;
     height: 2px;
-    background: #4a4a6a;
+    background: var(--theme-panel-border, #4a4a6a);
+    transition: background 0.3s ease;
 }
 
 .branch-connector-horizontal.active {
-    background: #c9a227;
+    background: var(--theme-gold, #c9a227);
 }
 
 .branch-connector-vertical {
     width: 2px;
     height: 20px;
-    background: #4a4a6a;
+    background: var(--theme-panel-border, #4a4a6a);
+    transition: background 0.3s ease;
 }
 
 .branch-connector-vertical.active {
-    background: #c9a227;
+    background: var(--theme-gold, #c9a227);
 }
 
 /* 分支区域 */
@@ -768,10 +796,11 @@ body {
     align-items: center;
     gap: 12px;
     padding: 20px 25px;
-    background: rgba(0, 0, 0, 0.3);
+    background: var(--theme-panel-bg, rgba(0, 0, 0, 0.3));
     border-radius: 12px;
-    border: 2px solid #4a4a6a;
+    border: 2px solid var(--theme-panel-border, #4a4a6a);
     min-width: 160px;
+    transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .branch.locked {
@@ -779,11 +808,12 @@ body {
 }
 
 .branch-title {
-    color: #c9a227;
+    color: var(--theme-gold, #c9a227);
     font-size: 14px;
     font-weight: bold;
     margin-bottom: 5px;
     text-align: center;
+    transition: color 0.3s ease;
 }
 
 .branch-nodes {
@@ -795,8 +825,8 @@ body {
 
 .branch-node {
     padding: 12px 18px;
-    background: linear-gradient(135deg, #2a2a4a, #1a1a3a);
-    border: 2px solid #4a4a6a;
+    background: var(--theme-panel-bg-solid, linear-gradient(135deg, #2a2a4a, #1a1a3a));
+    border: 2px solid var(--theme-panel-border, #4a4a6a);
     border-radius: 10px;
     font-size: 13px;
     text-align: center;
@@ -805,7 +835,7 @@ body {
 }
 
 .branch-node:hover:not(.locked) {
-    border-color: #c9a227;
+    border-color: var(--theme-gold, #c9a227);
     transform: translateY(-2px);
 }
 
@@ -815,8 +845,10 @@ body {
 }
 
 .branch-node.locked {
-    opacity: 0.4;
+    opacity: 0.65;
     cursor: not-allowed;
+    filter: grayscale(30%);
+    border-style: dashed;
 }
 
 /* 分支树状结构 */
@@ -855,7 +887,7 @@ body {
 }
 
 .branch-lock-hint {
-    color: #ff9800;
+    color: var(--theme-warning, #ff9800);
     font-size: 11px;
     text-align: center;
     margin-bottom: 10px;
@@ -880,14 +912,16 @@ body {
 
 .stat-value {
     font-size: 28px;
-    color: #c9a227;
+    color: var(--theme-gold, #c9a227);
     font-weight: bold;
+    transition: color 0.3s ease;
 }
 
 .stat-label {
     font-size: 12px;
-    color: #8a8a9a;
+    color: var(--theme-text-secondary, #8a8a9a);
     margin-top: 5px;
+    transition: color 0.3s ease;
 }
 
 /* 考试确认弹窗 */
@@ -915,14 +949,15 @@ body {
 }
 
 .exam-modal-content {
-    background: linear-gradient(180deg, #1a1a2e 0%, #0f0f20 100%);
-    border: 2px solid #c9a227;
+    background: var(--theme-modal-bg, linear-gradient(180deg, #1a1a2e 0%, #0f0f20 100%));
+    border: 2px solid var(--theme-gold, #c9a227);
     border-radius: 16px;
     padding: 30px;
     min-width: 320px;
     max-width: 400px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 10px 40px var(--theme-shadow, rgba(0, 0, 0, 0.5));
     animation: slideUp 0.3s ease;
+    transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 @keyframes slideUp {
@@ -942,9 +977,10 @@ body {
 }
 
 .exam-modal-title {
-    color: #c9a227;
+    color: var(--theme-gold, #c9a227);
     font-size: 20px;
     margin: 0;
+    transition: color 0.3s ease;
 }
 
 .exam-modal-body {
@@ -954,23 +990,25 @@ body {
 .exam-modal-level {
     text-align: center;
     font-size: 24px;
-    color: #e0e0e0;
+    color: var(--theme-text-primary, #e0e0e0);
     margin-bottom: 10px;
     padding: 15px;
-    background: rgba(201, 162, 39, 0.1);
+    background: var(--theme-glow, rgba(201, 162, 39, 0.1));
     border-radius: 10px;
-    border: 1px solid rgba(201, 162, 39, 0.3);
+    border: 1px solid var(--theme-panel-border, rgba(201, 162, 39, 0.3));
+    transition: color 0.3s ease, background 0.3s ease, border-color 0.3s ease;
 }
 
 .exam-modal-scope {
     text-align: center;
     font-size: 14px;
-    color: #a0a0b0;
+    color: var(--theme-text-secondary, #a0a0b0);
     margin-bottom: 20px;
     padding: 8px 15px;
-    background: rgba(100, 100, 120, 0.2);
+    background: var(--theme-panel-bg, rgba(100, 100, 120, 0.2));
     border-radius: 6px;
     font-style: italic;
+    transition: color 0.3s ease, background 0.3s ease;
 }
 
 .exam-modal-info {
@@ -984,15 +1022,17 @@ body {
 
 .info-label {
     display: block;
-    color: #8a8a9a;
+    color: var(--theme-text-secondary, #8a8a9a);
     font-size: 12px;
     margin-bottom: 5px;
+    transition: color 0.3s ease;
 }
 
 .info-value {
-    color: #4ade80;
+    color: var(--theme-success, #4ade80);
     font-size: 16px;
     font-weight: bold;
+    transition: color 0.3s ease;
 }
 
 .exam-modal-footer {
@@ -1011,22 +1051,22 @@ body {
 }
 
 .exam-modal-btn.cancel {
-    background: #4a4a6a;
-    color: #e0e0e0;
+    background: var(--theme-panel-border, #4a4a6a);
+    color: var(--theme-text-primary, #e0e0e0);
 }
 
 .exam-modal-btn.cancel:hover {
-    background: #5a5a7a;
+    background: var(--theme-panel-bg, #5a5a7a);
 }
 
 .exam-modal-btn.confirm {
-    background: linear-gradient(135deg, #4a9ecc, #2a6a99);
-    color: white;
+    background: var(--theme-accent, linear-gradient(135deg, #4a9ecc, #2a6a99));
+    color: var(--theme-text-primary, white);
     font-weight: bold;
 }
 
 .exam-modal-btn.confirm:hover {
-    background: linear-gradient(135deg, #5aaedc, #3a7aa9);
+    background: var(--theme-accent-hover, linear-gradient(135deg, #5aaedc, #3a7aa9));
     transform: translateY(-2px);
 }
 
@@ -1063,7 +1103,8 @@ body {
     gap: 20px;
     margin-top: 30px;
     padding-top: 20px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid var(--theme-panel-border, rgba(255, 255, 255, 0.1));
+    transition: border-color 0.3s ease;
 }
 
 .data-btn {
@@ -1077,16 +1118,17 @@ body {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    background: transparent;
+    background: rgba(0, 0, 0, 0.2);
 }
 
 .export-btn {
     color: #4ecdc4;
     border-color: #4ecdc4;
+    background: rgba(78, 205, 196, 0.1);
 }
 
 .export-btn:hover {
-    background: rgba(78, 205, 196, 0.15);
+    background: rgba(78, 205, 196, 0.25);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(78, 205, 196, 0.3);
 }
@@ -1094,10 +1136,11 @@ body {
 .import-btn {
     color: #f39c12;
     border-color: #f39c12;
+    background: rgba(243, 156, 18, 0.1);
 }
 
 .import-btn:hover {
-    background: rgba(243, 156, 18, 0.15);
+    background: rgba(243, 156, 18, 0.25);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(243, 156, 18, 0.3);
 }
@@ -1127,5 +1170,674 @@ body {
     .branch-connector-horizontal {
         width: 60px;
     }
+}
+
+/* ========================================
+   主题适配样式 - 荣誉殿堂
+   ======================================== */
+
+/* ----------------------------------------
+   赛博朋克主题
+   ---------------------------------------- */
+body.theme-cyberpunk .page-title {
+    text-shadow: 0 0 15px rgba(240, 192, 48, 0.5), 0 0 30px rgba(240, 192, 48, 0.3);
+}
+
+body.theme-cyberpunk .badge-hall,
+body.theme-cyberpunk .skill-tree-section {
+    background: rgba(58, 58, 66, 0.9);
+    border-color: rgba(240, 192, 48, 0.4);
+    box-shadow: 
+        0 0 20px rgba(240, 192, 48, 0.15),
+        inset 0 2px 0 rgba(240, 192, 48, 0.1);
+}
+
+body.theme-cyberpunk .tree-node.main-node {
+    background: linear-gradient(135deg, #52525c, #42424a);
+    border-color: rgba(240, 192, 48, 0.4);
+}
+
+body.theme-cyberpunk .tree-node.sub-node {
+    background: rgba(72, 72, 82, 0.9);
+    border-color: rgba(240, 192, 48, 0.3);
+}
+
+body.theme-cyberpunk .tree-node.main-node.final-exam-ready {
+    border-color: #f0c030;
+    box-shadow: 0 0 15px rgba(240, 192, 48, 0.4);
+}
+
+body.theme-cyberpunk .tree-node.main-node.locked,
+body.theme-cyberpunk .tree-node.sub-node.locked {
+    background: rgba(60, 60, 68, 0.9);
+    border-color: rgba(150, 150, 160, 0.5);
+}
+
+body.theme-cyberpunk .branch-node.locked {
+    background: rgba(60, 60, 68, 0.9);
+    border-color: rgba(150, 150, 160, 0.5);
+}
+
+body.theme-cyberpunk .tree-connector,
+body.theme-cyberpunk .branch-connector-line,
+body.theme-cyberpunk .branch-connector-horizontal,
+body.theme-cyberpunk .branch-connector-vertical {
+    border-color: rgba(240, 192, 48, 0.4);
+    background: rgba(240, 192, 48, 0.4);
+}
+
+body.theme-cyberpunk .tree-arrow {
+    color: rgba(240, 192, 48, 0.6);
+}
+
+body.theme-cyberpunk .cooldown-toast {
+    background: rgba(240, 192, 48, 0.95);
+    color: #2a2a30;
+}
+
+body.theme-cyberpunk .branch {
+    background: rgba(58, 58, 66, 0.9);
+    border-color: rgba(240, 192, 48, 0.4);
+}
+
+body.theme-cyberpunk .branch-node {
+    background: rgba(72, 72, 82, 0.9);
+    border-color: rgba(240, 192, 48, 0.3);
+}
+
+body.theme-cyberpunk .branch-lock-hint {
+    color: #f0c030;
+    background: rgba(240, 192, 48, 0.1);
+}
+
+/* ----------------------------------------
+   Kitty猫主题 - 需要深色文字以保证可读性
+   ---------------------------------------- */
+body.theme-doraemon {
+    background: linear-gradient(135deg, #d4789c 0%, #e8a4bc 100%);
+}
+
+/* Kitty主题：深色文字 */
+body.theme-doraemon .page-title {
+    color: #7a2040;
+    text-shadow: 0 2px 4px rgba(255, 255, 255, 0.3);
+}
+
+body.theme-doraemon .page-subtitle {
+    color: #8a4060;
+}
+
+body.theme-doraemon .page-header {
+    border-color: #c9557a;
+}
+
+body.theme-doraemon .page-title::before,
+body.theme-doraemon .page-title::after {
+    content: '🎀';
+}
+
+body.theme-doraemon .badge-hall-title::before,
+body.theme-doraemon .badge-hall-title::after {
+    content: '💖';
+}
+
+body.theme-doraemon .skill-tree-title::before,
+body.theme-doraemon .skill-tree-title::after {
+    content: '🌸';
+}
+
+/* Kitty主题：面板样式 - 白色半透明背景 */
+body.theme-doraemon .badge-hall,
+body.theme-doraemon .skill-tree-section {
+    background: rgba(255, 255, 255, 0.85);
+    border-color: #c9557a;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 20px rgba(160, 64, 96, 0.2);
+}
+
+body.theme-doraemon .badge-hall-title,
+body.theme-doraemon .skill-tree-title {
+    color: #a04060;
+}
+
+body.theme-doraemon .badge-section-label {
+    color: #8a5070;
+    border-color: #c9557a;
+}
+
+body.theme-doraemon .badge-slot-name {
+    color: #8a5070;
+}
+
+body.theme-doraemon .badge-slot.earned .badge-slot-name {
+    color: #a04060;
+}
+
+/* Kitty主题：树节点样式 - 确保文字可读 */
+body.theme-doraemon .tree-node.main-node {
+    background: linear-gradient(135deg, #f8e8ed, #fdf2f5);
+    border-color: #d4789c;
+    border-radius: 15px;
+}
+
+body.theme-doraemon .tree-node.main-node .node-name {
+    color: #7a3050;
+}
+
+body.theme-doraemon .tree-node.main-node .node-score {
+    color: #a04060;
+}
+
+body.theme-doraemon .tree-node.sub-node {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: #d4789c;
+    border-radius: 12px;
+}
+
+body.theme-doraemon .tree-node.sub-node .node-name {
+    color: #7a3050;
+}
+
+body.theme-doraemon .tree-node.sub-node:hover:not(.locked) {
+    border-color: #c9557a;
+    background: rgba(255, 240, 245, 0.95);
+}
+
+/* Kitty主题：锁定节点 - 确保可见 */
+body.theme-doraemon .tree-node.main-node.locked,
+body.theme-doraemon .tree-node.sub-node.locked {
+    background: rgba(240, 220, 230, 0.9);
+    border-color: #b08090;
+    opacity: 0.85;
+}
+
+body.theme-doraemon .tree-node.main-node.locked .node-name,
+body.theme-doraemon .tree-node.sub-node.locked .node-name {
+    color: #8a6070;
+}
+
+body.theme-doraemon .branch-node.locked {
+    background: rgba(240, 220, 230, 0.9);
+    border-color: #b08090;
+    color: #8a6070;
+    opacity: 0.85;
+}
+
+body.theme-doraemon .tree-node.main-node.completed {
+    background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
+    border-color: #7dcea0;
+}
+
+body.theme-doraemon .tree-node.sub-node.completed {
+    background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
+    border-color: #7dcea0;
+}
+
+body.theme-doraemon .tree-node.main-node.current {
+    border-color: #c9557a;
+    box-shadow: 0 0 12px rgba(201, 85, 122, 0.4);
+}
+
+body.theme-doraemon .tree-node.sub-node.current {
+    border-color: #c9557a;
+    box-shadow: 0 0 8px rgba(201, 85, 122, 0.3);
+}
+
+/* Kitty主题：连接线 */
+body.theme-doraemon .tree-connector {
+    border-color: #d4789c;
+}
+
+body.theme-doraemon .tree-arrow {
+    color: #c9557a;
+}
+
+body.theme-doraemon .tree-arrow.active {
+    color: #a04060;
+}
+
+body.theme-doraemon .branch-connector-line,
+body.theme-doraemon .branch-connector-horizontal,
+body.theme-doraemon .branch-connector-vertical {
+    background: #d4789c;
+}
+
+/* Kitty主题：统计数据 */
+body.theme-doraemon .stat-value {
+    color: #a04060;
+}
+
+body.theme-doraemon .stat-label {
+    color: #8a5070;
+}
+
+/* Kitty主题：返回按钮 */
+body.theme-doraemon .back-btn {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: #c9557a;
+    color: #a04060;
+    border-radius: 20px;
+}
+
+body.theme-doraemon .back-btn:hover {
+    background: #fff;
+    border-color: #a04060;
+}
+
+/* Kitty主题：弹窗 */
+body.theme-doraemon .exam-modal-content {
+    background: linear-gradient(135deg, #fdf2f5, #fff);
+    border-color: #c9557a;
+}
+
+body.theme-doraemon .exam-modal-title {
+    color: #a04060;
+}
+
+body.theme-doraemon .exam-modal-level {
+    color: #7a3050;
+    background: rgba(212, 120, 156, 0.1);
+    border-color: rgba(212, 120, 156, 0.3);
+}
+
+body.theme-doraemon .exam-modal-scope {
+    color: #8a5070;
+}
+
+body.theme-doraemon .info-label {
+    color: #8a5070;
+}
+
+body.theme-doraemon .exam-modal-btn.cancel {
+    background: #e8a4bc;
+    color: #fff;
+}
+
+body.theme-doraemon .exam-modal-btn.confirm {
+    background: linear-gradient(135deg, #c9557a, #a04060);
+}
+
+body.theme-doraemon .cooldown-toast {
+    background: rgba(201, 85, 122, 0.95);
+    border-radius: 15px;
+}
+
+/* Kitty主题：旧样式适配 */
+body.theme-doraemon .level-section {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: #d4789c;
+}
+
+body.theme-doraemon .level-section.completed {
+    border-color: #7dcea0;
+}
+
+body.theme-doraemon .level-section.current {
+    border-color: #c9557a;
+}
+
+body.theme-doraemon .level-header {
+    border-color: rgba(212, 120, 156, 0.3);
+}
+
+body.theme-doraemon .level-name {
+    color: #7a3050;
+}
+
+body.theme-doraemon .sub-level {
+    background: rgba(212, 120, 156, 0.1);
+}
+
+body.theme-doraemon .sub-level:hover:not(.locked):not(.completed) {
+    background: rgba(201, 85, 122, 0.2);
+}
+
+body.theme-doraemon .sub-level.completed {
+    background: rgba(125, 206, 160, 0.15);
+}
+
+body.theme-doraemon .sub-level.current {
+    background: rgba(201, 85, 122, 0.15);
+    border-color: #c9557a;
+}
+
+body.theme-doraemon .sub-level-name {
+    color: #7a3050;
+}
+
+body.theme-doraemon .sub-level.completed .sub-level-name {
+    color: #58a060;
+}
+
+body.theme-doraemon .sub-level.current .sub-level-name {
+    color: #a04060;
+}
+
+body.theme-doraemon .locked-hint {
+    color: #8a5070;
+}
+
+body.theme-doraemon .tree-node {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: #d4789c;
+}
+
+body.theme-doraemon .tree-node.completed {
+    background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
+    border-color: #7dcea0;
+}
+
+body.theme-doraemon .node-name {
+    color: #7a3050;
+}
+
+body.theme-doraemon .node-status {
+    color: #8a5070;
+}
+
+body.theme-doraemon .tree-node.completed .node-status {
+    color: #58a060;
+}
+
+/* Kitty主题：分支区域 */
+body.theme-doraemon .branch {
+    background: rgba(255, 255, 255, 0.85);
+    border-color: #d4789c;
+}
+
+body.theme-doraemon .branch-title {
+    color: #a04060;
+}
+
+body.theme-doraemon .branch-node {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: #d4789c;
+    color: #7a3050;
+}
+
+body.theme-doraemon .branch-node:hover:not(.locked) {
+    border-color: #c9557a;
+}
+
+body.theme-doraemon .branch-node.completed {
+    background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
+    border-color: #7dcea0;
+}
+
+body.theme-doraemon .branch-lock-hint {
+    color: #c9557a;
+    background: rgba(201, 85, 122, 0.1);
+}
+
+/* Kitty主题：Tooltip */
+body.theme-doraemon .tree-node.sub-node[data-tooltip]:hover::after,
+body.theme-doraemon .tree-node.main-node[data-tooltip]:hover::after {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: #d4789c;
+    color: #7a3050;
+}
+
+body.theme-doraemon .tree-node.sub-node[data-tooltip]:hover::before,
+body.theme-doraemon .tree-node.main-node[data-tooltip]:hover::before {
+    border-top-color: #d4789c;
+}
+
+/* ----------------------------------------
+   蝙蝠侠主题
+   ---------------------------------------- */
+body.theme-batman {
+    background: radial-gradient(ellipse at top, #1a1a2e 0%, #0d0d0d 70%);
+}
+
+body.theme-batman .page-title {
+    text-shadow: 0 0 20px rgba(255, 215, 0, 0.6), 0 0 40px rgba(255, 215, 0, 0.3);
+    letter-spacing: 6px;
+}
+
+body.theme-batman .badge-hall,
+body.theme-batman .skill-tree-section {
+    background: rgba(13, 13, 13, 0.9);
+    border-color: rgba(255, 215, 0, 0.4);
+    box-shadow: 
+        0 0 30px rgba(255, 215, 0, 0.1),
+        inset 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+body.theme-batman .tree-node.main-node {
+    background: linear-gradient(135deg, #1a1a2e, #0d0d0d);
+    border-color: rgba(255, 215, 0, 0.4);
+}
+
+body.theme-batman .tree-node.sub-node {
+    background: rgba(26, 26, 46, 0.9);
+    border-color: rgba(255, 215, 0, 0.3);
+}
+
+body.theme-batman .tree-node.main-node.final-exam-ready {
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+}
+
+body.theme-batman .tree-node.main-node.locked,
+body.theme-batman .tree-node.sub-node.locked {
+    background: rgba(20, 20, 35, 0.9);
+    border-color: rgba(120, 120, 140, 0.5);
+}
+
+body.theme-batman .branch-node.locked {
+    background: rgba(20, 20, 35, 0.9);
+    border-color: rgba(120, 120, 140, 0.5);
+}
+
+body.theme-batman .tree-connector,
+body.theme-batman .branch-connector-line,
+body.theme-batman .branch-connector-horizontal,
+body.theme-batman .branch-connector-vertical {
+    border-color: rgba(255, 215, 0, 0.3);
+    background: rgba(255, 215, 0, 0.3);
+}
+
+body.theme-batman .tree-arrow {
+    color: rgba(255, 215, 0, 0.5);
+}
+
+body.theme-batman .cooldown-toast {
+    background: rgba(183, 28, 28, 0.95);
+}
+
+body.theme-batman .branch {
+    background: rgba(13, 13, 13, 0.9);
+    border-color: rgba(255, 215, 0, 0.4);
+}
+
+body.theme-batman .branch-node {
+    background: rgba(26, 26, 46, 0.9);
+    border-color: rgba(255, 215, 0, 0.3);
+}
+
+body.theme-batman .branch-lock-hint {
+    color: #ffd700;
+    background: rgba(255, 215, 0, 0.1);
+}
+
+/* ----------------------------------------
+   蜘蛛侠主题
+   ---------------------------------------- */
+body.theme-spiderman {
+    background: linear-gradient(135deg, #1a0a0a 0%, #2d1515 100%);
+}
+
+body.theme-spiderman .page-title {
+    text-shadow: 0 0 15px rgba(226, 54, 54, 0.6), 0 0 30px rgba(226, 54, 54, 0.3);
+}
+
+body.theme-spiderman .badge-hall,
+body.theme-spiderman .skill-tree-section {
+    background: rgba(26, 10, 10, 0.9);
+    border-color: rgba(226, 54, 54, 0.4);
+    box-shadow: 
+        0 0 20px rgba(226, 54, 54, 0.1),
+        inset 0 2px 0 rgba(226, 54, 54, 0.1);
+}
+
+body.theme-spiderman .tree-node.main-node {
+    background: linear-gradient(135deg, #2d1515, #1a0a0a);
+    border-color: rgba(226, 54, 54, 0.4);
+}
+
+body.theme-spiderman .tree-node.sub-node {
+    background: rgba(45, 21, 21, 0.9);
+    border-color: rgba(226, 54, 54, 0.3);
+}
+
+body.theme-spiderman .tree-node.main-node.completed,
+body.theme-spiderman .tree-node.sub-node.completed {
+    border-color: #e23636;
+    background: linear-gradient(135deg, #3d2020, #2d1515);
+}
+
+body.theme-spiderman .tree-node.main-node.final-exam-ready {
+    border-color: #e23636;
+    box-shadow: 0 0 15px rgba(226, 54, 54, 0.5);
+}
+
+body.theme-spiderman .tree-node.main-node.locked,
+body.theme-spiderman .tree-node.sub-node.locked {
+    background: rgba(35, 15, 15, 0.9);
+    border-color: rgba(140, 80, 80, 0.5);
+}
+
+body.theme-spiderman .branch-node.locked {
+    background: rgba(35, 15, 15, 0.9);
+    border-color: rgba(140, 80, 80, 0.5);
+}
+
+body.theme-spiderman .tree-connector,
+body.theme-spiderman .branch-connector-line,
+body.theme-spiderman .branch-connector-horizontal,
+body.theme-spiderman .branch-connector-vertical {
+    border-color: rgba(226, 54, 54, 0.4);
+    background: rgba(226, 54, 54, 0.4);
+}
+
+body.theme-spiderman .tree-arrow {
+    color: rgba(226, 54, 54, 0.6);
+}
+
+body.theme-spiderman .cooldown-toast {
+    background: rgba(226, 54, 54, 0.95);
+}
+
+body.theme-spiderman .branch {
+    background: rgba(26, 10, 10, 0.9);
+    border-color: rgba(226, 54, 54, 0.4);
+}
+
+body.theme-spiderman .branch-node {
+    background: rgba(45, 21, 21, 0.9);
+    border-color: rgba(226, 54, 54, 0.3);
+}
+
+body.theme-spiderman .branch-node.completed {
+    border-color: #e23636;
+    background: linear-gradient(135deg, #3d2020, #2d1515);
+}
+
+body.theme-spiderman .branch-lock-hint {
+    color: #e23636;
+    background: rgba(226, 54, 54, 0.1);
+}
+
+/* ----------------------------------------
+   各主题的数据管理按钮适配
+   ---------------------------------------- */
+
+/* Kitty主题：数据管理按钮 */
+body.theme-doraemon .data-management {
+    border-top-color: rgba(201, 85, 122, 0.3);
+}
+
+body.theme-doraemon .export-btn {
+    color: #fff;
+    border-color: #58a060;
+    background: linear-gradient(135deg, #7dcea0, #58a060);
+}
+
+body.theme-doraemon .export-btn:hover {
+    background: linear-gradient(135deg, #58a060, #48904f);
+    box-shadow: 0 4px 12px rgba(88, 160, 96, 0.4);
+}
+
+body.theme-doraemon .import-btn {
+    color: #fff;
+    border-color: #a04060;
+    background: linear-gradient(135deg, #c9557a, #a04060);
+}
+
+body.theme-doraemon .import-btn:hover {
+    background: linear-gradient(135deg, #a04060, #8a3050);
+    box-shadow: 0 4px 12px rgba(160, 64, 96, 0.4);
+}
+
+/* 赛博朋克主题：数据管理按钮 */
+body.theme-cyberpunk .export-btn {
+    color: #7cb342;
+    border-color: #7cb342;
+    background: rgba(124, 179, 66, 0.15);
+}
+
+body.theme-cyberpunk .export-btn:hover {
+    background: rgba(124, 179, 66, 0.3);
+}
+
+body.theme-cyberpunk .import-btn {
+    color: #f0c030;
+    border-color: #f0c030;
+    background: rgba(240, 192, 48, 0.15);
+}
+
+body.theme-cyberpunk .import-btn:hover {
+    background: rgba(240, 192, 48, 0.3);
+}
+
+/* 蝙蝠侠主题：数据管理按钮 */
+body.theme-batman .export-btn {
+    color: #4caf50;
+    border-color: #4caf50;
+    background: rgba(76, 175, 80, 0.15);
+}
+
+body.theme-batman .export-btn:hover {
+    background: rgba(76, 175, 80, 0.3);
+}
+
+body.theme-batman .import-btn {
+    color: #ffd700;
+    border-color: #ffd700;
+    background: rgba(255, 215, 0, 0.15);
+}
+
+body.theme-batman .import-btn:hover {
+    background: rgba(255, 215, 0, 0.3);
+}
+
+/* 蜘蛛侠主题：数据管理按钮 */
+body.theme-spiderman .export-btn {
+    color: #4caf50;
+    border-color: #4caf50;
+    background: rgba(76, 175, 80, 0.15);
+}
+
+body.theme-spiderman .export-btn:hover {
+    background: rgba(76, 175, 80, 0.3);
+}
+
+body.theme-spiderman .import-btn {
+    color: #e23636;
+    border-color: #e23636;
+    background: rgba(226, 54, 54, 0.15);
+}
+
+body.theme-spiderman .import-btn:hover {
+    background: rgba(226, 54, 54, 0.3);
 }
 

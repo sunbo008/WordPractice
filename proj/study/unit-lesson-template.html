@@ -4,34 +4,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Unit Lesson</title>
+    <link rel="stylesheet" href="../css/themes.css">
     <link rel="stylesheet" href="../css/styles.css">
     <link rel="stylesheet" href="../css/settings.css">
+    <script>
+        // 主题加载器
+        (function() {
+            var theme = localStorage.getItem('wordTetris_selectedTheme') || 'default';
+            if (theme !== 'default') {
+                document.documentElement.className = 'theme-' + theme;
+            }
+        })();
+    </script>
     <style>
-        .unit-container { max-width: 1100px; margin: 30px auto; padding: 20px; background: #fff; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+        .unit-container { max-width: 1100px; margin: 30px auto; padding: 20px; background: var(--study-container-bg, #fff); border-radius: 12px; box-shadow: 0 8px 24px var(--theme-shadow, rgba(0,0,0,0.1)); color: var(--study-text, #2c3e50); }
         .unit-header { display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px; }
-        .title { font-size: 22px; font-weight: 700; }
-        .meta { color:#7f8c8d; }
+        .title { font-size: 22px; font-weight: 700; color: var(--study-title, #2c3e50); }
+        .meta { color: var(--study-meta, #7f8c8d); }
         .word-list { display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; margin-top: 10px; }
-        .word-item { background:#f8f9fa; border:1px solid #ecf0f1; border-radius:8px; padding:10px; }
+        .word-item { background: var(--study-word-bg, #f8f9fa); border:1px solid var(--study-word-border, #ecf0f1); border-radius:8px; padding:10px; }
         .word-text { display:flex; align-items:center; gap:6px; }
-        .w { font-weight:700; }
-        .phon { color:#3498db; margin-left:6px; font-weight:400; }
-        .mean { color:#7f8c8d; font-size: 0.9em; }
-        .section-title { margin-top: 22px; font-size: 18px; font-weight: 700; }
-        .story-box { background:#fffaf1; border:1px solid #ffe3a3; border-radius:8px; padding:16px; line-height:1.7; }
+        .w { font-weight:700; color: var(--study-word, #2c3e50); }
+        .phon { color: var(--study-phonetic, #3498db); margin-left:6px; font-weight:400; }
+        .mean { color: var(--study-meaning, #7f8c8d); font-size: 0.9em; }
+        .section-title { margin-top: 22px; font-size: 18px; font-weight: 700; color: var(--study-section-title, #2c3e50); }
+        .story-box { background: var(--study-story-bg, #fffaf1); border:1px solid var(--study-story-border, #ffe3a3); border-radius:8px; padding:16px; line-height:1.7; color: var(--study-story-text, #2c3e50); }
         .actions { display:flex; gap:10px; margin-top:12px; }
-        .btn { padding:8px 14px; border:none; border-radius:6px; cursor:pointer; }
-        .btn-primary { background:#3498db; color:#fff; }
-        .btn-secondary { background:#ecf0f1; }
-        .back { margin: 10px 0 0 0; display:inline-block; color:#3498db; text-decoration:none; }
-        /* 小喇叭按钮：仅比图标大一圈 */
+        .btn { padding:8px 14px; border:none; border-radius:6px; cursor:pointer; transition: all 0.3s ease; }
+        .btn-primary { background: var(--theme-accent, #3498db); color: var(--theme-text-primary, #fff); }
+        .btn-secondary { background: var(--study-btn-secondary, #ecf0f1); color: var(--study-text, #2c3e50); }
+        .back { margin: 10px 0 0 0; display:inline-block; color: var(--theme-accent, #3498db); text-decoration:none; }
+        /* 小喇叭按钮 */
         .speak-btn { width: 22px; height: 22px; min-width:22px; min-height:22px; border-radius: 50%;
-            display:inline-flex; align-items:center; justify-content:center; border:1px solid #d9e2ea; background:#eef3f7; cursor:pointer; padding:0; }
+            display:inline-flex; align-items:center; justify-content:center; border:1px solid var(--study-speak-border, #d9e2ea); background: var(--study-speak-bg, #eef3f7); cursor:pointer; padding:0; }
         .speak-btn span { font-size: 13px; line-height:1; }
-        .speak-btn:hover { background:#e2f2ff; }
+        .speak-btn:hover { background: var(--study-speak-hover, #e2f2ff); }
     </style>
 </head>
 <body>
+    <script>
+        (function() {
+            var theme = localStorage.getItem('wordTetris_selectedTheme') || 'default';
+            document.body.className = 'theme-' + theme;
+        })();
+    </script>
     <div class="unit-container">
         <div class="unit-header">
             <div>

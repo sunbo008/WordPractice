@@ -7,9 +7,10 @@
 
 body {
     font-family: 'Arial', sans-serif;
-    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-    color: white;
+    background: linear-gradient(135deg, var(--theme-bg-primary) 0%, var(--theme-bg-secondary) 100%);
+    color: var(--theme-text-primary);
     min-height: 100vh;
+    transition: background 0.3s ease, color 0.3s ease;
 }
 
 .game-container {
@@ -49,10 +50,11 @@ body {
     grid-area: info;
     display: flex;
     justify-content: space-around;
-    background: rgba(255,255,255,0.1);
+    background: var(--theme-panel-bg);
     padding: 15px;
     border-radius: 10px;
     backdrop-filter: blur(10px);
+    transition: background 0.3s ease;
 }
 
 .info-item {
@@ -69,7 +71,7 @@ body {
 .info-item span:last-child {
     font-size: 1.5em;
     font-weight: bold;
-    color: #ffd700;
+    color: var(--theme-gold);
 }
 
 /* 考试统计栏 */
@@ -78,11 +80,12 @@ body {
     display: flex;
     justify-content: center;
     gap: 30px;
-    background: rgba(255,255,255,0.15);
+    background: var(--theme-panel-bg);
     padding: 12px 20px;
     border-radius: 8px;
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,0.2);
+    border: 1px solid var(--theme-panel-border);
+    transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .stats-item {
@@ -95,18 +98,18 @@ body {
 .stats-item .label {
     font-size: 0.95em;
     opacity: 0.9;
-    color: #e8f4fd;
+    color: var(--theme-text-secondary, #e8f4fd);
 }
 
 .stats-item span:not(.label):not(.percentage) {
     font-size: 1.1em;
     font-weight: bold;
-    color: #4fc3f7;
+    color: var(--theme-stats-value, #4fc3f7);
 }
 
 .stats-item .percentage {
     font-size: 0.9em;
-    color: #81c784;
+    color: var(--theme-stats-percentage, #81c784);
     font-weight: normal;
 }
 
@@ -120,10 +123,11 @@ body {
 
 .left-panel > .image-showcase,
 .left-panel > .game-controls {
-    background: rgba(255,255,255,0.1);
+    background: var(--theme-panel-bg);
     padding: 16px;
     border-radius: 10px;
     backdrop-filter: blur(10px);
+    transition: background 0.3s ease;
 }
 
 /* 图片展示区 */
@@ -168,10 +172,11 @@ body {
 
 /* 游戏画布 */
 #gameCanvas {
-    border: 3px solid #ffd700;
+    border: 3px solid var(--theme-canvas-border);
     border-radius: 10px;
-    background: #0e1f3d; /* 统一深蓝底色，避免色差 */
-    box-shadow: 0 0 20px rgba(255,215,0,0.3);
+    background: var(--theme-canvas-bg);
+    box-shadow: 0 0 20px var(--theme-glow);
+    transition: border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
 }
 
 /* 游戏控制 */
@@ -186,26 +191,28 @@ body {
     grid-template-columns: 1fr;
     grid-template-rows: auto auto auto auto;
     gap: 12px;
-    background: rgba(255,255,255,0.1);
+    background: var(--theme-panel-bg);
     padding: 16px;
     border-radius: 10px;
     align-items: stretch;
+    transition: background 0.3s ease;
 }
 
 .input-section label {
     font-weight: bold;
     font-size: 1.1em;
-    color: #ffd700;
+    color: var(--theme-gold);
 }
 
 #letterInput {
     padding: 12px 20px;
-    border: 2px solid #3498db;
+    border: 2px solid var(--theme-input-border);
     border-radius: 8px;
     font-size: 1.1em;
     text-align: center;
     text-transform: uppercase;
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--theme-input-bg);
+    color: var(--theme-input-text);
     font-weight: bold;
     letter-spacing: 2px;
     transition: all 0.3s;
@@ -214,8 +221,8 @@ body {
 
 #letterInput:focus {
     outline: none;
-    border-color: #ffd700;
-    box-shadow: 0 0 10px rgba(255, 215, 0, 0.35);
+    border-color: var(--theme-gold);
+    box-shadow: 0 0 10px var(--theme-glow);
 }
 
 .give-up-btn {
@@ -246,9 +253,9 @@ body {
     padding: 10px 15px;
     background: rgba(0,0,0,0.3);
     border-radius: 6px;
-    border-left: 4px solid #3498db;
+    border-left: 4px solid var(--theme-accent);
     font-size: 1.1em;
-    color: #ffd700;
+    color: var(--theme-gold);
     font-weight: bold;
 }
 
@@ -258,7 +265,7 @@ body {
     border: 1px solid rgba(52, 152, 219, 0.3);
     border-radius: 5px;
     font-size: 0.85em;
-    color: #3498db;
+    color: var(--theme-accent);
     text-align: right;
     line-height: 1.4;
     animation: pulse 2s infinite;
@@ -301,54 +308,55 @@ button {
 }
 
 #submitBtn, #startBtn {
-    background: #4CAF50;
-    color: white;
+    background: var(--theme-success);
+    color: var(--theme-text-primary);
 }
 
 .give-up-btn {
-    background: #9e9e9e;
-    color: white;
+    background: var(--theme-btn-secondary, #9e9e9e);
+    color: var(--theme-text-primary, white);
     margin-left: 10px;
 }
 
 .toggle-speech {
-    background: #2196F3;
-    color: white;
+    background: var(--theme-accent, #2196F3);
+    color: var(--theme-text-primary, white);
     font-size: 0.9em;
 }
 
 .toggle-speech.disabled {
-    background: #757575;
+    background: var(--theme-btn-disabled, #757575);
 }
 
 .settings-btn {
-    background: #9b59b6;
-    color: white;
+    background: var(--theme-btn-settings, #9b59b6);
+    color: var(--theme-text-primary, white);
     font-size: 0.9em;
 }
 
 .settings-btn:hover {
-    background: #8e44ad;
+    background: var(--theme-btn-settings-hover, #8e44ad);
 }
 
 .test-btn {
-    background: #204455;
-    color: white;
+    background: var(--theme-btn-test, #204455);
+    color: var(--theme-text-primary, white);
     font-size: 0.9em;
 }
 
 .test-btn:hover {
-    background: #214b5e;
+    background: var(--theme-btn-test-hover, #214b5e);
 }
 
 #pauseBtn {
-    background: #ff9800;
-    color: white;
+    background: var(--theme-warning);
+    color: var(--theme-text-primary);
 }
 
 #resetBtn {
-    background: #f44336;
-    color: white;
+    background: var(--theme-error);
+    color: #fff;
+    font-weight: bold;
 }
 
 button:hover:not(:disabled) {
@@ -370,15 +378,16 @@ button:disabled {
 }
 
 .sidebar > div {
-    background: rgba(255,255,255,0.1);
+    background: var(--theme-panel-bg);
     padding: 20px;
     border-radius: 10px;
     backdrop-filter: blur(10px);
+    transition: background 0.3s ease;
 }
 
 .sidebar h3 {
     margin-bottom: 15px;
-    color: #ffd700;
+    color: var(--theme-gold);
     text-align: center;
 }
 
@@ -394,7 +403,7 @@ button:disabled {
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    border: 2px solid #333;
+    border: 2px solid var(--theme-light-border, #333);
     opacity: 0.3;
     transition: opacity 0.3s ease;
 }
@@ -421,8 +430,9 @@ button:disabled {
     font-size: 1.2em;
     font-weight: bold;
     padding: 10px;
-    background: rgba(0,0,0,0.3);
+    background: var(--theme-panel-bg-dark, rgba(0,0,0,0.3));
     border-radius: 5px;
+    color: var(--theme-text-primary);
 }
 
 /* 生词本 */
@@ -437,7 +447,7 @@ button:disabled {
 }
 
 .vocab-item {
-    background: rgba(0,0,0,0.3);
+    background: var(--theme-panel-bg-dark, rgba(0,0,0,0.3));
     padding: 8px;
     margin-bottom: 5px;
     border-radius: 5px;
@@ -448,7 +458,7 @@ button:disabled {
 
 .vocab-word {
     font-weight: bold;
-    color: #ffd700;
+    color: var(--theme-gold);
 }
 
 .vocab-count {
@@ -481,7 +491,7 @@ button:disabled {
 .game-instructions .game-intro h4 {
     margin: 0 0 6px 0;
     font-size: 0.85em;
-    color: #ffd700;
+    color: var(--theme-gold);
     text-align: left;
 }
 
@@ -503,7 +513,7 @@ button:disabled {
 
 .game-instructions li:before {
     content: "▶ ";
-    color: #ffd700;
+    color: var(--theme-gold);
     font-weight: bold;
 }
 
@@ -521,14 +531,14 @@ button:disabled {
 }
 
 .modal-content {
-    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    background: var(--theme-modal-bg);
     margin: 15% auto;
     padding: 0;
     border-radius: 15px;
     width: 90%;
     max-width: 500px;
     text-align: center;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    box-shadow: 0 10px 30px var(--theme-shadow);
     animation: slideIn 0.3s ease;
     position: relative;
     overflow: visible; /* 改为 visible 确保关闭按钮不被裁剪 */
@@ -570,7 +580,7 @@ button:disabled {
 }
 
 .modal-content h2 {
-    color: #ffd700;
+    color: var(--theme-gold);
     margin-bottom: 20px;
     font-size: 2em;
 }
@@ -588,8 +598,8 @@ button:disabled {
 }
 
 .modal-buttons button {
-    background: #4CAF50;
-    color: white;
+    background: var(--theme-success);
+    color: var(--theme-text-primary);
     padding: 12px 24px;
 }
 

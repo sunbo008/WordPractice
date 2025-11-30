@@ -1078,3 +1078,667 @@ body {
         padding: 12px !important;
     }
 }
+
+/* ========================================
+   风格设置 - 主题选择样式
+   ======================================== */
+
+.theme-section h2 {
+    margin-bottom: 20px;
+}
+
+.theme-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+@media (max-width: 900px) {
+    .theme-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 500px) {
+    .theme-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.theme-card {
+    background: #f8f9fa;
+    border: 3px solid #e9ecef;
+    border-radius: 12px;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.theme-card:hover {
+    border-color: #3498db;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.theme-card.selected {
+    border-color: #27ae60;
+    background: linear-gradient(135deg, #d5f4e6, #ffffff);
+    box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+}
+
+.theme-card.selected::before {
+    content: '✓';
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: #27ae60;
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.theme-card {
+    position: relative;
+}
+
+/* 主题预览卡片 */
+.theme-preview {
+    width: 100%;
+    height: 80px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    position: relative;
+}
+
+.theme-preview .preview-bar {
+    height: 20px;
+    width: 100%;
+}
+
+.theme-preview .preview-content {
+    padding: 10px;
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.theme-preview .preview-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+}
+
+/* 默认主题预览 */
+.theme-preview-default {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+}
+
+.theme-preview-default .preview-bar {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.theme-preview-default .preview-dot:first-child {
+    background: #ffd700;
+}
+
+.theme-preview-default .preview-dot:last-child {
+    background: #3498db;
+}
+
+/* 赛博朋克主题预览 */
+.theme-preview-cyberpunk {
+    background: linear-gradient(135deg, #3a3a42 0%, #52525c 100%);
+}
+
+.theme-preview-cyberpunk .preview-bar {
+    background: rgba(240, 192, 48, 0.2);
+}
+
+.theme-preview-cyberpunk .preview-dot:first-child {
+    background: #f0c030;
+    box-shadow: 0 0 8px rgba(240, 192, 48, 0.6);
+}
+
+.theme-preview-cyberpunk .preview-dot:last-child {
+    background: #c0c0c8;
+}
+
+/* Kitty猫主题预览 */
+.theme-preview-doraemon {
+    background: linear-gradient(135deg, #d4789c 0%, #e8a4bc 100%);
+}
+
+.theme-preview-doraemon .preview-bar {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.theme-preview-doraemon .preview-dot:first-child {
+    background: #ffffff;
+}
+
+.theme-preview-doraemon .preview-dot:last-child {
+    background: #c9557a;
+}
+
+/* 蝙蝠侠主题预览 */
+.theme-preview-batman {
+    background: linear-gradient(135deg, #0d0d0d 0%, #1a1a2e 100%);
+}
+
+.theme-preview-batman .preview-bar {
+    background: rgba(255, 215, 0, 0.1);
+}
+
+.theme-preview-batman .preview-dot:first-child {
+    background: #ffd700;
+    box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+}
+
+.theme-preview-batman .preview-dot:last-child {
+    background: #333333;
+}
+
+/* 蜘蛛侠主题预览 */
+.theme-preview-spiderman {
+    background: linear-gradient(135deg, #1a0a0a 0%, #2d1515 100%);
+}
+
+.theme-preview-spiderman .preview-bar {
+    background: rgba(226, 54, 54, 0.2);
+}
+
+.theme-preview-spiderman .preview-dot:first-child {
+    background: #e23636;
+    box-shadow: 0 0 8px rgba(226, 54, 54, 0.6);
+}
+
+.theme-preview-spiderman .preview-dot:last-child {
+    background: #1a0a0a;
+}
+
+/* 主题名称和描述 */
+.theme-name {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 4px;
+}
+
+.theme-desc {
+    font-size: 0.85em;
+    color: #7f8c8d;
+}
+
+/* 设置页面主题适配 */
+/* 赛博朋克主题 - 设置页面完整适配（银灰色） */
+body.theme-cyberpunk {
+    background: linear-gradient(135deg, #3a3a42 0%, #52525c 100%);
+}
+
+body.theme-cyberpunk .settings-header,
+body.theme-cyberpunk .config-overview,
+body.theme-cyberpunk .library-categories {
+    background: rgba(72, 72, 82, 0.95);
+    border: 1px solid rgba(240, 192, 48, 0.25);
+}
+
+body.theme-cyberpunk .settings-header h1 {
+    background: linear-gradient(45deg, #f0c030, #d4a820);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+body.theme-cyberpunk .settings-header p {
+    color: #c8c8d0;
+}
+
+body.theme-cyberpunk .back-btn {
+    background: #f0c030;
+    color: #2a2a30;
+}
+
+body.theme-cyberpunk .back-btn:hover {
+    background: #d4a820;
+}
+
+body.theme-cyberpunk .stat-item {
+    background: linear-gradient(135deg, #52525c, #62626c);
+    border-color: rgba(240, 192, 48, 0.2);
+}
+
+body.theme-cyberpunk .stat-value {
+    color: #f0c030;
+}
+
+body.theme-cyberpunk .stat-label {
+    color: #c8c8d0;
+}
+
+body.theme-cyberpunk .theme-card {
+    background: rgba(72, 72, 82, 0.95);
+    border-color: rgba(240, 192, 48, 0.3);
+}
+
+body.theme-cyberpunk .theme-card:hover {
+    border-color: #f0c030;
+    box-shadow: 0 0 15px rgba(240, 192, 48, 0.3);
+}
+
+body.theme-cyberpunk .theme-card.selected {
+    border-color: #f0c030;
+    background: linear-gradient(135deg, #52525c, #62626c);
+    box-shadow: 0 4px 15px rgba(240, 192, 48, 0.25);
+}
+
+body.theme-cyberpunk .theme-name {
+    color: #f0c030;
+}
+
+body.theme-cyberpunk .theme-desc {
+    color: #c8c8d0;
+}
+
+body.theme-cyberpunk .category-section {
+    border-color: rgba(240, 192, 48, 0.25);
+}
+
+body.theme-cyberpunk .category-section:hover {
+    border-color: rgba(240, 192, 48, 0.45);
+}
+
+body.theme-cyberpunk .category-header {
+    background: linear-gradient(135deg, #52525c, #62626c);
+}
+
+body.theme-cyberpunk .category-header:hover {
+    background: linear-gradient(135deg, #62626c, #72727c);
+}
+
+body.theme-cyberpunk .category-name {
+    color: #f5f5f5;
+}
+
+body.theme-cyberpunk .category-desc {
+    color: #a8a8b0;
+}
+
+body.theme-cyberpunk .select-all-btn {
+    background: #f0c030;
+    color: #2a2a30;
+}
+
+body.theme-cyberpunk .select-all-btn:hover {
+    background: #d4a820;
+}
+
+body.theme-cyberpunk .selected-count,
+body.theme-cyberpunk .grade-count {
+    color: #f0c030;
+    background: rgba(240, 192, 48, 0.12);
+}
+
+body.theme-cyberpunk .btn-primary {
+    background: #f0c030;
+    color: #2a2a30;
+}
+
+body.theme-cyberpunk .btn-primary:hover {
+    background: #d4a820;
+}
+
+body.theme-cyberpunk .btn-success {
+    background: #7cb342;
+}
+
+body.theme-cyberpunk .btn-success:hover {
+    background: #689f38;
+}
+
+body.theme-cyberpunk .btn-secondary {
+    background: #808088;
+}
+
+body.theme-cyberpunk .btn-secondary:hover {
+    background: #707078;
+}
+
+/* 赛博朋克 - 文字颜色适配 */
+body.theme-cyberpunk .mode-radio-label,
+body.theme-cyberpunk .mode-radio-label span {
+    color: #f5f5f5;
+}
+
+body.theme-cyberpunk .config-overview h2,
+body.theme-cyberpunk .library-categories h2 {
+    color: #f0c030;
+}
+
+body.theme-cyberpunk .subcategory-title,
+body.theme-cyberpunk .grade-name {
+    color: #f5f5f5;
+}
+
+body.theme-cyberpunk .subcategory-description,
+body.theme-cyberpunk .subcategory-meta {
+    color: #a8a8b0;
+}
+
+/* Kitty猫主题 - 设置页面完整适配 */
+body.theme-doraemon {
+    background: linear-gradient(135deg, #d4789c 0%, #e8a4bc 100%);
+}
+
+body.theme-doraemon .settings-header,
+body.theme-doraemon .config-overview,
+body.theme-doraemon .library-categories {
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(212, 120, 156, 0.2);
+}
+
+body.theme-doraemon .settings-header h1 {
+    background: linear-gradient(45deg, #d4789c, #c9557a);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+body.theme-doraemon .settings-header p {
+    color: #a04060;
+}
+
+body.theme-doraemon .back-btn {
+    background: #c9557a;
+}
+
+body.theme-doraemon .back-btn:hover {
+    background: #b34567;
+}
+
+body.theme-doraemon .stat-value {
+    color: #c9557a;
+}
+
+body.theme-doraemon .theme-card {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(212, 120, 156, 0.3);
+}
+
+body.theme-doraemon .theme-card:hover {
+    border-color: #c9557a;
+    box-shadow: 0 8px 20px rgba(201, 85, 122, 0.2);
+}
+
+body.theme-doraemon .theme-card.selected {
+    border-color: #c9557a;
+    background: linear-gradient(135deg, #fdf2f5, #ffffff);
+    box-shadow: 0 4px 15px rgba(201, 85, 122, 0.25);
+}
+
+body.theme-doraemon .theme-name {
+    color: #a04060;
+}
+
+body.theme-doraemon .theme-desc {
+    color: #c9557a;
+}
+
+body.theme-doraemon .category-header {
+    background: linear-gradient(135deg, #fdf2f5, #f8e8ed);
+}
+
+body.theme-doraemon .category-header:hover {
+    background: linear-gradient(135deg, #f8e8ed, #f3dde5);
+}
+
+body.theme-doraemon .category-name {
+    color: #a04060;
+}
+
+body.theme-doraemon .select-all-btn {
+    background: #c9557a;
+}
+
+body.theme-doraemon .select-all-btn:hover {
+    background: #b34567;
+}
+
+body.theme-doraemon .selected-count,
+body.theme-doraemon .grade-count {
+    color: #c9557a;
+}
+
+body.theme-doraemon .btn-primary {
+    background: #c9557a;
+}
+
+body.theme-doraemon .btn-primary:hover {
+    background: #b34567;
+}
+
+body.theme-doraemon .btn-success {
+    background: #7dcea0;
+}
+
+body.theme-doraemon .btn-success:hover {
+    background: #58d68d;
+}
+
+body.theme-batman .settings-container {
+    background: transparent;
+}
+
+body.theme-batman .settings-header,
+body.theme-batman .config-overview,
+body.theme-batman .library-categories {
+    background: rgba(255, 215, 0, 0.03);
+    border: 1px solid rgba(255, 215, 0, 0.2);
+}
+
+body.theme-batman .settings-header h1 {
+    background: linear-gradient(45deg, #ffd700, #e6c200);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+body.theme-batman .theme-card {
+    background: rgba(0, 0, 0, 0.3);
+    border-color: rgba(255, 215, 0, 0.3);
+}
+
+body.theme-batman .theme-card:hover {
+    border-color: #ffd700;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+}
+
+body.theme-batman .theme-name {
+    color: #ffd700;
+}
+
+body.theme-batman .theme-desc {
+    color: rgba(255, 215, 0, 0.7);
+}
+
+/* 蝙蝠侠 - 文字颜色适配 */
+body.theme-batman .mode-radio-label,
+body.theme-batman .mode-radio-label span {
+    color: #e0e0e0;
+}
+
+body.theme-batman .config-overview h2,
+body.theme-batman .library-categories h2 {
+    color: #ffd700;
+}
+
+body.theme-batman .subcategory-title,
+body.theme-batman .grade-name {
+    color: #e0e0e0;
+}
+
+body.theme-batman .subcategory-description,
+body.theme-batman .subcategory-meta {
+    color: #8a8a9a;
+}
+
+/* 蜘蛛侠主题 - 设置页面完整适配 */
+body.theme-spiderman {
+    background: linear-gradient(135deg, #1a0a0a 0%, #2d1515 100%);
+}
+
+body.theme-spiderman .settings-header,
+body.theme-spiderman .config-overview,
+body.theme-spiderman .library-categories {
+    background: rgba(45, 21, 21, 0.95);
+    border: 1px solid rgba(226, 54, 54, 0.25);
+}
+
+body.theme-spiderman .settings-header h1 {
+    background: linear-gradient(45deg, #e23636, #ff4444);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+body.theme-spiderman .settings-header p {
+    color: #ccaaaa;
+}
+
+body.theme-spiderman .back-btn {
+    background: #e23636;
+    color: #ffffff;
+}
+
+body.theme-spiderman .back-btn:hover {
+    background: #c42020;
+}
+
+body.theme-spiderman .stat-item {
+    background: linear-gradient(135deg, #2d1515, #3d2020);
+    border-color: rgba(226, 54, 54, 0.2);
+}
+
+body.theme-spiderman .stat-value {
+    color: #e23636;
+}
+
+body.theme-spiderman .stat-label {
+    color: #ccaaaa;
+}
+
+body.theme-spiderman .theme-card {
+    background: rgba(45, 21, 21, 0.95);
+    border-color: rgba(226, 54, 54, 0.3);
+}
+
+body.theme-spiderman .theme-card:hover {
+    border-color: #e23636;
+    box-shadow: 0 0 15px rgba(226, 54, 54, 0.3);
+}
+
+body.theme-spiderman .theme-card.selected {
+    border-color: #e23636;
+    background: linear-gradient(135deg, #2d1515, #3d2020);
+    box-shadow: 0 4px 15px rgba(226, 54, 54, 0.25);
+}
+
+body.theme-spiderman .theme-name {
+    color: #e23636;
+}
+
+body.theme-spiderman .theme-desc {
+    color: #ccaaaa;
+}
+
+body.theme-spiderman .category-section {
+    border-color: rgba(226, 54, 54, 0.25);
+}
+
+body.theme-spiderman .category-section:hover {
+    border-color: rgba(226, 54, 54, 0.45);
+}
+
+body.theme-spiderman .category-header {
+    background: linear-gradient(135deg, #2d1515, #3d2020);
+}
+
+body.theme-spiderman .category-header:hover {
+    background: linear-gradient(135deg, #3d2020, #4d2a2a);
+}
+
+body.theme-spiderman .category-name {
+    color: #ffffff;
+}
+
+body.theme-spiderman .category-desc {
+    color: #aa8888;
+}
+
+body.theme-spiderman .select-all-btn {
+    background: #e23636;
+    color: #ffffff;
+}
+
+body.theme-spiderman .select-all-btn:hover {
+    background: #c42020;
+}
+
+body.theme-spiderman .selected-count,
+body.theme-spiderman .grade-count {
+    color: #e23636;
+    background: rgba(226, 54, 54, 0.12);
+}
+
+body.theme-spiderman .btn-primary {
+    background: #e23636;
+    color: #ffffff;
+}
+
+body.theme-spiderman .btn-primary:hover {
+    background: #c42020;
+}
+
+body.theme-spiderman .btn-success {
+    background: #4caf50;
+}
+
+body.theme-spiderman .btn-success:hover {
+    background: #43a047;
+}
+
+body.theme-spiderman .btn-secondary {
+    background: #5a3030;
+}
+
+body.theme-spiderman .btn-secondary:hover {
+    background: #4a2525;
+}
+
+/* 蜘蛛侠 - 文字颜色适配 */
+body.theme-spiderman .mode-radio-label,
+body.theme-spiderman .mode-radio-label span {
+    color: #ffffff;
+}
+
+body.theme-spiderman .config-overview h2,
+body.theme-spiderman .library-categories h2 {
+    color: #e23636;
+}
+
+body.theme-spiderman .subcategory-title,
+body.theme-spiderman .grade-name {
+    color: #ffffff;
+}
+
+body.theme-spiderman .subcategory-description,
+body.theme-spiderman .subcategory-meta {
+    color: #aa8888;
+}

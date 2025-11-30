@@ -4,9 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Word Tetris - 词库设置</title>
-    <link rel="stylesheet" href="css/settings.css?v=1.2.7">
+    <link rel="stylesheet" href="css/themes.css?v=20251130">
+    <link rel="stylesheet" href="css/settings.css?v=20251130">
+    <script>
+        // 主题加载器 - 页面加载前应用主题，避免闪烁
+        (function() {
+            var theme = localStorage.getItem('wordTetris_selectedTheme') || 'default';
+            if (theme !== 'default') {
+                document.documentElement.className = 'theme-' + theme;
+            }
+        })();
+    </script>
 </head>
 <body>
+    <script>
+        // 立即应用主题到 body
+        (function() {
+            var theme = localStorage.getItem('wordTetris_selectedTheme') || 'default';
+            document.body.className = 'theme-' + theme;
+        })();
+    </script>
     <div class="settings-container">
         <!-- 头部 -->
         <header class="settings-header">
@@ -49,6 +66,68 @@
                             <input type="radio" name="game-mode" id="mode-challenge" value="challenge">
                             <span>挑战</span>
                         </label>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 风格设置 -->
+            <section class="config-overview theme-section">
+                <h2>🎨 风格设置</h2>
+                <div class="theme-grid">
+                    <div class="theme-card selected" data-theme="default" onclick="selectTheme('default')">
+                        <div class="theme-preview theme-preview-default">
+                            <div class="preview-bar"></div>
+                            <div class="preview-content">
+                                <div class="preview-dot"></div>
+                                <div class="preview-dot"></div>
+                            </div>
+                        </div>
+                        <div class="theme-name">默认</div>
+                        <div class="theme-desc">经典蓝色</div>
+                    </div>
+                    <div class="theme-card" data-theme="cyberpunk" onclick="selectTheme('cyberpunk')">
+                        <div class="theme-preview theme-preview-cyberpunk">
+                            <div class="preview-bar"></div>
+                            <div class="preview-content">
+                                <div class="preview-dot"></div>
+                                <div class="preview-dot"></div>
+                            </div>
+                        </div>
+                        <div class="theme-name">赛博朋克</div>
+                        <div class="theme-desc">科技金属</div>
+                    </div>
+                    <div class="theme-card" data-theme="doraemon" onclick="selectTheme('doraemon')">
+                        <div class="theme-preview theme-preview-doraemon">
+                            <div class="preview-bar"></div>
+                            <div class="preview-content">
+                                <div class="preview-dot"></div>
+                                <div class="preview-dot"></div>
+                            </div>
+                        </div>
+                        <div class="theme-name">Kitty猫</div>
+                        <div class="theme-desc">温柔粉红</div>
+                    </div>
+                    <div class="theme-card" data-theme="batman" onclick="selectTheme('batman')">
+                        <div class="theme-preview theme-preview-batman">
+                            <div class="preview-bar"></div>
+                            <div class="preview-content">
+                                <div class="preview-dot"></div>
+                                <div class="preview-dot"></div>
+                            </div>
+                        </div>
+                        <div class="theme-name">蝙蝠侠</div>
+                        <div class="theme-desc">暗黑哥特</div>
+                    </div>
+                    <div class="theme-card" data-theme="spiderman" onclick="selectTheme('spiderman')">
+                        <div class="theme-preview theme-preview-spiderman">
+                            <div class="preview-bar"></div>
+                            <div class="preview-content">
+                                <div class="preview-dot"></div>
+                                <div class="preview-dot"></div>
+                            </div>
+                        </div>
+                        <div class="theme-name">蜘蛛侠</div>
+                        <div class="theme-desc">热血红黑</div>
                     </div>
                 </div>
             </section>

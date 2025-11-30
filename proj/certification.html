@@ -4,10 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>荣誉殿堂 - Word Tetris</title>
-    <link rel="stylesheet" href="css/certification.css?v=20251130c">
+    <link rel="stylesheet" href="css/themes.css?v=20251130">
+    <link rel="stylesheet" href="css/certification.css?v=20251130d">
     <link rel="stylesheet" href="css/badge.css?v=20251130c">
+    <script>
+        // 主题加载器 - 页面加载前应用主题，避免闪烁
+        (function() {
+            var theme = localStorage.getItem('wordTetris_selectedTheme') || 'default';
+            if (theme !== 'default') {
+                document.documentElement.className = 'theme-' + theme;
+            }
+        })();
+    </script>
 </head>
 <body>
+    <script>
+        // 立即应用主题到 body
+        (function() {
+            var theme = localStorage.getItem('wordTetris_selectedTheme') || 'default';
+            document.body.className = 'theme-' + theme;
+        })();
+    </script>
     <!-- 返回按钮 -->
     <button class="back-btn" onclick="location.href='index.html'">← 返回主页</button>
 
