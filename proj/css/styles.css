@@ -312,6 +312,19 @@ button {
     color: var(--theme-text-primary);
 }
 
+/* 游戏中按钮 hover 变为"结束游戏"时的样式 */
+#startBtn.end-game-hover {
+    background: var(--theme-danger, #e74c3c) !important;
+    color: white !important;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+#startBtn.end-game-hover:hover {
+    background: var(--theme-danger-dark, #c0392b) !important;
+    transform: scale(1.02);
+}
+
 .give-up-btn {
     background: var(--theme-btn-secondary, #9e9e9e);
     color: var(--theme-text-primary, white);

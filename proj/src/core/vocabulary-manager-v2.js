@@ -40,6 +40,22 @@ class VocabularyManagerV2 {
     // 加载词汇系统
     async loadVocabularySystem() {
         try {
+            // 🔧 优先检查是否有考试模式（来自荣誉殿堂）
+            // 与 tempPracticeWords 同样的模式：在最开始检查，如果是考试模式则等待考试词库加载
+            const pendingExam = sessionStorage.getItem('currentExam');
+            const urlParams = new URLSearchParams(window.location.search);
+            const isExamMode = pendingExam || urlParams.get('mode') === 'exam';
+            
+            if (isExamMode) {
+                console.log('📝 检测到考试模式，等待 ExamIntegration 加载考试词库...');
+                // 设置标志，让后续加载知道我们在考试模式
+                this.waitingForExamVocabulary = true;
+                // 不在这里加载任何词库，等待 ExamIntegration 设置 examVocabularyLoaded
+                // 但需要先加载配置文件，以便 ExamIntegration 能够获取文件路径
+                await this.loadConfig();
+                return; // 不设置 isLoaded，让 ExamIntegration 来设置
+            }
+            
             // 优先检查是否有临时练习单词（来自错词复习页面）
             const tempPracticeWords = localStorage.getItem('wordTetris_tempPracticeWords');
             if (tempPracticeWords) {

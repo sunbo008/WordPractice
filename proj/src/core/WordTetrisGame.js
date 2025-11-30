@@ -574,7 +574,26 @@ class WordTetrisGame {
 
     bindEvents() {
         // 按钮事件
-        document.getElementById('startBtn').addEventListener('click', () => this.startGame());
+        const startBtn = document.getElementById('startBtn');
+        startBtn.addEventListener('click', () => this.handleStartBtnClick());
+        
+        // 开始按钮 hover 效果：游戏中或暂停时显示"结束游戏"
+        startBtn.addEventListener('mouseenter', () => {
+            if (this.gameState === 'playing' || this.gameState === 'paused') {
+                startBtn.textContent = '结束游戏';
+                startBtn.classList.add('end-game-hover');
+            }
+        });
+        startBtn.addEventListener('mouseleave', () => {
+            if (this.gameState === 'playing') {
+                startBtn.textContent = '游戏中';
+                startBtn.classList.remove('end-game-hover');
+            } else if (this.gameState === 'paused') {
+                startBtn.textContent = '已暂停';
+                startBtn.classList.remove('end-game-hover');
+            }
+        });
+        
         document.getElementById('pauseBtn').addEventListener('click', () => this.pauseGame());
         document.getElementById('resetBtn').addEventListener('click', () => this.resetGame(true));
         // 提交按钮已移除，使用实时输入自动射击机制
@@ -693,6 +712,18 @@ class WordTetrisGame {
         if (currentValue.length > 0) {
             letterInput.value = currentValue.slice(0, -1);
             this.updateRealTimeDisplay();
+        }
+    }
+
+    // 处理开始按钮点击：根据游戏状态决定开始或结束游戏
+    handleStartBtnClick() {
+        if (this.gameState === 'playing' || this.gameState === 'paused') {
+            // 游戏进行中或暂停时，结束游戏
+            console.log('🛑 用户点击结束游戏');
+            this.closeAndResetGame();
+        } else {
+            // 游戏未开始，开始游戏
+            this.startGame();
         }
     }
 
@@ -1610,12 +1641,16 @@ class WordTetrisGame {
                 break;
             case 'playing':
                 startBtn.textContent = '游戏中';
-                startBtn.disabled = true;
+                startBtn.disabled = false;  // 游戏中可点击，hover 时变为"结束游戏"
+                startBtn.classList.remove('end-game-hover');
                 pauseBtn.textContent = '暂停';
                 pauseBtn.disabled = false;
                 console.log('  ➡️ 暂停按钮已启用 (playing 状态)，disabled=', pauseBtn.disabled);
                 break;
             case 'paused':
+                startBtn.textContent = '已暂停';
+                startBtn.disabled = false;  // 暂停时可点击，hover 时变为"结束游戏"
+                startBtn.classList.remove('end-game-hover');
                 pauseBtn.textContent = '继续';
                 pauseBtn.disabled = false;
                 console.log('  ➡️ 暂停按钮已启用 (paused 状态)，文本="继续"');

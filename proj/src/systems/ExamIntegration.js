@@ -270,6 +270,10 @@ class ExamIntegration {
             console.log(`✂️ 考试单词数量: ${vm.allWords.length}/${uniqueWords.length}`);
         }
         
+        // 🔧 修复：设置标志，告诉 VocabularyManager 考试词库已加载
+        vm.examVocabularyLoaded = true;
+        vm.isLoaded = true; // 重要：设置加载完成标志，让 initExamStats 可以继续
+        
         // 重新初始化单词池
         vm.initializeWordPool();
         
