@@ -1,50 +1,52 @@
 {
-  "version": "1.0",
+  "version": "1.1",
   "description": "音标分类词库映射 - 用于考级系统",
   "categories": {
     "shortVowels": {
       "name": "短元音",
-      "phonemes": ["/æ/", "/e/", "/ɪ/", "/ɒ/", "/ʌ/"],
-      "description": "短元音音标：/æ/ /e/ /ɪ/ /ɒ/ /ʌ/",
-      "sources": [
-        "special-practice/ae-practice.json",
-        "special-practice/e-practice.json"
-      ],
-      "dailyPhonics": ["day01", "day02", "day03", "day04", "day05"]
+      "phonemes": ["/æ/", "/e/", "/ɪ/", "/ɒ/", "/ʌ/", "/ʊ/"],
+      "description": "短元音音标：/æ/ /e/ /ɪ/ /ɒ/ /ʌ/ /ʊ/",
+      "dailyPhonics": ["day02", "day06", "day07", "day08", "day09", "day11"],
+      "testDays": ["day10"]
     },
     "longVowels": {
       "name": "长元音",
-      "phonemes": ["/iː/", "/uː/", "/ɑː/", "/ɔː/", "/ɜː/"],
-      "description": "长元音音标：/iː/ /uː/ /ɑː/ /ɔː/ /ɜː/",
-      "sources": [],
-      "dailyPhonics": ["day06", "day07", "day08", "day09", "day10"]
+      "phonemes": ["/iː/", "/uː/", "/ɜː/", "/ə/"],
+      "description": "长元音音标：/iː/ /uː/ /ɜː/ /ə/",
+      "dailyPhonics": ["day01", "day03", "day13", "day14"],
+      "testDays": ["day05"]
     },
     "diphthongs": {
       "name": "双元音",
       "phonemes": ["/eɪ/", "/aɪ/", "/ɔɪ/", "/əʊ/", "/aʊ/", "/ɪə/", "/eə/", "/ʊə/"],
       "description": "双元音音标：/eɪ/ /aɪ/ /ɔɪ/ /əʊ/ /aʊ/ /ɪə/ /eə/ /ʊə/",
-      "sources": [],
-      "dailyPhonics": ["day11", "day12", "day13", "day14", "day15"]
+      "dailyPhonics": ["day04", "day12", "day17", "day18", "day19", "day20", "day22", "day23", "day24", "day25"],
+      "testDays": ["day15"]
     },
     "consonants": {
       "name": "辅音",
-      "phonemes": ["/p/", "/b/", "/t/", "/d/", "/k/", "/g/", "/f/", "/v/", "/s/", "/z/", "/m/", "/n/", "/l/", "/r/", "/h/", "/w/", "/j/"],
+      "phonemes": ["/p/", "/b/", "/t/", "/d/", "/k/", "/g/", "/f/", "/v/", "/s/", "/z/", "/m/", "/n/", "/l/", "/r/", "/h/", "/w/", "/j/", "/ŋ/"],
       "description": "基础辅音音标",
-      "sources": [],
-      "dailyPhonics": ["day17", "day18", "day19", "day20", "day22", "day23", "day24", "day25"]
+      "dailyPhonics": ["day28", "day29", "day30", "day32", "day34", "day38", "day39", "day40", "day42"],
+      "testDays": []
     },
     "complexSounds": {
       "name": "复合音",
-      "phonemes": ["/tʃ/", "/dʒ/", "/ʃ/", "/ʒ/", "/θ/", "/ð/", "/ŋ/"],
-      "description": "复合音和特殊音标：/tʃ/ /dʒ/ /ʃ/ /ʒ/ /θ/ /ð/ /ŋ/",
-      "sources": [],
-      "dailyPhonics": ["day28", "day29", "day30", "day32", "day33", "day34", "day35"]
+      "phonemes": ["/tʃ/", "/dʒ/", "/ʃ/", "/ʒ/", "/θ/", "/ð/"],
+      "description": "复合音和特殊音标：/tʃ/ /dʒ/ /ʃ/ /ʒ/ /θ/ /ð/",
+      "dailyPhonics": ["day33", "day35", "day37"],
+      "testDays": []
     }
   },
   "examConfig": {
     "wordsPerExam": 20,
     "minWordsRequired": 15,
     "passThreshold": 90
+  },
+  "notes": {
+    "testDays说明": "testDays 包含复习测试日，考试时可选择是否包含",
+    "day05": "第1周测试 - 复习 day01-04 的内容",
+    "day10": "第2周测试 - 复习 day06-09 的内容",
+    "day15": "第3周测试 - 复习 day11-14 的内容"
   }
 }
-

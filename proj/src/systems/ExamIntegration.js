@@ -179,7 +179,7 @@ class ExamIntegration {
 
     /**
      * 加载考试对应的词库
-     * 注意：这是一个异步操作，需要等待词库加载完成
+     * 🔧 修复：根据考试类型从对应的词库文件加载单词，而非使用当前启用的词库
      */
     async loadExamVocabulary(series, majorLevel, minorLevel) {
         console.log(`📚 准备加载考试词库: ${series}/${majorLevel}/${minorLevel}`);
@@ -189,9 +189,6 @@ class ExamIntegration {
         const targetWordCount = examInfo.wordCount;
         
         console.log(`📊 考试配置: ${examInfo.scope}, 目标单词数: ${targetWordCount}`);
-        
-        // 保存考试配置，稍后在词库加载完成后使用
-        this._pendingExamWordCount = targetWordCount;
         
         // 获取词库管理器（从 game 实例获取）
         const vm = this.game?.vocabularyManager;
@@ -206,35 +203,44 @@ class ExamIntegration {
             return;
         }
         
-        // 等待词库加载完成
-        let waitCount = 0;
-        while (!vm.isLoaded) {
-            if (waitCount === 0) {
-                console.log('⏳ 等待词库加载完成后再限制单词数量...');
-            }
-            await new Promise(resolve => setTimeout(resolve, 100));
-            waitCount++;
-            if (waitCount > 100) { // 最多等待10秒
-                console.error('❌ 等待词库加载超时');
-                return;
-            }
-        }
-        
-        console.log(`📚 词库已加载完成，当前单词数: ${vm.allWords.length}`);
-        
         // 保存原始单词池
         if (!this._originalAllWords) {
             this._originalAllWords = [...vm.allWords];
             console.log(`💾 已备份原始词库: ${this._originalAllWords.length} 个单词`);
         }
         
-        // 限制单词数量：随机选取指定数量的单词
-        if (vm.allWords.length > targetWordCount) {
-            // 打乱并截取
-            const shuffled = [...vm.allWords].sort(() => Math.random() - 0.5);
-            vm.allWords = shuffled.slice(0, targetWordCount);
-            console.log(`✂️ 单词数量已限制: ${vm.allWords.length}/${this._originalAllWords.length}`);
+        // 🔧 根据考试类型获取对应的词库文件列表
+        const examFiles = await this.getExamVocabularyFiles(series, majorLevel, minorLevel);
+        
+        if (!examFiles || examFiles.length === 0) {
+            console.warn('⚠️ 未找到对应的考试词库文件，使用当前词库');
+            // 回退到旧逻辑：从当前词库随机选取
+            this._applyWordCountLimit(vm, targetWordCount);
+            return;
         }
+        
+        console.log(`📂 考试词库文件列表: ${examFiles.join(', ')}`);
+        
+        // 🔧 从指定文件加载单词
+        const examWords = await this.loadWordsFromFiles(examFiles);
+        
+        if (examWords.length === 0) {
+            console.warn('⚠️ 从考试词库文件加载单词失败，使用当前词库');
+            this._applyWordCountLimit(vm, targetWordCount);
+            return;
+        }
+        
+        console.log(`📖 从考试词库文件加载了 ${examWords.length} 个单词`);
+        
+        // 去重
+        const uniqueWords = this._deduplicateWords(examWords);
+        console.log(`🔄 去重后: ${uniqueWords.length} 个单词`);
+        
+        // 打乱并限制数量
+        const shuffled = [...uniqueWords].sort(() => Math.random() - 0.5);
+        vm.allWords = shuffled.slice(0, Math.min(targetWordCount, shuffled.length));
+        
+        console.log(`✂️ 考试单词数量: ${vm.allWords.length}/${uniqueWords.length}`);
         
         // 重新初始化单词池
         vm.initializeWordPool();
@@ -246,6 +252,220 @@ class ExamIntegration {
         }
         
         console.log(`✅ 考试词库已加载: ${vm.allWords.length} 个单词`);
+    }
+    
+    /**
+     * 根据考试类型获取对应的词库文件列表
+     */
+    async getExamVocabularyFiles(series, majorLevel, minorLevel) {
+        const files = [];
+        
+        if (series === 'phonics') {
+            // 音标考试：从 phonics-categories.json 获取对应的 daily-phonics 文件
+            return await this._getPhonicsExamFiles(majorLevel, minorLevel);
+        }
+        
+        if (series === 'primaryGrades') {
+            // 年级考试：根据年级和学期获取对应文件
+            return this._getGradeExamFiles(majorLevel, minorLevel);
+        }
+        
+        if (series === 'extracurricular') {
+            // 课外阅读考试：根据书籍系列和范围获取对应文件
+            return this._getExtracurricularExamFiles(majorLevel, minorLevel);
+        }
+        
+        return files;
+    }
+    
+    /**
+     * 获取音标考试的词库文件
+     */
+    async _getPhonicsExamFiles(majorLevel, minorLevel) {
+        try {
+            // 加载 phonics-categories.json
+            const response = await fetch('./words/phonics-categories.json');
+            const config = await response.json();
+            
+            if (minorLevel === 'finalExam') {
+                // 总考：加载所有音标分类的单词（包含测试日）
+                const allFiles = [];
+                const addedDays = new Set();
+                
+                for (const category of Object.values(config.categories)) {
+                    // 添加学习日
+                    if (category.dailyPhonics) {
+                        category.dailyPhonics.forEach(day => {
+                            if (!addedDays.has(day)) {
+                                allFiles.push(`./words/daily-phonics/${day}.json`);
+                                addedDays.add(day);
+                            }
+                        });
+                    }
+                    // 添加测试日
+                    if (category.testDays) {
+                        category.testDays.forEach(day => {
+                            if (!addedDays.has(day)) {
+                                allFiles.push(`./words/daily-phonics/${day}.json`);
+                                addedDays.add(day);
+                            }
+                        });
+                    }
+                }
+                console.log(`📚 音标总考: 加载全部 ${allFiles.length} 个文件`);
+                return allFiles;
+            }
+            
+            // 单项考试：加载对应分类的单词
+            const category = config.categories[majorLevel];
+            if (category && category.dailyPhonics) {
+                const files = category.dailyPhonics.map(day => `./words/daily-phonics/${day}.json`);
+                // 可选：包含测试日的单词（测试日通常是复习，包含重复单词）
+                // if (category.testDays) {
+                //     category.testDays.forEach(day => files.push(`./words/daily-phonics/${day}.json`));
+                // }
+                console.log(`📚 音标考试 [${category.name}]: 加载 ${files.length} 个文件`);
+                return files;
+            }
+            
+            console.warn(`⚠️ 未找到音标分类: ${majorLevel}`);
+            return [];
+        } catch (e) {
+            console.error('❌ 加载 phonics-categories.json 失败:', e);
+            return [];
+        }
+    }
+    
+    /**
+     * 获取年级考试的词库文件
+     */
+    _getGradeExamFiles(majorLevel, minorLevel) {
+        // majorLevel: grade3, grade4, grade5, grade6
+        // minorLevel: term1, term2, finalExam
+        
+        const files = [];
+        const gradeNum = majorLevel.replace('grade', '');
+        
+        if (minorLevel === 'finalExam') {
+            // 年级总考：加载该年级所有单元
+            for (const term of ['term1', 'term2']) {
+                for (let unit = 1; unit <= 6; unit++) {
+                    files.push(`./words/grade-based/primary/grade${gradeNum}-${term}-unit${unit}.json`);
+                }
+            }
+            console.log(`📚 ${majorLevel} 总考: 加载全部 ${files.length} 个文件`);
+        } else {
+            // 学期考试：加载该学期所有单元
+            const unitCount = (majorLevel === 'grade6' && minorLevel === 'term2') ? 4 : 6;
+            for (let unit = 1; unit <= unitCount; unit++) {
+                files.push(`./words/grade-based/primary/grade${gradeNum}-${minorLevel}-unit${unit}.json`);
+            }
+            console.log(`📚 ${majorLevel} ${minorLevel}: 加载 ${files.length} 个文件`);
+        }
+        
+        return files;
+    }
+    
+    /**
+     * 获取课外阅读考试的词库文件
+     */
+    _getExtracurricularExamFiles(majorLevel, minorLevel) {
+        // majorLevel: flyGuy, magicTreeHouse, etc.
+        // minorLevel: book1to5, book6to10, book11to15, finalExam
+        
+        const files = [];
+        
+        if (majorLevel === 'flyGuy') {
+            const bookRanges = {
+                'book1to5': [1, 5],
+                'book6to10': [6, 10],
+                'book11to15': [11, 15],
+                'finalExam': [1, 15]
+            };
+            
+            const range = bookRanges[minorLevel];
+            if (range) {
+                for (let i = range[0]; i <= range[1]; i++) {
+                    const bookNum = i.toString().padStart(2, '0');
+                    files.push(`./words/extracurricular-books/fly-guy/fg-book${bookNum}.json`);
+                }
+                console.log(`📚 Fly Guy ${minorLevel}: 加载 ${files.length} 个文件`);
+            }
+        }
+        
+        // TODO: 添加其他课外书系列的文件映射
+        // if (majorLevel === 'magicTreeHouse') { ... }
+        
+        return files;
+    }
+    
+    /**
+     * 从指定文件列表加载单词
+     */
+    async loadWordsFromFiles(files) {
+        const allWords = [];
+        
+        const loadPromises = files.map(async (filePath) => {
+            try {
+                const response = await fetch(filePath);
+                if (!response.ok) {
+                    console.warn(`⚠️ 无法加载文件: ${filePath}`);
+                    return [];
+                }
+                const data = await response.json();
+                
+                // 从 JSON 中提取单词
+                if (data.words && Array.isArray(data.words)) {
+                    return data.words.map(w => ({
+                        word: w.word,
+                        phonetic: w.phonetic || '',
+                        meaning: w.meaning || '',
+                        difficulty: w.difficulty || 1,
+                        source: filePath
+                    }));
+                }
+                return [];
+            } catch (e) {
+                console.warn(`⚠️ 加载文件失败: ${filePath}`, e);
+                return [];
+            }
+        });
+        
+        const results = await Promise.all(loadPromises);
+        results.forEach(words => allWords.push(...words));
+        
+        return allWords;
+    }
+    
+    /**
+     * 单词去重（按 word 字段）
+     */
+    _deduplicateWords(words) {
+        const seen = new Set();
+        return words.filter(w => {
+            const key = w.word.toLowerCase();
+            if (seen.has(key)) {
+                return false;
+            }
+            seen.add(key);
+            return true;
+        });
+    }
+    
+    /**
+     * 应用单词数量限制（旧逻辑的回退方案）
+     */
+    _applyWordCountLimit(vm, targetWordCount) {
+        if (vm.allWords.length > targetWordCount) {
+            const shuffled = [...vm.allWords].sort(() => Math.random() - 0.5);
+            vm.allWords = shuffled.slice(0, targetWordCount);
+            console.log(`✂️ 单词数量已限制: ${vm.allWords.length}`);
+        }
+        vm.initializeWordPool();
+        if (this.game) {
+            this.game.totalWords = vm.allWords.length;
+            this.game.updateExamStats();
+        }
     }
     
     /**
