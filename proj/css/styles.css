@@ -30,14 +30,12 @@ body {
 /* 游戏标题 */
 .game-header {
     grid-area: header;
-    display: flex;
-    align-items: center;
+    text-align: center;
     margin-bottom: 20px;
     position: relative;
 }
 
 .game-header .header-content {
-    flex: 1;
     text-align: center;
 }
 

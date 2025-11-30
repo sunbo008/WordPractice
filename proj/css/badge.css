@@ -4,13 +4,17 @@
 
 /* 主页徽章区 */
 .badge-area {
-    flex-shrink: 0;
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
     cursor: pointer;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    z-index: 10;
 }
 
 .badge-area:hover {
-    transform: scale(1.05);
+    transform: translateY(-50%) scale(1.05);
 }
 
 .badge-area-container {
