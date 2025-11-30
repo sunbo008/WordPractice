@@ -273,11 +273,13 @@ class CertificationPage {
                 const tooltip = earned 
                     ? `🏅 ${info.name}\n解锁于: ${formatDate(earnedAt)}${showStar ? '\n🌟 全满分成就！' : ''}` 
                     : `🔒 ${info.name}\n未解锁`;
+                const passedBadgeHtml = earned ? '<span class="badge-hall-passed">🏅</span>' : '';
                 return `
                     <div class="badge-slot ${earned ? 'earned' : 'locked'}" title="${tooltip}">
                         <div class="badge-img-wrapper">
                             <img src="assets/badges/${filePrefix}" alt="${info.name}">
                             ${starHtml}
+                            ${passedBadgeHtml}
                         </div>
                         <div class="badge-slot-name">${info.name}</div>
                     </div>
