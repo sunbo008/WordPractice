@@ -6,9 +6,9 @@
       <stop offset="100%" style="stop-color:#1a5e3a"/>
     </linearGradient>
     <linearGradient id="goldBorder3" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#ffd700"/>
-      <stop offset="50%" style="stop-color:#c9a227"/>
-      <stop offset="100%" style="stop-color:#ffd700"/>
+      <stop offset="0%" style="stop-color:#E8E8E8"/>
+      <stop offset="50%" style="stop-color:#A0A0A0"/>
+      <stop offset="100%" style="stop-color:#E8E8E8"/>
     </linearGradient>
   </defs>
   
@@ -22,10 +22,10 @@
   <line x1="50" y1="27" x2="50" y2="53" stroke="#8b4513" stroke-width="1"/>
   
   <!-- 罗马数字 III -->
-  <text x="50" y="75" text-anchor="middle" font-family="Georgia, serif" font-size="22" fill="#ffd700" font-weight="bold">III</text>
+  <text x="50" y="75" text-anchor="middle" font-family="Georgia, serif" font-size="22" fill="#C0C0C0" font-weight="bold">III</text>
   
   <!-- 底部文字 -->
-  <text x="50" y="95" text-anchor="middle" font-family="Georgia, serif" font-size="9" fill="#c9a227" letter-spacing="1">GRADE 3</text>
+  <text x="50" y="95" text-anchor="middle" font-family="Georgia, serif" font-size="9" fill="#A0A0A0" letter-spacing="1">GRADE 3</text>
   
   <!-- 橄榄枝装饰 -->
   <path d="M25 105 Q35 100 40 108" stroke="#2d5a2d" stroke-width="2" fill="none"/>

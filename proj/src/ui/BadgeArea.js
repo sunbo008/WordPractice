@@ -101,12 +101,21 @@ class BadgeArea {
             'harryPotter': 'harrypotter-badge.svg',
             'middleSchool': 'middle-badge.svg',
             'highSchool': 'high-badge.svg',
-            'cet4': 'cet4-badge.svg'
+            'cet4': 'cet4-badge.svg',
+            // 段位徽章
+            'bronze': 'tier-bronze-badge.svg',
+            'silver': 'tier-silver-badge.svg',
+            'gold': 'tier-gold-badge.svg',
+            'king': 'tier-king-badge.svg'
         };
+        
+        // 获取段位徽章
+        const tierBadges = this.certSystem.getEarnedTierBadges();
+        const allBadges = [...badges, ...tierBadges.map(t => ({ id: t.tier, name: t.name }))];
 
         const maxDisplay = 5; // 最多显示5个徽章缩略图
-        const displayBadges = badges.slice(0, maxDisplay);
-        const remaining = badges.length - maxDisplay;
+        const displayBadges = allBadges.slice(0, maxDisplay);
+        const remaining = allBadges.length - maxDisplay;
 
         let thumbnailsHtml = displayBadges.map(badge => {
             const svgFile = badgeMap[badge.id] || 'phonics-badge.svg';
@@ -119,7 +128,7 @@ class BadgeArea {
                     ${thumbnailsHtml}
                 </div>
                 <div class="badge-count-text">
-                    ${badges.length} 枚徽章${remaining > 0 ? ` (+${remaining})` : ''}
+                    ${allBadges.length} 枚徽章${remaining > 0 ? ` (+${remaining})` : ''}
                 </div>
                 <div class="badge-area-hint">点击查看全部</div>
             </div>
@@ -177,10 +186,15 @@ class BadgeArea {
             'harryPotter': 'harrypotter-badge.svg',
             'middleSchool': 'middle-badge.svg',
             'highSchool': 'high-badge.svg',
-            'cet4': 'cet4-badge.svg'
+            'cet4': 'cet4-badge.svg',
+            // 段位徽章
+            'bronze': 'tier-bronze-badge.svg',
+            'silver': 'tier-silver-badge.svg',
+            'gold': 'tier-gold-badge.svg',
+            'king': 'tier-king-badge.svg'
         };
 
-        const svgFile = badgeMap[badgeInfo.id] || 'phonics-badge.svg';
+        const svgFile = badgeMap[badgeInfo.id] || badgeMap[badgeInfo.tier] || 'phonics-badge.svg';
 
         overlay.innerHTML = `
             <div style="text-align: center;">

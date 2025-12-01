@@ -580,7 +580,16 @@ class CertificationSystem {
                 this.progress.phonics.badge.earnedAt = Date.now();
                 // 解锁小学年级系列
                 this.progress.primaryGrades.unlocked = true;
-                return { id: 'phonics', name: '音标大师' };
+                
+                // 检查并更新段位徽章
+                const newTierBadges = this.checkAndUpdateTierBadges();
+                this.storage.save(this.progress);
+                
+                return { 
+                    id: 'phonics', 
+                    name: '音标大师',
+                    newTierBadges: newTierBadges
+                };
             }
         }
         
@@ -597,8 +606,16 @@ class CertificationSystem {
                     this.progress.academic.unlocked = true;
                 }
                 
+                // 检查并更新段位徽章
+                const newTierBadges = this.checkAndUpdateTierBadges();
+                this.storage.save(this.progress);
+                
                 const gradeNum = majorLevel.replace('grade', '');
-                return { id: majorLevel, name: `${gradeNum}年级` };
+                return { 
+                    id: majorLevel, 
+                    name: `${gradeNum}年级`,
+                    newTierBadges: newTierBadges
+                };
             }
         }
         
@@ -608,8 +625,17 @@ class CertificationSystem {
             if (bookData.finalExam?.passed && !bookData.badge.earned) {
                 bookData.badge.earned = true;
                 bookData.badge.earnedAt = Date.now();
+                
+                // 检查并更新段位徽章
+                const newTierBadges = this.checkAndUpdateTierBadges();
+                this.storage.save(this.progress);
+                
                 const names = { flyGuy: 'Fly Guy', magicTreeHouse: '神奇树屋', dragonBall: '七龙珠', harryPotter: '哈利波特' };
-                return { id: majorLevel, name: names[majorLevel] };
+                return { 
+                    id: majorLevel, 
+                    name: names[majorLevel],
+                    newTierBadges: newTierBadges
+                };
             }
         }
         
@@ -620,11 +646,28 @@ class CertificationSystem {
                 levelData.badge.earned = true;
                 levelData.badge.earnedAt = Date.now();
                 const names = { middleSchool: '初中', highSchool: '高中', cet4: '四级' };
-                return { id: majorLevel, name: names[majorLevel] };
+                
+                // 检查并更新段位徽章
+                const newTierBadges = this.checkAndUpdateTierBadges();
+                this.storage.save(this.progress);
+                
+                return { 
+                    id: majorLevel, 
+                    name: names[majorLevel],
+                    newTierBadges: newTierBadges
+                };
             }
         }
         
         return null;
+    }
+    
+    /**
+     * 检查并更新段位徽章
+     * @returns {Array} 新点亮的段位徽章列表
+     */
+    checkAndUpdateTierBadges() {
+        return this.storage.checkAndUpdateTierBadges(this.progress);
     }
 
     /**
@@ -632,6 +675,30 @@ class CertificationSystem {
      */
     getEarnedBadges() {
         return this.storage.getEarnedBadges(this.progress);
+    }
+    
+    /**
+     * 获取当前最高段位
+     * @returns {Object|null}
+     */
+    getHighestTier() {
+        return this.storage.getHighestTier(this.progress);
+    }
+    
+    /**
+     * 获取已获得的段位徽章列表
+     * @returns {Array}
+     */
+    getEarnedTierBadges() {
+        return this.storage.getEarnedTierBadges(this.progress);
+    }
+    
+    /**
+     * 获取段位徽章配置
+     * @returns {Object}
+     */
+    getTierBadgesConfig() {
+        return this.storage.TIER_BADGES;
     }
 
     /**

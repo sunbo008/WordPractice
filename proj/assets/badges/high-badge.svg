@@ -6,9 +6,9 @@
       <stop offset="100%" style="stop-color:#5a2a7a"/>
     </linearGradient>
     <linearGradient id="goldBorderHigh" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#ffd700"/>
-      <stop offset="50%" style="stop-color:#c9a227"/>
-      <stop offset="100%" style="stop-color:#ffd700"/>
+      <stop offset="0%" style="stop-color:#FFD700"/>
+      <stop offset="50%" style="stop-color:#DAA520"/>
+      <stop offset="100%" style="stop-color:#FFD700"/>
     </linearGradient>
   </defs>
   
@@ -21,8 +21,8 @@
   <rect x="34" y="39" width="32" height="7" fill="#5a2a90" rx="1"/>
   <rect x="36" y="46" width="28" height="7" fill="#4a1a80" rx="1"/>
   
-  <text x="50" y="72" text-anchor="middle" font-family="Georgia, serif" font-size="9" fill="#ffd700" font-weight="bold">HIGH</text>
-  <text x="50" y="84" text-anchor="middle" font-family="Georgia, serif" font-size="9" fill="#ffd700" font-weight="bold">SCHOOL</text>
-  <text x="50" y="98" text-anchor="middle" font-family="Georgia, serif" font-size="7" fill="#c9a227">10-11-12</text>
+  <text x="50" y="72" text-anchor="middle" font-family="Georgia, serif" font-size="9" fill="#FFD700" font-weight="bold">HIGH</text>
+  <text x="50" y="84" text-anchor="middle" font-family="Georgia, serif" font-size="9" fill="#FFD700" font-weight="bold">SCHOOL</text>
+  <text x="50" y="98" text-anchor="middle" font-family="Georgia, serif" font-size="7" fill="#DAA520">10-11-12</text>
 </svg>
 

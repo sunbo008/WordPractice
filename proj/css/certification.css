@@ -116,11 +116,65 @@ body {
     transition: color 0.3s ease, border-color 0.3s ease;
 }
 
+/* 段位分组样式 */
+.tier-section {
+    background: linear-gradient(135deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.1) 100%);
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-left: 4px solid var(--tier-color, #c9a227);
+    position: relative;
+}
+
+.tier-section .badge-section-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-left: none;
+    padding-left: 0;
+    font-size: 14px;
+    font-weight: bold;
+    color: var(--tier-color, #c9a227);
+}
+
+.tier-section .tier-icon {
+    font-size: 18px;
+}
+
+.tier-section .tier-name {
+    letter-spacing: 2px;
+}
+
+/* 青铜段位 */
+.tier-bronze {
+    --tier-color: #CD7F32;
+    background: linear-gradient(135deg, rgba(205, 127, 50, 0.1) 0%, rgba(139, 90, 43, 0.05) 100%);
+}
+
+/* 白银段位 */
+.tier-silver {
+    --tier-color: #C0C0C0;
+    background: linear-gradient(135deg, rgba(192, 192, 192, 0.1) 0%, rgba(160, 160, 160, 0.05) 100%);
+}
+
+/* 黄金段位 */
+.tier-gold {
+    --tier-color: #FFD700;
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(218, 165, 32, 0.05) 100%);
+}
+
+/* 王者段位 */
+.tier-king {
+    --tier-color: #9B30FF;
+    background: linear-gradient(135deg, rgba(155, 48, 255, 0.15) 0%, rgba(123, 31, 162, 0.05) 100%);
+}
+
 .badge-row {
     display: flex;
     justify-content: center;
     gap: 20px;
     flex-wrap: wrap;
+    align-items: flex-end;
 }
 
 .badge-slot {
@@ -142,6 +196,25 @@ body {
 
 .badge-slot.locked img {
     filter: grayscale(100%) brightness(0.5);
+}
+
+/* 段位徽章样式 */
+.tier-badge img {
+    width: 70px;
+    height: 84px;
+}
+
+.tier-badge-wrapper {
+    position: relative;
+}
+
+.tier-badge.earned img {
+    filter: drop-shadow(0 0 8px var(--tier-color, #FFD700));
+}
+
+.tier-badge-name {
+    font-weight: bold;
+    font-size: 12px !important;
 }
 
 .badge-slot-name {
@@ -323,7 +396,7 @@ body {
     z-index: 10;
 }
 
-/* 徽章悬挂区的通过标志 */
+/* 徽章悬挂区的通过标志（右下角） */
 .badge-hall-passed {
     position: absolute;
     bottom: 2px;
@@ -331,6 +404,37 @@ body {
     font-size: 14px;
     filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
     z-index: 10;
+}
+
+/* 段位行容器 */
+.tier-row-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 15px 0;
+    min-height: 120px;
+}
+
+/* 段位徽章左侧绝对定位 */
+.tier-badge-left {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+}
+
+/* 分级徽章居中（相对于整个容器） */
+.tier-section .badge-row.badge-row-center {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    align-items: flex-end;
 }
 
 /* 主节点 tooltip */

@@ -6,9 +6,9 @@
       <stop offset="100%" style="stop-color:#1a3a6e"/>
     </linearGradient>
     <linearGradient id="goldBorder" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#ffd700"/>
-      <stop offset="50%" style="stop-color:#c9a227"/>
-      <stop offset="100%" style="stop-color:#ffd700"/>
+      <stop offset="0%" style="stop-color:#CD7F32"/>
+      <stop offset="50%" style="stop-color:#8B5A2B"/>
+      <stop offset="100%" style="stop-color:#CD7F32"/>
     </linearGradient>
     <filter id="innerShadow">
       <feOffset dx="0" dy="2"/>
@@ -28,13 +28,13 @@
   <rect x="15" y="70" width="70" height="4" fill="url(#goldBorder)" rx="2"/>
   
   <!-- 音标符号 -->
-  <text x="50" y="50" text-anchor="middle" font-family="Georgia, serif" font-size="24" fill="#ffd700" font-style="italic">/æ/</text>
+  <text x="50" y="50" text-anchor="middle" font-family="Georgia, serif" font-size="24" fill="#CD7F32" font-style="italic">/æ/</text>
   
   <!-- 底部文字 -->
-  <text x="50" y="88" text-anchor="middle" font-family="Georgia, serif" font-size="8" fill="#c9a227" letter-spacing="1">MASTER OF</text>
-  <text x="50" y="98" text-anchor="middle" font-family="Georgia, serif" font-size="8" fill="#c9a227" letter-spacing="1">SOUNDS</text>
+  <text x="50" y="88" text-anchor="middle" font-family="Georgia, serif" font-size="8" fill="#8B5A2B" letter-spacing="1">MASTER OF</text>
+  <text x="50" y="98" text-anchor="middle" font-family="Georgia, serif" font-size="8" fill="#8B5A2B" letter-spacing="1">SOUNDS</text>
   
   <!-- 丝带装饰 -->
-  <path d="M35 110 L40 115 L50 110 L60 115 L65 110" stroke="#c9a227" stroke-width="2" fill="none"/>
+  <path d="M35 110 L40 115 L50 110 L60 115 L65 110" stroke="#8B5A2B" stroke-width="2" fill="none"/>
 </svg>
 

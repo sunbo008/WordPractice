@@ -224,7 +224,8 @@ TBD - created by archiving change add-level-certification-system. Update Purpose
 
 - **GIVEN** 用户进入考级页面
 - **THEN** 页面顶部 SHALL 显示徽章悬挂区
-- **AND** 分区显示：基础徽章（音标+小学）、阅读徽章、升学徽章
+- **AND** 按段位分区显示：青铜（🥉）、白银（🥈）、黄金（🥇）、王者（👑）
+- **AND** 每个段位组首位显示段位徽章，后跟该段位的分级徽章
 - **AND** 已获得徽章显示彩色，未获得显示灰色
 
 #### Scenario: 技能树布局
@@ -258,7 +259,8 @@ TBD - created by archiving change add-level-certification-system. Update Purpose
   - 每个级别的通过状态
   - 每个级别的最高分数
   - 每个级别的尝试次数
-  - 每个徽章的获得状态和时间
+  - 每个分级徽章的获得状态和时间
+  - 每个段位徽章的获得状态和时间
 
 #### Scenario: 恢复进度
 
@@ -266,6 +268,7 @@ TBD - created by archiving change add-level-certification-system. Update Purpose
 - **WHEN** 进入考级系统
 - **THEN** 系统 SHALL 从 localStorage 恢复所有考级进度
 - **AND** 正确显示解锁状态和分数
+- **AND** 正确显示段位徽章点亮状态
 
 ### Requirement: 小级别分数显示
 
@@ -284,11 +287,14 @@ TBD - created by archiving change add-level-certification-system. Update Purpose
 - **AND** 未通过的级别（<90%）显示红色分数
 
 ### Requirement: 测试模式支持
+
 系统 SHALL 支持通过 URL 参数 `test=2` 开启测试模式，在荣誉殿堂中显示所有徽章为已获得状态。
 
 #### Scenario: 测试模式开启所有徽章
+
 - **WHEN** 用户访问带有 `?test=2` 参数的荣誉殿堂页面
-- **THEN** 所有徽章显示为彩色已获得状态
+- **THEN** 所有分级徽章显示为彩色已获得状态
+- **AND** 所有段位徽章显示为彩色已获得状态
 - **AND** 所有徽章显示亮星标记
 
 ### Requirement: 徽章通过标志
@@ -322,4 +328,91 @@ TBD - created by archiving change add-level-certification-system. Update Purpose
 - **WHEN** 用户进入游戏主页面
 - **THEN** 徽章区显示在 header 左侧
 - **AND** 标题居中显示
+
+### Requirement: 段位系统
+
+系统 SHALL 将徽章按青铜、白银、黄金、王者四个段位分组，每个段位有专属段位徽章。
+
+#### Scenario: 段位分组结构
+
+- **GIVEN** 用户进入徽章悬挂区
+- **THEN** 系统 SHALL 按以下段位分组显示徽章：
+  - 青铜：音标（1枚分级徽章）
+  - 白银：3年级、4年级、5年级、6年级（4枚分级徽章）
+  - 黄金：Fly Guy、神奇树屋、初中、高中（4枚分级徽章）
+  - 王者：七龙珠、哈利波特、四级（3枚分级徽章）
+- **AND** 每个段位组首位显示该段位的段位徽章
+
+#### Scenario: 段位徽章点亮条件
+
+- **GIVEN** 用户获得分级徽章
+- **WHEN** 该段位内所有分级徽章全部点亮
+- **THEN** 系统 SHALL 自动点亮该段位的段位徽章
+- **AND** 显示段位徽章获得动画
+
+#### Scenario: 青铜段位徽章点亮
+
+- **GIVEN** 用户获得音标徽章
+- **THEN** 青铜段位徽章 SHALL 自动点亮
+
+#### Scenario: 白银段位徽章点亮
+
+- **GIVEN** 用户已获得3年级、4年级、5年级、6年级徽章
+- **THEN** 白银段位徽章 SHALL 自动点亮
+
+#### Scenario: 黄金段位徽章点亮
+
+- **GIVEN** 用户已获得 Fly Guy、神奇树屋、初中、高中徽章
+- **THEN** 黄金段位徽章 SHALL 自动点亮
+
+#### Scenario: 王者段位徽章点亮
+
+- **GIVEN** 用户已获得七龙珠、哈利波特、四级徽章
+- **THEN** 王者段位徽章 SHALL 自动点亮
+
+#### Scenario: 段位不影响解锁逻辑
+
+- **GIVEN** 考级系统的树状解锁机制
+- **THEN** 段位分组 SHALL 仅影响徽章展示分组
+- **AND** 不影响考试解锁顺序
+- **AND** 原有树状解锁逻辑保持不变
+
+### Requirement: 主游戏界面段位显示
+
+系统 SHALL 在主游戏界面 header 右侧显示用户当前段位徽章，与左侧徽章区形成左右呼应，仅用于展示不支持点击。
+
+#### Scenario: 段位显示位置
+
+- **GIVEN** 用户进入主游戏界面
+- **THEN** header 左侧 SHALL 显示徽章区
+- **AND** header 中间 SHALL 显示标题 "Word Cannon WORD大炮 - 在游戏中学习英语"
+- **AND** header 右侧 SHALL 显示当前段位徽章
+
+#### Scenario: 显示当前最高段位徽章
+
+- **GIVEN** 用户已点亮某些段位徽章
+- **THEN** 段位显示区 SHALL 显示用户当前最高已点亮的段位徽章
+- **AND** 徽章显示为彩色版本
+
+#### Scenario: 无段位状态显示
+
+- **GIVEN** 用户尚未点亮任何段位徽章
+- **THEN** 段位显示区 SHALL 显示青铜段位徽章的暗色版本
+
+#### Scenario: 段位徽章样式
+
+- **WHEN** 当前最高段位为青铜
+- **THEN** 显示青铜段位徽章彩色版本
+- **WHEN** 当前最高段位为白银
+- **THEN** 显示白银段位徽章彩色版本
+- **WHEN** 当前最高段位为黄金
+- **THEN** 显示黄金段位徽章彩色版本
+- **WHEN** 当前最高段位为王者
+- **THEN** 显示王者段位徽章彩色版本
+
+#### Scenario: 段位徽章不可点击
+
+- **GIVEN** 用户在主游戏界面
+- **THEN** 段位徽章 SHALL 仅用于展示
+- **AND** 不响应点击事件
 

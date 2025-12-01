@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120">
+  <defs>
+    <linearGradient id="kingShield" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#9B30FF"/>
+      <stop offset="25%" style="stop-color:#7B1FA2"/>
+      <stop offset="50%" style="stop-color:#9B30FF"/>
+      <stop offset="75%" style="stop-color:#6A1B9A"/>
+      <stop offset="100%" style="stop-color:#9B30FF"/>
+    </linearGradient>
+    <linearGradient id="kingBorder" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFD700"/>
+      <stop offset="25%" style="stop-color:#9B30FF"/>
+      <stop offset="50%" style="stop-color:#FFD700"/>
+      <stop offset="75%" style="stop-color:#9B30FF"/>
+      <stop offset="100%" style="stop-color:#FFD700"/>
+    </linearGradient>
+    <linearGradient id="diamondShine" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFFFF"/>
+      <stop offset="50%" style="stop-color:#E0E0FF"/>
+      <stop offset="100%" style="stop-color:#FFFFFF"/>
+    </linearGradient>
+    <filter id="kingGlow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="kingShadow">
+      <feOffset dx="0" dy="2"/>
+      <feGaussianBlur stdDeviation="2" result="offset-blur"/>
+      <feComposite operator="out" in="SourceGraphic" in2="offset-blur" result="inverse"/>
+      <feFlood flood-color="black" flood-opacity="0.4" result="color"/>
+      <feComposite operator="in" in="color" in2="inverse" result="shadow"/>
+      <feComposite operator="over" in="shadow" in2="SourceGraphic"/>
+    </filter>
+  </defs>
+  
+  <!-- 盾牌主体（皇冠形状顶部） -->
+  <path d="M50 2 L60 12 L70 5 L75 18 L90 20 L90 55 Q90 85 50 110 Q10 85 10 55 L10 20 L25 18 L30 5 L40 12 Z" 
+        fill="url(#kingShield)" stroke="url(#kingBorder)" stroke-width="4" filter="url(#kingShadow)"/>
+  
+  <!-- 皇冠顶部宝石 -->
+  <circle cx="50" cy="8" r="4" fill="url(#diamondShine)" filter="url(#kingGlow)"/>
+  <circle cx="30" cy="10" r="3" fill="#FF4500"/>
+  <circle cx="70" cy="10" r="3" fill="#FF4500"/>
+  
+  <!-- 中心圆环 -->
+  <circle cx="50" cy="52" r="22" fill="none" stroke="url(#kingBorder)" stroke-width="3"/>
+  <circle cx="50" cy="52" r="17" fill="#4B0082"/>
+  
+  <!-- 王冠 + 权杖图案 -->
+  <path d="M40 45 L43 55 L47 48 L50 55 L53 48 L57 55 L60 45 L58 58 L42 58 Z" 
+        fill="#FFD700" stroke="#B8860B" stroke-width="1"/>
+  <line x1="50" y1="58" x2="50" y2="68" stroke="#FFD700" stroke-width="3"/>
+  <circle cx="50" cy="70" r="3" fill="#FF4500"/>
+  
+  <!-- 钻石镶嵌 -->
+  <polygon points="20,35 24,42 20,49 16,42" fill="url(#diamondShine)" filter="url(#kingGlow)"/>
+  <polygon points="80,35 84,42 80,49 76,42" fill="url(#diamondShine)" filter="url(#kingGlow)"/>
+  <polygon points="50,78 54,85 50,92 46,85" fill="url(#diamondShine)" filter="url(#kingGlow)"/>
+  
+  <!-- 段位名称 -->
+  <text x="50" y="102" text-anchor="middle" font-family="Georgia, serif" font-size="10" fill="#FFD700" letter-spacing="2" font-weight="bold">KING</text>
+  
+  <!-- 丝带飘扬 -->
+  <path d="M25 105 Q35 100 40 108 Q45 102 50 108 Q55 102 60 108 Q65 100 75 105" 
+        stroke="#FFD700" stroke-width="2" fill="none"/>
+  <path d="M28 110 L35 115 M72 110 L65 115" stroke="#9B30FF" stroke-width="2"/>
+</svg>
+

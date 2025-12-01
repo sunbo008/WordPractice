@@ -6,9 +6,11 @@
       <stop offset="100%" style="stop-color:#740001"/>
     </linearGradient>
     <linearGradient id="goldBorderHP" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#ffd700"/>
-      <stop offset="50%" style="stop-color:#c9a227"/>
-      <stop offset="100%" style="stop-color:#ffd700"/>
+      <stop offset="0%" style="stop-color:#9B30FF"/>
+      <stop offset="25%" style="stop-color:#FFD700"/>
+      <stop offset="50%" style="stop-color:#9B30FF"/>
+      <stop offset="75%" style="stop-color:#FFD700"/>
+      <stop offset="100%" style="stop-color:#9B30FF"/>
     </linearGradient>
   </defs>
   
@@ -16,11 +18,11 @@
         fill="url(#hpShield)" stroke="url(#goldBorderHP)" stroke-width="3"/>
   
   <!-- 闪电图案 -->
-  <path d="M55 20 L45 40 L52 40 L42 60 L60 35 L50 35 L58 20" fill="#ffd700" stroke="#c9a227" stroke-width="1"/>
+  <path d="M55 20 L45 40 L52 40 L42 60 L60 35 L50 35 L58 20" fill="#FFD700" stroke="#9B30FF" stroke-width="1"/>
   
   <!-- 魔法帽轮廓 -->
-  <path d="M30 70 L50 50 L70 70 L60 70 L50 80 L40 70 Z" fill="none" stroke="#ffd700" stroke-width="1.5"/>
+  <path d="M30 70 L50 50 L70 70 L60 70 L50 80 L40 70 Z" fill="none" stroke="#9B30FF" stroke-width="1.5"/>
   
-  <text x="50" y="95" text-anchor="middle" font-family="Georgia, serif" font-size="8" fill="#ffd700" font-weight="bold" letter-spacing="1">HARRY POTTER</text>
+  <text x="50" y="95" text-anchor="middle" font-family="Georgia, serif" font-size="8" fill="#9B30FF" font-weight="bold" letter-spacing="1">HARRY POTTER</text>
 </svg>
 

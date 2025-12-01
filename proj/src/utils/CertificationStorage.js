@@ -7,6 +7,38 @@ class CertificationStorage {
     constructor() {
         this.STORAGE_KEY = 'wordTetris_certification';
         this.COOLDOWN_DURATION = 30 * 60 * 1000; // 30分钟冷却时间（毫秒）
+        
+        // 段位徽章配置
+        this.TIER_BADGES = {
+            bronze: {
+                name: '青铜',
+                icon: '🥉',
+                color: '#CD7F32',
+                file: 'tier-bronze-badge.svg',
+                requiredBadges: ['phonics']
+            },
+            silver: {
+                name: '白银',
+                icon: '🥈',
+                color: '#C0C0C0',
+                file: 'tier-silver-badge.svg',
+                requiredBadges: ['grade3', 'grade4', 'grade5', 'grade6']
+            },
+            gold: {
+                name: '黄金',
+                icon: '🥇',
+                color: '#FFD700',
+                file: 'tier-gold-badge.svg',
+                requiredBadges: ['flyGuy', 'magicTreeHouse', 'middleSchool', 'highSchool']
+            },
+            king: {
+                name: '王者',
+                icon: '👑',
+                color: '#9B30FF',
+                file: 'tier-king-badge.svg',
+                requiredBadges: ['dragonBall', 'harryPotter', 'cet4']
+            }
+        };
     }
 
     /**
@@ -122,6 +154,14 @@ class CertificationStorage {
                         advancedVocab: this._createLevelData()
                     }
                 }
+            },
+            
+            // 段位徽章
+            tierBadges: {
+                bronze: { earned: false, earnedAt: null },
+                silver: { earned: false, earnedAt: null },
+                gold: { earned: false, earnedAt: null },
+                king: { earned: false, earnedAt: null }
             }
         };
     }
@@ -306,6 +346,94 @@ class CertificationStorage {
         });
         
         return badges;
+    }
+    
+    /**
+     * 检查段位徽章是否应该点亮
+     * @param {string} tier - 段位名称 (bronze, silver, gold, king)
+     * @param {Array} earnedBadgeIds - 已获得的分级徽章 ID 列表
+     * @returns {boolean}
+     */
+    isTierBadgeEarned(tier, earnedBadgeIds) {
+        const tierConfig = this.TIER_BADGES[tier];
+        if (!tierConfig) return false;
+        return tierConfig.requiredBadges.every(badgeId => earnedBadgeIds.includes(badgeId));
+    }
+    
+    /**
+     * 检查并更新所有段位徽章状态
+     * @param {Object} progress - 考级进度数据
+     * @returns {Array} 新点亮的段位徽章列表
+     */
+    checkAndUpdateTierBadges(progress) {
+        const earnedBadges = this.getEarnedBadges(progress);
+        const earnedBadgeIds = earnedBadges.map(b => b.id);
+        const newlyEarned = [];
+        
+        // 确保 tierBadges 存在
+        if (!progress.tierBadges) {
+            progress.tierBadges = {
+                bronze: { earned: false, earnedAt: null },
+                silver: { earned: false, earnedAt: null },
+                gold: { earned: false, earnedAt: null },
+                king: { earned: false, earnedAt: null }
+            };
+        }
+        
+        // 检查每个段位
+        for (const tier of ['bronze', 'silver', 'gold', 'king']) {
+            if (!progress.tierBadges[tier].earned && this.isTierBadgeEarned(tier, earnedBadgeIds)) {
+                progress.tierBadges[tier].earned = true;
+                progress.tierBadges[tier].earnedAt = Date.now();
+                newlyEarned.push({
+                    tier,
+                    ...this.TIER_BADGES[tier]
+                });
+            }
+        }
+        
+        return newlyEarned;
+    }
+    
+    /**
+     * 获取当前最高段位
+     * @param {Object} progress - 考级进度数据
+     * @returns {Object|null} 最高段位信息，或 null（未点亮任何段位）
+     */
+    getHighestTier(progress) {
+        if (!progress.tierBadges) return null;
+        
+        const tierOrder = ['king', 'gold', 'silver', 'bronze'];
+        for (const tier of tierOrder) {
+            if (progress.tierBadges[tier]?.earned) {
+                return {
+                    tier,
+                    ...this.TIER_BADGES[tier]
+                };
+            }
+        }
+        return null;
+    }
+    
+    /**
+     * 获取已获得的段位徽章列表
+     * @param {Object} progress - 考级进度数据
+     * @returns {Array}
+     */
+    getEarnedTierBadges(progress) {
+        const earned = [];
+        if (!progress.tierBadges) return earned;
+        
+        for (const tier of ['bronze', 'silver', 'gold', 'king']) {
+            if (progress.tierBadges[tier]?.earned) {
+                earned.push({
+                    tier,
+                    earnedAt: progress.tierBadges[tier].earnedAt,
+                    ...this.TIER_BADGES[tier]
+                });
+            }
+        }
+        return earned;
     }
     
     /**

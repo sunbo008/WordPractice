@@ -21,6 +21,42 @@ class CertificationPage {
             'highSchool': { file: 'high-badge.svg', name: '高中', encourage: '高中词汇全部掌握，大学之门为你敞开！' },
             'cet4': { file: 'cet4-badge.svg', name: '四级', encourage: '四级词汇已征服，你已是真正的英语高手！' }
         };
+        
+        // 段位配置
+        this.tierConfig = {
+            bronze: {
+                name: '青铜',
+                icon: '🥉',
+                color: '#CD7F32',
+                file: 'tier-bronze-badge.svg',
+                badges: ['phonics'],
+                encourage: '踏上征程，青铜之路已开启！'
+            },
+            silver: {
+                name: '白银',
+                icon: '🥈',
+                color: '#C0C0C0',
+                file: 'tier-silver-badge.svg',
+                badges: ['grade3', 'grade4', 'grade5', 'grade6'],
+                encourage: '稳扎稳打，白银殿堂等着你！'
+            },
+            gold: {
+                name: '黄金',
+                icon: '🥇',
+                color: '#FFD700',
+                file: 'tier-gold-badge.svg',
+                badges: ['flyGuy', 'magicTreeHouse', 'middleSchool', 'highSchool'],
+                encourage: '实力超群，黄金荣耀属于你！'
+            },
+            king: {
+                name: '王者',
+                icon: '👑',
+                color: '#9B30FF',
+                file: 'tier-king-badge.svg',
+                badges: ['dragonBall', 'harryPotter', 'cet4'],
+                encourage: '登峰造极，王者无敌！'
+            }
+        };
     }
 
     /**
@@ -231,10 +267,14 @@ class CertificationPage {
             earnedMap[b.id] = b.earnedAt;
         });
         
+        // 获取段位徽章状态
+        const tierBadges = progress.tierBadges || {};
+        
         // 测试模式：test=2 时开启所有徽章
         const urlParams = new URLSearchParams(window.location.search);
         const isTestMode = urlParams.get('test') === '2';
         if (isTestMode) {
+            // 开启所有分级徽章
             const allBadgeIds = Object.keys(this.badgeMap);
             const testTime = Date.now();
             allBadgeIds.forEach(id => {
@@ -242,14 +282,16 @@ class CertificationPage {
                     earnedMap[id] = testTime;
                 }
             });
+            // 开启所有段位徽章
+            ['bronze', 'silver', 'gold', 'king'].forEach(tier => {
+                if (!tierBadges[tier]) {
+                    tierBadges[tier] = { earned: true, earnedAt: testTime };
+                } else if (!tierBadges[tier].earned) {
+                    tierBadges[tier].earned = true;
+                    tierBadges[tier].earnedAt = testTime;
+                }
+            });
         }
-
-        // 基础系列
-        const basicBadges = ['phonics', 'grade3', 'grade4', 'grade5', 'grade6'];
-        // 课外阅读系列
-        const readingBadges = ['flyGuy', 'magicTreeHouse', 'dragonBall', 'harryPotter'];
-        // 升学系列
-        const academicBadges = ['middleSchool', 'highSchool', 'cet4'];
 
         const formatDate = (timestamp) => {
             if (!timestamp) return '';
@@ -266,47 +308,85 @@ class CertificationPage {
             return null;
         };
 
-        const renderBadgeRow = (badges, label) => {
-            const badgesHtml = badges.map(id => {
-                const info = this.badgeMap[id];
-                const earnedAt = earnedMap[id];
-                const earned = !!earnedAt;
-                const filePrefix = earned ? info.file : info.file.replace('.svg', '-gray.svg');
-                
-                // 检查是否显示亮星（测试模式下全部显示亮星）
-                const seriesInfo = getBadgeSeriesInfo(id);
-                const showStar = isTestMode || (seriesInfo && this.certSystem.shouldShowStar(seriesInfo.series, seriesInfo.major));
-                const starHtml = showStar ? '<span class="badge-hall-star">⭐</span>' : '';
-                
-                const tooltip = earned 
-                    ? `🏅 ${info.name}\n${info.encourage}\n\n解锁于: ${formatDate(earnedAt)}${showStar ? '\n🌟 全满分成就！' : ''}` 
-                    : `🔒 ${info.name}\n未解锁`;
-                const passedBadgeHtml = earned ? '<span class="badge-hall-passed">🏅</span>' : '';
-                return `
-                    <div class="badge-slot ${earned ? 'earned' : 'locked'}" title="${tooltip}">
-                        <div class="badge-img-wrapper">
-                            <img src="assets/badges/${filePrefix}" alt="${info.name}">
-                            ${starHtml}
-                            ${passedBadgeHtml}
-                        </div>
-                        <div class="badge-slot-name">${info.name}</div>
-                    </div>
-                `;
-            }).join('');
-
+        // 渲染单个分级徽章
+        const renderBadge = (id) => {
+            const info = this.badgeMap[id];
+            const earnedAt = earnedMap[id];
+            const earned = !!earnedAt;
+            const filePrefix = earned ? info.file : info.file.replace('.svg', '-gray.svg');
+            
+            // 检查是否显示亮星（测试模式下全部显示亮星）
+            const seriesInfo = getBadgeSeriesInfo(id);
+            const showStar = isTestMode || (seriesInfo && this.certSystem.shouldShowStar(seriesInfo.series, seriesInfo.major));
+            const starHtml = showStar ? '<span class="badge-hall-star">⭐</span>' : '';
+            
+            const tooltip = earned 
+                ? `🏅 ${info.name}\n${info.encourage}\n\n解锁于: ${formatDate(earnedAt)}${showStar ? '\n🌟 全满分成就！' : ''}` 
+                : `🔒 ${info.name}\n未解锁`;
+            const passedBadgeHtml = earned ? '<span class="badge-hall-passed">🏅</span>' : '';
+            
             return `
-                <div class="badge-section">
-                    <div class="badge-section-label">${label}</div>
-                    <div class="badge-row">${badgesHtml}</div>
+                <div class="badge-slot ${earned ? 'earned' : 'locked'}" title="${tooltip}">
+                    <div class="badge-img-wrapper">
+                        <img src="assets/badges/${filePrefix}" alt="${info.name}">
+                        ${starHtml}
+                        ${passedBadgeHtml}
+                    </div>
+                    <div class="badge-slot-name">${info.name}</div>
+                </div>
+            `;
+        };
+
+        // 渲染段位徽章
+        const renderTierBadge = (tierId) => {
+            const tier = this.tierConfig[tierId];
+            const tierData = tierBadges[tierId] || { earned: false, earnedAt: null };
+            const earned = tierData.earned;
+            const filePrefix = earned ? tier.file : tier.file.replace('.svg', '-gray.svg');
+            
+            const tooltip = earned 
+                ? `${tier.icon} ${tier.name}段位\n${tier.encourage}\n\n解锁于: ${formatDate(tierData.earnedAt)}` 
+                : `🔒 ${tier.name}段位\n完成本段位所有徽章后解锁`;
+            
+            return `
+                <div class="badge-slot tier-badge ${earned ? 'earned' : 'locked'}" title="${tooltip}">
+                    <div class="badge-img-wrapper tier-badge-wrapper">
+                        <img src="assets/badges/${filePrefix}" alt="${tier.name}段位">
+                    </div>
+                    <div class="badge-slot-name tier-badge-name" style="color: ${earned ? tier.color : '#666'}">${tier.icon} ${tier.name}</div>
+                </div>
+            `;
+        };
+
+        // 渲染段位行
+        const renderTierRow = (tierId) => {
+            const tier = this.tierConfig[tierId];
+            const tierData = tierBadges[tierId] || { earned: false, earnedAt: null };
+            const tierEarned = tierData.earned;
+            
+            const badgesHtml = tier.badges.map(id => renderBadge(id)).join('');
+            const tierBadgeHtml = renderTierBadge(tierId);
+            
+            return `
+                <div class="badge-section tier-section tier-${tierId}" style="--tier-color: ${tier.color}">
+                    <div class="tier-row-container">
+                        <div class="tier-badge-left">
+                            ${tierBadgeHtml}
+                        </div>
+                        <div class="badge-row badge-row-center">
+                            ${badgesHtml}
+                        </div>
+                    </div>
                 </div>
             `;
         };
 
         container.innerHTML = `
             <h2 class="badge-hall-title">徽章悬挂区</h2>
-            ${renderBadgeRow(basicBadges, '基础系列')}
-            ${renderBadgeRow(readingBadges, '课外阅读系列')}
-            ${renderBadgeRow(academicBadges, '升学系列')}
+            ${renderTierRow('bronze')}
+            ${renderTierRow('silver')}
+            ${renderTierRow('gold')}
+            ${renderTierRow('king')}
         `;
     }
 

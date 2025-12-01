@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120">
+  <defs>
+    <linearGradient id="graySilverShield" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#7A7A7A"/>
+      <stop offset="30%" style="stop-color:#5A5A5A"/>
+      <stop offset="50%" style="stop-color:#6A6A6A"/>
+      <stop offset="70%" style="stop-color:#606060"/>
+      <stop offset="100%" style="stop-color:#7A7A7A"/>
+    </linearGradient>
+    <linearGradient id="graySilverBorder" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8A8A8A"/>
+      <stop offset="50%" style="stop-color:#5A5A5A"/>
+      <stop offset="100%" style="stop-color:#8A8A8A"/>
+    </linearGradient>
+    <filter id="graySilverShadow">
+      <feOffset dx="0" dy="2"/>
+      <feGaussianBlur stdDeviation="2" result="offset-blur"/>
+      <feComposite operator="out" in="SourceGraphic" in2="offset-blur" result="inverse"/>
+      <feFlood flood-color="black" flood-opacity="0.3" result="color"/>
+      <feComposite operator="in" in="color" in2="inverse" result="shadow"/>
+      <feComposite operator="over" in="shadow" in2="SourceGraphic"/>
+    </filter>
+  </defs>
+  
+  <!-- 盾牌主体 -->
+  <path d="M50 5 L90 20 L90 55 Q90 85 50 110 Q10 85 10 55 L10 20 Z" 
+        fill="url(#graySilverShield)" stroke="url(#graySilverBorder)" stroke-width="4" filter="url(#graySilverShadow)"/>
+  
+  <!-- 中心圆环 -->
+  <circle cx="50" cy="48" r="22" fill="none" stroke="url(#graySilverBorder)" stroke-width="3"/>
+  <circle cx="50" cy="48" r="17" fill="#4A4A4A"/>
+  
+  <!-- 书本图案 -->
+  <rect x="38" y="38" width="24" height="18" fill="#505050" rx="2"/>
+  <rect x="40" y="40" width="20" height="14" fill="#6A6A6A" rx="1"/>
+  <line x1="50" y1="40" x2="50" y2="54" stroke="#505050" stroke-width="1"/>
+  
+  <!-- 段位名称 -->
+  <text x="50" y="88" text-anchor="middle" font-family="Georgia, serif" font-size="10" fill="#606060" letter-spacing="2" font-weight="bold">SILVER</text>
+  
+  <!-- 月桂枝装饰 -->
+  <path d="M18 95 Q25 88 32 95 Q25 90 18 95" fill="#5A5A5A"/>
+  <path d="M20 100 Q27 93 34 100 Q27 95 20 100" fill="#5A5A5A"/>
+  <path d="M82 95 Q75 88 68 95 Q75 90 82 95" fill="#5A5A5A"/>
+  <path d="M80 100 Q73 93 66 100 Q73 95 80 100" fill="#5A5A5A"/>
+  
+  <!-- 底部丝带 -->
+  <path d="M30 108 L38 113 L50 108 L62 113 L70 108" stroke="#5A5A5A" stroke-width="2.5" fill="none"/>
+</svg>
+

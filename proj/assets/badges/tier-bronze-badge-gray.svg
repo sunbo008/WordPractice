@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" width="100" height="120">
+  <defs>
+    <linearGradient id="grayShield" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6B6B6B"/>
+      <stop offset="30%" style="stop-color:#4A4A4A"/>
+      <stop offset="70%" style="stop-color:#6B6B6B"/>
+      <stop offset="100%" style="stop-color:#5A5A5A"/>
+    </linearGradient>
+    <linearGradient id="grayBorder" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8A8A8A"/>
+      <stop offset="50%" style="stop-color:#5A5A5A"/>
+      <stop offset="100%" style="stop-color:#8A8A8A"/>
+    </linearGradient>
+    <filter id="grayShadow">
+      <feOffset dx="0" dy="2"/>
+      <feGaussianBlur stdDeviation="2" result="offset-blur"/>
+      <feComposite operator="out" in="SourceGraphic" in2="offset-blur" result="inverse"/>
+      <feFlood flood-color="black" flood-opacity="0.4" result="color"/>
+      <feComposite operator="in" in="color" in2="inverse" result="shadow"/>
+      <feComposite operator="over" in="shadow" in2="SourceGraphic"/>
+    </filter>
+  </defs>
+  
+  <!-- 盾牌主体 -->
+  <path d="M50 5 L90 20 L90 55 Q90 85 50 110 Q10 85 10 55 L10 20 Z" 
+        fill="url(#grayShield)" stroke="url(#grayBorder)" stroke-width="4" filter="url(#grayShadow)"/>
+  
+  <!-- 锈迹装饰（灰色） -->
+  <circle cx="20" cy="35" r="4" fill="#5A5A5A" opacity="0.4"/>
+  <circle cx="80" cy="40" r="3" fill="#5A5A5A" opacity="0.3"/>
+  <circle cx="25" cy="70" r="3" fill="#5A5A5A" opacity="0.3"/>
+  
+  <!-- 中心圆环 -->
+  <circle cx="50" cy="50" r="25" fill="none" stroke="url(#grayBorder)" stroke-width="3"/>
+  <circle cx="50" cy="50" r="20" fill="#3A3A3A" opacity="0.8"/>
+  
+  <!-- 音标符号 /æ/ -->
+  <text x="50" y="58" text-anchor="middle" font-family="Georgia, serif" font-size="22" fill="#8A8A8A" font-style="italic">/æ/</text>
+  
+  <!-- 段位名称 -->
+  <text x="50" y="90" text-anchor="middle" font-family="Georgia, serif" font-size="10" fill="#8A8A8A" letter-spacing="2" font-weight="bold">BRONZE</text>
+  
+  <!-- 橄榄枝装饰 -->
+  <path d="M20 100 Q30 95 38 102 M22 102 Q30 98 36 104" stroke="#5A5A5A" stroke-width="1.5" fill="none"/>
+  <path d="M80 100 Q70 95 62 102 M78 102 Q70 98 64 104" stroke="#5A5A5A" stroke-width="1.5" fill="none"/>
+  
+  <!-- 底部丝带 -->
+  <path d="M30 108 L38 113 L50 108 L62 113 L70 108" stroke="#5A5A5A" stroke-width="2.5" fill="none"/>
+</svg>
+
